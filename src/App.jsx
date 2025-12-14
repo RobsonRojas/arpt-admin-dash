@@ -1,64 +1,85 @@
-import React, { useState, useMemo } from 'react';
-import { ThemeProvider, CssBaseline, Box, Dialog, DialogTitle, DialogContent } from '@mui/material';
+
+import React, { useState, useEffect } from 'react';
+import { ThemeProvider, CssBaseline, Box, AppBar, Toolbar, Typography, IconButton, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, CircularProgress } from '@mui/material';
+import { Menu, Dashboard, Forest, Folder, People, Logout } from '@mui/icons-material';
+import { initializeApp } from 'firebase/app';
+import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { theme } from './utils/theme';
-import { INITIAL_PROJECTS } from './utils/constants';
+import Login from './Login';
+import DashboardView from './modules/DashboardView';
+import NecromassaView from './modules/NecromassaView';
+import ProjectsView from './modules/ProjectsView';
+import SponsorsView from './modules/SponsorsView';
 
-// Layout
-import Sidebar from './components/layout/Sidebar';
-import TopBar from './components/layout/TopBar';
+// CONFIGURAÇÃO FIREBASE - SUBSTITUA AQUI
 
-// Modules
-import DashboardView from './components/modules/DashboardView';
-import NecromassaView from './components/modules/NecromassaView';
-import ProjectsView from './components/modules/ProjectsView';
-import SponsorsView from './components/modules/SponsorsView';
-import FieldAppEmbedded from './components/modules/FieldAppEmbedded';
+  const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
+};
+
+// Init Firebase Safe
+let auth;
+try { 
+  const app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+} catch(e) { console.log("Firebase init error", e); }
 
 export default function App() {
-  const [currentView, setCurrentView] = useState('dashboard');
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [openCadastro, setOpenCadastro] = useState(false);
-  const [projects, setProjects] = useState(INITIAL_PROJECTS);
+  const [user, setUser] = useState(null);
+  const [view, setView] = useState('dashboard');
+  const [drawer, setDrawer] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const stats = useMemo(() => ({
-      area: 1650, investimento: 205000, pendentes: 1, aprovados: 1
-  }), []);
+  useEffect(() => {
+    if(auth) {
+        const unsub = onAuthStateChanged(auth, u => { setUser(u); setLoading(false); });
+        return () => unsub();
+    } else { setLoading(false); }
+  }, []);
 
-  const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
-  
-  const handleStatusChange = (id, newStatus) => {
-    setProjects(prev => prev.map(p => p.id === id ? { ...p, status: newStatus } : p));
-  };
+  if(loading) return <CircularProgress />;
+  if(!user && auth) return <ThemeProvider theme={theme}><CssBaseline /><Login /></ThemeProvider>;
+  // Fallback demo mode if auth fails to init
+  if(!auth) console.warn("Running in No-Auth Demo Mode");
 
-  const handleSaveNewProject = (p) => { 
-      setProjects([...projects, p]); 
-      setOpenCadastro(false); 
+  const renderView = () => {
+    switch(view) {
+      case 'dashboard': return <DashboardView />;
+      case 'necromassa': return <NecromassaView />;
+      case 'projects': return <ProjectsView />;
+      case 'sponsors': return <SponsorsView />;
+      default: return <DashboardView />;
+    }
   };
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f4f6f8' }}>
-        <CssBaseline />
-        <TopBar handleDrawerToggle={handleDrawerToggle} currentView={currentView} />
-        <Sidebar mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle} currentView={currentView} setCurrentView={setCurrentView} />
-        
-        <Box component="main" sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - 240px)` } }}>
-          <ToolbarSpacer />
-          
-          {currentView === 'dashboard' && <DashboardView stats={stats} projects={projects} />}
-          {currentView === 'necromassa' && <NecromassaView />}
-          {currentView === 'projects' && <ProjectsView projects={projects} onStatusChange={handleStatusChange} onOpenCadastro={() => setOpenCadastro(true)} />}
-          {currentView === 'sponsors' && <SponsorsView />}
-
-          <Dialog open={openCadastro} onClose={() => setOpenCadastro(false)} fullWidth maxWidth="md">
-             <DialogTitle>Novo Cadastro de Manejo</DialogTitle>
-             <DialogContent><FieldAppEmbedded onClose={() => setOpenCadastro(false)} onSave={handleSaveNewProject} /></DialogContent>
-          </Dialog>
+      <CssBaseline />
+      <AppBar position="fixed" sx={{ zIndex: 1201 }}>
+        <Toolbar>
+          <IconButton color="inherit" onClick={()=>setDrawer(!drawer)} sx={{ mr: 2 }}><Menu /></IconButton>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>ARPT Admin</Typography>
+          {auth && <IconButton color="inherit" onClick={()=>signOut(auth)}><Logout /></IconButton>}
+        </Toolbar>
+      </AppBar>
+      <Box display="flex">
+        <Drawer open={drawer} onClose={()=>setDrawer(false)} sx={{ width: 240, flexShrink: 0, '& .MuiDrawer-paper': { width: 240, boxSizing: 'border-box', mt: 8 } }} variant="temporary">
+          <List>
+            <ListItem disablePadding><ListItemButton onClick={()=>{setView('dashboard');setDrawer(false)}}><ListItemIcon><Dashboard/></ListItemIcon><ListItemText primary="Dashboard"/></ListItemButton></ListItem>
+            <ListItem disablePadding><ListItemButton onClick={()=>{setView('necromassa');setDrawer(false)}}><ListItemIcon><Forest/></ListItemIcon><ListItemText primary="Necromassa"/></ListItemButton></ListItem>
+            <ListItem disablePadding><ListItemButton onClick={()=>{setView('projects');setDrawer(false)}}><ListItemIcon><Folder/></ListItemIcon><ListItemText primary="Projetos"/></ListItemButton></ListItem>
+            <ListItem disablePadding><ListItemButton onClick={()=>{setView('sponsors');setDrawer(false)}}><ListItemIcon><People/></ListItemIcon><ListItemText primary="Patrocinadores"/></ListItemButton></ListItem>
+          </List>
+        </Drawer>
+        <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 8, width: '100%' }}>
+          {renderView()}
         </Box>
       </Box>
     </ThemeProvider>
   );
 }
-
-// Simple spacer component
-const ToolbarSpacer = () => <div style={{ minHeight: 64 }} />;
