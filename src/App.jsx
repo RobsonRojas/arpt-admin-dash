@@ -259,14 +259,3 @@ export default function App() {
     </ThemeProvider>
   );
 }
-
-// import RoutesMain from "./routes/routesMain.jsx";
-
-// const App = () => {
-
-//   return (
-//     <RoutesMain />
-//   )
-// };
-
-// export default App;
