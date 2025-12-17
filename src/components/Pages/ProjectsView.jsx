@@ -1,10 +1,35 @@
-import React, { useState, useMemo } from 'react';
-import { Box, Paper, Toolbar, Typography, TextField, MenuItem, Button, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Drawer, Divider, List, ListItem, ListItemText } from '@mui/material';
+import React, { useState, useMemo, useEffect } from 'react';
+import {
+    Box,
+    Paper,
+    Toolbar,
+    Typography,
+    TextField,
+    MenuItem,
+    Button,
+    TableContainer,
+    Table,
+    TableHead,
+    TableRow,
+    TableCell,
+    TableBody,
+    IconButton,
+    Drawer,
+    Divider,
+    List,
+    ListItem,
+    ListItemText
+} from '@mui/material';
 import { Search, Add, Visibility } from '@mui/icons-material';
-import { StatusChip, RiskChip } from '../common/Chips';
-import MapEmbed from '../common/MapEmbed';
+import { StatusChip, RiskChip } from '../components/common/Chips';
+import MapEmbed from '../components/common/MapEmbed';
+import { AdminContext } from '../providers/adminProviders';
+import { useContext } from 'react';
 
-const ProjectsView = ({ projects, onStatusChange, onOpenCadastro }) => {
+const ProjectsView = ({ onStatusChange, onOpenCadastro }) => {
+    const { 
+        projects
+    } = useContext(AdminContext);
     const [searchTerm, setSearchTerm] = useState("");
     const [filterStatus, setFilterStatus] = useState("Todos");
     const [selectedProject, setSelectedProject] = useState(null);
@@ -19,6 +44,11 @@ const ProjectsView = ({ projects, onStatusChange, onOpenCadastro }) => {
             return matchesSearch && matchesStatus;
         });
     }, [projects, searchTerm, filterStatus]);
+
+    useEffect(() => {
+        console.log("Projects =>", projects);
+    }, []);
+
 
     return (
         <Box sx={{ animation: 'fadeIn 0.5s' }}>

@@ -28,6 +28,8 @@ const firebaseConfig = {
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
   appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
+import { AdminContext } from './providers/adminProviders.jsx';
+import { useContext } from 'react';
 
 let app, auth;
 try { app = initializeApp(firebaseConfig); auth = getAuth(app); } catch (e) { console.log("Firebase mock init"); }
@@ -159,7 +161,7 @@ const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
                   <Grid item xs={12}><TextField fullWidth label="Nome do Projeto" value={formData.descricao} onChange={e=>setFormData({...formData, descricao: e.target.value})} /></Grid>
                   <Grid item xs={6}><TextField fullWidth label="Município" value={formData.municipio} onChange={e=>setFormData({...formData, municipio: e.target.value})} /></Grid>
                   <Grid item xs={6}><TextField fullWidth label="Tamanho (ha)" type="number" value={formData.tamanho} onChange={e=>setFormData({...formData, tamanho: e.target.value})} /></Grid>
-                  <Grid item xs={12}><TextField fullWidth label="Custo Operacional (R$)" type="number" value={formData.custo} onChange={e=>setFormData({...formData, custo: e.target.value})} /></Grid>
+                  <Grid item xs={12}><TextField fullWidth label="Custo Operacional (R$)" type="number" value={formData.custo_operacional} onChange={e=>setFormData({...formData, custo_operacional: e.target.value})} /></Grid>
               </Grid>
           ) : (
               <Alert severity="info">Confirme: {formData.descricao}, {formData.municipio}, {formData.tamanho} ha.</Alert>
@@ -181,8 +183,8 @@ const ProjectsView = ({ projects, onSave, onEdit }) => {
                 {projects.map(p => (
                     <TableRow key={p.id}>
                         <TableCell>{p.descricao}</TableCell>
-                        <TableCell><Chip label={p.status} color={p.status==='Aprovado'?'success':'warning'} size="small"/></TableCell>
-                        <TableCell>R$ {p.custo}</TableCell>
+                        <TableCell><Chip label={p.id_status===5?'Em Captação': p.id_status=== 1 ? 'Em Digitação' : 'Em Análise'} color={p.id_status===5?'success':'warning'} size="small"/></TableCell>
+                        <TableCell>R$ {p.custo_operacional}</TableCell>
                         <TableCell><IconButton onClick={() => onEdit(p)}><Edit/></IconButton><IconButton><Visibility/></IconButton></TableCell>
                     </TableRow>
                 ))}
@@ -201,13 +203,16 @@ const Login = () => {
 
 // --- APP ---
 export default function App() {
+  const { 
+    projects
+  } = useContext(AdminContext);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState('dashboard');
   const [drawer, setDrawer] = useState(false);
   
   // Projects State
-  const [projects, setProjects] = useState(INITIAL_PROJECTS);
+
   const [openProjectWizard, setOpenProjectWizard] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
 
@@ -225,7 +230,7 @@ export default function App() {
   const openWizard = (p) => { setEditingProject(p); setOpenProjectWizard(true); };
 
   if (loading) return <CircularProgress />;
-  if (!user && auth) return <ThemeProvider theme={THEME}><CssBaseline/><Login/></ThemeProvider>;
+  // if (!user && auth) return <ThemeProvider theme={THEME}><CssBaseline/><Login/></ThemeProvider>;
 
   return (
     <ThemeProvider theme={THEME}>
@@ -254,3 +259,14 @@ export default function App() {
     </ThemeProvider>
   );
 }
+
+// import RoutesMain from "./routes/routesMain.jsx";
+
+// const App = () => {
+
+//   return (
+//     <RoutesMain />
+//   )
+// };
+
+// export default App;
