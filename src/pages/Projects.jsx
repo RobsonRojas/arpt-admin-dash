@@ -124,7 +124,7 @@ export const Projects = () => {
             alignItems:'center' 
           }}
         >
-          {editingProject ? `Editar: ${editingProject.id}` : "Novo Cadastro de Manejo"}
+          {editingProject ? `Editar: ${editingProject.descricao}` : "Novo Cadastro de Manejo"}
           <IconButton onClick={handleCloseCadastro} sx={{color:'white'}}>
             <Close/>
           </IconButton>

@@ -53,18 +53,99 @@ export const AdminProvider = ({ children }) => {
         getProjects();
     }, []);
 
+    // Helper: normaliza payload para API (tipos e campos exigidos)
+    const normalizeProjectForApi = (p) => {
+        const statusMap = {
+            'Em digitacao': 1,
+            'Aguardando inventario': 2,
+            'Inventariado': 3,
+            'Finalizado prospecção': 4,
+            'Em captação': 5,
+            // Fallback para possíveis desc_status antigos
+            'Em Análise': 2,
+            'Ativo': 3,
+        };
+
+        const numericStatus = (() => {
+            if (p == null) return 1;
+            // Se já vier status numérico
+            if (typeof p.status === 'number' && p.status > 0) return p.status;
+            const st = Number(p.status);
+            if (!Number.isNaN(st) && st > 0) return st;
+            
+            // Se vier id_status numérico
+            if (p.id_status != null) {
+                const is = Number(p.id_status);
+                if (!Number.isNaN(is) && is > 0) return is;
+            }
+            // cod_status existente
+            if (p.cod_status != null) {
+                const cs = Number(p.cod_status);
+                if (!Number.isNaN(cs) && cs > 0) return cs;
+            }
+            // desc_status mapeado
+            if (p.desc_status && statusMap[p.desc_status]) return statusMap[p.desc_status];
+            // status textual comum
+            if (typeof p.status === 'string' && statusMap[p.status]) return statusMap[p.status];
+            
+            return 1;
+        })();
+
+        // Mapear apenas os campos que a API espera para UPDATE
+        const payload = {
+            id: p.id,
+            descricao: p.descricao || '',
+            resumo: p.resumo || '',
+            detalhes: p.detalhes || '',
+            estado: p.estado || '',
+            municipio: p.municipio || '',
+            potencial: p.potencial || '',
+            tamanho: Number(p.tamanho || 0),
+            unidade_medida: p.unidade_medida || 'ha',
+            latitude: Number(p.latitude || 0),
+            longitude: Number(p.longitude || 0),
+            ranking: Number(p.ranking || 0),
+            custo_operacional: Number(p.custo_operacional || 0),
+            valor_arrecadado: Number(p.valor_arrecadado || 0),
+            url_doacao: p.url_doacao || '',
+            id_status: numericStatus,
+            // Campos opcionais que podem estar no objeto
+            ...(p.data_inicio && { data_inicio: p.data_inicio }),
+            ...(p.data_termino && { data_termino: p.data_termino }),
+            ...(p.intervalo_tempo_manejo && { intervalo_tempo_manejo: p.intervalo_tempo_manejo }),
+            ...(p.expira_anos && { expira_anos: p.expira_anos }),
+            ...(p.nome && { nome: p.nome }),
+            ...(p.id_propriedade && { id_propriedade: p.id_propriedade }),
+        };
+
+        return payload;
+    };
+
+    const updateProjects = async (newProject) => {
+        try {
+            const payload = normalizeProjectForApi(newProject);
+            const response = await api.put(`/manejos/${newProject.id}`, payload);
+            getProjects();
+        } catch (error) {
+            console.error("❌ Error updating project:", error);
+            if (error.response?.data) {
+                console.error("Detalhes do erro:", error.response.data);
+            }
+        }
+    }
+
     // ==================== REGRAS DE NEGÓCIO - PROJETOS ====================
     
     /**
      * Salvar projeto (criar ou atualizar)
      */
-    const handleSaveProject = (projectData) => {
+    const handleSaveProject = async (projectData) => {
         if (editingProject) {
-        // Atualização de projeto existente
-        setProjects(prev => prev.map(p => p.id === projectData.id ? projectData : p));
+            // Atualização via API para projeto existente
+            await updateProjects(projectData);
         } else {
-        // Criação de novo projeto
-        setProjects(prev => [projectData, ...prev]);
+            // Criação de novo projeto (mantém local por enquanto)
+            setProjects(prev => [projectData, ...prev]);
         }
         setOpenCadastro(false);
         setEditingProject(null);
@@ -260,6 +341,7 @@ export const AdminProvider = ({ children }) => {
         handleDeleteProject,
         handleOpenNewProject,
         handleCloseCadastro,
+        updateProjects,
         
         // Regras de Negócio - Propriedades
         handleAddProperty,
