@@ -56,7 +56,7 @@ export const AdminProvider = ({ children }) => {
     // Helper: normaliza payload para API (tipos e campos exigidos)
     const normalizeProjectForApi = (p) => {
         const statusMap = {
-            'Em digitacao': 1,
+            'Em breve': 1,
             'Aguardando inventario': 2,
             'Inventariado': 3,
             'Finalizado prospecção': 4,
@@ -121,16 +121,30 @@ export const AdminProvider = ({ children }) => {
         return payload;
     };
 
-    const updateProjects = async (newProject) => {
+    const updateProject = async (newProject) => {
+        if (!newProject?.id) {
+            const err = new Error('Projeto inválido: id ausente');
+            console.error(err);
+            throw err;
+        }
+
         try {
             const payload = normalizeProjectForApi(newProject);
             const response = await api.put(`/manejos/${newProject.id}`, payload);
-            getProjects();
-        } catch (error) {
-            console.error("❌ Error updating project:", error);
-            if (error.response?.data) {
-                console.error("Detalhes do erro:", error.response.data);
+            if (response.status === 200) {
+                console.log('Projeto atualizado com sucesso na API.');
+                await getProjects();
+                return response;
             }
+            const unexpected = new Error(`Resposta inesperada ao atualizar projeto: status ${response.status}`);
+            console.warn(unexpected, response);
+            throw unexpected;
+        } catch (error) {
+            console.error('ERROR: Error updating project:', error);
+            if (error.response?.data) {
+                console.error('Detalhes do erro:', error.response.data);
+            }
+            throw error;
         }
     }
 
@@ -140,16 +154,21 @@ export const AdminProvider = ({ children }) => {
      * Salvar projeto (criar ou atualizar)
      */
     const handleSaveProject = async (projectData) => {
-        if (editingProject) {
-            // Atualização via API para projeto existente
-            await updateProjects(projectData);
-        } else {
-            // Criação de novo projeto (mantém local por enquanto)
-            setProjects(prev => [projectData, ...prev]);
+        try {
+            if (editingProject) {
+                // Atualização via API para projeto existente
+                await updateProject(projectData);
+            } else {
+                // Criação de novo projeto (mantém local por enquanto)
+                setProjects(prev => [projectData, ...prev]);
+            }
+            setOpenCadastro(false);
+            setEditingProject(null);
+            setCurrentView('projects');
+        } catch (error) {
+            console.error('ERROR: Error saving project:', error);
+            window.alert('Não foi possível salvar o projeto. Verifique os dados e tente novamente.');
         }
-        setOpenCadastro(false);
-        setEditingProject(null);
-        setCurrentView('projects');
     };
 
     /**
@@ -341,7 +360,7 @@ export const AdminProvider = ({ children }) => {
         handleDeleteProject,
         handleOpenNewProject,
         handleCloseCadastro,
-        updateProjects,
+        updateProject,
         
         // Regras de Negócio - Propriedades
         handleAddProperty,
