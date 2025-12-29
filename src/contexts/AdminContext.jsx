@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { 
-  INITIAL_PROJECTS, 
   INITIAL_PROPERTIES, 
   INITIAL_NECROMASSA, 
   MOCK_SPONSORS 
@@ -29,7 +28,7 @@ export const AdminProvider = ({ children }) => {
     
     // Dados
     const [projects, setProjects] = useState([]);
-    const [properties, setProperties] = useState(INITIAL_PROPERTIES);
+    const [properties, setProperties] = useState([]);
     const [necromassaRequests, setNecromassaRequests] = useState(INITIAL_NECROMASSA);
     const [sponsors] = useState(MOCK_SPONSORS);
     
@@ -48,10 +47,6 @@ export const AdminProvider = ({ children }) => {
             console.error("Error fetching projects:", error);
         }
     }
-
-    useEffect(() => {
-        getProjects();
-    }, []);
 
     // Helper: normaliza payload para API (tipos e campos exigidos)
     const normalizeProjectForApi = (p) => {
@@ -147,6 +142,16 @@ export const AdminProvider = ({ children }) => {
             throw error;
         }
     }
+
+    const getProperties = async () => {
+        
+        const response = await api.get('/propriedades');
+        console.log("Propriedades fetched:", response.data);
+        if (response.status === 200) {
+            setProperties(response.data);
+        }
+
+    };
 
     // ==================== REGRAS DE NEGÓCIO - PROJETOS ====================
     
@@ -330,8 +335,12 @@ export const AdminProvider = ({ children }) => {
         };
     };
 
+    useEffect(() => {
+        getProjects();
+        getProperties();
+    }, []);
+
     // ==================== VALOR DO CONTEXTO ====================
-    
     const value = {
         // Estados
         currentView,
