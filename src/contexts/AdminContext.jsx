@@ -1,8 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { 
-  INITIAL_PROPERTIES, 
-  INITIAL_NECROMASSA, 
-  MOCK_SPONSORS 
+  INITIAL_NECROMASSA,
+  MOCK_SPONSORS
 } from '../constants/mockData';
 import { api } from '../services/api.js';
 
@@ -21,6 +20,7 @@ export const useAdmin = () => {
 // Provider do Context
 export const AdminProvider = ({ children }) => {
     // ==================== ESTADOS ====================
+    const urlMidiasFiles = "https://arpt.site/api/midias/files/";
     
     // Navegação
     const [currentView, setCurrentView] = useState('dashboard');
@@ -144,11 +144,16 @@ export const AdminProvider = ({ children }) => {
     }
 
     const getProperties = async () => {
-        
-        const response = await api.get('/propriedades');
-        console.log("Propriedades fetched:", response.data);
-        if (response.status === 200) {
-            setProperties(response.data);
+
+        try {
+            const response = await api.get('/propriedades');
+            console.log("Propriedades fetched:", response.data);
+            if (response.status === 200) {
+                setProperties(response.data);
+            }
+        } catch (error) {
+            console.error("Error fetching properties:", error);
+            alert("Não foi possível carregar as propriedades. Tente novamente mais tarde.");
         }
 
     };
@@ -354,6 +359,7 @@ export const AdminProvider = ({ children }) => {
         selectedProject,
         searchTerm,
         filterStatus,
+        urlMidiasFiles,
         
         // Setters (para casos específicos)
         setCurrentView,

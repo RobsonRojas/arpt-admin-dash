@@ -11,7 +11,12 @@ import { STATUS_PROPRIEDADE } from '../constants';
 import { useAdmin } from '../contexts/AdminContext';
 
 export const Properties = () => {
-  const { properties, handleAddProperty, handleUpdateProperty } = useAdmin();
+  const {
+    properties,
+    handleAddProperty,
+    handleUpdateProperty,
+    urlMidiasFiles
+  } = useAdmin();
   
   const [openForm, setOpenForm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -114,8 +119,7 @@ export const Properties = () => {
               <TableRow key={row.id} hover>
                 <TableCell>
                   <Box display="flex" alignItems="center" gap={2}>
-                    <Avatar src={`https://arpt.site/api/midias/files/${row.image_internal_path}`} variant="rounded">
-                      {/* {row.image_internal_path} */}
+                    <Avatar src={`${urlMidiasFiles}${row.image_internal_path}`} variant="rounded">
                     </Avatar>
                     <Box>
                       <Typography variant="body2" fontWeight="bold">
@@ -273,7 +277,9 @@ export const Properties = () => {
                 </Grid>
               </Grid>
             </Paper>
-            <MapEmbed lat={selectedProp.latitude} lng={selectedProp.longitude} />
+            {selectedProp.latitude != null && selectedProp.longitude != null && (
+              <MapEmbed lat={selectedProp.latitude} lng={selectedProp.longitude} />
+            )}
           </Box>
         )}
       </Drawer>
