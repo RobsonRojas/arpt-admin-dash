@@ -1,9 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { 
-  INITIAL_PROJECTS, 
-  INITIAL_PROPERTIES, 
-  INITIAL_NECROMASSA, 
-  MOCK_SPONSORS 
+  INITIAL_NECROMASSA,
+  MOCK_SPONSORS
 } from '../constants/mockData';
 import { api } from '../services/api.js';
 
@@ -22,6 +20,7 @@ export const useAdmin = () => {
 // Provider do Context
 export const AdminProvider = ({ children }) => {
     // ==================== ESTADOS ====================
+    const urlMidiasFiles = "https://arpt.site/api/midias/files/";
     
     // Navegação
     const [currentView, setCurrentView] = useState('dashboard');
@@ -29,7 +28,7 @@ export const AdminProvider = ({ children }) => {
     
     // Dados
     const [projects, setProjects] = useState([]);
-    const [properties, setProperties] = useState(INITIAL_PROPERTIES);
+    const [properties, setProperties] = useState([]);
     const [necromassaRequests, setNecromassaRequests] = useState(INITIAL_NECROMASSA);
     const [sponsors] = useState(MOCK_SPONSORS);
     
@@ -48,10 +47,6 @@ export const AdminProvider = ({ children }) => {
             console.error("Error fetching projects:", error);
         }
     }
-
-    useEffect(() => {
-        getProjects();
-    }, []);
 
     // Helper: normaliza payload para API (tipos e campos exigidos)
     const normalizeProjectForApi = (p) => {
@@ -147,6 +142,21 @@ export const AdminProvider = ({ children }) => {
             throw error;
         }
     }
+
+    const getProperties = async () => {
+
+        try {
+            const response = await api.get('/propriedades');
+            console.log("Propriedades fetched:", response.data);
+            if (response.status === 200) {
+                setProperties(response.data);
+            }
+        } catch (error) {
+            console.error("Error fetching properties:", error);
+            alert("Não foi possível carregar as propriedades. Tente novamente mais tarde.");
+        }
+
+    };
 
     // ==================== REGRAS DE NEGÓCIO - PROJETOS ====================
     
@@ -330,8 +340,12 @@ export const AdminProvider = ({ children }) => {
         };
     };
 
+    useEffect(() => {
+        getProjects();
+        getProperties();
+    }, []);
+
     // ==================== VALOR DO CONTEXTO ====================
-    
     const value = {
         // Estados
         currentView,
@@ -345,6 +359,7 @@ export const AdminProvider = ({ children }) => {
         selectedProject,
         searchTerm,
         filterStatus,
+        urlMidiasFiles,
         
         // Setters (para casos específicos)
         setCurrentView,
