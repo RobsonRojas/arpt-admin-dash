@@ -147,7 +147,6 @@ export const AdminProvider = ({ children }) => {
 
         try {
             const response = await api.get('/propriedades');
-            console.log("Propriedades fetched:", response.data);
             if (response.status === 200) {
                 setProperties(response.data);
             }
@@ -157,6 +156,49 @@ export const AdminProvider = ({ children }) => {
         }
 
     };
+
+    const getAllInventoryByPropertyId = async (propertyId) => {
+        try {
+            const response = await api.get(`/inventarios/${propertyId}/arvores`);
+            if (response.status === 200) {
+                return response.data;
+            } else {
+                console.warn(`Resposta inesperada ao buscar inventário: status ${response.status}`);
+                return null;
+            }
+        } catch (error) {
+            console.error("Error fetching inventory by property ID:", error);
+            return null;
+        }
+    }
+
+    const createInventory = async (payload) => {
+        try {
+            const response = await api.post('/inventarios', payload);
+            if (response.status === 201 || response.status === 200) {
+                return response.data;
+            }
+            console.warn(`Resposta inesperada ao criar inventário: status ${response.status}`);
+            return null;
+        } catch (error) {
+            console.error("Error creating inventory:", error);
+            return null;
+        }
+    }
+
+    const createTree = async (inventoryId, payload) => {
+        try {
+            const response = await api.post(`/arvores`, payload);
+            if (response.status === 201 || response.status === 200) {
+                return response.data;
+            }
+            console.warn(`Resposta inesperada ao criar árvore: status ${response.status}`);
+            return null;
+        } catch (error) {
+            console.error("Error creating tree:", error);
+            return null;
+        }
+    }
 
     // ==================== REGRAS DE NEGÓCIO - PROJETOS ====================
     
@@ -394,6 +436,9 @@ export const AdminProvider = ({ children }) => {
         // Regras de Negócio - Utilitários
         getFilteredProjects,
         getDashboardStats,
+        getAllInventoryByPropertyId,
+        createInventory,
+        createTree,
     };
 
     return (
