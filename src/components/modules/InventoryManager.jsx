@@ -72,6 +72,8 @@ export const InventoryManager = ({ property, onClose }) => {
       await loadTrees({ suppressCreatePrompt: true });
       setViewState("list");
       return;
+    } else {
+      window.alert('Não foi possível salvar a árvore. Tente novamente.');
     }
 
     // fallback otimista local
@@ -147,6 +149,7 @@ export const InventoryManager = ({ property, onClose }) => {
       console.error("Erro ao buscar inventário:", error);
       setTrees([]);
       if (!suppressCreatePrompt) setOpenCreateInventory(true);
+      alert('Erro ao carregar inventário. Tente novamente mais tarde.');
     }
   };
 

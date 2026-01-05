@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Box, Typography, Button, Table, TableContainer, TableHead, 
   TableRow, TableCell, TableBody, Paper, IconButton, Avatar,
   Dialog, DialogTitle, DialogContent, DialogActions, Grid, 
-  TextField, MenuItem, Drawer, Divider, List, ListItem, ListItemText
+  TextField, MenuItem, Drawer, Divider,
 } from '@mui/material';
 import { Add, Visibility, Edit, CloudUpload, HomeWork, Park } from '@mui/icons-material';
-import { StatusChip, MapEmbed, InventoryManager } from '../components';
+import { MapEmbed, InventoryManager } from '../components';
 import { STATUS_PROPRIEDADE } from '../constants';
 import { useAdmin } from '../contexts/AdminContext';
 
