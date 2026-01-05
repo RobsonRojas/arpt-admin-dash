@@ -37,7 +37,7 @@ export const TreeForm = ({ initialData, onSave, onCancel, propertyId, inventoryI
         setForm(f => ({ ...f, dap: dapCalc }));
       }
     }
-  }, [form.cap]);
+  }, [form.cap, form.dap]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
