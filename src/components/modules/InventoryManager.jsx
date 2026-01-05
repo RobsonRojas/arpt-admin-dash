@@ -33,16 +33,17 @@ export const InventoryManager = ({ property, onClose }) => {
   });
 
   const handleSaveTree = async (treeData) => {
-    console.log("inventoryId ao salvar árvore:", currentInventoryId);
+
     if (!currentInventoryId) {
       window.alert('Crie um inventário antes de cadastrar árvores.');
       return;
     }
 
     // Gera número automático se não fornecido
+    const normalizedTrees = Array.isArray(trees) ? trees : [];
     const autoNumber = treeData.number 
       ? Number(treeData.number) 
-      : (trees.length > 0 ? Math.max(...trees.map(t => t.number || 0)) + 1 : 1);
+      : (normalizedTrees.length > 0 ? Math.max(...normalizedTrees.map(t => t.number || 0)) + 1 : 1);
 
     // Normaliza payload para API
     const nowIso = new Date().toISOString();
@@ -135,10 +136,10 @@ export const InventoryManager = ({ property, onClose }) => {
         return;
       }
 
-      const inventories = response?.data?.inventories;
+      const inventories = response?.inventories;
       setTrees(inventories);
       // Descobrir o inventoryId
-      const inferredInventoryId = response?.data?.inventoryId;
+      const inferredInventoryId = response?.inventoryId;
       setCurrentInventoryId(inferredInventoryId);
       // Inventário existe: mantém modal fechado mesmo com 0 árvores
       setOpenCreateInventory(false);
