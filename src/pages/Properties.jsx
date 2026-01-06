@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Box, Typography, Button, Table, TableContainer, TableHead, 
   TableRow, TableCell, TableBody, Paper, IconButton, Avatar,
   Dialog, DialogTitle, DialogContent, DialogActions, Grid, 
-  TextField, MenuItem, Drawer, Divider, List, ListItem, ListItemText
+  TextField, MenuItem, Drawer, Divider,
 } from '@mui/material';
-import { Add, Visibility, Edit, CloudUpload, HomeWork } from '@mui/icons-material';
-import { StatusChip, MapEmbed } from '../components';
+import { Add, Visibility, Edit, CloudUpload, HomeWork, Park } from '@mui/icons-material';
+import { MapEmbed, InventoryManager } from '../components';
 import { STATUS_PROPRIEDADE } from '../constants';
 import { useAdmin } from '../contexts/AdminContext';
 
@@ -21,6 +21,7 @@ export const Properties = () => {
   const [openForm, setOpenForm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedProp, setSelectedProp] = useState(null);
+  const [openInventory, setOpenInventory] = useState(false);
   
   const [formData, setFormData] = useState({
     id: '', 
@@ -280,9 +281,33 @@ export const Properties = () => {
             {selectedProp.latitude != null && selectedProp.longitude != null && (
               <MapEmbed lat={selectedProp.latitude} lng={selectedProp.longitude} />
             )}
+            <Button 
+              fullWidth 
+              variant="contained" 
+              color="success" 
+              startIcon={<Park />} 
+              onClick={() => setOpenInventory(true)}
+              sx={{ mt: 2 }}
+            >
+              Gerir Inventário de Árvores
+            </Button>
           </Box>
         )}
       </Drawer>
+
+      {/* Modal Fullscreen de Inventário */}
+      <Dialog 
+        open={openInventory} 
+        onClose={() => setOpenInventory(false)} 
+        fullScreen
+      >
+        {selectedProp && (
+          <InventoryManager 
+            property={selectedProp} 
+            onClose={() => setOpenInventory(false)} 
+          />
+        )}
+      </Dialog>
     </Box>
   );
 };
