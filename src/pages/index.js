@@ -5,3 +5,4 @@ export { Properties } from './Properties';
 export { Necromassa } from './Necromassa';
 export { Sponsors } from './Sponsors';
 export { Login } from './Login';
+export { Users } from './Users';

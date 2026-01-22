@@ -1,7 +1,7 @@
 import { ThemeProvider, CssBaseline, CircularProgress, Box } from '@mui/material';
 import { theme } from './theme';
 import { Layout } from './components';
-import { Dashboard, Projects, Properties, Necromassa, Sponsors, Login } from './pages';
+import { Dashboard, Projects, Properties, Necromassa, Sponsors, Login, Users } from './pages';
 import { useAdmin } from './contexts/AdminContext';
 import { useAuth } from './contexts/AuthContext.jsx';
 
@@ -11,22 +11,25 @@ export default function App() {
 
   // Renderização condicional das páginas
   const renderPage = () => {
-    switch(currentView) {
+    switch (currentView) {
       case 'dashboard':
         return <Dashboard />;
-      
+
       case 'projects':
         return <Projects />;
-      
+
       case 'properties':
         return <Properties />;
-      
+
       case 'necromassa':
         return <Necromassa />;
-      
+
       case 'sponsors':
         return <Sponsors />;
-      
+
+      case 'users':
+        return <Users />;
+
       default:
         return <Dashboard />;
     }

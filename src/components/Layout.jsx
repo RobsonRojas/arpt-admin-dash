@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import {
   Dashboard, FolderOpen, People, Menu as MenuIcon,
-  Landscape, Forest, HomeWork, Logout
+  Landscape, Forest, HomeWork, Logout, ManageAccounts
 } from '@mui/icons-material';
 import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -30,6 +30,7 @@ export const Layout = ({ children }) => {
     { id: 'projects', label: 'Gestão Projetos', icon: <FolderOpen /> },
     { id: 'properties', label: 'Propriedades', icon: <HomeWork /> },
     { id: 'sponsors', label: 'Patrocinadores', icon: <People /> },
+    { id: 'users', label: 'Gestão de Usuários', icon: <ManageAccounts /> },
   ];
 
   const getPageTitle = () => {
@@ -39,6 +40,7 @@ export const Layout = ({ children }) => {
       case 'sponsors': return 'Patrocinadores';
       case 'properties': return 'Gestão de Propriedades';
       case 'projects': return 'Gestão de Projetos';
+      case 'users': return 'Gestão de Usuários';
       default: return 'ARPT Admin';
     }
   };

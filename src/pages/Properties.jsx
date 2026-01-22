@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import {
-  Box, Typography, Button, Table, TableContainer, TableHead, 
+  Box, Typography, Button, Table, TableContainer, TableHead,
   TableRow, TableCell, TableBody, Paper, IconButton, Avatar,
-  Dialog, DialogTitle, DialogContent, DialogActions, Grid, 
+  Dialog, DialogTitle, DialogContent, DialogActions, Grid,
   TextField, MenuItem, Drawer, Divider,
 } from '@mui/material';
 import { Add, Visibility, Edit, CloudUpload, HomeWork, Park } from '@mui/icons-material';
@@ -17,35 +17,35 @@ export const Properties = () => {
     handleUpdateProperty,
     urlMidiasFiles
   } = useAdmin();
-  
+
   const [openForm, setOpenForm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedProp, setSelectedProp] = useState(null);
   const [openInventory, setOpenInventory] = useState(false);
-  
+
   const [formData, setFormData] = useState({
-    id: '', 
-    proprietario: '', 
-    car: '', 
-    municipio: '', 
-    area: '', 
-    status: 'Regular', 
-    foto: '', 
-    lat: '', 
+    id: '',
+    proprietario: '',
+    car: '',
+    municipio: '',
+    area: '',
+    status: 'Regular',
+    foto: '',
+    lat: '',
     lng: ''
   });
 
   const handleOpenNew = () => {
-    setFormData({ 
-      id: '', 
-      proprietario: '', 
-      car: '', 
-      municipio: '', 
-      area: '', 
-      status: 'Regular', 
-      foto: '', 
-      lat: '', 
-      lng: '' 
+    setFormData({
+      id: '',
+      proprietario: '',
+      car: '',
+      municipio: '',
+      area: '',
+      status: 'Regular',
+      foto: '',
+      lat: '',
+      lng: ''
     });
     setIsEditing(false);
     setOpenForm(true);
@@ -53,14 +53,14 @@ export const Properties = () => {
 
   const handleOpenEdit = (prop) => {
     setFormData({
-      id: prop.id, 
-      proprietario: prop.proprietario, 
-      car: prop.car, 
-      municipio: prop.municipio, 
-      area: prop.area, 
-      status: prop.status, 
-      foto: prop.foto, 
-      lat: prop.latitude, 
+      id: prop.id,
+      proprietario: prop.proprietario,
+      car: prop.car,
+      municipio: prop.municipio,
+      area: prop.area,
+      status: prop.status,
+      foto: prop.foto,
+      lat: prop.latitude,
       lng: prop.longitude
     });
     setIsEditing(true);
@@ -68,9 +68,9 @@ export const Properties = () => {
   };
 
   const handleUploadPhoto = () => {
-    setFormData({ 
-      ...formData, 
-      foto: `https://picsum.photos/200?random=${Math.floor(Math.random() * 1000)}` 
+    setFormData({
+      ...formData,
+      foto: `https://picsum.photos/200?random=${Math.floor(Math.random() * 1000)}`
     });
   };
 
@@ -79,13 +79,13 @@ export const Properties = () => {
       alert("Preencha os campos obrigatórios");
       return;
     }
-    
+
     if (isEditing) {
       handleUpdateProperty(formData);
     } else {
       handleAddProperty(formData);
     }
-    
+
     setOpenForm(false);
   };
 
@@ -95,19 +95,20 @@ export const Properties = () => {
         <Typography variant="h5" display="flex" alignItems="center" gap={1}>
           <HomeWork color="primary" /> Gestão de Propriedades
         </Typography>
-        <Button 
-          variant="contained" 
-          startIcon={<Add />} 
+        <Button
+          variant="contained"
+          startIcon={<Add />}
           onClick={handleOpenNew}
         >
           Cadastrar Propriedade
         </Button>
       </Box>
-      
+
       <TableContainer component={Paper}>
         <Table>
           <TableHead sx={{ bgcolor: '#f9fafb' }}>
             <TableRow>
+              <TableCell>ID</TableCell>
               <TableCell>Propriedade / CAR</TableCell>
               <TableCell>Município</TableCell>
               <TableCell>Área (ha)</TableCell>
@@ -118,6 +119,11 @@ export const Properties = () => {
           <TableBody>
             {properties.map((row) => (
               <TableRow key={row.id} hover>
+                <TableCell>
+                  <Typography variant="body2" fontWeight="medium">
+                    {row.id}
+                  </Typography>
+                </TableCell>
                 <TableCell>
                   <Box display="flex" alignItems="center" gap={2}>
                     <Avatar src={`${urlMidiasFiles}${row.image_internal_path}`} variant="rounded">
@@ -138,18 +144,18 @@ export const Properties = () => {
                   <StatusChip status={row.status} />
                 </TableCell> */}
                 <TableCell align="right">
-                  <IconButton 
-                    size="small" 
-                    color="primary" 
-                    onClick={() => setSelectedProp(row)} 
+                  <IconButton
+                    size="small"
+                    color="primary"
+                    onClick={() => setSelectedProp(row)}
                     title="Visualizar"
                   >
                     <Visibility />
                   </IconButton>
-                  <IconButton 
-                    size="small" 
-                    color="default" 
-                    onClick={() => handleOpenEdit(row)} 
+                  <IconButton
+                    size="small"
+                    color="default"
+                    onClick={() => handleOpenEdit(row)}
                     title="Editar"
                   >
                     <Edit />
@@ -160,7 +166,7 @@ export const Properties = () => {
           </TableBody>
         </Table>
       </TableContainer>
-      
+
       {/* Dialog Form */}
       <Dialog open={openForm} onClose={() => setOpenForm(false)} maxWidth="sm" fullWidth>
         <DialogTitle>
@@ -169,45 +175,45 @@ export const Properties = () => {
         <DialogContent dividers>
           <Grid container spacing={2} pt={1}>
             <Grid item xs={12}>
-              <TextField 
-                fullWidth 
-                label="Nome do Proprietário" 
-                value={formData.proprietario} 
-                onChange={e => setFormData({...formData, proprietario: e.target.value})} 
+              <TextField
+                fullWidth
+                label="Nome do Proprietário"
+                value={formData.proprietario}
+                onChange={e => setFormData({ ...formData, proprietario: e.target.value })}
               />
             </Grid>
             <Grid item xs={6}>
-              <TextField 
-                fullWidth 
-                label="Número CAR" 
-                value={formData.car} 
-                onChange={e => setFormData({...formData, car: e.target.value})} 
+              <TextField
+                fullWidth
+                label="Número CAR"
+                value={formData.car}
+                onChange={e => setFormData({ ...formData, car: e.target.value })}
               />
             </Grid>
             <Grid item xs={6}>
-              <TextField 
-                fullWidth 
-                label="Município" 
-                value={formData.municipio} 
-                onChange={e => setFormData({...formData, municipio: e.target.value})} 
+              <TextField
+                fullWidth
+                label="Município"
+                value={formData.municipio}
+                onChange={e => setFormData({ ...formData, municipio: e.target.value })}
               />
             </Grid>
             <Grid item xs={6}>
-              <TextField 
-                fullWidth 
-                type="number" 
-                label="Área Total (ha)" 
-                value={formData.area} 
-                onChange={e => setFormData({...formData, area: e.target.value})} 
+              <TextField
+                fullWidth
+                type="number"
+                label="Área Total (ha)"
+                value={formData.area}
+                onChange={e => setFormData({ ...formData, area: e.target.value })}
               />
             </Grid>
             <Grid item xs={6}>
-              <TextField 
-                select 
-                fullWidth 
-                label="Status" 
-                value={formData.status} 
-                onChange={e => setFormData({...formData, status: e.target.value})}
+              <TextField
+                select
+                fullWidth
+                label="Status"
+                value={formData.status}
+                onChange={e => setFormData({ ...formData, status: e.target.value })}
               >
                 {STATUS_PROPRIEDADE.map(status => (
                   <MenuItem key={status} value={status}>{status}</MenuItem>
@@ -215,27 +221,27 @@ export const Properties = () => {
               </TextField>
             </Grid>
             <Grid item xs={12}>
-              <Box 
-                display="flex" 
-                alignItems="center" 
-                gap={2} 
-                mt={1} 
-                p={2} 
-                border="1px dashed #ccc" 
+              <Box
+                display="flex"
+                alignItems="center"
+                gap={2}
+                mt={1}
+                p={2}
+                border="1px dashed #ccc"
                 borderRadius={2}
               >
                 {formData.foto ? (
-                  <Avatar 
-                    src={formData.foto} 
-                    sx={{ width: 56, height: 56 }} 
-                    variant="rounded" 
+                  <Avatar
+                    src={formData.foto}
+                    sx={{ width: 56, height: 56 }}
+                    variant="rounded"
                   />
                 ) : (
                   <Typography color="textSecondary">Sem foto</Typography>
                 )}
-                <Button 
-                  variant="outlined" 
-                  startIcon={<CloudUpload />} 
+                <Button
+                  variant="outlined"
+                  startIcon={<CloudUpload />}
                   onClick={handleUploadPhoto}
                 >
                   Upload
@@ -251,12 +257,12 @@ export const Properties = () => {
           </Button>
         </DialogActions>
       </Dialog>
-      
+
       {/* Drawer Detalhes */}
-      <Drawer 
-        anchor="right" 
-        open={Boolean(selectedProp)} 
-        onClose={() => setSelectedProp(null)} 
+      <Drawer
+        anchor="right"
+        open={Boolean(selectedProp)}
+        onClose={() => setSelectedProp(null)}
         PaperProps={{ sx: { width: { xs: '100%', md: 400 } } }}
       >
         {selectedProp && (
@@ -281,11 +287,11 @@ export const Properties = () => {
             {selectedProp.latitude != null && selectedProp.longitude != null && (
               <MapEmbed lat={selectedProp.latitude} lng={selectedProp.longitude} />
             )}
-            <Button 
-              fullWidth 
-              variant="contained" 
-              color="success" 
-              startIcon={<Park />} 
+            <Button
+              fullWidth
+              variant="contained"
+              color="success"
+              startIcon={<Park />}
               onClick={() => setOpenInventory(true)}
               sx={{ mt: 2 }}
             >
@@ -296,15 +302,15 @@ export const Properties = () => {
       </Drawer>
 
       {/* Modal Fullscreen de Inventário */}
-      <Dialog 
-        open={openInventory} 
-        onClose={() => setOpenInventory(false)} 
+      <Dialog
+        open={openInventory}
+        onClose={() => setOpenInventory(false)}
         fullScreen
       >
         {selectedProp && (
-          <InventoryManager 
-            property={selectedProp} 
-            onClose={() => setOpenInventory(false)} 
+          <InventoryManager
+            property={selectedProp}
+            onClose={() => setOpenInventory(false)}
           />
         )}
       </Dialog>
