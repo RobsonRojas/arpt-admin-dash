@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { 
-  INITIAL_NECROMASSA,
-  MOCK_SPONSORS
+import {
+    INITIAL_NECROMASSA,
+    MOCK_SPONSORS
 } from '../constants/mockData';
 import { api } from '../services/api.js';
 
@@ -10,28 +10,28 @@ const AdminContext = createContext();
 
 // Hook personalizado para usar o context
 export const useAdmin = () => {
-  const context = useContext(AdminContext);
-  if (!context) {
-    throw new Error('useAdmin deve ser usado dentro de um AdminProvider');
-  }
-  return context;
+    const context = useContext(AdminContext);
+    if (!context) {
+        throw new Error('useAdmin deve ser usado dentro de um AdminProvider');
+    }
+    return context;
 };
 
 // Provider do Context
 export const AdminProvider = ({ children }) => {
     // ==================== ESTADOS ====================
     const urlMidiasFiles = "https://arpt.site/api/midias/files/";
-    
+
     // Navegação
     const [currentView, setCurrentView] = useState('dashboard');
     const [mobileOpen, setMobileOpen] = useState(false);
-    
+
     // Dados
     const [projects, setProjects] = useState([]);
     const [properties, setProperties] = useState([]);
     const [necromassaRequests, setNecromassaRequests] = useState(INITIAL_NECROMASSA);
     const [sponsors] = useState(MOCK_SPONSORS);
-    
+
     // Gerenciamento de Projetos
     const [openCadastro, setOpenCadastro] = useState(false);
     const [editingProject, setEditingProject] = useState(null);
@@ -67,7 +67,7 @@ export const AdminProvider = ({ children }) => {
             if (typeof p.status === 'number' && p.status > 0) return p.status;
             const st = Number(p.status);
             if (!Number.isNaN(st) && st > 0) return st;
-            
+
             // Se vier id_status numérico
             if (p.id_status != null) {
                 const is = Number(p.id_status);
@@ -82,7 +82,7 @@ export const AdminProvider = ({ children }) => {
             if (p.desc_status && statusMap[p.desc_status]) return statusMap[p.desc_status];
             // status textual comum
             if (typeof p.status === 'string' && statusMap[p.status]) return statusMap[p.status];
-            
+
             return 1;
         })();
 
@@ -157,6 +157,38 @@ export const AdminProvider = ({ children }) => {
 
     };
 
+    const getInventoriesByPropertyId = async (propertyId) => {
+        try {
+            const response = await api.get(`/propriedades/${propertyId}/inventarios`);
+            if (response.status === 200) {
+                return response.data;
+            } else {
+                console.warn(`Resposta inesperada ao buscar inventários: status ${response.status}`);
+                return null;
+            }
+        } catch (error) {
+            console.error("Error fetching inventories by property ID:", error);
+            return null;
+        }
+    }
+
+    const getTreesByInventoryId = async (inventoryId, page = 1, pageSize = 100) => {
+        try {
+            const response = await api.get(`/inventarios/${inventoryId}/arvores`, {
+                params: { page, pageSize }
+            });
+            if (response.status === 200) {
+                return response.data;
+            } else {
+                console.warn(`Resposta inesperada ao buscar árvores: status ${response.status}`);
+                return null;
+            }
+        } catch (error) {
+            console.error("Error fetching trees by inventory ID:", error);
+            return null;
+        }
+    }
+
     const getAllInventoryByPropertyId = async (propertyId) => {
         try {
             const response = await api.get(`/inventarios/${propertyId}/arvores`);
@@ -201,7 +233,7 @@ export const AdminProvider = ({ children }) => {
     }
 
     // ==================== REGRAS DE NEGÓCIO - PROJETOS ====================
-    
+
     /**
      * Salvar projeto (criar ou atualizar)
      */
@@ -236,7 +268,7 @@ export const AdminProvider = ({ children }) => {
      */
     const handleDeleteProject = (projectId) => {
         if (window.confirm('Tem certeza que deseja deletar este projeto?')) {
-        setProjects(prev => prev.filter(p => p.id !== projectId));
+            setProjects(prev => prev.filter(p => p.id !== projectId));
         }
     };
 
@@ -257,19 +289,19 @@ export const AdminProvider = ({ children }) => {
     };
 
     // ==================== REGRAS DE NEGÓCIO - PROPRIEDADES ====================
-    
+
     /**
      * Adicionar nova propriedade
      */
     const handleAddProperty = (property) => {
         const newProperty = {
-        ...property,
-        id: `PROP-${Math.floor(Math.random() * 10000)}`,
-        area: Number(property.area),
-        coords: { 
-            lat: Number(property.lat) || -3.0, 
-            lng: Number(property.lng) || -60.0 
-        }
+            ...property,
+            id: `PROP-${Math.floor(Math.random() * 10000)}`,
+            area: Number(property.area),
+            coords: {
+                lat: Number(property.lat) || -3.0,
+                lng: Number(property.lng) || -60.0
+            }
         };
         setProperties(prev => [newProperty, ...prev]);
     };
@@ -279,12 +311,12 @@ export const AdminProvider = ({ children }) => {
      */
     const handleUpdateProperty = (property) => {
         const updatedProperty = {
-        ...property,
-        area: Number(property.area),
-        coords: { 
-            lat: Number(property.lat), 
-            lng: Number(property.lng) 
-        }
+            ...property,
+            area: Number(property.area),
+            coords: {
+                lat: Number(property.lat),
+                lng: Number(property.lng)
+            }
         };
         setProperties(prev => prev.map(p => p.id === property.id ? updatedProperty : p));
     };
@@ -294,21 +326,21 @@ export const AdminProvider = ({ children }) => {
      */
     const handleDeleteProperty = (propertyId) => {
         if (window.confirm('Tem certeza que deseja deletar esta propriedade?')) {
-        setProperties(prev => prev.filter(p => p.id !== propertyId));
+            setProperties(prev => prev.filter(p => p.id !== propertyId));
         }
     };
 
     // ==================== REGRAS DE NEGÓCIO - NECROMASSA ====================
-    
+
     /**
      * Adicionar nova solicitação de necromassa
      */
     const handleAddNecromassa = (request) => {
         const newRequest = {
-        ...request,
-        id: `NECRO-${Math.floor(Math.random() * 1000)}`,
-        data: new Date().toISOString().split('T')[0],
-        origem: "WhatsApp"
+            ...request,
+            id: `NECRO-${Math.floor(Math.random() * 1000)}`,
+            data: new Date().toISOString().split('T')[0],
+            origem: "WhatsApp"
         };
         setNecromassaRequests(prev => [newRequest, ...prev]);
     };
@@ -317,8 +349,8 @@ export const AdminProvider = ({ children }) => {
      * Atualizar status de solicitação de necromassa
      */
     const handleUpdateNecromassaStatus = (requestId, newStatus) => {
-        setNecromassaRequests(prev => 
-        prev.map(req => req.id === requestId ? { ...req, status: newStatus } : req)
+        setNecromassaRequests(prev =>
+            prev.map(req => req.id === requestId ? { ...req, status: newStatus } : req)
         );
     };
 
@@ -327,12 +359,12 @@ export const AdminProvider = ({ children }) => {
      */
     const handleDeleteNecromassa = (requestId) => {
         if (window.confirm('Tem certeza que deseja deletar esta solicitação?')) {
-        setNecromassaRequests(prev => prev.filter(req => req.id !== requestId));
+            setNecromassaRequests(prev => prev.filter(req => req.id !== requestId));
         }
     };
 
     // ==================== REGRAS DE NEGÓCIO - NAVEGAÇÃO ====================
-    
+
     /**
      * Alternar menu mobile
      */
@@ -349,19 +381,19 @@ export const AdminProvider = ({ children }) => {
     };
 
     // ==================== REGRAS DE NEGÓCIO - FILTROS E BUSCA ====================
-    
+
     /**
      * Filtrar projetos por termo de busca e status
      */
     const getFilteredProjects = () => {
         return projects.filter(project => {
-        const searchLower = searchTerm.toLowerCase();
-        const matchesSearch = 
-            (project.descricao?.toLowerCase().includes(searchLower) || false) ||
-            (project.municipio?.toLowerCase().includes(searchLower) || false) ||
-            (project.estado?.toLowerCase().includes(searchLower) || false);
-        const matchesStatus = filterStatus === "Todos" ? true : project.desc_status === filterStatus;
-        return matchesSearch && matchesStatus;
+            const searchLower = searchTerm.toLowerCase();
+            const matchesSearch =
+                (project.descricao?.toLowerCase().includes(searchLower) || false) ||
+                (project.municipio?.toLowerCase().includes(searchLower) || false) ||
+                (project.estado?.toLowerCase().includes(searchLower) || false);
+            const matchesStatus = filterStatus === "Todos" ? true : project.desc_status === filterStatus;
+            return matchesSearch && matchesStatus;
         });
     };
 
@@ -375,10 +407,10 @@ export const AdminProvider = ({ children }) => {
         const aprovados = projects.filter(p => p.desc_status === 'Ativo').length;
 
         return {
-        area: totalArea,
-        investimento: totalInvestimento,
-        pendentes,
-        aprovados
+            area: totalArea,
+            investimento: totalInvestimento,
+            pendentes,
+            aprovados
         };
     };
 
@@ -402,7 +434,7 @@ export const AdminProvider = ({ children }) => {
         searchTerm,
         filterStatus,
         urlMidiasFiles,
-        
+
         // Setters (para casos específicos)
         setCurrentView,
         setMobileOpen,
@@ -410,7 +442,7 @@ export const AdminProvider = ({ children }) => {
         setSearchTerm,
         setFilterStatus,
         setOpenCadastro,
-        
+
         // Regras de Negócio - Projetos
         handleSaveProject,
         handleEditProject,
@@ -418,32 +450,34 @@ export const AdminProvider = ({ children }) => {
         handleOpenNewProject,
         handleCloseCadastro,
         updateProject,
-        
+
         // Regras de Negócio - Propriedades
         handleAddProperty,
         handleUpdateProperty,
         handleDeleteProperty,
-        
+
         // Regras de Negócio - Necromassa
         handleAddNecromassa,
         handleUpdateNecromassaStatus,
         handleDeleteNecromassa,
-        
+
         // Regras de Negócio - Navegação
         handleDrawerToggle,
         navigateTo,
-        
+
         // Regras de Negócio - Utilitários
         getFilteredProjects,
         getDashboardStats,
         getAllInventoryByPropertyId,
+        getInventoriesByPropertyId,
+        getTreesByInventoryId,
         createInventory,
         createTree,
     };
 
     return (
         <AdminContext.Provider value={value}>
-        {children}
+            {children}
         </AdminContext.Provider>
     );
 };
