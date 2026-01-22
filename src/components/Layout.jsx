@@ -1,18 +1,28 @@
 import React from 'react';
 import {
   Box, Drawer, AppBar, Toolbar, List, Typography, Divider,
-  ListItem, ListItemButton, ListItemIcon, ListItemText, IconButton, Avatar
+  ListItem, ListItemButton, ListItemIcon, ListItemText, IconButton, Avatar, Tooltip
 } from '@mui/material';
 import {
   Dashboard, FolderOpen, People, Menu as MenuIcon,
-  Landscape, Forest, HomeWork
+  Landscape, Forest, HomeWork, Logout
 } from '@mui/icons-material';
 import { useAdmin } from '../contexts/AdminContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const DRAWER_WIDTH = 240;
 
 export const Layout = ({ children }) => {
   const { currentView, mobileOpen, handleDrawerToggle, navigateTo } = useAdmin();
+  const { signOut } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
+  };
 
   const menuItems = [
     { id: 'dashboard', label: 'Sala de Situação', icon: <Dashboard /> },
@@ -23,7 +33,7 @@ export const Layout = ({ children }) => {
   ];
 
   const getPageTitle = () => {
-    switch(currentView) {
+    switch (currentView) {
       case 'dashboard': return 'Visão Geral';
       case 'necromassa': return 'Gestão de Necromassa';
       case 'sponsors': return 'Patrocinadores';
@@ -43,8 +53,8 @@ export const Layout = ({ children }) => {
       <List>
         {menuItems.map((item) => (
           <ListItem key={item.id} disablePadding>
-            <ListItemButton 
-              selected={currentView === item.id} 
+            <ListItemButton
+              selected={currentView === item.id}
               onClick={() => navigateTo(item.id)}
             >
               <ListItemIcon>{item.icon}</ListItemIcon>
@@ -59,21 +69,21 @@ export const Layout = ({ children }) => {
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f4f6f8' }}>
       {/* AppBar */}
-      <AppBar 
-        position="fixed" 
-        sx={{ 
-          width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` }, 
-          ml: { sm: `${DRAWER_WIDTH}px` }, 
-          bgcolor: 'white', 
-          color: 'text.primary', 
-          boxShadow: 1 
+      <AppBar
+        position="fixed"
+        sx={{
+          width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
+          ml: { sm: `${DRAWER_WIDTH}px` },
+          bgcolor: 'white',
+          color: 'text.primary',
+          boxShadow: 1
         }}
       >
         <Toolbar>
-          <IconButton 
-            color="inherit" 
-            edge="start" 
-            onClick={handleDrawerToggle} 
+          <IconButton
+            color="inherit"
+            edge="start"
+            onClick={handleDrawerToggle}
             sx={{ mr: 2, display: { sm: 'none' } }}
           >
             <MenuIcon />
@@ -81,42 +91,47 @@ export const Layout = ({ children }) => {
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             {getPageTitle()}
           </Typography>
+          <Tooltip title="Sair">
+            <IconButton onClick={handleLogout} color="inherit" sx={{ mr: 1 }}>
+              <Logout />
+            </IconButton>
+          </Tooltip>
           <Avatar sx={{ bgcolor: 'secondary.main' }}>A</Avatar>
         </Toolbar>
       </AppBar>
 
       {/* Drawer */}
-      <Box 
-        component="nav" 
+      <Box
+        component="nav"
         sx={{ width: { sm: DRAWER_WIDTH }, flexShrink: { sm: 0 } }}
       >
         {/* Mobile Drawer */}
-        <Drawer 
-          variant="temporary" 
-          open={mobileOpen} 
-          onClose={handleDrawerToggle} 
-          ModalProps={{ keepMounted: true }} 
-          sx={{ 
-            display: { xs: 'block', sm: 'none' }, 
-            '& .MuiDrawer-paper': { 
-              boxSizing: 'border-box', 
-              width: DRAWER_WIDTH 
-            } 
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{ keepMounted: true }}
+          sx={{
+            display: { xs: 'block', sm: 'none' },
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
+              width: DRAWER_WIDTH
+            }
           }}
         >
           {drawerContent}
         </Drawer>
-        
+
         {/* Desktop Drawer */}
-        <Drawer 
-          variant="permanent" 
-          sx={{ 
-            display: { xs: 'none', sm: 'block' }, 
-            '& .MuiDrawer-paper': { 
-              boxSizing: 'border-box', 
-              width: DRAWER_WIDTH 
-            } 
-          }} 
+        <Drawer
+          variant="permanent"
+          sx={{
+            display: { xs: 'none', sm: 'block' },
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
+              width: DRAWER_WIDTH
+            }
+          }}
           open
         >
           {drawerContent}
@@ -124,12 +139,12 @@ export const Layout = ({ children }) => {
       </Box>
 
       {/* Main Content */}
-      <Box 
-        component="main" 
-        sx={{ 
-          flexGrow: 1, 
-          p: 3, 
-          width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` } 
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` }
         }}
       >
         <Toolbar />
