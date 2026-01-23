@@ -189,9 +189,11 @@ export const AdminProvider = ({ children }) => {
         }
     }
 
-    const getAllInventoryByPropertyId = async (propertyId) => {
+    const getAllInventoryByPropertyId = async (propertyId, page = 1, pageSize = 10) => {
         try {
-            const response = await api.get(`/inventarios/${propertyId}/arvores`);
+            const response = await api.get(`/inventarios/${propertyId}/arvores`, {
+                params: { page, pageSize }
+            });
             if (response.status === 200) {
                 return response.data;
             } else {
@@ -228,6 +230,56 @@ export const AdminProvider = ({ children }) => {
             return null;
         } catch (error) {
             console.error("Error creating tree:", error);
+            return null;
+        }
+    }
+
+    const updateTree = async (treeId, payload) => {
+        try {
+            const response = await api.put(`/arvores/${treeId}`, payload);
+            if (response.status === 200) {
+                return response.data;
+            }
+            console.warn(`Resposta inesperada ao atualizar árvore: status ${response.status}`);
+            return null;
+        } catch (error) {
+            console.error("Error updating tree:", error);
+            return null;
+        }
+    }
+
+    const uploadTreePhoto = async (treeId, file) => {
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const response = await api.post(`/arvores/${treeId}/photo_upload`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            if (response.status === 200 || response.status === 201) {
+                return response.data;
+            }
+            console.warn(`Resposta inesperada ao fazer upload de foto: status ${response.status}`);
+            return null;
+        } catch (error) {
+            console.error("Error uploading tree photo:", error);
+            return null;
+        }
+    }
+
+    const createTreePhoto = async (payload) => {
+        try {
+            const response = await api.post('/arvorefotos', payload);
+            if (response.status === 200 || response.status === 201) {
+                return response.data;
+            }
+            console.warn(`Resposta inesperada ao registrar foto: status ${response.status}`);
+            return null;
+        } catch (error) {
+            console.error("Error creating tree photo record:", error);
             return null;
         }
     }
@@ -547,6 +599,9 @@ export const AdminProvider = ({ children }) => {
         getTreesByInventoryId,
         createInventory,
         createTree,
+        updateTree,
+        uploadTreePhoto,
+        createTreePhoto,
 
         // Regras de Negócio - Rewards
         getRewardsByManejoId,

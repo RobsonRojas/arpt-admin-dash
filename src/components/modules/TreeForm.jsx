@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box, Grid, Typography, TextField, Button, MenuItem, Paper, 
-  Avatar, IconButton
+  Box, Grid, Typography, TextField, Button, MenuItem, Paper,
+  Avatar, IconButton, CircularProgress
 } from '@mui/material';
 import { PhotoCamera, Close } from '@mui/icons-material';
+import { useAdmin } from '../../contexts/AdminContext';
 
 export const TreeForm = ({ initialData, onSave, onCancel, propertyId, inventoryId }) => {
+  const { uploadTreePhoto, createTreePhoto, urlMidiasFiles } = useAdmin();
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
   const [form, setForm] = useState(initialData || {
     propertyId: propertyId,
     inventoryId: inventoryId,
@@ -43,13 +47,75 @@ export const TreeForm = ({ initialData, onSave, onCancel, propertyId, inventoryI
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleAddPhoto = () => {
-    const newPhoto = {
-      id: Date.now(),
-      url: `https://picsum.photos/200?random=${Math.floor(Math.random() * 1000)}`,
-      name: `Foto ${form.photos.length + 1}`
+  const handleAddPhoto = async () => {
+    // Verificar se a árvore já foi salva (tem ID)
+    if (!initialData || !initialData.id) {
+      alert('Salve a árvore antes de adicionar fotos.');
+      return;
+    }
+
+    // Criar input file
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // Validar tamanho (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        alert('Arquivo muito grande. Máximo 10MB.');
+        return;
+      }
+
+      // Validar tipo
+      if (!file.type.startsWith('image/')) {
+        alert('Por favor, selecione uma imagem.');
+        return;
+      }
+
+      try {
+        setUploadingPhoto(true);
+
+        // 1. Upload da foto
+        const uploadResult = await uploadTreePhoto(initialData.id, file);
+        if (!uploadResult) {
+          alert('Erro ao fazer upload da foto. Tente novamente.');
+          return;
+        }
+
+        // 2. Registrar foto no banco
+        const photoPayload = {
+          treeInventoryId: initialData.id,
+          url: `${urlMidiasFiles}${uploadResult.filename || uploadResult.internalPath || file.name}`,
+          name: file.name,
+          alt: `Foto de ${form.popularName || 'árvore'}`,
+          internalPath: uploadResult.filename || uploadResult.internalPath || file.name
+        };
+
+        const photoRecord = await createTreePhoto(photoPayload);
+        if (!photoRecord) {
+          console.warn('Upload bem-sucedido mas falhou ao registrar no banco');
+        }
+
+        // 3. Adicionar foto ao estado local
+        const newPhoto = {
+          id: photoRecord?.id || Date.now(),
+          url: photoPayload.url,
+          name: photoPayload.name
+        };
+        setForm({ ...form, photos: [...form.photos, newPhoto] });
+
+      } catch (error) {
+        console.error('Erro ao adicionar foto:', error);
+        alert('Erro ao adicionar foto. Tente novamente.');
+      } finally {
+        setUploadingPhoto(false);
+      }
     };
-    setForm({ ...form, photos: [...form.photos, newPhoto] });
+
+    input.click();
   };
 
   const handleRemovePhoto = (id) => {
@@ -60,7 +126,7 @@ export const TreeForm = ({ initialData, onSave, onCancel, propertyId, inventoryI
     const hasPopular = (form.popularName || '').trim() !== '';
     const hasSpecie = (form.specieName || '').trim() !== '';
     const hasNumber = (form.number || '').toString().trim() !== '';
-    
+
     if (!hasPopular || !hasSpecie || !hasNumber) {
       alert("Preencha os campos obrigatórios (Nome Popular, Espécie e Nº Placa)");
       return;
@@ -264,8 +330,9 @@ export const TreeForm = ({ initialData, onSave, onCancel, propertyId, inventoryI
               variant="outlined"
               sx={{ height: 60, width: 60, minWidth: 60 }}
               onClick={handleAddPhoto}
+              disabled={uploadingPhoto}
             >
-              <PhotoCamera />
+              {uploadingPhoto ? <CircularProgress size={24} /> : <PhotoCamera />}
             </Button>
           </Box>
         </Grid>
@@ -278,6 +345,6 @@ export const TreeForm = ({ initialData, onSave, onCancel, propertyId, inventoryI
           Salvar Árvore
         </Button>
       </Box>
-    </Box>
+    </Box >
   );
 };

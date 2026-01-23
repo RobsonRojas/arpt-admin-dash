@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import {
   Box, Paper, Typography, Table, TableContainer, TableHead, TableRow,
   TableCell, TableBody, IconButton, Button, Dialog, DialogTitle, DialogContent,
-  DialogActions, TextField, Select, MenuItem, FormControl, InputLabel, CircularProgress
+  DialogActions, TextField, Select, MenuItem, FormControl, InputLabel, CircularProgress,
+  TablePagination
 } from '@mui/material';
 import { Edit, Add, ArrowBack, Park } from '@mui/icons-material';
 import { TreeForm } from './TreeForm';
@@ -14,11 +15,18 @@ export const InventoryManager = ({ property, onClose }) => {
   const [viewState, setViewState] = useState("list");
   const [editingTree, setEditingTree] = useState(null);
   const [loadingTrees, setLoadingTrees] = useState(false);
+
+  // Paginação
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
   const {
     getInventoriesByPropertyId,
     getTreesByInventoryId,
+    getAllInventoryByPropertyId,
     createInventory,
     createTree,
+    updateTree,
   } = useAdmin();
 
   const [openCreateInventory, setOpenCreateInventory] = useState(false);
@@ -42,19 +50,13 @@ export const InventoryManager = ({ property, onClose }) => {
       return;
     }
 
-    // Gera número automático se não fornecido
-    const normalizedTrees = Array.isArray(trees) ? trees : [];
-    const autoNumber = treeData.number
-      ? Number(treeData.number)
-      : (normalizedTrees.length > 0 ? Math.max(...normalizedTrees.map(t => t.number || 0)) + 1 : 1);
-
     // Normaliza payload para API
     const nowIso = new Date().toISOString();
     const payload = {
       ...treeData,
       propertyId: Number(property.id),
       inventoryId: currentInventoryId,
-      number: autoNumber,
+      number: treeData.number ? Number(treeData.number) : (editingTree?.number || 1),
       cap: treeData.cap ? Number(treeData.cap) : 0,
       dap: treeData.dap ? Number(treeData.dap) : 0,
       height: treeData.height ? Number(treeData.height) : 0,
@@ -69,23 +71,23 @@ export const InventoryManager = ({ property, onClose }) => {
       updatedAt: nowIso,
     };
 
-    const created = await createTree(currentInventoryId, payload);
+    let result;
+    if (editingTree && editingTree.id) {
+      // Atualizar árvore existente
+      result = await updateTree(editingTree.id, payload);
+    } else {
+      // Criar nova árvore
+      result = await createTree(currentInventoryId, payload);
+    }
 
-    if (created) {
+    if (result) {
       await loadTrees({ suppressCreatePrompt: true });
       setViewState("list");
+      setEditingTree(null);
       return;
     } else {
       window.alert('Não foi possível salvar a árvore. Tente novamente.');
     }
-
-    // fallback otimista local
-    const newTree = {
-      ...payload,
-      id: Date.now(),
-    };
-    setTrees([newTree, ...trees]);
-    setViewState("list");
   };
 
   const handleEdit = (tree) => {
@@ -130,54 +132,66 @@ export const InventoryManager = ({ property, onClose }) => {
     }
   };
 
-  const loadTrees = async ({ suppressCreatePrompt = false } = {}) => {
+  const loadTrees = async () => {
     try {
       setLoadingTrees(true);
 
-      // 1. Buscar inventários da propriedade
-      const inventoriesData = await getInventoriesByPropertyId(property.id);
+      // Buscar árvores com paginação (API usa page 1-based)
+      const response = await getAllInventoryByPropertyId(property.id, page + 1, rowsPerPage);
 
-      // Se não houver inventário na API, abre modal
-      if (!inventoriesData || inventoriesData.length === 0) {
-        setInventories([]);
-        setTrees([]);
-        setCurrentInventoryId(null);
-        if (!suppressCreatePrompt) setOpenCreateInventory(true);
-        return;
+      let allTrees = [];
+      let total = 0;
+
+      // Padrão identificado: { data: { inventories: [...], total: N } }
+      if (response?.data?.inventories && Array.isArray(response.data.inventories)) {
+        allTrees = response.data.inventories;
+        total = response.data.total || 0;
+      } else if (Array.isArray(response)) {
+        // Fallback para caso retorne array direto (sem paginação ou estrutura antiga)
+        allTrees = response;
+        total = response.length;
+      } else if (response?.data && Array.isArray(response.data)) {
+        allTrees = response.data;
+        total = response.data.length;
       }
 
-      setInventories(inventoriesData);
+      setTrees(allTrees);
+      setTotalCount(total);
 
-      // 2. Usar o primeiro inventário como padrão ou manter o atual
-      const targetInventoryId = currentInventoryId || inventoriesData[0]?.id;
-      setCurrentInventoryId(targetInventoryId);
-
-      // 3. Buscar árvores do inventário selecionado
-      if (targetInventoryId) {
-        const treesResponse = await getTreesByInventoryId(targetInventoryId);
-        const treesData = treesResponse?.data || [];
-        setTrees(treesData);
-      } else {
-        setTrees([]);
+      // Tentar inferir currentInventoryId a partir das árvores (primeira que tiver)
+      if (allTrees.length > 0) {
+        const firstTree = allTrees[0];
+        const inferredId = firstTree.inventoryId || firstTree.inventory_id;
+        if (inferredId && !currentInventoryId) {
+          setCurrentInventoryId(inferredId);
+        }
       }
 
-      // Inventário existe: mantém modal fechado mesmo com 0 árvores
       setOpenCreateInventory(false);
+
     } catch (error) {
-      console.error("Erro ao buscar inventário:", error);
-      setInventories([]);
+      console.error("Erro ao carregar árvores:", error);
       setTrees([]);
-      if (!suppressCreatePrompt) setOpenCreateInventory(true);
-      alert('Erro ao carregar inventário. Tente novamente mais tarde.');
+      setTotalCount(0);
     } finally {
       setLoadingTrees(false);
     }
   };
 
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+
   useEffect(() => {
     loadTrees();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [property.id]);
+  }, [property.id, page, rowsPerPage]);
 
   if (viewState === "form") {
     return (
@@ -207,6 +221,7 @@ export const InventoryManager = ({ property, onClose }) => {
     <Box p={3} height="100%" display="flex" flexDirection="column" bgcolor="background.default">
       {/* CABEÇALHO */}
       <Paper sx={{ p: 2, mb: 2 }}>
+
         <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
           <Box>
             <Typography variant="h6" display="flex" alignItems="center" gap={1}>
@@ -226,26 +241,7 @@ export const InventoryManager = ({ property, onClose }) => {
           </Box>
         </Box>
 
-        {/* Seletor de Inventário */}
-        {inventories.length > 0 && (
-          <FormControl fullWidth size="small" sx={{ maxWidth: 400 }}>
-            <InputLabel>Inventário Ativo</InputLabel>
-            <Select
-              value={currentInventoryId || ''}
-              label="Inventário Ativo"
-              onChange={(e) => {
-                setCurrentInventoryId(e.target.value);
-                loadTrees({ suppressCreatePrompt: true });
-              }}
-            >
-              {inventories.map((inv) => (
-                <MenuItem key={inv.id} value={inv.id}>
-                  Inventário #{inv.id} - {new Date(inv.startDate).toLocaleDateString('pt-BR')} até {new Date(inv.endDate).toLocaleDateString('pt-BR')}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        )}
+
       </Paper>
 
       {/* TABELA */}
@@ -271,7 +267,7 @@ export const InventoryManager = ({ property, onClose }) => {
                   </Typography>
                 </TableCell>
               </TableRow>
-            ) : !trees || trees.length === 0 ? (
+            ) : !Array.isArray(trees) || trees.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
                   <Typography color="textSecondary">
@@ -303,6 +299,18 @@ export const InventoryManager = ({ property, onClose }) => {
           </TableBody>
         </Table>
       </TableContainer>
+
+      <TablePagination
+        rowsPerPageOptions={[10, 25, 50, 100]}
+        component="div"
+        count={totalCount}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+        labelRowsPerPage="Linhas por página"
+        labelDisplayedRows={({ from, to, count }) => `${from}-${to} de ${count}`}
+      />
 
       <Dialog open={openCreateInventory} onClose={() => setOpenCreateInventory(false)} fullWidth maxWidth="sm">
         <DialogTitle>Criar Inventário</DialogTitle>
