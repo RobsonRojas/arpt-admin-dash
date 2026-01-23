@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import {
   Dashboard, FolderOpen, People, Menu as MenuIcon,
-  Landscape, Forest, HomeWork, Logout, ManageAccounts
+  Landscape, Forest, HomeWork, Logout, ManageAccounts, CardGiftcard
 } from '@mui/icons-material';
 import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -28,6 +28,7 @@ export const Layout = ({ children }) => {
     { id: 'dashboard', label: 'Sala de Situação', icon: <Dashboard /> },
     { id: 'necromassa', label: 'Necromassa', icon: <Forest /> },
     { id: 'projects', label: 'Gestão Projetos', icon: <FolderOpen /> },
+    { id: 'rewards', label: 'Recompensas', icon: <CardGiftcard /> },
     { id: 'properties', label: 'Propriedades', icon: <HomeWork /> },
     { id: 'sponsors', label: 'Patrocinadores', icon: <People /> },
     { id: 'users', label: 'Gestão de Usuários', icon: <ManageAccounts /> },
@@ -40,6 +41,7 @@ export const Layout = ({ children }) => {
       case 'sponsors': return 'Patrocinadores';
       case 'properties': return 'Gestão de Propriedades';
       case 'projects': return 'Gestão de Projetos';
+      case 'rewards': return 'Gerenciamento de Recompensas';
       case 'users': return 'Gestão de Usuários';
       default: return 'ARPT Admin';
     }

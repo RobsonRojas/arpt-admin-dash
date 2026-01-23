@@ -232,6 +232,80 @@ export const AdminProvider = ({ children }) => {
         }
     }
 
+    // ==================== REWARDS (PRODUTOS) MANAGEMENT ====================
+
+    const getRewardsByManejoId = async (manejoId) => {
+        try {
+            const response = await api.get(`/manejos/${manejoId}/produtos`);
+            if (response.status === 200) {
+                return response.data;
+            } else {
+                console.warn(`Resposta inesperada ao buscar recompensas: status ${response.status}`);
+                return null;
+            }
+        } catch (error) {
+            console.error("Error fetching rewards by manejo ID:", error);
+            return null;
+        }
+    }
+
+    const getRewardById = async (manejoId, productId) => {
+        try {
+            const response = await api.get(`/manejos/${manejoId}/produtos/${productId}`);
+            if (response.status === 200) {
+                return response.data;
+            } else {
+                console.warn(`Resposta inesperada ao buscar recompensa: status ${response.status}`);
+                return null;
+            }
+        } catch (error) {
+            console.error("Error fetching reward by ID:", error);
+            return null;
+        }
+    }
+
+    const createReward = async (manejoId, payload) => {
+        try {
+            const response = await api.post(`/manejos/${manejoId}/produtos`, payload);
+            if (response.status === 201 || response.status === 200) {
+                return response.data;
+            }
+            console.warn(`Resposta inesperada ao criar recompensa: status ${response.status}`);
+            return null;
+        } catch (error) {
+            console.error("Error creating reward:", error);
+            return null;
+        }
+    }
+
+    const updateReward = async (manejoId, productId, payload) => {
+        try {
+            const response = await api.put(`/manejos/${manejoId}/produtos/${productId}`, payload);
+            if (response.status === 200) {
+                return response.data;
+            }
+            console.warn(`Resposta inesperada ao atualizar recompensa: status ${response.status}`);
+            return null;
+        } catch (error) {
+            console.error("Error updating reward:", error);
+            return null;
+        }
+    }
+
+    const deleteReward = async (manejoId, productId) => {
+        try {
+            const response = await api.delete(`/manejos/${manejoId}/produtos/${productId}`);
+            if (response.status === 200 || response.status === 204) {
+                return true;
+            }
+            console.warn(`Resposta inesperada ao deletar recompensa: status ${response.status}`);
+            return false;
+        } catch (error) {
+            console.error("Error deleting reward:", error);
+            return false;
+        }
+    }
+
     // ==================== REGRAS DE NEGÓCIO - PROJETOS ====================
 
     /**
@@ -473,6 +547,13 @@ export const AdminProvider = ({ children }) => {
         getTreesByInventoryId,
         createInventory,
         createTree,
+
+        // Regras de Negócio - Rewards
+        getRewardsByManejoId,
+        getRewardById,
+        createReward,
+        updateReward,
+        deleteReward,
     };
 
     return (

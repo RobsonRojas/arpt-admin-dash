@@ -1,7 +1,7 @@
 import { ThemeProvider, CssBaseline, CircularProgress, Box } from '@mui/material';
 import { theme } from './theme';
 import { Layout } from './components';
-import { Dashboard, Projects, Properties, Necromassa, Sponsors, Login, Users } from './pages';
+import { Dashboard, Projects, Properties, Necromassa, Sponsors, Login, Users, Rewards } from './pages';
 import { useAdmin } from './contexts/AdminContext';
 import { useAuth } from './contexts/AuthContext.jsx';
 
@@ -29,6 +29,9 @@ export default function App() {
 
       case 'users':
         return <Users />;
+
+      case 'rewards':
+        return <Rewards />;
 
       default:
         return <Dashboard />;
