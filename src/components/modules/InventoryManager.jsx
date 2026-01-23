@@ -5,9 +5,12 @@ import {
   DialogActions, TextField, Select, MenuItem, FormControl, InputLabel, CircularProgress,
   TablePagination
 } from '@mui/material';
-import { Edit, Add, ArrowBack, Park } from '@mui/icons-material';
+import { Edit, Add, ArrowBack, Park, Description, ContentCopy } from '@mui/icons-material';
 import { TreeForm } from './TreeForm';
 import { useAdmin } from '../../contexts/AdminContext';
+import { generateDocument } from '../../services/gemini';
+import MDEditor from '@uiw/react-md-editor';
+
 
 export const InventoryManager = ({ property, onClose }) => {
   const [trees, setTrees] = useState([]);
@@ -28,6 +31,12 @@ export const InventoryManager = ({ property, onClose }) => {
     createTree,
     updateTree,
   } = useAdmin();
+
+  // Document Generation State
+  const [openDocDialog, setOpenDocDialog] = useState(false);
+  const [generatedDoc, setGeneratedDoc] = useState("");
+  const [loadingDoc, setLoadingDoc] = useState(false);
+
 
   const [openCreateInventory, setOpenCreateInventory] = useState(false);
   const [currentInventoryId, setCurrentInventoryId] = useState(null);
@@ -129,6 +138,22 @@ export const InventoryManager = ({ property, onClose }) => {
       await loadTrees({ suppressCreatePrompt: true });
     } else {
       window.alert('Não foi possível criar o inventário. Tente novamente.');
+    }
+  };
+
+
+  const handleGenerateDocument = async (tree) => {
+    setLoadingDoc(true);
+    setOpenDocDialog(true);
+    setGeneratedDoc("Gerando documento, por favor aguarde...");
+
+    try {
+      const doc = await generateDocument('fallen_tree', tree);
+      setGeneratedDoc(doc);
+    } catch (error) {
+      setGeneratedDoc("Erro ao gerar documento. Tente novamente.");
+    } finally {
+      setLoadingDoc(false);
     }
   };
 
@@ -292,6 +317,16 @@ export const InventoryManager = ({ property, onClose }) => {
                     >
                       <Edit fontSize="small" />
                     </IconButton>
+                    {tree.classification === 'Árvore Caída' && (
+                      <IconButton
+                        size="small"
+                        color="secondary"
+                        onClick={() => handleGenerateDocument(tree)}
+                        title="Gerar Documento"
+                      >
+                        <Description fontSize="small" />
+                      </IconButton>
+                    )}
                   </TableCell>
                 </TableRow>
               ))
@@ -340,6 +375,36 @@ export const InventoryManager = ({ property, onClose }) => {
           <Button variant="contained" onClick={handleCreateInventory}>Criar Inventário</Button>
         </DialogActions>
       </Dialog>
-    </Box>
+
+
+      <Dialog open={openDocDialog} onClose={() => setOpenDocDialog(false)} fullWidth maxWidth="md">
+        <DialogTitle>
+          Documento Gerado (IA)
+          <IconButton
+            onClick={() => {
+              navigator.clipboard.writeText(generatedDoc);
+              alert("Texto copiado!");
+            }}
+            sx={{ position: 'absolute', right: 8, top: 8 }}
+          >
+            <ContentCopy />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers>
+          {loadingDoc ? (
+            <Box display="flex" justifyContent="center" p={3}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <Box data-color-mode="light">
+              <MDEditor.Markdown source={generatedDoc} style={{ whiteSpace: 'pre-wrap' }} />
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDocDialog(false)}>Fechar</Button>
+        </DialogActions>
+      </Dialog>
+    </Box >
   );
 };
