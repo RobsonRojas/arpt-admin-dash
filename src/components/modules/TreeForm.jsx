@@ -10,7 +10,7 @@ export const TreeForm = ({ initialData, onSave, onCancel, propertyId, inventoryI
   const { uploadTreePhoto, createTreePhoto, urlMidiasFiles } = useAdmin();
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
-  const [form, setForm] = useState(initialData || {
+  const [form, setForm] = useState(initialData ? { ...initialData, photos: initialData.photos || [] } : {
     propertyId: propertyId,
     inventoryId: inventoryId,
     popularName: "",
