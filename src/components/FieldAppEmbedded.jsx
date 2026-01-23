@@ -1,32 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Button, Grid, TextField, MenuItem, Paper, Typography,
-  Stepper, Step, StepLabel, Alert, Avatar
+  Stepper, Step, StepLabel, Alert, Avatar, Divider
 } from '@mui/material';
-import { 
-  Map, CloudUpload, ArrowForward, CheckCircle, Save 
+import {
+  Map, CloudUpload, ArrowForward, CheckCircle, Save
 } from '@mui/icons-material';
+import MDEditor from '@uiw/react-md-editor';
+import '@uiw/react-md-editor/markdown-editor.css';
+import '@uiw/react-markdown-preview/markdown.css';
 import { ESTADOS, UNIDADES, POTENCIAIS } from '../constants';
 
 export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
   const [activeStep, setActiveStep] = useState(0);
-  
+
   const defaultState = {
     id: null,
-    descricao: "", 
-    proponente: "Técnico Administrativo", 
-    estado: "Amazonas", 
+    descricao: "",
+    proponente: "Técnico Administrativo",
+    estado: "Amazonas",
     municipio: "",
-    tamanho: "", 
-    unidade_medida: "ha", 
-    latitude: 0, 
-    longitude: 0, 
+    tamanho: "",
+    unidade_medida: "ha",
+    latitude: 0,
+    longitude: 0,
     potencial: "Manejo de Madeira",
-    data_submissao: new Date().toISOString().split('T')[0], 
-    custo_operacional: "", 
-    ranking: 5, 
+    data_submissao: new Date().toISOString().split('T')[0],
+    custo_operacional: "",
+    ranking: 5,
+    resumo: "",
+    detalhes: "",
     fotos: [],
-    auditoria: { risco: "Baixo", alertas: [] }, 
+    auditoria: { risco: "Baixo", alertas: [] },
     status: "Em Análise"
   };
 
@@ -40,7 +45,7 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
     }
   }, [initialData]);
 
-  const steps = ['Identificação', 'Detalhes Técnicos', 'Mídia', 'Revisão'];
+  const steps = ['Identificação', 'Detalhes Técnicos', 'Resumo e Detalhes', 'Mídia', 'Revisão'];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,8 +56,8 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => setFormData(prev => ({
-          ...prev, 
-          latitude: pos.coords.latitude, 
+          ...prev,
+          latitude: pos.coords.latitude,
           longitude: pos.coords.longitude
         })),
         () => alert("Erro ao obter GPS")
@@ -62,9 +67,9 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
 
   const handleAddPhoto = () => {
     const randomId = Math.floor(Math.random() * 100);
-    setFormData(prev => ({ 
-      ...prev, 
-      fotos: [...prev.fotos, `https://picsum.photos/600?random=${randomId}`] 
+    setFormData(prev => ({
+      ...prev,
+      fotos: [...prev.fotos, `https://picsum.photos/600?random=${randomId}`]
     }));
   };
 
@@ -73,39 +78,39 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
       alert("Preencha os campos obrigatórios");
       return;
     }
-    
-    const projectToSave = { 
-      ...formData, 
+
+    const projectToSave = {
+      ...formData,
       id: formData.id || `PROJ-${Math.floor(Math.random() * 1000)}`,
       custo_operacional: Number(formData.custo_operacional),
       tamanho: Number(formData.tamanho)
     };
-    
+
     onSave(projectToSave);
   };
 
   const renderStep = (step) => {
-    switch(step) {
+    switch (step) {
       case 0:
         return (
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12}>
-              <TextField 
-                fullWidth 
-                required 
-                label="Nome do Projeto / Comunidade" 
-                name="descricao" 
-                value={formData.descricao} 
-                onChange={handleChange} 
+              <TextField
+                fullWidth
+                required
+                label="Nome do Projeto / Comunidade"
+                name="descricao"
+                value={formData.descricao}
+                onChange={handleChange}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField 
-                select 
-                fullWidth 
-                label="Estado" 
-                name="estado" 
-                value={formData.estado} 
+              <TextField
+                select
+                fullWidth
+                label="Estado"
+                name="estado"
+                value={formData.estado}
                 onChange={handleChange}
               >
                 {ESTADOS.map((opt) => (
@@ -114,24 +119,24 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
               </TextField>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField 
-                fullWidth 
-                required 
-                label="Município" 
-                name="municipio" 
-                value={formData.municipio} 
-                onChange={handleChange} 
+              <TextField
+                fullWidth
+                required
+                label="Município"
+                name="municipio"
+                value={formData.municipio}
+                onChange={handleChange}
               />
             </Grid>
             <Grid item xs={12}>
-              <Paper 
-                variant="outlined" 
-                sx={{ 
-                  p: 2, 
-                  bgcolor: '#f1f8e9', 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center' 
+              <Paper
+                variant="outlined"
+                sx={{
+                  p: 2,
+                  bgcolor: '#f1f8e9',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
                 }}
               >
                 <Box>
@@ -140,10 +145,10 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
                     Lat: {Number(formData.latitude).toFixed(4)} / Long: {Number(formData.longitude).toFixed(4)}
                   </Typography>
                 </Box>
-                <Button 
-                  size="small" 
-                  variant="contained" 
-                  onClick={handleGeoLocation} 
+                <Button
+                  size="small"
+                  variant="contained"
+                  onClick={handleGeoLocation}
                   startIcon={<Map />}
                 >
                   GPS
@@ -152,27 +157,27 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
             </Grid>
           </Grid>
         );
-      
+
       case 1:
         return (
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={8}>
-              <TextField 
-                fullWidth 
-                type="number" 
-                label="Tamanho da Área" 
-                name="tamanho" 
-                value={formData.tamanho} 
-                onChange={handleChange} 
+              <TextField
+                fullWidth
+                type="number"
+                label="Tamanho da Área"
+                name="tamanho"
+                value={formData.tamanho}
+                onChange={handleChange}
               />
             </Grid>
             <Grid item xs={4}>
-              <TextField 
-                select 
-                fullWidth 
-                label="Unid." 
-                name="unidade_medida" 
-                value={formData.unidade_medida} 
+              <TextField
+                select
+                fullWidth
+                label="Unid."
+                name="unidade_medida"
+                value={formData.unidade_medida}
                 onChange={handleChange}
               >
                 {UNIDADES.map((u) => (
@@ -181,12 +186,12 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
               </TextField>
             </Grid>
             <Grid item xs={12}>
-              <TextField 
-                select 
-                fullWidth 
-                label="Potencial" 
-                name="potencial" 
-                value={formData.potencial} 
+              <TextField
+                select
+                fullWidth
+                label="Potencial"
+                name="potencial"
+                value={formData.potencial}
                 onChange={handleChange}
               >
                 {POTENCIAIS.map((p) => (
@@ -195,44 +200,82 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
               </TextField>
             </Grid>
             <Grid item xs={12}>
-              <TextField 
-                fullWidth 
-                type="number" 
-                label="Custo Operacional (R$)" 
-                name="custo_operacional" 
-                value={formData.custo_operacional} 
-                onChange={handleChange} 
+              <TextField
+                fullWidth
+                type="number"
+                label="Custo Operacional (R$)"
+                name="custo_operacional"
+                value={formData.custo_operacional}
+                onChange={handleChange}
               />
             </Grid>
           </Grid>
         );
-      
-      case 2: 
+
+      case 2:
+        return (
+          <Grid container spacing={3} sx={{ mt: 1 }}>
+            <Grid item xs={12}>
+              <Typography variant="subtitle2" gutterBottom>
+                Resumo do Projeto
+              </Typography>
+              <Typography variant="caption" color="text.secondary" gutterBottom display="block">
+                Breve descrição do projeto (suporta Markdown)
+              </Typography>
+              <Box sx={{ mt: 1 }} data-color-mode="light">
+                <MDEditor
+                  value={formData.resumo}
+                  onChange={(value) => setFormData(prev => ({ ...prev, resumo: value || '' }))}
+                  preview="edit"
+                  height={200}
+                />
+              </Box>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="subtitle2" gutterBottom>
+                Detalhes do Projeto
+              </Typography>
+              <Typography variant="caption" color="text.secondary" gutterBottom display="block">
+                Informações detalhadas sobre o projeto (suporta Markdown)
+              </Typography>
+              <Box sx={{ mt: 1 }} data-color-mode="light">
+                <MDEditor
+                  value={formData.detalhes}
+                  onChange={(value) => setFormData(prev => ({ ...prev, detalhes: value || '' }))}
+                  preview="edit"
+                  height={300}
+                />
+              </Box>
+            </Grid>
+          </Grid>
+        );
+
+      case 3:
         return (
           <Box sx={{ mt: 2, textAlign: 'center' }}>
-            <Button 
-              variant="outlined" 
-              component="label" 
-              startIcon={<CloudUpload />} 
+            <Button
+              variant="outlined"
+              component="label"
+              startIcon={<CloudUpload />}
               onClick={handleAddPhoto}
             >
               Simular Upload
             </Button>
-            <Box 
-              sx={{ 
-                display: 'flex', 
-                gap: 1, 
-                mt: 2, 
-                justifyContent: 'center', 
-                flexWrap: 'wrap' 
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 1,
+                mt: 2,
+                justifyContent: 'center',
+                flexWrap: 'wrap'
               }}
             >
               {formData.fotos.map((f, i) => (
-                <Avatar 
-                  key={i} 
-                  src={f} 
-                  variant="rounded" 
-                  sx={{ width: 80, height: 80 }} 
+                <Avatar
+                  key={i}
+                  src={f}
+                  variant="rounded"
+                  sx={{ width: 80, height: 80 }}
                 />
               ))}
               {formData.fotos.length === 0 && (
@@ -243,29 +286,55 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
             </Box>
           </Box>
         );
-      
-      case 3:
+
+      case 4:
         return (
-          <Alert severity="info" sx={{ mt: 2 }}>
-            <Typography variant="subtitle2">
-              Resumo {initialData ? "(Edição)" : "(Novo)"}
-            </Typography>
-            <Typography variant="body2">
-              <strong>Projeto:</strong> {formData.descricao}
-            </Typography>
-            <Typography variant="body2">
-              <strong>Local:</strong> {formData.municipio} - {formData.estado}
-            </Typography>
-            <Typography variant="body2">
-              <strong>Área:</strong> {formData.tamanho} {formData.unidade_medida}
-            </Typography>
-            <Typography variant="body2">
-              <strong>Valor:</strong> R$ {formData.custo_operacional}
-            </Typography>
-          </Alert>
+          <Box sx={{ mt: 2 }}>
+            <Alert severity="info">
+              <Typography variant="subtitle2" gutterBottom>
+                Revisão Final {initialData ? "(Edição)" : "(Novo)"}
+              </Typography>
+              <Typography variant="body2">
+                <strong>Projeto:</strong> {formData.descricao}
+              </Typography>
+              <Typography variant="body2">
+                <strong>Local:</strong> {formData.municipio} - {formData.estado}
+              </Typography>
+              <Typography variant="body2">
+                <strong>Área:</strong> {formData.tamanho} {formData.unidade_medida}
+              </Typography>
+              <Typography variant="body2">
+                <strong>Valor:</strong> R$ {formData.custo_operacional}
+              </Typography>
+            </Alert>
+
+            {formData.resumo && (
+              <Paper variant="outlined" sx={{ mt: 2, p: 2 }}>
+                <Typography variant="subtitle2" color="primary" gutterBottom>
+                  Resumo do Projeto
+                </Typography>
+                <Divider sx={{ mb: 1 }} />
+                <Box data-color-mode="light">
+                  <MDEditor.Markdown source={formData.resumo} style={{ whiteSpace: 'pre-wrap' }} />
+                </Box>
+              </Paper>
+            )}
+
+            {formData.detalhes && (
+              <Paper variant="outlined" sx={{ mt: 2, p: 2 }}>
+                <Typography variant="subtitle2" color="primary" gutterBottom>
+                  Detalhes do Projeto
+                </Typography>
+                <Divider sx={{ mb: 1 }} />
+                <Box data-color-mode="light">
+                  <MDEditor.Markdown source={formData.detalhes} style={{ whiteSpace: 'pre-wrap' }} />
+                </Box>
+              </Paper>
+            )}
+          </Box>
         );
-      
-      default: 
+
+      default:
         return null;
     }
   };
@@ -279,39 +348,39 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
           </Step>
         ))}
       </Stepper>
-      
+
       <Box sx={{ minHeight: 300, py: 2 }}>
         {renderStep(activeStep)}
       </Box>
-      
-      <Box 
-        sx={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          borderTop: '1px solid #eee', 
-          pt: 2 
+
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          borderTop: '1px solid #eee',
+          pt: 2
         }}
       >
-        <Button 
-          disabled={activeStep === 0} 
+        <Button
+          disabled={activeStep === 0}
           onClick={() => setActiveStep(p => p - 1)}
         >
           Voltar
         </Button>
-        
+
         {activeStep === steps.length - 1 ? (
-          <Button 
-            variant="contained" 
-            color="primary" 
-            onClick={handleFinish} 
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleFinish}
             startIcon={initialData ? <Save /> : <CheckCircle />}
           >
             {initialData ? "Atualizar" : "Finalizar"}
           </Button>
         ) : (
-          <Button 
-            variant="contained" 
-            onClick={() => setActiveStep(p => p + 1)} 
+          <Button
+            variant="contained"
+            onClick={() => setActiveStep(p => p + 1)}
             endIcon={<ArrowForward />}
           >
             Próximo
