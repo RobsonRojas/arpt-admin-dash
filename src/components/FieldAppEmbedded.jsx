@@ -4,15 +4,18 @@ import {
   Stepper, Step, StepLabel, Alert, Avatar, Divider
 } from '@mui/material';
 import {
-  Map, CloudUpload, ArrowForward, CheckCircle, Save
+  Map, CloudUpload, ArrowForward, CheckCircle, Save, AutoFixHigh
 } from '@mui/icons-material';
 import MDEditor from '@uiw/react-md-editor';
 import '@uiw/react-md-editor/markdown-editor.css';
 import '@uiw/react-markdown-preview/markdown.css';
 import { ESTADOS, UNIDADES, POTENCIAIS } from '../constants';
+import { improveText } from '../services/gemini';
+import { CircularProgress } from '@mui/material';
 
 export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
   const [activeStep, setActiveStep] = useState(0);
+  const [loadingAI, setLoadingAI] = useState({ resumo: false, detalhes: false });
 
   const defaultState = {
     id: null,
@@ -62,6 +65,25 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
         })),
         () => alert("Erro ao obter GPS")
       );
+    }
+  };
+
+  const handleImproveText = async (field) => {
+    const textToImprove = formData[field];
+    if (!textToImprove || textToImprove.length < 5) {
+      alert("Digite um texto um pouco maior para a IA melhorar.");
+      return;
+    }
+
+    setLoadingAI(prev => ({ ...prev, [field]: true }));
+    try {
+      const context = `Projeto: ${formData.descricao}, Município: ${formData.municipio}`;
+      const improved = await improveText(textToImprove, context);
+      setFormData(prev => ({ ...prev, [field]: improved }));
+    } catch (error) {
+      alert("Erro ao melhorar texto. Verifique a API Key ou tente novamente.");
+    } finally {
+      setLoadingAI(prev => ({ ...prev, [field]: false }));
     }
   };
 
@@ -216,12 +238,25 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
         return (
           <Grid container spacing={3} sx={{ mt: 1 }}>
             <Grid item xs={12}>
-              <Typography variant="subtitle2" gutterBottom>
-                Resumo do Projeto
-              </Typography>
-              <Typography variant="caption" color="text.secondary" gutterBottom display="block">
-                Breve descrição do projeto (suporta Markdown)
-              </Typography>
+              <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                <Box>
+                  <Typography variant="subtitle2">
+                    Resumo do Projeto
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Breve descrição do projeto (suporta Markdown)
+                  </Typography>
+                </Box>
+                <Button
+                  startIcon={loadingAI.resumo ? <CircularProgress size={20} /> : <AutoFixHigh />}
+                  size="small"
+                  variant="outlined"
+                  onClick={() => handleImproveText('resumo')}
+                  disabled={loadingAI.resumo}
+                >
+                  {loadingAI.resumo ? "Melhorando..." : "Melhorar com IA"}
+                </Button>
+              </Box>
               <Box sx={{ mt: 1 }} data-color-mode="light">
                 <MDEditor
                   value={formData.resumo}
@@ -232,12 +267,25 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
               </Box>
             </Grid>
             <Grid item xs={12}>
-              <Typography variant="subtitle2" gutterBottom>
-                Detalhes do Projeto
-              </Typography>
-              <Typography variant="caption" color="text.secondary" gutterBottom display="block">
-                Informações detalhadas sobre o projeto (suporta Markdown)
-              </Typography>
+              <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                <Box>
+                  <Typography variant="subtitle2">
+                    Detalhes do Projeto
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Informações detalhadas sobre o projeto (suporta Markdown)
+                  </Typography>
+                </Box>
+                <Button
+                  startIcon={loadingAI.detalhes ? <CircularProgress size={20} /> : <AutoFixHigh />}
+                  size="small"
+                  variant="outlined"
+                  onClick={() => handleImproveText('detalhes')}
+                  disabled={loadingAI.detalhes}
+                >
+                  {loadingAI.detalhes ? "Melhorando..." : "Melhorar com IA"}
+                </Button>
+              </Box>
               <Box sx={{ mt: 1 }} data-color-mode="light">
                 <MDEditor
                   value={formData.detalhes}
