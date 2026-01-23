@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -12,6 +13,7 @@ const firebaseConfig = {
 
 let app = null;
 let auth = null;
+let db = null;
 let isFirebaseConfigured = true;
 
 try {
@@ -22,9 +24,10 @@ try {
   }
   app = initializeApp(firebaseConfig);
   auth = getAuth(app);
+  db = getFirestore(app);
 } catch (err) {
   console.warn('[Firebase] Configuração ausente ou inválida:', err?.message || err);
   isFirebaseConfigured = false;
 }
 
-export { auth, isFirebaseConfigured };
+export { auth, db, isFirebaseConfigured };

@@ -7,3 +7,4 @@ export { Sponsors } from './Sponsors';
 export { Login } from './Login';
 export { Users } from './Users';
 export { Rewards } from './Rewards';
+export { default as Certificates } from './Certificates';

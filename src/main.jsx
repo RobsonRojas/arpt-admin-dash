@@ -5,12 +5,16 @@ import { AdminProvider } from './contexts/AdminContext';
 import { AuthProvider } from './contexts/AuthContext.jsx';
 import './styles/index.css';
 
+import { BrowserRouter } from 'react-router-dom';
+
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
-        <AuthProvider>
-            <AdminProvider>
-                <App />
-            </AdminProvider>
-        </AuthProvider>
+        <BrowserRouter>
+            <AuthProvider>
+                <AdminProvider>
+                    <App />
+                </AdminProvider>
+            </AuthProvider>
+        </BrowserRouter>
     </React.StrictMode>
 );
