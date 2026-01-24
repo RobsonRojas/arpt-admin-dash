@@ -3,20 +3,27 @@ import {
     Box, Typography, Button, Paper, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, IconButton, Dialog,
     DialogTitle, DialogContent, DialogActions, TextField,
-    CircularProgress, Chip
+    CircularProgress, Chip, MenuItem
 } from '@mui/material';
-import { Add, Visibility, Delete, CardMembership } from '@mui/icons-material';
+import { Add, Visibility, Delete, CardMembership, Edit } from '@mui/icons-material';
 import { db } from '../services/firebase';
-import { collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, getDocs, deleteDoc, updateDoc, doc, query, orderBy, Timestamp } from 'firebase/firestore';
+import { useAdmin } from '../contexts/AdminContext';
+
+const CERTIFICATE_TYPES = ['Bronze', 'Prata', 'Ouro', 'Diamante', 'Platina'];
 
 const Certificates = () => {
+    const { projects } = useAdmin();
     const [certificates, setCertificates] = useState([]);
     const [loading, setLoading] = useState(true);
     const [openDialog, setOpenDialog] = useState(false);
+    const [editingId, setEditingId] = useState(null);
     const [formData, setFormData] = useState({
         sponsorName: '',
         projectName: '',
-        date: new Date().toISOString().split('T')[0]
+        date: new Date().toISOString().split('T')[0],
+        blockchainLink: '',
+        type: 'Ouro'
     });
     const [submitting, setSubmitting] = useState(false);
 
@@ -46,17 +53,32 @@ const Certificates = () => {
         }
     };
 
-    const handleOpenDialog = () => {
+    const handleOpenDialog = (cert = null) => {
+        if (cert) {
+            setEditingId(cert.id);
+            setFormData({
+                sponsorName: cert.sponsorName,
+                projectName: cert.projectName,
+                date: cert.date,
+                blockchainLink: cert.blockchainLink || '',
+                type: cert.type || 'Ouro'
+            });
+        } else {
+            setEditingId(null);
+            setFormData({
+                sponsorName: '',
+                projectName: '',
+                date: new Date().toISOString().split('T')[0],
+                blockchainLink: '',
+                type: 'Ouro'
+            });
+        }
         setOpenDialog(true);
-        setFormData({
-            sponsorName: '',
-            projectName: '',
-            date: new Date().toISOString().split('T')[0]
-        });
     };
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
+        setEditingId(null);
     };
 
     const handleInputChange = (e) => {
@@ -65,24 +87,37 @@ const Certificates = () => {
     };
 
     const handleSubmit = async () => {
-        if (!formData.sponsorName || !formData.projectName || !formData.date) {
-            alert("Preencha todos os campos");
+        if (!formData.sponsorName || !formData.projectName || !formData.date || !formData.type) {
+            alert("Preencha todos os campos obrigatórios");
             return;
         }
 
         setSubmitting(true);
         try {
-            await addDoc(collection(db, "certificates"), {
+            const dataToSave = {
                 sponsorName: formData.sponsorName,
                 projectName: formData.projectName,
                 date: formData.date,
-                createdAt: Timestamp.now()
-            });
+                blockchainLink: formData.blockchainLink || '',
+                type: formData.type
+            };
+
+            if (editingId) {
+                // Update existing
+                const certRef = doc(db, "certificates", editingId);
+                await updateDoc(certRef, dataToSave);
+            } else {
+                // Create new
+                await addDoc(collection(db, "certificates"), {
+                    ...dataToSave,
+                    createdAt: Timestamp.now()
+                });
+            }
             await fetchCertificates();
             handleCloseDialog();
         } catch (error) {
-            console.error("Error creating certificate: ", error);
-            alert("Erro ao criar certificado");
+            console.error("Error saving certificate: ", error);
+            alert("Erro ao salvar certificado");
         } finally {
             setSubmitting(false);
         }
@@ -105,12 +140,25 @@ const Certificates = () => {
         const viewData = {
             sponsorName: cert.sponsorName,
             projectName: cert.projectName,
-            date: cert.date
+            date: cert.date,
+            blockchainLink: cert.blockchainLink,
+            type: cert.type || 'Ouro'
         };
-        // Encode to base64
+        // Encode to base64 (Unicode safe)
         const json = JSON.stringify(viewData);
-        const encoded = btoa(json);
+        const encoded = btoa(unescape(encodeURIComponent(json)));
         window.open(`/certificate/view?d=${encoded}`, '_blank');
+    };
+
+    const getTypeColor = (type) => {
+        switch (type) {
+            case 'Bronze': return '#cd7f32';
+            case 'Prata': return '#c0c0c0';
+            case 'Ouro': return '#ffd700';
+            case 'Diamante': return '#b9f2ff';
+            case 'Platina': return '#e5e4e2';
+            default: return '#ffd700';
+        }
     };
 
     return (
@@ -123,7 +171,7 @@ const Certificates = () => {
                 <Button
                     variant="contained"
                     startIcon={<Add />}
-                    onClick={handleOpenDialog}
+                    onClick={() => handleOpenDialog()}
                     disabled={!db}
                 >
                     Novo Certificado
@@ -141,6 +189,7 @@ const Certificates = () => {
                     <TableHead>
                         <TableRow sx={{ bgcolor: '#f5f5f5' }}>
                             <TableCell><strong>Patrocinador</strong></TableCell>
+                            <TableCell><strong>Tipo</strong></TableCell>
                             <TableCell><strong>Projeto / Título</strong></TableCell>
                             <TableCell><strong>Data</strong></TableCell>
                             <TableCell align="right"><strong>Ações</strong></TableCell>
@@ -149,13 +198,13 @@ const Certificates = () => {
                     <TableBody>
                         {loading ? (
                             <TableRow>
-                                <TableCell colSpan={4} align="center" sx={{ py: 3 }}>
+                                <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
                                     <CircularProgress />
                                 </TableCell>
                             </TableRow>
                         ) : certificates.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={4} align="center" sx={{ py: 3 }}>
+                                <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
                                     <Typography color="textSecondary">Nenhum certificado encontrado.</Typography>
                                 </TableCell>
                             </TableRow>
@@ -163,6 +212,17 @@ const Certificates = () => {
                             certificates.map((cert) => (
                                 <TableRow key={cert.id} hover>
                                     <TableCell>{cert.sponsorName}</TableCell>
+                                    <TableCell>
+                                        <Chip
+                                            label={cert.type || 'Ouro'}
+                                            size="small"
+                                            sx={{
+                                                bgcolor: getTypeColor(cert.type),
+                                                color: ['Diamante', 'Platina', 'Prata'].includes(cert.type) ? '#000' : '#fff',
+                                                fontWeight: 'bold'
+                                            }}
+                                        />
+                                    </TableCell>
                                     <TableCell>{cert.projectName}</TableCell>
                                     <TableCell>{new Date(cert.date).toLocaleDateString()}</TableCell>
                                     <TableCell align="right">
@@ -172,6 +232,13 @@ const Certificates = () => {
                                             title="Visualizar"
                                         >
                                             <Visibility />
+                                        </IconButton>
+                                        <IconButton
+                                            color="info"
+                                            onClick={() => handleOpenDialog(cert)}
+                                            title="Editar"
+                                        >
+                                            <Edit />
                                         </IconButton>
                                         <IconButton
                                             color="error"
@@ -189,9 +256,24 @@ const Certificates = () => {
             </TableContainer>
 
             <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-                <DialogTitle>Novo Certificado</DialogTitle>
+                <DialogTitle>{editingId ? 'Editar Certificado' : 'Novo Certificado'}</DialogTitle>
                 <DialogContent dividers>
                     <Box display="flex" flexDirection="column" gap={2} pt={1}>
+                        <TextField
+                            select
+                            label="Tipo de Certificado"
+                            name="type"
+                            value={formData.type}
+                            onChange={handleInputChange}
+                            fullWidth
+                            required
+                        >
+                            {CERTIFICATE_TYPES.map((option) => (
+                                <MenuItem key={option} value={option}>
+                                    {option}
+                                </MenuItem>
+                            ))}
+                        </TextField>
                         <TextField
                             label="Nome do Patrocinador"
                             name="sponsorName"
@@ -201,14 +283,21 @@ const Certificates = () => {
                             required
                         />
                         <TextField
+                            select
                             label="Nome do Projeto / Título"
                             name="projectName"
                             value={formData.projectName}
                             onChange={handleInputChange}
                             fullWidth
                             required
-                            helperText="Ex: Reflorestamento 2024"
-                        />
+                            helperText="Selecione um projeto existente"
+                        >
+                            {projects && projects.map((p) => (
+                                <MenuItem key={p.id} value={p.descricao}>
+                                    {p.descricao}
+                                </MenuItem>
+                            ))}
+                        </TextField>
                         <TextField
                             label="Data de Emissão"
                             name="date"
@@ -218,6 +307,14 @@ const Certificates = () => {
                             fullWidth
                             required
                             InputLabelProps={{ shrink: true }}
+                        />
+                        <TextField
+                            label="Link do Blockchain (Opcional)"
+                            name="blockchainLink"
+                            value={formData.blockchainLink}
+                            onChange={handleInputChange}
+                            fullWidth
+                            placeholder="https://..."
                         />
                     </Box>
                 </DialogContent>
