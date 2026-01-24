@@ -1,21 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box, Paper, Toolbar, TextField, MenuItem, Button,
   Table, TableContainer, TableHead, TableRow, TableCell,
   TableBody, Typography, IconButton, Dialog, DialogTitle,
-  DialogContent, DialogActions, Drawer, List, ListItem, ListItemText, Divider
+  DialogContent, DialogActions, Drawer, List, ListItem, ListItemText, Divider,
+  Tabs, Tab
 } from '@mui/material';
-import { Search, Add, Edit, Visibility, Close } from '@mui/icons-material';
-import { StatusChip, MapEmbed } from '../components';
+import { Search, Add, Edit, Visibility, Close, ContentCopy, Description } from '@mui/icons-material';
+import { StatusChip } from '../components/StatusChip';
+import { MapEmbed } from '../components/MapEmbed';
 import { FieldAppEmbedded } from '../components/FieldAppEmbedded';
+import { ProjectProducts } from '../components/modules/project_tabs/ProjectProducts';
+import { ProjectDocs } from '../components/modules/project_tabs/ProjectDocs';
+import { ProjectIncidents } from '../components/modules/project_tabs/ProjectIncidents';
 
 import { STATUS_PROJETO } from '../constants';
 import { useAdmin } from '../contexts/AdminContext';
 import { generateDocument } from '../services/gemini';
 import { CircularProgress } from '@mui/material';
 import MDEditor from '@uiw/react-md-editor';
-import { ContentCopy, Description } from '@mui/icons-material';
-import { useState } from 'react';
 
 export const Projects = () => {
   const {
@@ -35,14 +38,19 @@ export const Projects = () => {
     projects,
   } = useAdmin();
 
-
-
   const filteredProjects = getFilteredProjects();
 
   // Document Generation State
   const [openDocDialog, setOpenDocDialog] = useState(false);
   const [generatedDoc, setGeneratedDoc] = useState("");
   const [loadingDoc, setLoadingDoc] = useState(false);
+
+  // Tabs State
+  const [tabValue, setTabValue] = useState(0);
+
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
 
   const handleGenerateLicensingDoc = async (project) => {
     setLoadingDoc(true);
@@ -129,7 +137,7 @@ export const Projects = () => {
                   </IconButton>
                   <IconButton
                     size="small"
-                    onClick={() => setSelectedProject(p)}
+                    onClick={() => { setSelectedProject(p); setTabValue(0); }}
                     title="Visualizar"
                   >
                     <Visibility />
@@ -171,50 +179,79 @@ export const Projects = () => {
         anchor="right"
         open={Boolean(selectedProject)}
         onClose={() => setSelectedProject(null)}
-        PaperProps={{ sx: { width: { xs: '100%', md: 500 } } }}
+        PaperProps={{ sx: { width: { xs: '100%', md: 600 } } }}
       >
         {selectedProject && (
-          <Box p={3} display="flex" flexDirection="column" height="100%">
-            <Typography variant="h6">{selectedProject.descricao}</Typography>
-            <Divider sx={{ my: 2 }} />
-            <Box flexGrow={1}>
-              <MapEmbed
-                lat={selectedProject.latitude || -3.0}
-                lng={selectedProject.longitude || -60.0}
-              />
-              <List>
-                <ListItem>
-                  <ListItemText
-                    primary="Proponente"
-                    secondary={selectedProject.proponente}
-                  />
-                </ListItem>
-                <ListItem>
-                  <ListItemText
-                    primary="Área"
-                    secondary={`${selectedProject.tamanho} ${selectedProject.unidade_medida}`}
-                  />
-                </ListItem>
-                <ListItem>
-                  <ListItemText
-                    primary="Risco Auditoria"
-                    secondary={
-                      <StatusChip label={selectedProject.auditoria.risco} size="small" />
-                    }
-                  />
-                </ListItem>
-              </List>
+          <Box height="100%" display="flex" flexDirection="column">
+            <Box p={2} bgcolor="primary.main" color="white">
+              <Typography variant="h6">{selectedProject.descricao}</Typography>
+            </Box>
 
-              <Divider sx={{ my: 2 }} />
-              <Typography variant="subtitle2" gutterBottom>Documentação</Typography>
-              <Button
-                variant="outlined"
-                fullWidth
-                startIcon={<Description />}
-                onClick={() => handleGenerateLicensingDoc(selectedProject)}
-              >
-                Gerar Documentos de Licenciamento
-              </Button>
+            <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth" indicatorColor="secondary" textColor="inherit">
+              <Tab label="Visão Geral" />
+              <Tab label="Produtos" />
+              <Tab label="Documentos" />
+              <Tab label="Incidentes" />
+            </Tabs>
+
+            <Box flexGrow={1} p={3} overflow="auto">
+              {/* TAB 0 - Visão Geral */}
+              {tabValue === 0 && (
+                <>
+                  <MapEmbed
+                    lat={selectedProject.latitude || -3.0}
+                    lng={selectedProject.longitude || -60.0}
+                  />
+                  <List>
+                    <ListItem>
+                      <ListItemText
+                        primary="Proponente"
+                        secondary={selectedProject.proponente}
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText
+                        primary="Área"
+                        secondary={`${selectedProject.tamanho} ${selectedProject.unidade_medida}`}
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText
+                        primary="Risco Auditoria"
+                        secondary={
+                          <StatusChip label={selectedProject.auditoria?.risco || 'N/A'} size="small" />
+                        }
+                      />
+                    </ListItem>
+                  </List>
+
+                  <Divider sx={{ my: 2 }} />
+                  <Typography variant="subtitle2" gutterBottom>Documentação (IA)</Typography>
+                  <Button
+                    variant="outlined"
+                    fullWidth
+                    startIcon={<Description />}
+                    onClick={() => handleGenerateLicensingDoc(selectedProject)}
+                  >
+                    Gerar Documentos de Licenciamento
+                  </Button>
+                </>
+              )}
+
+              {/* TAB 1 - Produtos */}
+              {tabValue === 1 && (
+                <ProjectProducts projectId={selectedProject.id} />
+              )}
+
+              {/* TAB 2 - Documentos */}
+              {tabValue === 2 && (
+                <ProjectDocs projectId={selectedProject.id} />
+              )}
+
+              {/* TAB 3 - Incidentes */}
+              {tabValue === 3 && (
+                <ProjectIncidents projectId={selectedProject.id} />
+              )}
             </Box>
           </Box>
         )}

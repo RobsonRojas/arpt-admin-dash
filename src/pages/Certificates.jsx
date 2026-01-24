@@ -12,7 +12,7 @@ import { useAdmin } from '../contexts/AdminContext';
 
 const CERTIFICATE_TYPES = ['Bronze', 'Prata', 'Ouro', 'Diamante', 'Platina'];
 
-const Certificates = () => {
+export const Certificates = () => {
     const { projects } = useAdmin();
     const [certificates, setCertificates] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -333,4 +333,4 @@ const Certificates = () => {
     );
 };
 
-export default Certificates;
+

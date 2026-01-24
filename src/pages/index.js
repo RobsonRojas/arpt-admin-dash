@@ -1,10 +1,10 @@
-// Exportação centralizada das páginas
-export { Dashboard } from './Dashboard';
-export { Projects } from './Projects';
-export { Properties } from './Properties';
-export { Necromassa } from './Necromassa';
-export { Sponsors } from './Sponsors';
-export { Login } from './Login';
-export { Users } from './Users';
-export { Rewards } from './Rewards';
-export { default as Certificates } from './Certificates';
+export * from './Dashboard';
+export * from './Projects';
+export * from './Properties';
+export * from './Necromassa';
+export * from './Sponsors';
+export * from './Login';
+export * from './Users';
+export * from './Rewards';
+export * from './Certificates';
+export * from './Products';

@@ -358,6 +358,117 @@ export const AdminProvider = ({ children }) => {
         }
     }
 
+    // ==================== DOCS MANAGEMENT ====================
+
+    const getDocsByManejoId = async (manejoId) => {
+        try {
+            const response = await api.get(`/manejos/${manejoId}/docs`);
+            if (response.status === 200) {
+                return response.data;
+            }
+            console.warn(`Resposta inesperada ao buscar documentos: status ${response.status}`);
+            return null;
+        } catch (error) {
+            console.error("Error fetching docs by manejo ID:", error);
+            return null;
+        }
+    }
+
+    const createDoc = async (manejoId, payload) => {
+        try {
+            // If payload has a file, use FormData
+            let data = payload;
+            let headers = {};
+
+            if (payload instanceof FormData) {
+                data = payload;
+                headers = { 'Content-Type': 'multipart/form-data' };
+            }
+
+            const response = await api.post(`/manejos/${manejoId}/docs`, data, { headers });
+            if (response.status === 201 || response.status === 200) {
+                return response.data;
+            }
+            console.warn(`Resposta inesperada ao criar documento: status ${response.status}`);
+            return null;
+        } catch (error) {
+            console.error("Error creating doc:", error);
+            return null;
+        }
+    }
+
+    const deleteDoc = async (manejoId, docId) => {
+        try {
+            const response = await api.delete(`/manejos/${manejoId}/docs/${docId}`);
+            if (response.status === 200 || response.status === 204) {
+                return true;
+            }
+            console.warn(`Resposta inesperada ao deletar documento: status ${response.status}`);
+            return false;
+        } catch (error) {
+            console.error("Error deleting doc:", error);
+            return false;
+        }
+    }
+
+    // ==================== INCIDENTS MANAGEMENT ====================
+
+    const getIncidentsByManejoId = async (manejoId) => {
+        try {
+            const response = await api.get(`/manejos/${manejoId}/incidents`);
+            if (response.status === 200) {
+                return response.data;
+            }
+            console.warn(`Resposta inesperada ao buscar incidentes: status ${response.status}`);
+            return null;
+        } catch (error) {
+            console.error("Error fetching incidents by manejo ID:", error);
+            return null;
+        }
+    }
+
+    const createIncident = async (manejoId, payload) => {
+        try {
+            const response = await api.post(`/manejos/${manejoId}/incidents`, payload);
+            if (response.status === 201 || response.status === 200) {
+                return response.data;
+            }
+            console.warn(`Resposta inesperada ao criar incidente: status ${response.status}`);
+            return null;
+        } catch (error) {
+            console.error("Error creating incident:", error);
+            return null;
+        }
+    }
+
+    const updateIncident = async (manejoId, incidentId, payload) => {
+        try {
+            const response = await api.put(`/manejos/${manejoId}/incidents/${incidentId}`, payload);
+            if (response.status === 200) {
+                return response.data;
+            }
+            console.warn(`Resposta inesperada ao atualizar incidente: status ${response.status}`);
+            return null;
+        } catch (error) {
+            console.error("Error updating incident:", error);
+            return null;
+        }
+    }
+
+    const deleteIncident = async (manejoId, incidentId) => {
+        try {
+            const response = await api.delete(`/manejos/${manejoId}/incidents/${incidentId}`);
+            if (response.status === 200 || response.status === 204) {
+                return true;
+            }
+            console.warn(`Resposta inesperada ao deletar incidente: status ${response.status}`);
+            return false;
+        } catch (error) {
+            console.error("Error deleting incident:", error);
+            return false;
+        }
+    }
+
     // ==================== REGRAS DE NEGÓCIO - PROJETOS ====================
 
     /**
@@ -609,6 +720,17 @@ export const AdminProvider = ({ children }) => {
         createReward,
         updateReward,
         deleteReward,
+
+        // Regras de Negócio - Docs
+        getDocsByManejoId,
+        createDoc,
+        deleteDoc,
+
+        // Regras de Negócio - Incidents
+        getIncidentsByManejoId,
+        createIncident,
+        updateIncident,
+        deleteIncident,
     };
 
     return (
