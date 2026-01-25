@@ -3,9 +3,9 @@ import {
     Box, Typography, Button, Table, TableContainer, TableHead,
     TableRow, TableCell, TableBody, Paper, IconButton, Chip,
     Dialog, DialogTitle, DialogContent, DialogActions, Grid,
-    TextField, MenuItem, CircularProgress, Alert,
+    TextField, MenuItem, CircularProgress, Alert, Avatar
 } from '@mui/material';
-import { Add, Edit, Delete, CardGiftcard, Refresh } from '@mui/icons-material';
+import { Add, Edit, Delete, CardGiftcard, Refresh, Visibility, Image as ImageIcon } from '@mui/icons-material';
 import { useAdmin } from '../contexts/AdminContext';
 
 export const Rewards = () => {
@@ -22,7 +22,9 @@ export const Rewards = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [openForm, setOpenForm] = useState(false);
+    const [openView, setOpenView] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+    const [selectedReward, setSelectedReward] = useState(null);
     const [formData, setFormData] = useState({
         id: '',
         name: '',
@@ -30,6 +32,7 @@ export const Rewards = () => {
         retail_price: '',
         reward_price: '',
         reward_qtd: '',
+        foto_url: ''
     });
 
     // Load rewards when manejo is selected
@@ -69,6 +72,7 @@ export const Rewards = () => {
             retail_price: '',
             reward_price: '',
             reward_qtd: '',
+            foto_url: ''
         });
         setIsEditing(false);
         setOpenForm(true);
@@ -82,9 +86,15 @@ export const Rewards = () => {
             retail_price: reward.retail_price || '',
             reward_price: reward.reward_price || '',
             reward_qtd: reward.reward_qtd || '',
+            foto_url: reward.foto_url || ''
         });
         setIsEditing(true);
         setOpenForm(true);
+    };
+
+    const handleOpenView = (reward) => {
+        setSelectedReward(reward);
+        setOpenView(true);
     };
 
     const handleSave = async () => {
@@ -104,6 +114,7 @@ export const Rewards = () => {
             retail_price: Number(formData.retail_price) || 0,
             reward_price: Number(formData.reward_price) || 0,
             reward_qtd: Number(formData.reward_qtd) || 0,
+            foto_url: formData.foto_url || ''
         };
 
         try {
@@ -240,9 +251,18 @@ export const Rewards = () => {
                                             </Typography>
                                         </TableCell>
                                         <TableCell>
-                                            <Typography variant="body2" fontWeight="bold">
-                                                {reward.name}
-                                            </Typography>
+                                            <Box display="flex" alignItems="center" gap={2}>
+                                                <Avatar
+                                                    src={reward.foto_url}
+                                                    variant="rounded"
+                                                    sx={{ width: 40, height: 40 }}
+                                                >
+                                                    <ImageIcon />
+                                                </Avatar>
+                                                <Typography variant="body2" fontWeight="bold">
+                                                    {reward.name}
+                                                </Typography>
+                                            </Box>
                                         </TableCell>
                                         <TableCell>
                                             <Typography variant="body2" color="text.secondary">
@@ -272,6 +292,14 @@ export const Rewards = () => {
                                             <IconButton
                                                 size="small"
                                                 color="primary"
+                                                onClick={() => handleOpenView(reward)}
+                                                title="Visualizar"
+                                            >
+                                                <Visibility />
+                                            </IconButton>
+                                            <IconButton
+                                                size="small"
+                                                color="default"
                                                 onClick={() => handleOpenEdit(reward)}
                                                 title="Editar"
                                             >
@@ -350,7 +378,7 @@ export const Rewards = () => {
                                 helperText="0 = Grátis"
                             />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid item xs={6}>
                             <TextField
                                 fullWidth
                                 type="number"
@@ -360,12 +388,85 @@ export const Rewards = () => {
                                 inputProps={{ min: '0' }}
                             />
                         </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                label="URL da Foto"
+                                value={formData.foto_url}
+                                onChange={e => setFormData({ ...formData, foto_url: e.target.value })}
+                                helperText="URL da imagem da recompensa"
+                            />
+                        </Grid>
                     </Grid>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpenForm(false)}>Cancelar</Button>
                     <Button variant="contained" onClick={handleSave}>
                         {isEditing ? 'Atualizar' : 'Cadastrar'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Dialog View */}
+            <Dialog open={openView} onClose={() => setOpenView(false)} maxWidth="sm" fullWidth>
+                <DialogTitle>Detalhes da Recompensa</DialogTitle>
+                <DialogContent dividers>
+                    {selectedReward && (
+                        <Box display="flex" flexDirection="column" gap={2}>
+                            {selectedReward.foto_url ? (
+                                <Box
+                                    component="img"
+                                    src={selectedReward.foto_url}
+                                    alt={selectedReward.name}
+                                    sx={{
+                                        width: '100%',
+                                        maxHeight: 300,
+                                        objectFit: 'contain',
+                                        borderRadius: 1,
+                                        mb: 2,
+                                        bgcolor: 'grey.100'
+                                    }}
+                                />
+                            ) : (
+                                <Box display="flex" justifyContent="center" alignItems="center" height={150} bgcolor="grey.100" borderRadius={1} mb={2}>
+                                    <ImageIcon sx={{ fontSize: 60, color: 'grey.300' }} />
+                                </Box>
+                            )}
+                            <Typography variant="h6">{selectedReward.name}</Typography>
+                            <Typography variant="body1" color="text.secondary">
+                                {selectedReward.info || "Sem descrição"}
+                            </Typography>
+                            <Box display="flex" justifyContent="space-between" mt={1}>
+                                <Box>
+                                    <Typography variant="caption" color="textSecondary">Preço Varejo</Typography>
+                                    <Typography variant="body1">
+                                        {selectedReward.retail_price ? `R$ ${Number(selectedReward.retail_price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '-'}
+                                    </Typography>
+                                </Box>
+                                <Box>
+                                    <Typography variant="caption" color="textSecondary">Preço Recompensa</Typography>
+                                    <Typography variant="body1" fontWeight="bold" color="primary">
+                                        {selectedReward.reward_price ? `R$ ${Number(selectedReward.reward_price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 'Grátis'}
+                                    </Typography>
+                                </Box>
+                                <Box>
+                                    <Typography variant="caption" color="textSecondary">Qtd.</Typography>
+                                    <Typography variant="body1">{selectedReward.reward_qtd}</Typography>
+                                </Box>
+                            </Box>
+                        </Box>
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenView(false)}>Fechar</Button>
+                    <Button
+                        variant="contained"
+                        onClick={() => {
+                            setOpenView(false);
+                            handleOpenEdit(selectedReward);
+                        }}
+                    >
+                        Editar
                     </Button>
                 </DialogActions>
             </Dialog>

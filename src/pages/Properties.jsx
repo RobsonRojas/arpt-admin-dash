@@ -5,7 +5,7 @@ import {
   Dialog, DialogTitle, DialogContent, DialogActions, Grid,
   TextField, MenuItem, Drawer, Divider,
 } from '@mui/material';
-import { Add, Visibility, Edit, CloudUpload, HomeWork, Park } from '@mui/icons-material';
+import { Add, Visibility, Edit, CloudUpload, HomeWork, Park, Image as ImageIcon } from '@mui/icons-material';
 import { MapEmbed, InventoryManager } from '../components';
 import { STATUS_PROPRIEDADE } from '../constants';
 import { useAdmin } from '../contexts/AdminContext';
@@ -89,6 +89,12 @@ export const Properties = () => {
     setOpenForm(false);
   };
 
+  const getPropertyImage = (prop) => {
+    if (prop.foto) return prop.foto;
+    if (prop.image_internal_path) return `${urlMidiasFiles}${prop.image_internal_path}`;
+    return null;
+  };
+
   return (
     <Box sx={{ animation: 'fadeIn 0.5s' }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
@@ -126,7 +132,11 @@ export const Properties = () => {
                 </TableCell>
                 <TableCell>
                   <Box display="flex" alignItems="center" gap={2}>
-                    <Avatar src={`${urlMidiasFiles}${row.image_internal_path}`} variant="rounded">
+                    <Avatar
+                      src={getPropertyImage(row)}
+                      variant="rounded"
+                    >
+                      <ImageIcon />
                     </Avatar>
                     <Box>
                       <Typography variant="body2" fontWeight="bold">
@@ -266,13 +276,30 @@ export const Properties = () => {
         PaperProps={{ sx: { width: { xs: '100%', md: 400 } } }}
       >
         {selectedProp && (
-          <Box p={3}>
-            <Typography variant="h6" gutterBottom>Detalhes</Typography>
-            <Divider sx={{ mb: 2 }} />
+          <Box p={3} display="flex" flexDirection="column" gap={2}>
+            <Box>
+              <Typography variant="h6" gutterBottom>Detalhes</Typography>
+              <Divider sx={{ mb: 2 }} />
+            </Box>
+
+            {getPropertyImage(selectedProp) && (
+              <Box
+                component="img"
+                src={getPropertyImage(selectedProp)}
+                alt={selectedProp.proprietario}
+                sx={{
+                  width: '100%',
+                  height: 200,
+                  objectFit: 'cover',
+                  borderRadius: 1
+                }}
+              />
+            )}
+
             <Typography variant="subtitle1" fontWeight="bold">
               {selectedProp.proprietario}
             </Typography>
-            <Paper variant="outlined" sx={{ p: 2, mb: 2, mt: 2 }}>
+            <Paper variant="outlined" sx={{ p: 2 }}>
               <Grid container spacing={1}>
                 <Grid item xs={6}>
                   <Typography variant="caption">CAR</Typography>
@@ -293,7 +320,7 @@ export const Properties = () => {
               color="success"
               startIcon={<Park />}
               onClick={() => setOpenInventory(true)}
-              sx={{ mt: 2 }}
+              sx={{ mt: 'auto' }}
             >
               Gerir Inventário de Árvores
             </Button>

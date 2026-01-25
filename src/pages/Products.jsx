@@ -3,9 +3,10 @@ import {
     Box, Typography, Button, Table, TableContainer, TableHead,
     TableRow, TableCell, TableBody, Paper, IconButton, Chip,
     Dialog, DialogTitle, DialogContent, DialogActions, TextField,
-    FormControlLabel, Switch, CircularProgress, Alert, Snackbar
+    FormControlLabel, Switch, CircularProgress, Alert, Snackbar,
+    Avatar, Grid
 } from '@mui/material';
-import { Add, Edit, Delete, Refresh } from '@mui/icons-material';
+import { Add, Edit, Delete, Refresh, Visibility, Image as ImageIcon } from '@mui/icons-material';
 import { api } from '../services/api';
 
 export const Products = () => {
@@ -18,7 +19,9 @@ export const Products = () => {
 
     // Dialog state
     const [openDialog, setOpenDialog] = useState(false);
+    const [openViewDialog, setOpenViewDialog] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
+    const [viewingProduct, setViewingProduct] = useState(null);
 
     // Form state
     const [formData, setFormData] = useState({
@@ -85,6 +88,16 @@ export const Products = () => {
         setEditingProduct(null);
     };
 
+    const handleOpenView = (product) => {
+        setViewingProduct(product);
+        setOpenViewDialog(true);
+    };
+
+    const handleCloseView = () => {
+        setOpenViewDialog(false);
+        setViewingProduct(null);
+    };
+
     const handleSave = async () => {
         try {
             const payload = {
@@ -149,8 +162,7 @@ export const Products = () => {
                     <Table>
                         <TableHead sx={{ bgcolor: '#f9fafb' }}>
                             <TableRow>
-                                <TableCell>ID</TableCell>
-                                <TableCell>Nome</TableCell>
+                                <TableCell>Produto</TableCell>
                                 <TableCell>Preço</TableCell>
                                 <TableCell>Prazo (meses)</TableCell>
                                 <TableCell>Status</TableCell>
@@ -160,11 +172,19 @@ export const Products = () => {
                         <TableBody>
                             {products.map((row) => (
                                 <TableRow key={row.id} hover>
-                                    <TableCell>{row.id}</TableCell>
                                     <TableCell>
-                                        <Box>
-                                            <Typography fontWeight="bold">{row.nome}</Typography>
-                                            <Typography variant="caption" color="textSecondary">{row.info}</Typography>
+                                        <Box display="flex" alignItems="center" gap={2}>
+                                            <Avatar
+                                                src={row.fotos?.[0]?.url}
+                                                variant="rounded"
+                                                sx={{ width: 48, height: 48 }}
+                                            >
+                                                <ImageIcon />
+                                            </Avatar>
+                                            <Box>
+                                                <Typography fontWeight="bold">{row.nome}</Typography>
+                                                <Typography variant="caption" color="textSecondary">{row.info}</Typography>
+                                            </Box>
                                         </Box>
                                     </TableCell>
                                     <TableCell>R$ {row.preco}</TableCell>
@@ -177,6 +197,9 @@ export const Products = () => {
                                         />
                                     </TableCell>
                                     <TableCell align="right">
+                                        <IconButton size="small" color="primary" onClick={() => handleOpenView(row)}>
+                                            <Visibility />
+                                        </IconButton>
                                         <IconButton size="small" onClick={() => handleOpenDialog(row)}>
                                             <Edit />
                                         </IconButton>
@@ -196,6 +219,7 @@ export const Products = () => {
                 </TableContainer>
             )}
 
+            {/* Create/Edit Dialog */}
             <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
                 <DialogTitle>{editingProduct ? 'Editar Produto' : 'Novo Produto'}</DialogTitle>
                 <DialogContent dividers>
@@ -251,6 +275,85 @@ export const Products = () => {
                 <DialogActions>
                     <Button onClick={handleCloseDialog}>Cancelar</Button>
                     <Button variant="contained" onClick={handleSave}>Salvar</Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* View Dialog */}
+            <Dialog open={openViewDialog} onClose={handleCloseView} maxWidth="sm" fullWidth>
+                <DialogTitle>
+                    {viewingProduct?.nome}
+                </DialogTitle>
+                <DialogContent dividers>
+                    {viewingProduct && (
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} display="flex" justifyContent="center">
+                                {viewingProduct.fotos?.[0]?.url ? (
+                                    <Box
+                                        component="img"
+                                        src={viewingProduct.fotos[0].url}
+                                        alt={viewingProduct.nome}
+                                        sx={{
+                                            maxWidth: '100%',
+                                            maxHeight: 300,
+                                            borderRadius: 1,
+                                            objectFit: 'contain'
+                                        }}
+                                    />
+                                ) : (
+                                    <Box
+                                        display="flex"
+                                        alignItems="center"
+                                        justifyContent="center"
+                                        sx={{
+                                            width: '100%',
+                                            height: 200,
+                                            bgcolor: 'grey.100',
+                                            borderRadius: 1
+                                        }}
+                                    >
+                                        <ImageIcon sx={{ fontSize: 60, color: 'grey.300' }} />
+                                    </Box>
+                                )}
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Typography variant="subtitle2" color="textSecondary">Descrição</Typography>
+                                <Typography variant="body1" paragraph>
+                                    {viewingProduct.info || "Sem descrição."}
+                                </Typography>
+
+                                <Box display="flex" justifyContent="space-between" mt={2}>
+                                    <Box>
+                                        <Typography variant="subtitle2" color="textSecondary">Preço</Typography>
+                                        <Typography variant="h6" color="primary">R$ {viewingProduct.preco}</Typography>
+                                    </Box>
+                                    <Box>
+                                        <Typography variant="subtitle2" color="textSecondary">Prazo</Typography>
+                                        <Typography variant="body1">{viewingProduct.prazo_entrega_meses} meses</Typography>
+                                    </Box>
+                                    <Box>
+                                        <Typography variant="subtitle2" color="textSecondary">Status</Typography>
+                                        <Chip
+                                            label={viewingProduct.is_ativo ? "Ativo" : "Inativo"}
+                                            color={viewingProduct.is_ativo ? "success" : "default"}
+                                            size="small"
+                                        />
+                                    </Box>
+                                </Box>
+                            </Grid>
+                        </Grid>
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseView}>Fechar</Button>
+                    <Button
+                        variant="contained"
+                        onClick={() => {
+                            handleCloseView();
+                            handleOpenDialog(viewingProduct);
+                        }}
+                    >
+                        Editar
+                    </Button>
                 </DialogActions>
             </Dialog>
 

@@ -4,9 +4,9 @@ import {
   Table, TableContainer, TableHead, TableRow, TableCell,
   TableBody, Typography, IconButton, Dialog, DialogTitle,
   DialogContent, DialogActions, Drawer, List, ListItem, ListItemText, Divider,
-  Tabs, Tab
+  Tabs, Tab, Avatar
 } from '@mui/material';
-import { Search, Add, Edit, Visibility, Close, ContentCopy, Description } from '@mui/icons-material';
+import { Search, Add, Edit, Visibility, Close, ContentCopy, Description, Image as ImageIcon } from '@mui/icons-material';
 import { StatusChip } from '../components/StatusChip';
 import { MapEmbed } from '../components/MapEmbed';
 import { FieldAppEmbedded } from '../components/FieldAppEmbedded';
@@ -36,6 +36,7 @@ export const Projects = () => {
     selectedProject,
     setSelectedProject,
     projects,
+    urlMidiasFiles
   } = useAdmin();
 
   const filteredProjects = getFilteredProjects();
@@ -65,6 +66,12 @@ export const Projects = () => {
     } finally {
       setLoadingDoc(false);
     }
+  };
+
+  const getProjectImage = (project) => {
+    if (project.foto_url) return project.foto_url;
+    if (project.image_internal_path) return `${urlMidiasFiles}${project.image_internal_path}`;
+    return null;
   };
 
   return (
@@ -116,10 +123,20 @@ export const Projects = () => {
             {filteredProjects.map(p => (
               <TableRow key={p.id}>
                 <TableCell>
-                  <Typography variant="body2" fontWeight="bold">
-                    {p.descricao}
-                  </Typography>
-                  <Typography variant="caption">{p.municipio} - {p.estado}</Typography>
+                  <Box display="flex" alignItems="center" gap={2}>
+                    <Avatar
+                      src={getProjectImage(p)}
+                      variant="rounded"
+                    >
+                      <ImageIcon />
+                    </Avatar>
+                    <Box>
+                      <Typography variant="body2" fontWeight="bold">
+                        {p.descricao}
+                      </Typography>
+                      <Typography variant="caption">{p.municipio} - {p.estado}</Typography>
+                    </Box>
+                  </Box>
                 </TableCell>
                 <TableCell>
                   <StatusChip status={p.desc_status} />
@@ -186,6 +203,20 @@ export const Projects = () => {
             <Box p={2} bgcolor="primary.main" color="white">
               <Typography variant="h6">{selectedProject.descricao}</Typography>
             </Box>
+
+            {/* Project Image Header */}
+            {getProjectImage(selectedProject) && (
+              <Box
+                component="img"
+                src={getProjectImage(selectedProject)}
+                alt={selectedProject.descricao}
+                sx={{
+                  width: '100%',
+                  height: 200,
+                  objectFit: 'cover'
+                }}
+              />
+            )}
 
             <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth" indicatorColor="secondary" textColor="inherit">
               <Tab label="Visão Geral" />
