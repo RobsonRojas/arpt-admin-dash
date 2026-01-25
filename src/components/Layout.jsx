@@ -29,6 +29,7 @@ export const Layout = ({ children }) => {
     { id: 'necromassa', label: 'Necromassa', icon: <Forest /> },
     { id: 'projects', label: 'Gestão Projetos', icon: <FolderOpen /> },
     { id: 'rewards', label: 'Recompensas', icon: <CardGiftcard /> },
+    { id: 'products', label: 'Produtos', icon: <CardGiftcard /> },
     { id: 'certificates', label: 'Certificados', icon: <CardMembership /> },
     { id: 'properties', label: 'Propriedades', icon: <HomeWork /> },
     { id: 'sponsors', label: 'Patrocinadores', icon: <People /> },
@@ -43,6 +44,7 @@ export const Layout = ({ children }) => {
       case 'properties': return 'Gestão de Propriedades';
       case 'projects': return 'Gestão de Projetos';
       case 'rewards': return 'Gerenciamento de Recompensas';
+      case 'products': return 'Gestão de Produtos';
       case 'users': return 'Gestão de Usuários';
       case 'certificates': return 'Certificados Avulsos';
       default: return 'ARPT Admin';

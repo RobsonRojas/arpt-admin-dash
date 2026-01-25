@@ -3,7 +3,7 @@ import {
     Box, Typography, Button, Paper, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, IconButton, Dialog,
     DialogTitle, DialogContent, DialogActions, TextField,
-    CircularProgress, Chip, MenuItem
+    CircularProgress, Chip, MenuItem, Snackbar, Alert
 } from '@mui/material';
 import { Add, Visibility, Delete, CardMembership, Edit } from '@mui/icons-material';
 import { db } from '../services/firebase';
@@ -26,6 +26,9 @@ export const Certificates = () => {
         type: 'Ouro'
     });
     const [submitting, setSubmitting] = useState(false);
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+
+    const handleCloseSnackbar = () => setSnackbar(prev => ({ ...prev, open: false }));
 
     useEffect(() => {
         fetchCertificates();
@@ -88,7 +91,7 @@ export const Certificates = () => {
 
     const handleSubmit = async () => {
         if (!formData.sponsorName || !formData.projectName || !formData.date || !formData.type) {
-            alert("Preencha todos os campos obrigatórios");
+            setSnackbar({ open: true, message: 'Preencha todos os campos obrigatórios', severity: 'warning' });
             return;
         }
 
@@ -117,7 +120,7 @@ export const Certificates = () => {
             handleCloseDialog();
         } catch (error) {
             console.error("Error saving certificate: ", error);
-            alert("Erro ao salvar certificado");
+            setSnackbar({ open: true, message: 'Erro ao salvar certificado', severity: 'error' });
         } finally {
             setSubmitting(false);
         }
@@ -130,7 +133,7 @@ export const Certificates = () => {
                 setCertificates(prev => prev.filter(c => c.id !== id));
             } catch (error) {
                 console.error("Error deleting certificate: ", error);
-                alert("Erro ao excluir certificado");
+                setSnackbar({ open: true, message: 'Erro ao excluir certificado', severity: 'error' });
             }
         }
     };
@@ -329,6 +332,16 @@ export const Certificates = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+            >
+                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 };

@@ -3,7 +3,7 @@ import {
     Box, Typography, Button, Table, TableContainer, TableHead,
     TableRow, TableCell, TableBody, Paper, IconButton, Chip,
     Dialog, DialogTitle, DialogContent, DialogActions, TextField,
-    FormControlLabel, Switch, CircularProgress, Alert
+    FormControlLabel, Switch, CircularProgress, Alert, Snackbar
 } from '@mui/material';
 import { Add, Edit, Delete, Refresh } from '@mui/icons-material';
 import { api } from '../services/api';
@@ -12,6 +12,9 @@ export const Products = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+
+    const handleCloseSnackbar = () => setSnackbar(prev => ({ ...prev, open: false }));
 
     // Dialog state
     const [openDialog, setOpenDialog] = useState(false);
@@ -41,6 +44,7 @@ export const Products = () => {
             } else {
                 console.error(err);
                 setError('Erro ao carregar produtos');
+                setSnackbar({ open: true, message: 'Erro ao carregar produtos', severity: 'error' });
             }
         } finally {
             setLoading(false);
@@ -102,7 +106,7 @@ export const Products = () => {
             fetchProducts();
         } catch (err) {
             console.error(err);
-            alert('Erro ao salvar produto');
+            setSnackbar({ open: true, message: 'Erro ao salvar produto', severity: 'error' });
         }
     };
 
@@ -113,7 +117,7 @@ export const Products = () => {
                 fetchProducts();
             } catch (err) {
                 console.error(err);
-                alert('Erro ao deletar produto');
+                setSnackbar({ open: true, message: 'Erro ao deletar produto', severity: 'error' });
             }
         }
     };
@@ -249,6 +253,16 @@ export const Products = () => {
                     <Button variant="contained" onClick={handleSave}>Salvar</Button>
                 </DialogActions>
             </Dialog>
-        </Box>
+
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+            >
+                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
+        </Box >
     );
 };
