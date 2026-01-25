@@ -6,6 +6,7 @@ import {
   TextField, MenuItem, Drawer, Divider,
 } from '@mui/material';
 import { Add, Visibility, Edit, CloudUpload, HomeWork, Park, Image as ImageIcon } from '@mui/icons-material';
+import { AIAssistant } from '../components/AIAssistant';
 import { MapEmbed, InventoryManager } from '../components';
 import { STATUS_PROPRIEDADE } from '../constants';
 import { useAdmin } from '../contexts/AdminContext';
@@ -233,6 +234,15 @@ export const Properties = () => {
               />
             </Grid>
             <Grid item xs={6}>
+              <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                <Typography variant="caption">CAR (Cadastro Ambiental Rural)</Typography>
+                <AIAssistant
+                  initialText={formData.car}
+                  context={`Propriedade: ${formData.proprietario}`}
+                  onApply={(text) => setFormData({ ...formData, car: text })}
+                  label="Corrigir"
+                />
+              </Box>
               <TextField
                 fullWidth
                 label="Número CAR"

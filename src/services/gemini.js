@@ -9,7 +9,8 @@ if (API_KEY) {
     console.warn("VITE_GEMINI_API_KEY not found in environment variables");
 }
 
-export const improveText = async (text, context = "") => {
+// Função genérica para melhoria de texto com IA
+export const improveText = async (text, context = "", type = "improve") => {
     if (!genAI) {
         throw new Error("API Key do Gemini não configurada");
     }
@@ -19,10 +20,26 @@ export const improveText = async (text, context = "") => {
     try {
         const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-        let prompt = `Você é um assistente especializado em projetos de manejo sustentável e comunidades ribeirinhas.
-    Melhore o texto abaixo, tornando-o mais técnico, claro e profissional, mantendo as informações originais.
-    Corrija erros de português e pontuação.
-    O texto é parte de um projeto de cadastro de unidade de manejo.
+        let specificInstruction = "";
+
+        switch (type) {
+            case "expand":
+                specificInstruction = "Expanda o texto abaixo com mais detalhes relevantes, mantendo o tom profissional.";
+                break;
+            case "summarize":
+                specificInstruction = "Resuma o texto abaixo mantendo os pontos chave de forma concisa.";
+                break;
+            case "fix":
+                specificInstruction = "Corrija apenas erros gramaticais e de pontuação do texto abaixo, mantendo o estilo original.";
+                break;
+            case "improve":
+            default:
+                specificInstruction = "Melhore a escrita do texto abaixo, tornando-o mais técnico, claro e profissional.";
+                break;
+        }
+
+        let prompt = `Você é um assistente especializado em gestão de projetos e administração.
+    ${specificInstruction}
     
     Texto Original: "${text}"
     `;
@@ -33,9 +50,7 @@ export const improveText = async (text, context = "") => {
 
         const result = await model.generateContent(prompt);
         const response = await result.response;
-        const textOutput = response.text();
-
-        return textOutput;
+        return response.text();
     } catch (error) {
         console.error("Erro ao chamar Gemini:", error);
         throw error;

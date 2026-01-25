@@ -12,6 +12,7 @@ import '@uiw/react-markdown-preview/markdown.css';
 import { ESTADOS, UNIDADES, POTENCIAIS } from '../constants';
 import { improveText } from '../services/gemini';
 import { CircularProgress } from '@mui/material';
+import { AIAssistant } from './AIAssistant';
 
 export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
   const [activeStep, setActiveStep] = useState(0);
@@ -68,24 +69,7 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
     }
   };
 
-  const handleImproveText = async (field) => {
-    const textToImprove = formData[field];
-    if (!textToImprove || textToImprove.length < 5) {
-      alert("Digite um texto um pouco maior para a IA melhorar.");
-      return;
-    }
 
-    setLoadingAI(prev => ({ ...prev, [field]: true }));
-    try {
-      const context = `Projeto: ${formData.descricao}, Município: ${formData.municipio}`;
-      const improved = await improveText(textToImprove, context);
-      setFormData(prev => ({ ...prev, [field]: improved }));
-    } catch (error) {
-      alert("Erro ao melhorar texto. Verifique a API Key ou tente novamente.");
-    } finally {
-      setLoadingAI(prev => ({ ...prev, [field]: false }));
-    }
-  };
 
   const handleAddPhoto = () => {
     const randomId = Math.floor(Math.random() * 100);
@@ -238,6 +222,10 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
         return (
           <Grid container spacing={3} sx={{ mt: 1 }}>
             <Grid item xs={12}>
+              import {AIAssistant} from './AIAssistant';
+
+              // ... inside FieldAppEmbedded ...
+
               <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
                 <Box>
                   <Typography variant="subtitle2">
@@ -247,15 +235,11 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
                     Breve descrição do projeto (suporta Markdown)
                   </Typography>
                 </Box>
-                <Button
-                  startIcon={loadingAI.resumo ? <CircularProgress size={20} /> : <AutoFixHigh />}
-                  size="small"
-                  variant="outlined"
-                  onClick={() => handleImproveText('resumo')}
-                  disabled={loadingAI.resumo}
-                >
-                  {loadingAI.resumo ? "Melhorando..." : "Melhorar com IA"}
-                </Button>
+                <AIAssistant
+                  initialText={formData.resumo}
+                  context={`Projeto: ${formData.descricao}`}
+                  onApply={(text) => setFormData(prev => ({ ...prev, resumo: text }))}
+                />
               </Box>
               <Box sx={{ mt: 1 }} data-color-mode="light">
                 <MDEditor
@@ -276,15 +260,11 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
                     Informações detalhadas sobre o projeto (suporta Markdown)
                   </Typography>
                 </Box>
-                <Button
-                  startIcon={loadingAI.detalhes ? <CircularProgress size={20} /> : <AutoFixHigh />}
-                  size="small"
-                  variant="outlined"
-                  onClick={() => handleImproveText('detalhes')}
-                  disabled={loadingAI.detalhes}
-                >
-                  {loadingAI.detalhes ? "Melhorando..." : "Melhorar com IA"}
-                </Button>
+                <AIAssistant
+                  initialText={formData.detalhes}
+                  context={`Projeto: ${formData.descricao}`}
+                  onApply={(text) => setFormData(prev => ({ ...prev, detalhes: text }))}
+                />
               </Box>
               <Box sx={{ mt: 1 }} data-color-mode="light">
                 <MDEditor

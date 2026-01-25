@@ -5,7 +5,8 @@ import {
     Dialog, DialogTitle, DialogContent, DialogActions, Grid,
     TextField, MenuItem, CircularProgress, Alert, Avatar
 } from '@mui/material';
-import { Add, Edit, Delete, CardGiftcard, Refresh, Visibility, Image as ImageIcon, BrokenImage } from '@mui/icons-material';
+import { Add, Edit, Delete, Visibility, Close, Image as ImageIcon, Search } from '@mui/icons-material';
+import { AIAssistant } from '../components/AIAssistant';
 import { useAdmin } from '../contexts/AdminContext';
 
 export const Rewards = () => {
@@ -411,13 +412,22 @@ export const Rewards = () => {
                             />
                         </Grid>
                         <Grid item xs={12}>
+                            <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                                <Typography variant="caption">Descrição / Informações</Typography>
+                                <AIAssistant
+                                    initialText={formData.info}
+                                    context={`Recompensa: ${formData.name}`}
+                                    onApply={(text) => setFormData({ ...formData, info: text })}
+                                    label="Melhorar Descrição"
+                                />
+                            </Box>
                             <TextField
                                 fullWidth
+                                label="Informações Adicionais"
                                 multiline
                                 rows={3}
-                                label="Descrição"
                                 value={formData.info}
-                                onChange={e => setFormData({ ...formData, info: e.target.value })}
+                                onChange={(e) => setFormData({ ...formData, info: e.target.value })}
                             />
                         </Grid>
                         <Grid item xs={6}>

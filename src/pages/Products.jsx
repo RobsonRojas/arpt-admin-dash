@@ -6,7 +6,9 @@ import {
     FormControlLabel, Switch, CircularProgress, Alert, Snackbar,
     Avatar, Grid
 } from '@mui/material';
-import { Add, Edit, Delete, Refresh, Visibility, Image as ImageIcon, BrokenImage } from '@mui/icons-material';
+import { Add, Edit, Delete, Visibility, Close, Image as ImageIcon, Search } from '@mui/icons-material';
+import { AIAssistant } from '../components/AIAssistant';
+import { useAdmin } from '../contexts/AdminContext';
 import { api } from '../services/api';
 
 export const Products = () => {
@@ -288,14 +290,25 @@ export const Products = () => {
                             value={formData.nome}
                             onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
                         />
-                        <TextField
-                            label="Informações/Descrição"
-                            fullWidth
-                            multiline
-                            rows={3}
-                            value={formData.info}
-                            onChange={(e) => setFormData({ ...formData, info: e.target.value })}
-                        />
+                        <Grid item xs={12}>
+                            <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                                <Typography variant="caption">Descrição / Informações</Typography>
+                                <AIAssistant
+                                    initialText={formData.info}
+                                    context={`Produto: ${formData.nome}`}
+                                    onApply={(text) => setFormData({ ...formData, info: text })}
+                                    label="Melhorar Descrição"
+                                />
+                            </Box>
+                            <TextField
+                                fullWidth
+                                label="Informações Adicionais"
+                                multiline
+                                rows={3}
+                                value={formData.info}
+                                onChange={(e) => setFormData({ ...formData, info: e.target.value })}
+                            />
+                        </Grid>
                         <Box display="flex" gap={2}>
                             <TextField
                                 label="Preço"
