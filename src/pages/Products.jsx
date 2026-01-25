@@ -163,65 +163,118 @@ export const Products = () => {
                     <CircularProgress />
                 </Box>
             ) : (
-                <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid #e0e0e0' }}>
-                    <Table>
-                        <TableHead sx={{ bgcolor: '#f9fafb' }}>
-                            <TableRow>
-                                <TableCell>Produto</TableCell>
-                                <TableCell>Preço</TableCell>
-                                <TableCell>Prazo (meses)</TableCell>
-                                <TableCell>Status</TableCell>
-                                <TableCell align="right">Ações</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {products.map((row) => (
-                                <TableRow key={row.id} hover>
-                                    <TableCell>
-                                        <Box display="flex" alignItems="center" gap={2}>
-                                            <Avatar
-                                                src={row.fotos?.[0]?.url}
-                                                variant="rounded"
-                                                sx={{ width: 48, height: 48 }}
-                                            >
-                                                <ImageIcon />
-                                            </Avatar>
-                                            <Box>
-                                                <Typography fontWeight="bold">{row.nome}</Typography>
-                                                <Typography variant="caption" color="textSecondary">{row.info}</Typography>
-                                            </Box>
-                                        </Box>
-                                    </TableCell>
-                                    <TableCell>R$ {row.preco}</TableCell>
-                                    <TableCell>{row.prazo_entrega_meses}</TableCell>
-                                    <TableCell>
-                                        <Chip
-                                            label={row.is_ativo ? "Ativo" : "Inativo"}
-                                            color={row.is_ativo ? "success" : "default"}
-                                            size="small"
-                                        />
-                                    </TableCell>
-                                    <TableCell align="right">
-                                        <IconButton size="small" color="primary" onClick={() => handleOpenView(row)}>
-                                            <Visibility />
-                                        </IconButton>
-                                        <IconButton size="small" onClick={() => handleOpenDialog(row)}>
-                                            <Edit />
-                                        </IconButton>
-                                        <IconButton size="small" color="error" onClick={() => handleDelete(row.id)}>
-                                            <Delete />
-                                        </IconButton>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                            {products.length === 0 && (
+                <>
+                    {/* Desktop Table View */}
+                    <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid #e0e0e0', display: { xs: 'none', md: 'block' } }}>
+                        <Table>
+                            <TableHead sx={{ bgcolor: '#f9fafb' }}>
                                 <TableRow>
-                                    <TableCell colSpan={6} align="center">Nenhum produto encontrado</TableCell>
+                                    <TableCell>Produto</TableCell>
+                                    <TableCell>Preço</TableCell>
+                                    <TableCell>Prazo (meses)</TableCell>
+                                    <TableCell>Status</TableCell>
+                                    <TableCell align="right">Ações</TableCell>
                                 </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                            </TableHead>
+                            <TableBody>
+                                {products.map((row) => (
+                                    <TableRow key={row.id} hover>
+                                        <TableCell>
+                                            <Box display="flex" alignItems="center" gap={2}>
+                                                <Avatar
+                                                    src={row.fotos?.[0]?.url}
+                                                    variant="rounded"
+                                                    sx={{ width: 48, height: 48 }}
+                                                >
+                                                    <ImageIcon />
+                                                </Avatar>
+                                                <Box>
+                                                    <Typography fontWeight="bold">{row.nome}</Typography>
+                                                    <Typography variant="caption" color="textSecondary">{row.info}</Typography>
+                                                </Box>
+                                            </Box>
+                                        </TableCell>
+                                        <TableCell>R$ {row.preco}</TableCell>
+                                        <TableCell>{row.prazo_entrega_meses}</TableCell>
+                                        <TableCell>
+                                            <Chip
+                                                label={row.is_ativo ? "Ativo" : "Inativo"}
+                                                color={row.is_ativo ? "success" : "default"}
+                                                size="small"
+                                            />
+                                        </TableCell>
+                                        <TableCell align="right">
+                                            <IconButton size="small" color="primary" onClick={() => handleOpenView(row)}>
+                                                <Visibility />
+                                            </IconButton>
+                                            <IconButton size="small" onClick={() => handleOpenDialog(row)}>
+                                                <Edit />
+                                            </IconButton>
+                                            <IconButton size="small" color="error" onClick={() => handleDelete(row.id)}>
+                                                <Delete />
+                                            </IconButton>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                                {products.length === 0 && (
+                                    <TableRow>
+                                        <TableCell colSpan={6} align="center">Nenhum produto encontrado</TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+
+                    {/* Mobile Card View */}
+                    <Box sx={{ display: { xs: 'flex', md: 'none' }, flexDirection: 'column', gap: 2 }}>
+                        {products.map((row) => (
+                            <Paper key={row.id} sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                <Box display="flex" gap={2} alignItems="center">
+                                    <Avatar
+                                        src={row.fotos?.[0]?.url}
+                                        variant="rounded"
+                                        sx={{ width: 60, height: 60 }}
+                                    >
+                                        <ImageIcon />
+                                    </Avatar>
+                                    <Box flex={1}>
+                                        <Typography fontWeight="bold" variant="subtitle1">{row.nome}</Typography>
+                                        <Typography variant="body2" color="textSecondary" noWrap>{row.info}</Typography>
+                                    </Box>
+                                    <IconButton size="small" onClick={(e) => {
+                                        // Simple menu or just actions row
+                                    }}>
+                                        {/* Could use MoreVert here, but let's just show actions below or inline */}
+                                    </IconButton>
+                                </Box>
+
+                                <Box display="flex" justifyContent="space-between" alignItems="center">
+                                    <Typography variant="body2"><strong>Preço:</strong> R$ {row.preco}</Typography>
+                                    <Chip
+                                        label={row.is_ativo ? "Ativo" : "Inativo"}
+                                        color={row.is_ativo ? "success" : "default"}
+                                        size="small"
+                                    />
+                                </Box>
+
+                                <Box display="flex" justifyContent="flex-end" gap={1} mt={1}>
+                                    <Button size="small" startIcon={<Visibility />} onClick={() => handleOpenView(row)}>
+                                        Ver
+                                    </Button>
+                                    <Button size="small" startIcon={<Edit />} onClick={() => handleOpenDialog(row)}>
+                                        Editar
+                                    </Button>
+                                    <Button size="small" color="error" startIcon={<Delete />} onClick={() => handleDelete(row.id)}>
+                                        Excluir
+                                    </Button>
+                                </Box>
+                            </Paper>
+                        ))}
+                        {products.length === 0 && (
+                            <Typography align="center" color="textSecondary">Nenhum produto encontrado</Typography>
+                        )}
+                    </Box>
+                </>
             )}
 
             {/* Create/Edit Dialog */}

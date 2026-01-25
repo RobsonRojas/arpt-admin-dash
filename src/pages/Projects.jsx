@@ -109,62 +109,105 @@ export const Projects = () => {
         </Toolbar>
       </Paper>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Projeto</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Custo</TableCell>
-              <TableCell align="right">Ação</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredProjects.map(p => (
-              <TableRow key={p.id}>
-                <TableCell>
-                  <Box display="flex" alignItems="center" gap={2}>
-                    <Avatar
-                      src={getProjectImage(p)}
-                      variant="rounded"
-                    >
-                      <ImageIcon />
-                    </Avatar>
-                    <Box>
-                      <Typography variant="body2" fontWeight="bold">
-                        {p.descricao}
-                      </Typography>
-                      <Typography variant="caption">{p.municipio} - {p.estado}</Typography>
-                    </Box>
-                  </Box>
-                </TableCell>
-                <TableCell>
-                  <StatusChip status={p.desc_status} />
-                </TableCell>
-                <TableCell>
-                  R$ {parseFloat(p.custo_operacional).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                </TableCell>
-                <TableCell align="right">
-                  <IconButton
-                    size="small"
-                    onClick={() => handleEditProject(p)}
-                    title="Editar"
-                  >
-                    <Edit />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    onClick={() => { setSelectedProject(p); setTabValue(0); }}
-                    title="Visualizar"
-                  >
-                    <Visibility />
-                  </IconButton>
-                </TableCell>
+      <Box>
+        {/* Desktop Table View */}
+        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid #e0e0e0', display: { xs: 'none', md: 'block' } }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Projeto</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>Custo</TableCell>
+                <TableCell align="right">Ação</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {filteredProjects.map(p => (
+                <TableRow key={p.id}>
+                  <TableCell>
+                    <Box display="flex" alignItems="center" gap={2}>
+                      <Avatar
+                        src={getProjectImage(p)}
+                        variant="rounded"
+                      >
+                        <ImageIcon />
+                      </Avatar>
+                      <Box>
+                        <Typography variant="body2" fontWeight="bold">
+                          {p.descricao}
+                        </Typography>
+                        <Typography variant="caption">{p.municipio} - {p.estado}</Typography>
+                      </Box>
+                    </Box>
+                  </TableCell>
+                  <TableCell>
+                    <StatusChip status={p.desc_status} />
+                  </TableCell>
+                  <TableCell>
+                    R$ {parseFloat(p.custo_operacional).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </TableCell>
+                  <TableCell align="right">
+                    <IconButton
+                      size="small"
+                      onClick={() => handleEditProject(p)}
+                      title="Editar"
+                    >
+                      <Edit />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      onClick={() => { setSelectedProject(p); setTabValue(0); }}
+                      title="Visualizar"
+                    >
+                      <Visibility />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+        {/* Mobile Card View */}
+        <Box sx={{ display: { xs: 'flex', md: 'none' }, flexDirection: 'column', gap: 2 }}>
+          {filteredProjects.map((p) => (
+            <Paper key={p.id} sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <Box display="flex" gap={2} alignItems="center">
+                <Avatar
+                  src={getProjectImage(p)}
+                  variant="rounded"
+                  sx={{ width: 60, height: 60 }}
+                >
+                  <ImageIcon />
+                </Avatar>
+                <Box flex={1}>
+                  <Typography fontWeight="bold" variant="subtitle1">{p.descricao}</Typography>
+                  <Typography variant="body2" color="textSecondary">{p.municipio} - {p.estado}</Typography>
+                </Box>
+              </Box>
+
+              <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
+                <StatusChip status={p.desc_status} />
+                <Typography variant="body2" fontWeight="bold">
+                  R$ {parseFloat(p.custo_operacional).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </Typography>
+              </Box>
+
+              <Box display="flex" justifyContent="flex-end" gap={1} mt={1}>
+                <Button size="small" startIcon={<Visibility />} onClick={() => { setSelectedProject(p); setTabValue(0); }}>
+                  Ver Detalhes
+                </Button>
+                <Button size="small" startIcon={<Edit />} onClick={() => handleEditProject(p)}>
+                  Editar
+                </Button>
+              </Box>
+            </Paper>
+          ))}
+          {filteredProjects.length === 0 && (
+            <Typography align="center" color="textSecondary">Nenhum projeto encontrado</Typography>
+          )}
+        </Box>
+      </Box>
 
       {/* Modal Wizard de Cadastro/Edição */}
       <Dialog open={openCadastro} onClose={handleCloseCadastro} fullWidth maxWidth="md">

@@ -110,72 +110,112 @@ export const Properties = () => {
         </Button>
       </Box>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead sx={{ bgcolor: '#f9fafb' }}>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Propriedade / CAR</TableCell>
-              <TableCell>Município</TableCell>
-              <TableCell>Área (ha)</TableCell>
-              {/* <TableCell>Status</TableCell> */}
-              <TableCell align="right">Ações</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {properties.map((row) => (
-              <TableRow key={row.id} hover>
-                <TableCell>
-                  <Typography variant="body2" fontWeight="medium">
-                    {row.id}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Box display="flex" alignItems="center" gap={2}>
-                    <Avatar
-                      src={getPropertyImage(row)}
-                      variant="rounded"
-                    >
-                      <ImageIcon />
-                    </Avatar>
-                    <Box>
-                      <Typography variant="body2" fontWeight="bold">
-                        {row.name}
-                      </Typography>
-                      <Typography variant="caption" color="textSecondary">
-                        {row.car}
-                      </Typography>
+      <Box>
+        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid #e0e0e0', display: { xs: 'none', md: 'block' } }}>
+          <Table>
+            <TableHead sx={{ bgcolor: '#f9fafb' }}>
+              <TableRow>
+                <TableCell>ID</TableCell>
+                <TableCell>Propriedade / CAR</TableCell>
+                <TableCell>Município</TableCell>
+                <TableCell>Área (ha)</TableCell>
+                {/* <TableCell>Status</TableCell> */}
+                <TableCell align="right">Ações</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {properties.map((row) => (
+                <TableRow key={row.id} hover>
+                  <TableCell>
+                    <Typography variant="body2" fontWeight="medium">
+                      {row.id}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Box display="flex" alignItems="center" gap={2}>
+                      <Avatar
+                        src={getPropertyImage(row)}
+                        variant="rounded"
+                      >
+                        <ImageIcon />
+                      </Avatar>
+                      <Box>
+                        <Typography variant="body2" fontWeight="bold">
+                          {row.name}
+                        </Typography>
+                        <Typography variant="caption" color="textSecondary">
+                          {row.car}
+                        </Typography>
+                      </Box>
                     </Box>
-                  </Box>
-                </TableCell>
-                <TableCell>{row.id_municipality}</TableCell>
-                <TableCell>{row.area_he}</TableCell>
-                {/* <TableCell>
+                  </TableCell>
+                  <TableCell>{row.id_municipality}</TableCell>
+                  <TableCell>{row.area_he}</TableCell>
+                  {/* <TableCell>
                   <StatusChip status={row.status} />
                 </TableCell> */}
-                <TableCell align="right">
-                  <IconButton
-                    size="small"
-                    color="primary"
-                    onClick={() => setSelectedProp(row)}
-                    title="Visualizar"
-                  >
-                    <Visibility />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    color="default"
-                    onClick={() => handleOpenEdit(row)}
-                    title="Editar"
-                  >
-                    <Edit />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                  <TableCell align="right">
+                    <IconButton
+                      size="small"
+                      color="primary"
+                      onClick={() => setSelectedProp(row)}
+                      title="Visualizar"
+                    >
+                      <Visibility />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      color="default"
+                      onClick={() => handleOpenEdit(row)}
+                      title="Editar"
+                    >
+                      <Edit />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+        {/* Mobile Card View */}
+        <Box sx={{ display: { xs: 'flex', md: 'none' }, flexDirection: 'column', gap: 2 }}>
+          {properties.map((row) => (
+            <Paper key={row.id} sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <Box display="flex" gap={2} alignItems="center">
+                <Avatar
+                  src={getPropertyImage(row)}
+                  variant="rounded"
+                  sx={{ width: 60, height: 60 }}
+                >
+                  <ImageIcon />
+                </Avatar>
+                <Box flex={1}>
+                  <Typography fontWeight="bold" variant="subtitle1">{row.name}</Typography>
+                  <Typography variant="body2" color="textSecondary">{row.car}</Typography>
+                </Box>
+              </Box>
+
+              <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
+                <Typography variant="body2">{row.id_municipality}</Typography>
+                <Typography variant="body2" fontWeight="bold">{row.area_he} ha</Typography>
+              </Box>
+
+              <Box display="flex" justifyContent="flex-end" gap={1} mt={1}>
+                <Button size="small" startIcon={<Visibility />} onClick={() => setSelectedProp(row)}>
+                  Ver Detalhes
+                </Button>
+                <Button size="small" startIcon={<Edit />} onClick={() => handleOpenEdit(row)}>
+                  Editar
+                </Button>
+              </Box>
+            </Paper>
+          ))}
+          {properties.length === 0 && (
+            <Typography align="center" color="textSecondary">Nenhuma propriedade encontrada</Typography>
+          )}
+        </Box>
+      </Box>
 
       {/* Dialog Form */}
       <Dialog open={openForm} onClose={() => setOpenForm(false)} maxWidth="sm" fullWidth>

@@ -226,106 +226,163 @@ export const Rewards = () => {
 
             {/* Rewards Table */}
             {!loading && selectedManejoId && (
-                <TableContainer component={Paper}>
-                    <Table>
-                        <TableHead sx={{ bgcolor: '#f9fafb' }}>
-                            <TableRow>
-                                <TableCell>ID</TableCell>
-                                <TableCell>Nome</TableCell>
-                                <TableCell>Descrição</TableCell>
-                                <TableCell>Preço Varejo</TableCell>
-                                <TableCell>Preço Recompensa</TableCell>
-                                <TableCell>Quantidade</TableCell>
-                                <TableCell align="right">Ações</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {rewards.length === 0 ? (
+                <Box>
+                    {/* Desktop Table */}
+                    <TableContainer component={Paper} sx={{ display: { xs: 'none', md: 'block' } }}>
+                        <Table>
+                            <TableHead sx={{ bgcolor: '#f9fafb' }}>
                                 <TableRow>
-                                    <TableCell colSpan={7} align="center">
-                                        <Typography variant="body2" color="text.secondary" py={2}>
-                                            Nenhuma recompensa cadastrada para este manejo
-                                        </Typography>
-                                    </TableCell>
+                                    <TableCell>ID</TableCell>
+                                    <TableCell>Nome</TableCell>
+                                    <TableCell>Descrição</TableCell>
+                                    <TableCell>Preço Varejo</TableCell>
+                                    <TableCell>Preço Recompensa</TableCell>
+                                    <TableCell>Quantidade</TableCell>
+                                    <TableCell align="right">Ações</TableCell>
                                 </TableRow>
-                            ) : (
-                                rewards.map((reward) => (
-                                    <TableRow key={reward.id} hover>
-                                        <TableCell>
-                                            <Typography variant="body2" fontWeight="medium">
-                                                {reward.id}
+                            </TableHead>
+                            <TableBody>
+                                {rewards.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={7} align="center">
+                                            <Typography variant="body2" color="text.secondary" py={2}>
+                                                Nenhuma recompensa cadastrada para este manejo
                                             </Typography>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Box display="flex" alignItems="center" gap={2}>
-                                                <Avatar
-                                                    src={reward.foto_url}
-                                                    variant="rounded"
-                                                    sx={{ width: 40, height: 40 }}
-                                                >
-                                                    <ImageIcon />
-                                                </Avatar>
-                                                <Typography variant="body2" fontWeight="bold">
-                                                    {reward.name}
-                                                </Typography>
-                                            </Box>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Typography variant="body2" color="text.secondary">
-                                                {reward.info || '-'}
-                                            </Typography>
-                                        </TableCell>
-                                        <TableCell>
-                                            {reward.retail_price ? (
-                                                `R$ ${Number(reward.retail_price).toLocaleString('pt-BR', {
-                                                    minimumFractionDigits: 2,
-                                                    maximumFractionDigits: 2
-                                                })}`
-                                            ) : '-'}
-                                        </TableCell>
-                                        <TableCell>
-                                            {reward.reward_price ? (
-                                                `R$ ${Number(reward.reward_price).toLocaleString('pt-BR', {
-                                                    minimumFractionDigits: 2,
-                                                    maximumFractionDigits: 2
-                                                })}`
-                                            ) : 'Grátis'}
-                                        </TableCell>
-                                        <TableCell>
-                                            {reward.reward_qtd !== undefined ? reward.reward_qtd : '-'}
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            <IconButton
-                                                size="small"
-                                                color="primary"
-                                                onClick={() => handleOpenView(reward)}
-                                                title="Visualizar"
-                                            >
-                                                <Visibility />
-                                            </IconButton>
-                                            <IconButton
-                                                size="small"
-                                                color="default"
-                                                onClick={() => handleOpenEdit(reward)}
-                                                title="Editar"
-                                            >
-                                                <Edit />
-                                            </IconButton>
-                                            <IconButton
-                                                size="small"
-                                                color="error"
-                                                onClick={() => handleDelete(reward.id)}
-                                                title="Excluir"
-                                            >
-                                                <Delete />
-                                            </IconButton>
                                         </TableCell>
                                     </TableRow>
-                                ))
-                            )}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                                ) : (
+                                    rewards.map((reward) => (
+                                        <TableRow key={reward.id} hover>
+                                            <TableCell>
+                                                <Typography variant="body2" fontWeight="medium">
+                                                    {reward.id}
+                                                </Typography>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Box display="flex" alignItems="center" gap={2}>
+                                                    <Avatar
+                                                        src={reward.foto_url}
+                                                        variant="rounded"
+                                                        sx={{ width: 40, height: 40 }}
+                                                    >
+                                                        <ImageIcon />
+                                                    </Avatar>
+                                                    <Typography variant="body2" fontWeight="bold">
+                                                        {reward.name}
+                                                    </Typography>
+                                                </Box>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    {reward.info || '-'}
+                                                </Typography>
+                                            </TableCell>
+                                            <TableCell>
+                                                {reward.retail_price ? (
+                                                    `R$ ${Number(reward.retail_price).toLocaleString('pt-BR', {
+                                                        minimumFractionDigits: 2,
+                                                        maximumFractionDigits: 2
+                                                    })}`
+                                                ) : '-'}
+                                            </TableCell>
+                                            <TableCell>
+                                                {reward.reward_price ? (
+                                                    `R$ ${Number(reward.reward_price).toLocaleString('pt-BR', {
+                                                        minimumFractionDigits: 2,
+                                                        maximumFractionDigits: 2
+                                                    })}`
+                                                ) : 'Grátis'}
+                                            </TableCell>
+                                            <TableCell>
+                                                {reward.reward_qtd !== undefined ? reward.reward_qtd : '-'}
+                                            </TableCell>
+                                            <TableCell align="right">
+                                                <IconButton
+                                                    size="small"
+                                                    color="primary"
+                                                    onClick={() => handleOpenView(reward)}
+                                                    title="Visualizar"
+                                                >
+                                                    <Visibility />
+                                                </IconButton>
+                                                <IconButton
+                                                    size="small"
+                                                    color="default"
+                                                    onClick={() => handleOpenEdit(reward)}
+                                                    title="Editar"
+                                                >
+                                                    <Edit />
+                                                </IconButton>
+                                                <IconButton
+                                                    size="small"
+                                                    color="error"
+                                                    onClick={() => handleDelete(reward.id)}
+                                                    title="Excluir"
+                                                >
+                                                    <Delete />
+                                                </IconButton>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+
+                    {/* Mobile Card View */}
+                    <Box sx={{ display: { xs: 'flex', md: 'none' }, flexDirection: 'column', gap: 2 }}>
+                        {rewards.map((reward) => (
+                            <Paper key={reward.id} sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                <Box display="flex" gap={2} alignItems="center">
+                                    <Avatar
+                                        src={reward.foto_url}
+                                        variant="rounded"
+                                        sx={{ width: 60, height: 60 }}
+                                    >
+                                        <ImageIcon />
+                                    </Avatar>
+                                    <Box flex={1}>
+                                        <Typography fontWeight="bold" variant="subtitle1">{reward.name}</Typography>
+                                        <Typography variant="body2" color="textSecondary">{reward.info}</Typography>
+                                    </Box>
+                                </Box>
+
+                                <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
+                                    <Box>
+                                        <Typography variant="caption" color="textSecondary">Preço Varejo</Typography>
+                                        <Typography variant="body2" sx={{ textDecoration: 'line-through' }}>
+                                            {reward.retail_price ? `R$ ${Number(reward.retail_price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '-'}
+                                        </Typography>
+                                    </Box>
+                                    <Box textAlign="right">
+                                        <Typography variant="caption" color="textSecondary">Preço Recompensa</Typography>
+                                        <Typography variant="body1" fontWeight="bold" color="primary">
+                                            {reward.reward_price ? `R$ ${Number(reward.reward_price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 'Grátis'}
+                                        </Typography>
+                                    </Box>
+                                </Box>
+
+                                <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
+                                    <Typography variant="body2">Qtd: {reward.reward_qtd}</Typography>
+                                    <Box display="flex" gap={1}>
+                                        <Button size="small" startIcon={<Visibility />} onClick={() => handleOpenView(reward)}>
+                                            Ver
+                                        </Button>
+                                        <Button size="small" startIcon={<Edit />} onClick={() => handleOpenEdit(reward)}>
+                                            Editar
+                                        </Button>
+                                        <Button size="small" color="error" startIcon={<Delete />} onClick={() => handleDelete(reward.id)}>
+                                            Excluir
+                                        </Button>
+                                    </Box>
+                                </Box>
+                            </Paper>
+                        ))}
+                        {rewards.length === 0 && (
+                            <Typography align="center" color="textSecondary">Nenhuma recompensa encontrada</Typography>
+                        )}
+                    </Box>
+                </Box>
             )}
 
             {/* No Manejo Selected */}
