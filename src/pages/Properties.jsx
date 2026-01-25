@@ -287,6 +287,7 @@ export const Properties = () => {
                 component="img"
                 src={getPropertyImage(selectedProp)}
                 alt={selectedProp.proprietario}
+                onError={(e) => { e.target.style.display = 'none'; }}
                 sx={{
                   width: '100%',
                   height: 200,

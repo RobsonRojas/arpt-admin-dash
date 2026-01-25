@@ -5,7 +5,7 @@ import {
     Dialog, DialogTitle, DialogContent, DialogActions, Grid,
     TextField, MenuItem, CircularProgress, Alert, Avatar
 } from '@mui/material';
-import { Add, Edit, Delete, CardGiftcard, Refresh, Visibility, Image as ImageIcon } from '@mui/icons-material';
+import { Add, Edit, Delete, CardGiftcard, Refresh, Visibility, Image as ImageIcon, BrokenImage } from '@mui/icons-material';
 import { useAdmin } from '../contexts/AdminContext';
 
 export const Rewards = () => {
@@ -34,6 +34,9 @@ export const Rewards = () => {
         reward_qtd: '',
         foto_url: ''
     });
+
+    // Image Error State for View and Preview
+    const [imgError, setImgError] = useState(false);
 
     // Load rewards when manejo is selected
     useEffect(() => {
@@ -65,6 +68,7 @@ export const Rewards = () => {
     };
 
     const handleOpenNew = () => {
+        setImgError(false); // Reset error
         setFormData({
             id: '',
             name: '',
@@ -79,6 +83,7 @@ export const Rewards = () => {
     };
 
     const handleOpenEdit = (reward) => {
+        setImgError(false); // Reset error
         setFormData({
             id: reward.id || '',
             name: reward.name || '',
@@ -93,6 +98,7 @@ export const Rewards = () => {
     };
 
     const handleOpenView = (reward) => {
+        setImgError(false); // Reset error
         setSelectedReward(reward);
         setOpenView(true);
     };
@@ -393,9 +399,45 @@ export const Rewards = () => {
                                 fullWidth
                                 label="URL da Foto"
                                 value={formData.foto_url}
-                                onChange={e => setFormData({ ...formData, foto_url: e.target.value })}
+                                onChange={e => {
+                                    setFormData({ ...formData, foto_url: e.target.value });
+                                    setImgError(false);
+                                }}
                                 helperText="URL da imagem da recompensa"
                             />
+                        </Grid>
+                        {/* Image Preview */}
+                        <Grid item xs={12}>
+                            {formData.foto_url && !imgError ? (
+                                <Box
+                                    display="flex"
+                                    justifyContent="center"
+                                    p={1}
+                                    border="1px dashed #ccc"
+                                    borderRadius={1}
+                                    bgcolor="grey.50"
+                                >
+                                    <img
+                                        src={formData.foto_url}
+                                        alt="Preview"
+                                        style={{ maxWidth: '100%', maxHeight: 200, objectFit: 'contain' }}
+                                        onError={() => setImgError(true)}
+                                    />
+                                </Box>
+                            ) : formData.foto_url && imgError && (
+                                <Box
+                                    display="flex"
+                                    alignItems="center"
+                                    gap={1}
+                                    color="error.main"
+                                    bgcolor="error.light"
+                                    p={1}
+                                    borderRadius={1}
+                                >
+                                    <BrokenImage fontSize="small" />
+                                    <Typography variant="caption">Não foi possível carregar a imagem</Typography>
+                                </Box>
+                            )}
                         </Grid>
                     </Grid>
                 </DialogContent>
@@ -413,11 +455,12 @@ export const Rewards = () => {
                 <DialogContent dividers>
                     {selectedReward && (
                         <Box display="flex" flexDirection="column" gap={2}>
-                            {selectedReward.foto_url ? (
+                            {selectedReward.foto_url && !imgError ? (
                                 <Box
                                     component="img"
                                     src={selectedReward.foto_url}
                                     alt={selectedReward.name}
+                                    onError={() => setImgError(true)}
                                     sx={{
                                         width: '100%',
                                         maxHeight: 300,
@@ -428,8 +471,15 @@ export const Rewards = () => {
                                     }}
                                 />
                             ) : (
-                                <Box display="flex" justifyContent="center" alignItems="center" height={150} bgcolor="grey.100" borderRadius={1} mb={2}>
-                                    <ImageIcon sx={{ fontSize: 60, color: 'grey.300' }} />
+                                <Box display="flex" justifyContent="center" alignItems="center" flexDirection="column" height={150} bgcolor="grey.100" borderRadius={1} mb={2}>
+                                    {selectedReward.foto_url ? (
+                                        <BrokenImage sx={{ fontSize: 60, color: 'grey.300', mb: 1 }} />
+                                    ) : (
+                                        <ImageIcon sx={{ fontSize: 60, color: 'grey.300' }} />
+                                    )}
+                                    <Typography variant="caption" color="textSecondary">
+                                        {selectedReward.foto_url ? "Erro ao carregar imagem" : "Sem foto"}
+                                    </Typography>
                                 </Box>
                             )}
                             <Typography variant="h6">{selectedReward.name}</Typography>

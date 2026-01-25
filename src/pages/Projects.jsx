@@ -210,6 +210,7 @@ export const Projects = () => {
                 component="img"
                 src={getProjectImage(selectedProject)}
                 alt={selectedProject.descricao}
+                onError={(e) => { e.target.style.display = 'none'; }}
                 sx={{
                   width: '100%',
                   height: 200,

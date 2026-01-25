@@ -6,7 +6,7 @@ import {
     FormControlLabel, Switch, CircularProgress, Alert, Snackbar,
     Avatar, Grid
 } from '@mui/material';
-import { Add, Edit, Delete, Refresh, Visibility, Image as ImageIcon } from '@mui/icons-material';
+import { Add, Edit, Delete, Refresh, Visibility, Image as ImageIcon, BrokenImage } from '@mui/icons-material';
 import { api } from '../services/api';
 
 export const Products = () => {
@@ -32,6 +32,9 @@ export const Products = () => {
         is_ativo: true,
         foto_url: ''
     });
+
+    // Image Error State for View and Preview
+    const [imgError, setImgError] = useState(false);
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -59,6 +62,7 @@ export const Products = () => {
     }, []);
 
     const handleOpenDialog = (product = null) => {
+        setImgError(false); // Reset error state on open
         if (product) {
             setEditingProduct(product);
             setFormData({
@@ -89,6 +93,7 @@ export const Products = () => {
     };
 
     const handleOpenView = (product) => {
+        setImgError(false); // Reset error state
         setViewingProduct(product);
         setOpenViewDialog(true);
     };
@@ -258,9 +263,45 @@ export const Products = () => {
                             label="URL da Foto"
                             fullWidth
                             value={formData.foto_url}
-                            onChange={(e) => setFormData({ ...formData, foto_url: e.target.value })}
+                            onChange={(e) => {
+                                setFormData({ ...formData, foto_url: e.target.value });
+                                setImgError(false); // Reset error on change
+                            }}
                             helperText="URL direta para a imagem do produto"
                         />
+
+                        {/* Image Preview */}
+                        {formData.foto_url && !imgError ? (
+                            <Box
+                                display="flex"
+                                justifyContent="center"
+                                p={1}
+                                border="1px dashed #ccc"
+                                borderRadius={1}
+                                bgcolor="grey.50"
+                            >
+                                <img
+                                    src={formData.foto_url}
+                                    alt="Preview"
+                                    style={{ maxWidth: '100%', maxHeight: 200, objectFit: 'contain' }}
+                                    onError={() => setImgError(true)}
+                                />
+                            </Box>
+                        ) : formData.foto_url && imgError && (
+                            <Box
+                                display="flex"
+                                alignItems="center"
+                                gap={1}
+                                color="error.main"
+                                bgcolor="error.light"
+                                p={1}
+                                borderRadius={1}
+                            >
+                                <BrokenImage fontSize="small" />
+                                <Typography variant="caption">Não foi possível carregar a imagem</Typography>
+                            </Box>
+                        )}
+
                         <FormControlLabel
                             control={
                                 <Switch
@@ -287,11 +328,12 @@ export const Products = () => {
                     {viewingProduct && (
                         <Grid container spacing={2}>
                             <Grid item xs={12} display="flex" justifyContent="center">
-                                {viewingProduct.fotos?.[0]?.url ? (
+                                {viewingProduct.fotos?.[0]?.url && !imgError ? (
                                     <Box
                                         component="img"
                                         src={viewingProduct.fotos[0].url}
                                         alt={viewingProduct.nome}
+                                        onError={() => setImgError(true)}
                                         sx={{
                                             maxWidth: '100%',
                                             maxHeight: 300,
@@ -304,6 +346,7 @@ export const Products = () => {
                                         display="flex"
                                         alignItems="center"
                                         justifyContent="center"
+                                        flexDirection="column"
                                         sx={{
                                             width: '100%',
                                             height: 200,
@@ -311,7 +354,14 @@ export const Products = () => {
                                             borderRadius: 1
                                         }}
                                     >
-                                        <ImageIcon sx={{ fontSize: 60, color: 'grey.300' }} />
+                                        {viewingProduct.fotos?.[0]?.url ? (
+                                            <BrokenImage sx={{ fontSize: 60, color: 'grey.300', mb: 1 }} />
+                                        ) : (
+                                            <ImageIcon sx={{ fontSize: 60, color: 'grey.300' }} />
+                                        )}
+                                        <Typography variant="caption" color="textSecondary">
+                                            {viewingProduct.fotos?.[0]?.url ? "Erro ao carregar imagem" : "Sem foto"}
+                                        </Typography>
                                     </Box>
                                 )}
                             </Grid>
