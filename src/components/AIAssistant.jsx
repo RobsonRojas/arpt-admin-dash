@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
     Box, Button, Menu, MenuItem, IconButton, Tooltip,
     CircularProgress, Dialog, DialogTitle, DialogContent,
-    DialogActions, Typography, TextField
+    DialogActions, Typography, TextField, Paper
 } from '@mui/material';
 import { AutoFixHigh, MoreVert, Check, Close, ContentCopy } from '@mui/icons-material';
 import { improveText } from '../services/gemini';
@@ -37,7 +37,7 @@ export const AIAssistant = ({ initialText, onApply, context = "", label = "Assis
             setOpenPreview(true);
         } catch (error) {
             console.error(error);
-            alert("Erro ao processar solicitação. Tente novamente.");
+            alert("Erro ao processar solicitação: " + (error.message || "Tente novamente."));
         } finally {
             setLoading(false);
         }
@@ -123,5 +123,3 @@ export const AIAssistant = ({ initialText, onApply, context = "", label = "Assis
         </>
     );
 };
-
-import { Paper } from '@mui/material';

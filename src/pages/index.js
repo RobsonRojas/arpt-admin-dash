@@ -9,3 +9,4 @@ export * from './Rewards';
 export * from './Certificates';
 export * from './Products';
 export * from './AuditLogs';
+export * from './GeminiSettings';

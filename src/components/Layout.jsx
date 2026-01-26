@@ -1,20 +1,33 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box, Drawer, AppBar, Toolbar, List, Typography, Divider,
-  ListItem, ListItemButton, ListItemIcon, ListItemText, IconButton, Avatar, Tooltip
+  ListItem, ListItemButton, ListItemIcon, ListItemText, IconButton, Avatar, Tooltip,
+  Snackbar, Alert
 } from '@mui/material';
 import {
   Dashboard, FolderOpen, People, Menu as MenuIcon,
-  Landscape, Forest, HomeWork, Logout, ManageAccounts, CardGiftcard, CardMembership, History
+  Landscape, Forest, HomeWork, Logout, ManageAccounts, CardGiftcard, CardMembership, History,
+  SettingsSuggest
 } from '@mui/icons-material';
 import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
+import { setQuotaCallback } from '../services/gemini';
 
 const DRAWER_WIDTH = 240;
 
 export const Layout = ({ children }) => {
   const { currentView, mobileOpen, handleDrawerToggle, navigateTo } = useAdmin();
   const { signOut } = useAuth();
+
+  // Quota Notification State
+  const [quotaMeta, setQuotaMeta] = useState({ open: false, model: "" });
+
+  useEffect(() => {
+    // Register global callback for Gemini quota issues
+    setQuotaCallback((modelName) => {
+      setQuotaMeta({ open: true, model: modelName });
+    });
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -35,6 +48,7 @@ export const Layout = ({ children }) => {
     { id: 'sponsors', label: 'Patrocinadores', icon: <People /> },
     { id: 'users', label: 'Gestão de Usuários', icon: <ManageAccounts /> },
     { id: 'audit', label: 'Log de Modificações', icon: <History /> },
+    { id: 'gemini-settings', label: 'Configuração IA', icon: <SettingsSuggest /> },
   ];
 
   const getPageTitle = () => {
@@ -49,6 +63,7 @@ export const Layout = ({ children }) => {
       case 'users': return 'Gestão de Usuários';
       case 'certificates': return 'Certificados Avulsos';
       case 'audit': return 'Log de Modificações';
+      case 'gemini-settings': return 'Configuração IA';
       default: return 'ARPT Admin';
     }
   };
@@ -160,6 +175,19 @@ export const Layout = ({ children }) => {
         <Toolbar />
         {children}
       </Box>
+
+      {/* Global Notifications */}
+      <Snackbar
+        open={quotaMeta.open}
+        autoHideDuration={6000}
+        onClose={() => setQuotaMeta({ ...quotaMeta, open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert severity="warning" variant="filled" onClose={() => setQuotaMeta({ ...quotaMeta, open: false })} sx={{ width: '100%' }}>
+          Cota expirada para o modelo {quotaMeta.model}. Alternando para modelo de backup...
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
+
