@@ -1,15 +1,28 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
     Box, Typography, Button, Table, TableContainer, TableHead,
     TableRow, TableCell, TableBody, Paper, IconButton, Chip,
     Dialog, DialogTitle, DialogContent, DialogActions, Grid,
     TextField, MenuItem, CircularProgress, Alert, Avatar
 } from '@mui/material';
-import { Add, Edit, Delete, Visibility, Close, Image as ImageIcon, Search } from '@mui/icons-material';
+import { Add, Edit, Delete, Visibility, Close, Image as ImageIcon, Search, CardGiftcard, Refresh, BrokenImage } from '@mui/icons-material';
 import { AIAssistant } from '../components/AIAssistant';
 import { useAdmin } from '../contexts/AdminContext';
 
 export const Rewards = () => {
+    // Skip link for screen readers
+    const skipRef = useRef(null);
+    const handleSkip = (e) => {
+        e.preventDefault();
+        const mainContent = document.getElementById('main-content');
+        if (mainContent) {
+            mainContent.tabIndex = -1;
+            mainContent.focus();
+            setTimeout(() => {
+                mainContent.removeAttribute('tabindex');
+            }, 100);
+        }
+    };
     const {
         projects,
         getRewardsByManejoId,
@@ -162,431 +175,437 @@ export const Rewards = () => {
     };
 
     return (
-        <Box sx={{ animation: 'fadeIn 0.5s' }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                <Typography variant="h5" display="flex" alignItems="center" gap={1}>
-                    <CardGiftcard color="primary" /> Gerenciamento de Recompensas
-                </Typography>
-            </Box>
-
-            {/* Manejo Selector */}
-            <Paper sx={{ p: 2, mb: 2 }}>
-                <Grid container spacing={2} alignItems="center">
-                    <Grid item xs={12} md={6}>
-                        <TextField
-                            select
-                            fullWidth
-                            label="Selecione o Manejo"
-                            value={selectedManejoId}
-                            onChange={(e) => setSelectedManejoId(e.target.value)}
-                        >
-                            <MenuItem value="">
-                                <em>Selecione um manejo...</em>
-                            </MenuItem>
-                            {projects.map((project) => (
-                                <MenuItem key={project.id} value={project.id}>
-                                    {project.descricao} - {project.municipio}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                    </Grid>
-                    <Grid item xs={12} md={6} display="flex" gap={1}>
-                        <Button
-                            variant="outlined"
-                            startIcon={<Refresh />}
-                            onClick={loadRewards}
-                            disabled={!selectedManejoId || loading}
-                        >
-                            Atualizar
-                        </Button>
-                        <Button
-                            variant="contained"
-                            startIcon={<Add />}
-                            onClick={handleOpenNew}
-                            disabled={!selectedManejoId}
-                        >
-                            Adicionar Recompensa
-                        </Button>
-                    </Grid>
-                </Grid>
-            </Paper>
-
-            {/* Error Display */}
-            {error && (
-                <Alert severity="error" sx={{ mb: 2 }}>
-                    {error}
-                </Alert>
-            )}
-
-            {/* Loading State */}
-            {loading && (
-                <Box display="flex" justifyContent="center" alignItems="center" py={4}>
-                    <CircularProgress />
+        <>
+            <a href="#main-content" onClick={handleSkip} ref={skipRef} style={{ position: 'absolute', left: '-9999px', top: 'auto', width: '1px', height: '1px', overflow: 'hidden' }}>Skip to main content</a>
+            <Box sx={{ animation: 'fadeIn 0.5s' }}>
+                <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+                    <Typography variant="h5" display="flex" alignItems="center" gap={1}>
+                        <CardGiftcard color="primary" /> Gerenciamento de Recompensas
+                    </Typography>
                 </Box>
-            )}
 
-            {/* Rewards Table */}
-            {!loading && selectedManejoId && (
-                <Box>
-                    {/* Desktop Table */}
-                    <TableContainer component={Paper} sx={{ display: { xs: 'none', md: 'block' } }}>
-                        <Table>
-                            <TableHead sx={{ bgcolor: '#f9fafb' }}>
-                                <TableRow>
-                                    <TableCell>ID</TableCell>
-                                    <TableCell>Nome</TableCell>
-                                    <TableCell>Descrição</TableCell>
-                                    <TableCell>Preço Varejo</TableCell>
-                                    <TableCell>Preço Recompensa</TableCell>
-                                    <TableCell>Quantidade</TableCell>
-                                    <TableCell align="right">Ações</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {rewards.length === 0 ? (
+                {/* Manejo Selector */}
+                <Paper sx={{ p: 2, mb: 2 }} id="main-content">
+                    <Grid container spacing={2} alignItems="center">
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                select
+                                fullWidth
+                                label="Selecione o Manejo"
+                                value={selectedManejoId}
+                                onChange={(e) => setSelectedManejoId(e.target.value)}
+                            >
+                                <MenuItem value="">
+                                    <em>Selecione um manejo...</em>
+                                </MenuItem>
+                                {projects.map((project) => (
+                                    <MenuItem key={project.id} value={project.id}>
+                                        {project.descricao} - {project.municipio}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+                        <Grid item xs={12} md={6} display="flex" gap={1}>
+                            <Button
+                                variant="outlined"
+                                startIcon={<Refresh />}
+                                onClick={loadRewards}
+                                disabled={!selectedManejoId || loading}
+                            >
+                                Atualizar
+                            </Button>
+                            <Button
+                                variant="contained"
+                                startIcon={<Add />}
+                                onClick={handleOpenNew}
+                                disabled={!selectedManejoId}
+                            >
+                                Adicionar Recompensa
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </Paper>
+
+                {/* Error Display */}
+                {error && (
+                    <Alert severity="error" sx={{ mb: 2 }}>
+                        {error}
+                    </Alert>
+                )}
+
+                {/* Loading State */}
+                {loading && (
+                    <Box display="flex" justifyContent="center" alignItems="center" py={4}>
+                        <CircularProgress />
+                    </Box>
+                )}
+
+                {/* Rewards Table */}
+                {!loading && selectedManejoId && (
+                    <Box>
+                        {/* Desktop Table */}
+                        <TableContainer component={Paper} sx={{ display: { xs: 'none', md: 'block' } }}>
+                            <Table>
+                                <TableHead sx={{ bgcolor: '#f9fafb' }}>
                                     <TableRow>
-                                        <TableCell colSpan={7} align="center">
-                                            <Typography variant="body2" color="text.secondary" py={2}>
-                                                Nenhuma recompensa cadastrada para este manejo
-                                            </Typography>
-                                        </TableCell>
+                                        <TableCell>ID</TableCell>
+                                        <TableCell>Nome</TableCell>
+                                        <TableCell>Descrição</TableCell>
+                                        <TableCell>Preço Varejo</TableCell>
+                                        <TableCell>Preço Recompensa</TableCell>
+                                        <TableCell>Quantidade</TableCell>
+                                        <TableCell align="right">Ações</TableCell>
                                     </TableRow>
-                                ) : (
-                                    rewards.map((reward) => (
-                                        <TableRow key={reward.id} hover>
-                                            <TableCell>
-                                                <Typography variant="body2" fontWeight="medium">
-                                                    {reward.id}
+                                </TableHead>
+                                <TableBody>
+                                    {rewards.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={7} align="center">
+                                                <Typography variant="body2" color="text.secondary" py={2}>
+                                                    Nenhuma recompensa cadastrada para este manejo
                                                 </Typography>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Box display="flex" alignItems="center" gap={2}>
-                                                    <Avatar
-                                                        src={reward.foto_url}
-                                                        variant="rounded"
-                                                        sx={{ width: 40, height: 40 }}
-                                                    >
-                                                        <ImageIcon />
-                                                    </Avatar>
-                                                    <Typography variant="body2" fontWeight="bold">
-                                                        {reward.name}
-                                                    </Typography>
-                                                </Box>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Typography variant="body2" color="text.secondary">
-                                                    {reward.info || '-'}
-                                                </Typography>
-                                            </TableCell>
-                                            <TableCell>
-                                                {reward.retail_price ? (
-                                                    `R$ ${Number(reward.retail_price).toLocaleString('pt-BR', {
-                                                        minimumFractionDigits: 2,
-                                                        maximumFractionDigits: 2
-                                                    })}`
-                                                ) : '-'}
-                                            </TableCell>
-                                            <TableCell>
-                                                {reward.reward_price ? (
-                                                    `R$ ${Number(reward.reward_price).toLocaleString('pt-BR', {
-                                                        minimumFractionDigits: 2,
-                                                        maximumFractionDigits: 2
-                                                    })}`
-                                                ) : 'Grátis'}
-                                            </TableCell>
-                                            <TableCell>
-                                                {reward.reward_qtd !== undefined ? reward.reward_qtd : '-'}
-                                            </TableCell>
-                                            <TableCell align="right">
-                                                <IconButton
-                                                    size="small"
-                                                    color="primary"
-                                                    onClick={() => handleOpenView(reward)}
-                                                    title="Visualizar"
-                                                >
-                                                    <Visibility />
-                                                </IconButton>
-                                                <IconButton
-                                                    size="small"
-                                                    color="default"
-                                                    onClick={() => handleOpenEdit(reward)}
-                                                    title="Editar"
-                                                >
-                                                    <Edit />
-                                                </IconButton>
-                                                <IconButton
-                                                    size="small"
-                                                    color="error"
-                                                    onClick={() => handleDelete(reward.id)}
-                                                    title="Excluir"
-                                                >
-                                                    <Delete />
-                                                </IconButton>
                                             </TableCell>
                                         </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                                    ) : (
+                                        rewards.map((reward) => (
+                                            <TableRow key={reward.id} hover>
+                                                <TableCell>
+                                                    <Typography variant="body2" fontWeight="medium">
+                                                        {reward.id}
+                                                    </Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Box display="flex" alignItems="center" gap={2}>
+                                                        <Avatar
+                                                            src={reward.foto_url}
+                                                            variant="rounded"
+                                                            sx={{ width: 40, height: 40 }}
+                                                        >
+                                                            <ImageIcon />
+                                                        </Avatar>
+                                                        <Typography variant="body2" fontWeight="bold">
+                                                            {reward.name}
+                                                        </Typography>
+                                                    </Box>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Typography variant="body2" color="text.secondary">
+                                                        {reward.info || '-'}
+                                                    </Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    {reward.retail_price ? (
+                                                        `R$ ${Number(reward.retail_price).toLocaleString('pt-BR', {
+                                                            minimumFractionDigits: 2,
+                                                            maximumFractionDigits: 2
+                                                        })}`
+                                                    ) : '-'}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {reward.reward_price ? (
+                                                        `R$ ${Number(reward.reward_price).toLocaleString('pt-BR', {
+                                                            minimumFractionDigits: 2,
+                                                            maximumFractionDigits: 2
+                                                        })}`
+                                                    ) : 'Grátis'}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {reward.reward_qtd !== undefined ? reward.reward_qtd : '-'}
+                                                </TableCell>
+                                                <TableCell align="right">
+                                                    <IconButton
+                                                        size="small"
+                                                        color="primary"
+                                                        onClick={() => handleOpenView(reward)}
+                                                        title="Visualizar"
+                                                        aria-label="Visualizar recompensa"
+                                                    >
+                                                        <Visibility />
+                                                    </IconButton>
+                                                    <IconButton
+                                                        size="small"
+                                                        color="default"
+                                                        onClick={() => handleOpenEdit(reward)}
+                                                        title="Editar"
+                                                        aria-label="Editar recompensa"
+                                                    >
+                                                        <Edit />
+                                                    </IconButton>
+                                                    <IconButton
+                                                        size="small"
+                                                        color="error"
+                                                        onClick={() => handleDelete(reward.id)}
+                                                        title="Excluir"
+                                                        aria-label="Excluir recompensa"
+                                                    >
+                                                        <Delete />
+                                                    </IconButton>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
 
-                    {/* Mobile Card View */}
-                    <Box sx={{ display: { xs: 'flex', md: 'none' }, flexDirection: 'column', gap: 2 }}>
-                        {rewards.map((reward) => (
-                            <Paper key={reward.id} sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
-                                <Box display="flex" gap={2} alignItems="center">
-                                    <Avatar
-                                        src={reward.foto_url}
-                                        variant="rounded"
-                                        sx={{ width: 60, height: 60 }}
-                                    >
-                                        <ImageIcon />
-                                    </Avatar>
-                                    <Box flex={1}>
-                                        <Typography fontWeight="bold" variant="subtitle1">{reward.name}</Typography>
-                                        <Typography variant="body2" color="textSecondary">{reward.info}</Typography>
+                        {/* Mobile Card View */}
+                        <Box sx={{ display: { xs: 'flex', md: 'none' }, flexDirection: 'column', gap: 2 }}>
+                            {rewards.map((reward) => (
+                                <Paper key={reward.id} sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                    <Box display="flex" gap={2} alignItems="center">
+                                        <Avatar
+                                            src={reward.foto_url}
+                                            variant="rounded"
+                                            sx={{ width: 60, height: 60 }}
+                                        >
+                                            <ImageIcon />
+                                        </Avatar>
+                                        <Box flex={1}>
+                                            <Typography fontWeight="bold" variant="subtitle1">{reward.name}</Typography>
+                                            <Typography variant="body2" color="textSecondary">{reward.info}</Typography>
+                                        </Box>
                                     </Box>
-                                </Box>
 
-                                <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
-                                    <Box>
-                                        <Typography variant="caption" color="textSecondary">Preço Varejo</Typography>
-                                        <Typography variant="body2" sx={{ textDecoration: 'line-through' }}>
-                                            {reward.retail_price ? `R$ ${Number(reward.retail_price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '-'}
-                                        </Typography>
+                                    <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
+                                        <Box>
+                                            <Typography variant="caption" color="textSecondary">Preço Varejo</Typography>
+                                            <Typography variant="body2" sx={{ textDecoration: 'line-through' }}>
+                                                {reward.retail_price ? `R$ ${Number(reward.retail_price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '-'}
+                                            </Typography>
+                                        </Box>
+                                        <Box textAlign="right">
+                                            <Typography variant="caption" color="textSecondary">Preço Recompensa</Typography>
+                                            <Typography variant="body1" fontWeight="bold" color="primary">
+                                                {reward.reward_price ? `R$ ${Number(reward.reward_price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 'Grátis'}
+                                            </Typography>
+                                        </Box>
                                     </Box>
-                                    <Box textAlign="right">
-                                        <Typography variant="caption" color="textSecondary">Preço Recompensa</Typography>
-                                        <Typography variant="body1" fontWeight="bold" color="primary">
-                                            {reward.reward_price ? `R$ ${Number(reward.reward_price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 'Grátis'}
-                                        </Typography>
-                                    </Box>
-                                </Box>
 
-                                <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
-                                    <Typography variant="body2">Qtd: {reward.reward_qtd}</Typography>
-                                    <Box display="flex" gap={1}>
-                                        <Button size="small" startIcon={<Visibility />} onClick={() => handleOpenView(reward)}>
-                                            Ver
-                                        </Button>
-                                        <Button size="small" startIcon={<Edit />} onClick={() => handleOpenEdit(reward)}>
-                                            Editar
-                                        </Button>
-                                        <Button size="small" color="error" startIcon={<Delete />} onClick={() => handleDelete(reward.id)}>
-                                            Excluir
-                                        </Button>
+                                    <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
+                                        <Typography variant="body2">Qtd: {reward.reward_qtd}</Typography>
+                                        <Box display="flex" gap={1}>
+                                            <Button size="small" startIcon={<Visibility />} onClick={() => handleOpenView(reward)}>
+                                                Ver
+                                            </Button>
+                                            <Button size="small" startIcon={<Edit />} onClick={() => handleOpenEdit(reward)}>
+                                                Editar
+                                            </Button>
+                                            <Button size="small" color="error" startIcon={<Delete />} onClick={() => handleDelete(reward.id)}>
+                                                Excluir
+                                            </Button>
+                                        </Box>
                                     </Box>
-                                </Box>
-                            </Paper>
-                        ))}
-                        {rewards.length === 0 && (
-                            <Typography align="center" color="textSecondary">Nenhuma recompensa encontrada</Typography>
-                        )}
+                                </Paper>
+                            ))}
+                            {rewards.length === 0 && (
+                                <Typography align="center" color="textSecondary">Nenhuma recompensa encontrada</Typography>
+                            )}
+                        </Box>
                     </Box>
-                </Box>
-            )}
+                )}
 
-            {/* No Manejo Selected */}
-            {!loading && !selectedManejoId && (
-                <Paper sx={{ p: 4, textAlign: 'center' }}>
-                    <CardGiftcard sx={{ fontSize: 60, color: 'action.disabled', mb: 2 }} />
-                    <Typography variant="h6" color="text.secondary">
-                        Selecione um manejo para gerenciar suas recompensas
-                    </Typography>
-                </Paper>
-            )}
+                {/* No Manejo Selected */}
+                {!loading && !selectedManejoId && (
+                    <Paper sx={{ p: 4, textAlign: 'center' }}>
+                        <CardGiftcard sx={{ fontSize: 60, color: 'action.disabled', mb: 2 }} />
+                        <Typography variant="h6" color="text.secondary">
+                            Selecione um manejo para gerenciar suas recompensas
+                        </Typography>
+                    </Paper>
+                )}
 
-            {/* Dialog Form */}
-            <Dialog open={openForm} onClose={() => setOpenForm(false)} maxWidth="sm" fullWidth>
-                <DialogTitle>
-                    {isEditing ? 'Editar Recompensa' : 'Nova Recompensa'}
-                </DialogTitle>
-                <DialogContent dividers>
-                    <Grid container spacing={2} pt={1}>
-                        <Grid item xs={12}>
-                            <TextField
-                                fullWidth
-                                label="Nome *"
-                                value={formData.name}
-                                onChange={e => setFormData({ ...formData, name: e.target.value })}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                                <Typography variant="caption">Descrição / Informações</Typography>
-                                <AIAssistant
-                                    initialText={formData.info}
-                                    context={`Recompensa: ${formData.name}`}
-                                    onApply={(text) => setFormData({ ...formData, info: text })}
-                                    label="Melhorar Descrição"
+                {/* Dialog Form */}
+                <Dialog open={openForm} onClose={() => setOpenForm(false)} maxWidth="sm" fullWidth>
+                    <DialogTitle>
+                        {isEditing ? 'Editar Recompensa' : 'Nova Recompensa'}
+                    </DialogTitle>
+                    <DialogContent dividers>
+                        <Grid container spacing={2} pt={1}>
+                            <Grid item xs={12}>
+                                <TextField
+                                    fullWidth
+                                    label="Nome *"
+                                    value={formData.name}
+                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
                                 />
-                            </Box>
-                            <TextField
-                                fullWidth
-                                label="Informações Adicionais"
-                                multiline
-                                rows={3}
-                                value={formData.info}
-                                onChange={(e) => setFormData({ ...formData, info: e.target.value })}
-                            />
-                        </Grid>
-                        <Grid item xs={6}>
-                            <TextField
-                                fullWidth
-                                type="number"
-                                label="Preço Varejo"
-                                value={formData.retail_price}
-                                onChange={e => setFormData({ ...formData, retail_price: e.target.value })}
-                                inputProps={{ step: '0.01', min: '0' }}
-                            />
-                        </Grid>
-                        <Grid item xs={6}>
-                            <TextField
-                                fullWidth
-                                type="number"
-                                label="Preço Recompensa"
-                                value={formData.reward_price}
-                                onChange={e => setFormData({ ...formData, reward_price: e.target.value })}
-                                inputProps={{ step: '0.01', min: '0' }}
-                                helperText="0 = Grátis"
-                            />
-                        </Grid>
-                        <Grid item xs={6}>
-                            <TextField
-                                fullWidth
-                                type="number"
-                                label="Quantidade Disponível"
-                                value={formData.reward_qtd}
-                                onChange={e => setFormData({ ...formData, reward_qtd: e.target.value })}
-                                inputProps={{ min: '0' }}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField
-                                fullWidth
-                                label="URL da Foto"
-                                value={formData.foto_url}
-                                onChange={e => {
-                                    setFormData({ ...formData, foto_url: e.target.value });
-                                    setImgError(false);
-                                }}
-                                helperText="URL da imagem da recompensa"
-                            />
-                        </Grid>
-                        {/* Image Preview */}
-                        <Grid item xs={12}>
-                            {formData.foto_url && !imgError ? (
-                                <Box
-                                    display="flex"
-                                    justifyContent="center"
-                                    p={1}
-                                    border="1px dashed #ccc"
-                                    borderRadius={1}
-                                    bgcolor="grey.50"
-                                >
-                                    <img
-                                        src={formData.foto_url}
-                                        alt="Preview"
-                                        style={{ maxWidth: '100%', maxHeight: 200, objectFit: 'contain' }}
-                                        onError={() => setImgError(true)}
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                                    <Typography variant="caption">Descrição / Informações</Typography>
+                                    <AIAssistant
+                                        initialText={formData.info}
+                                        context={`Recompensa: ${formData.name}`}
+                                        onApply={(text) => setFormData({ ...formData, info: text })}
+                                        label="Melhorar Descrição"
                                     />
                                 </Box>
-                            ) : formData.foto_url && imgError && (
-                                <Box
-                                    display="flex"
-                                    alignItems="center"
-                                    gap={1}
-                                    color="error.main"
-                                    bgcolor="error.light"
-                                    p={1}
-                                    borderRadius={1}
-                                >
-                                    <BrokenImage fontSize="small" />
-                                    <Typography variant="caption">Não foi possível carregar a imagem</Typography>
-                                </Box>
-                            )}
-                        </Grid>
-                    </Grid>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenForm(false)}>Cancelar</Button>
-                    <Button variant="contained" onClick={handleSave}>
-                        {isEditing ? 'Atualizar' : 'Cadastrar'}
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            {/* Dialog View */}
-            <Dialog open={openView} onClose={() => setOpenView(false)} maxWidth="sm" fullWidth>
-                <DialogTitle>Detalhes da Recompensa</DialogTitle>
-                <DialogContent dividers>
-                    {selectedReward && (
-                        <Box display="flex" flexDirection="column" gap={2}>
-                            {selectedReward.foto_url && !imgError ? (
-                                <Box
-                                    component="img"
-                                    src={selectedReward.foto_url}
-                                    alt={selectedReward.name}
-                                    onError={() => setImgError(true)}
-                                    sx={{
-                                        width: '100%',
-                                        maxHeight: 300,
-                                        objectFit: 'contain',
-                                        borderRadius: 1,
-                                        mb: 2,
-                                        bgcolor: 'grey.100'
-                                    }}
+                                <TextField
+                                    fullWidth
+                                    label="Informações Adicionais"
+                                    multiline
+                                    rows={3}
+                                    value={formData.info}
+                                    onChange={(e) => setFormData({ ...formData, info: e.target.value })}
                                 />
-                            ) : (
-                                <Box display="flex" justifyContent="center" alignItems="center" flexDirection="column" height={150} bgcolor="grey.100" borderRadius={1} mb={2}>
-                                    {selectedReward.foto_url ? (
-                                        <BrokenImage sx={{ fontSize: 60, color: 'grey.300', mb: 1 }} />
-                                    ) : (
-                                        <ImageIcon sx={{ fontSize: 60, color: 'grey.300' }} />
-                                    )}
-                                    <Typography variant="caption" color="textSecondary">
-                                        {selectedReward.foto_url ? "Erro ao carregar imagem" : "Sem foto"}
-                                    </Typography>
-                                </Box>
-                            )}
-                            <Typography variant="h6">{selectedReward.name}</Typography>
-                            <Typography variant="body1" color="text.secondary">
-                                {selectedReward.info || "Sem descrição"}
-                            </Typography>
-                            <Box display="flex" justifyContent="space-between" mt={1}>
-                                <Box>
-                                    <Typography variant="caption" color="textSecondary">Preço Varejo</Typography>
-                                    <Typography variant="body1">
-                                        {selectedReward.retail_price ? `R$ ${Number(selectedReward.retail_price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '-'}
-                                    </Typography>
-                                </Box>
-                                <Box>
-                                    <Typography variant="caption" color="textSecondary">Preço Recompensa</Typography>
-                                    <Typography variant="body1" fontWeight="bold" color="primary">
-                                        {selectedReward.reward_price ? `R$ ${Number(selectedReward.reward_price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 'Grátis'}
-                                    </Typography>
-                                </Box>
-                                <Box>
-                                    <Typography variant="caption" color="textSecondary">Qtd.</Typography>
-                                    <Typography variant="body1">{selectedReward.reward_qtd}</Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <TextField
+                                    fullWidth
+                                    type="number"
+                                    label="Preço Varejo"
+                                    value={formData.retail_price}
+                                    onChange={e => setFormData({ ...formData, retail_price: e.target.value })}
+                                    inputProps={{ step: '0.01', min: '0' }}
+                                />
+                            </Grid>
+                            <Grid item xs={6}>
+                                <TextField
+                                    fullWidth
+                                    type="number"
+                                    label="Preço Recompensa"
+                                    value={formData.reward_price}
+                                    onChange={e => setFormData({ ...formData, reward_price: e.target.value })}
+                                    inputProps={{ step: '0.01', min: '0' }}
+                                    helperText="0 = Grátis"
+                                />
+                            </Grid>
+                            <Grid item xs={6}>
+                                <TextField
+                                    fullWidth
+                                    type="number"
+                                    label="Quantidade Disponível"
+                                    value={formData.reward_qtd}
+                                    onChange={e => setFormData({ ...formData, reward_qtd: e.target.value })}
+                                    inputProps={{ min: '0' }}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    fullWidth
+                                    label="URL da Foto"
+                                    value={formData.foto_url}
+                                    onChange={e => {
+                                        setFormData({ ...formData, foto_url: e.target.value });
+                                        setImgError(false);
+                                    }}
+                                    helperText="URL da imagem da recompensa"
+                                />
+                            </Grid>
+                            {/* Image Preview */}
+                            <Grid item xs={12}>
+                                {formData.foto_url && !imgError ? (
+                                    <Box
+                                        display="flex"
+                                        justifyContent="center"
+                                        p={1}
+                                        border="1px dashed #ccc"
+                                        borderRadius={1}
+                                        bgcolor="grey.50"
+                                    >
+                                        <img
+                                            src={formData.foto_url}
+                                            alt="Preview"
+                                            style={{ maxWidth: '100%', maxHeight: 200, objectFit: 'contain' }}
+                                            onError={() => setImgError(true)}
+                                        />
+                                    </Box>
+                                ) : formData.foto_url && imgError && (
+                                    <Box
+                                        display="flex"
+                                        alignItems="center"
+                                        gap={1}
+                                        color="error.main"
+                                        bgcolor="error.light"
+                                        p={1}
+                                        borderRadius={1}
+                                    >
+                                        <BrokenImage fontSize="small" />
+                                        <Typography variant="caption">Não foi possível carregar a imagem</Typography>
+                                    </Box>
+                                )}
+                            </Grid>
+                        </Grid>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setOpenForm(false)}>Cancelar</Button>
+                        <Button variant="contained" onClick={handleSave}>
+                            {isEditing ? 'Atualizar' : 'Cadastrar'}
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+
+                {/* Dialog View */}
+                <Dialog open={openView} onClose={() => setOpenView(false)} maxWidth="sm" fullWidth>
+                    <DialogTitle>Detalhes da Recompensa</DialogTitle>
+                    <DialogContent dividers>
+                        {selectedReward && (
+                            <Box display="flex" flexDirection="column" gap={2}>
+                                {selectedReward.foto_url && !imgError ? (
+                                    <Box
+                                        component="img"
+                                        src={selectedReward.foto_url}
+                                        alt={selectedReward.name}
+                                        onError={() => setImgError(true)}
+                                        sx={{
+                                            width: '100%',
+                                            maxHeight: 300,
+                                            objectFit: 'contain',
+                                            borderRadius: 1,
+                                            mb: 2,
+                                            bgcolor: 'grey.100'
+                                        }}
+                                    />
+                                ) : (
+                                    <Box display="flex" justifyContent="center" alignItems="center" flexDirection="column" height={150} bgcolor="grey.100" borderRadius={1} mb={2}>
+                                        {selectedReward.foto_url ? (
+                                            <BrokenImage sx={{ fontSize: 60, color: 'grey.300', mb: 1 }} />
+                                        ) : (
+                                            <ImageIcon sx={{ fontSize: 60, color: 'grey.300' }} />
+                                        )}
+                                        <Typography variant="caption" color="textSecondary">
+                                            {selectedReward.foto_url ? "Erro ao carregar imagem" : "Sem foto"}
+                                        </Typography>
+                                    </Box>
+                                )}
+                                <Typography variant="h6">{selectedReward.name}</Typography>
+                                <Typography variant="body1" color="text.secondary">
+                                    {selectedReward.info || "Sem descrição"}
+                                </Typography>
+                                <Box display="flex" justifyContent="space-between" mt={1}>
+                                    <Box>
+                                        <Typography variant="caption" color="textSecondary">Preço Varejo</Typography>
+                                        <Typography variant="body1">
+                                            {selectedReward.retail_price ? `R$ ${Number(selectedReward.retail_price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '-'}
+                                        </Typography>
+                                    </Box>
+                                    <Box>
+                                        <Typography variant="caption" color="textSecondary">Preço Recompensa</Typography>
+                                        <Typography variant="body1" fontWeight="bold" color="primary">
+                                            {selectedReward.reward_price ? `R$ ${Number(selectedReward.reward_price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 'Grátis'}
+                                        </Typography>
+                                    </Box>
+                                    <Box>
+                                        <Typography variant="caption" color="textSecondary">Qtd.</Typography>
+                                        <Typography variant="body1">{selectedReward.reward_qtd}</Typography>
+                                    </Box>
                                 </Box>
                             </Box>
-                        </Box>
-                    )}
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenView(false)}>Fechar</Button>
-                    <Button
-                        variant="contained"
-                        onClick={() => {
-                            setOpenView(false);
-                            handleOpenEdit(selectedReward);
-                        }}
-                    >
-                        Editar
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        </Box>
+                        )}
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setOpenView(false)}>Fechar</Button>
+                        <Button
+                            variant="contained"
+                            onClick={() => {
+                                setOpenView(false);
+                                handleOpenEdit(selectedReward);
+                            }}
+                        >
+                            Editar
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </Box>
+        </>
     );
 };

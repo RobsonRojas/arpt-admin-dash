@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Box, Typography, Button, Table, TableContainer, TableHead,
     TableRow, TableCell, TableBody, Paper, IconButton, Chip,
@@ -6,7 +6,7 @@ import {
     FormControlLabel, Switch, CircularProgress, Alert, Snackbar,
     Avatar, Grid
 } from '@mui/material';
-import { Add, Edit, Delete, Visibility, Close, Image as ImageIcon, Search } from '@mui/icons-material';
+import { Add, Edit, Delete, Visibility, Close, Image as ImageIcon, Search, Refresh, BrokenImage } from '@mui/icons-material';
 import { AIAssistant } from '../components/AIAssistant';
 import { useAdmin } from '../contexts/AdminContext';
 import { api } from '../services/api';
@@ -37,6 +37,20 @@ export const Products = () => {
 
     // Image Error State for View and Preview
     const [imgError, setImgError] = useState(false);
+
+    const skipRef = useRef(null);
+
+    const handleSkip = (e) => {
+        e.preventDefault();
+        const mainContent = document.getElementById('main-content');
+        if (mainContent) {
+            mainContent.tabIndex = -1;
+            mainContent.focus();
+            setTimeout(() => {
+                mainContent.removeAttribute('tabindex');
+            }, 100);
+        }
+    };
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -144,6 +158,7 @@ export const Products = () => {
 
     return (
         <Box sx={{ animation: 'fadeIn 0.5s', p: 3 }}>
+            <a href="#main-content" onClick={handleSkip} ref={skipRef} style={{ position: 'absolute', left: '-9999px', top: 'auto', width: '1px', height: '1px', overflow: 'hidden' }}>Skip to main content</a>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
                 <Typography variant="h5" fontWeight={600}>
                     Gestão de Produtos
@@ -167,7 +182,7 @@ export const Products = () => {
             ) : (
                 <>
                     {/* Desktop Table View */}
-                    <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid #e0e0e0', display: { xs: 'none', md: 'block' } }}>
+                    <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid #e0e0e0', display: { xs: 'none', md: 'block' } }} id="main-content">
                         <Table>
                             <TableHead sx={{ bgcolor: '#f9fafb' }}>
                                 <TableRow>
@@ -206,13 +221,13 @@ export const Products = () => {
                                             />
                                         </TableCell>
                                         <TableCell align="right">
-                                            <IconButton size="small" color="primary" onClick={() => handleOpenView(row)}>
+                                            <IconButton size="small" color="primary" onClick={() => handleOpenView(row)} aria-label="Visualizar Produto">
                                                 <Visibility />
                                             </IconButton>
-                                            <IconButton size="small" onClick={() => handleOpenDialog(row)}>
+                                            <IconButton size="small" onClick={() => handleOpenDialog(row)} aria-label="Editar Produto">
                                                 <Edit />
                                             </IconButton>
-                                            <IconButton size="small" color="error" onClick={() => handleDelete(row.id)}>
+                                            <IconButton size="small" color="error" onClick={() => handleDelete(row.id)} aria-label="Deletar Produto">
                                                 <Delete />
                                             </IconButton>
                                         </TableCell>

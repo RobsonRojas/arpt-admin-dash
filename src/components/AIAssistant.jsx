@@ -4,7 +4,7 @@ import {
     CircularProgress, Dialog, DialogTitle, DialogContent,
     DialogActions, Typography, TextField
 } from '@mui/material';
-import { AutoFixHigh, MoreVert, Check, Close, contentCopy } from '@mui/icons-material';
+import { AutoFixHigh, MoreVert, Check, Close, ContentCopy } from '@mui/icons-material';
 import { improveText } from '../services/gemini';
 
 export const AIAssistant = ({ initialText, onApply, context = "", label = "Assistente IA" }) => {

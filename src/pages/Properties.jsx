@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   Box, Typography, Button, Table, TableContainer, TableHead,
   TableRow, TableCell, TableBody, Paper, IconButton, Avatar,
@@ -35,6 +35,20 @@ export const Properties = () => {
     lat: '',
     lng: ''
   });
+
+  const skipRef = useRef(null);
+
+  const handleSkip = (e) => {
+    e.preventDefault();
+    const mainContent = document.getElementById('main-content');
+    if (mainContent) {
+      mainContent.tabIndex = -1;
+      mainContent.focus();
+      setTimeout(() => {
+        mainContent.removeAttribute('tabindex');
+      }, 100);
+    }
+  };
 
   const handleOpenNew = () => {
     setFormData({
@@ -98,6 +112,7 @@ export const Properties = () => {
 
   return (
     <Box sx={{ animation: 'fadeIn 0.5s' }}>
+      <a href="#main-content" onClick={handleSkip} ref={skipRef} style={{ position: 'absolute', left: '-9999px', top: 'auto', width: '1px', height: '1px', overflow: 'hidden' }}>Skip to main content</a>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h5" display="flex" alignItems="center" gap={1}>
           <HomeWork color="primary" /> Gestão de Propriedades
@@ -112,7 +127,7 @@ export const Properties = () => {
       </Box>
 
       <Box>
-        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid #e0e0e0', display: { xs: 'none', md: 'block' } }}>
+        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid #e0e0e0', display: { xs: 'none', md: 'block' } }} id="main-content">
           <Table>
             <TableHead sx={{ bgcolor: '#f9fafb' }}>
               <TableRow>
@@ -161,6 +176,7 @@ export const Properties = () => {
                       color="primary"
                       onClick={() => setSelectedProp(row)}
                       title="Visualizar"
+                      aria-label="Visualizar propriedade"
                     >
                       <Visibility />
                     </IconButton>
@@ -169,6 +185,7 @@ export const Properties = () => {
                       color="default"
                       onClick={() => handleOpenEdit(row)}
                       title="Editar"
+                      aria-label="Editar propriedade"
                     >
                       <Edit />
                     </IconButton>
