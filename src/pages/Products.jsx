@@ -9,9 +9,12 @@ import {
 import { Add, Edit, Delete, Visibility, Close, Image as ImageIcon, Search, Refresh, BrokenImage } from '@mui/icons-material';
 import { AIAssistant } from '../components/AIAssistant';
 import { useAdmin } from '../contexts/AdminContext';
+import { useAuth } from '../contexts/AuthContext';
+import { recordAudit } from '../services/auditLog';
 import { api } from '../services/api';
 
 export const Products = () => {
+    const { user } = useAuth();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -132,8 +135,24 @@ export const Products = () => {
 
             if (editingProduct) {
                 await api.put(`/produtos/${editingProduct.id}`, payload);
+                await recordAudit({
+                    action: 'UPDATE',
+                    entity: 'PRODUCT',
+                    entityId: String(editingProduct.id),
+                    before: editingProduct,
+                    after: { ...payload, id: editingProduct.id },
+                    user
+                });
             } else {
-                await api.post('/produtos', payload);
+                const response = await api.post('/produtos', payload);
+                await recordAudit({
+                    action: 'CREATE',
+                    entity: 'PRODUCT',
+                    entityId: String(response.data?.id || 'new'),
+                    before: null,
+                    after: payload,
+                    user
+                });
             }
 
             handleCloseDialog();
@@ -147,7 +166,16 @@ export const Products = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Tem certeza que deseja deletar este produto?')) {
             try {
+                const before = products.find(p => p.id === id);
                 await api.delete(`/produtos/${id}`);
+                await recordAudit({
+                    action: 'DELETE',
+                    entity: 'PRODUCT',
+                    entityId: String(id),
+                    before,
+                    after: null,
+                    user
+                });
                 fetchProducts();
             } catch (err) {
                 console.error(err);

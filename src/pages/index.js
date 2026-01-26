@@ -8,3 +8,4 @@ export * from './Users';
 export * from './Rewards';
 export * from './Certificates';
 export * from './Products';
+export * from './AuditLogs';

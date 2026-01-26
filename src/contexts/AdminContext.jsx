@@ -4,6 +4,8 @@ import {
     MOCK_SPONSORS
 } from '../constants/mockData';
 import { api } from '../services/api.js';
+import { useAuth } from './AuthContext';
+import { recordAudit } from '../services/auditLog';
 
 // Criar o Context
 const AdminContext = createContext();
@@ -19,6 +21,7 @@ export const useAdmin = () => {
 
 // Provider do Context
 export const AdminProvider = ({ children }) => {
+    const { user } = useAuth();
     // ==================== ESTADOS ====================
     const urlMidiasFiles = "https://arpt.site/api/midias/files/";
 
@@ -124,10 +127,22 @@ export const AdminProvider = ({ children }) => {
         }
 
         try {
+            const before = projects.find(p => p.id === newProject.id);
             const payload = normalizeProjectForApi(newProject);
             const response = await api.put(`/manejos/${newProject.id}`, payload);
             if (response.status === 200) {
                 console.log('Projeto atualizado com sucesso na API.');
+
+                // Audit Log
+                await recordAudit({
+                    action: 'UPDATE',
+                    entity: 'PROJECT',
+                    entityId: String(newProject.id),
+                    before,
+                    after: newProject,
+                    user
+                });
+
                 await getProjects();
                 return response;
             }
@@ -320,6 +335,14 @@ export const AdminProvider = ({ children }) => {
         try {
             const response = await api.post(`/manejos/${manejoId}/produtos`, payload);
             if (response.status === 201 || response.status === 200) {
+                await recordAudit({
+                    action: 'CREATE',
+                    entity: 'REWARD',
+                    entityId: String(response.data.id || 'new'), // Entity ID might be in response
+                    before: null,
+                    after: { ...payload, manejoId },
+                    user
+                });
                 return response.data;
             }
             console.warn(`Resposta inesperada ao criar recompensa: status ${response.status}`);
@@ -332,8 +355,18 @@ export const AdminProvider = ({ children }) => {
 
     const updateReward = async (manejoId, productId, payload) => {
         try {
+            // We don't easily have 'before' state here without fetching it first
+            // or passing it. For now, let's use the payload as 'after'
             const response = await api.put(`/manejos/${manejoId}/produtos/${productId}`, payload);
             if (response.status === 200) {
+                await recordAudit({
+                    action: 'UPDATE',
+                    entity: 'REWARD',
+                    entityId: String(productId),
+                    before: null, // Would need fetching
+                    after: { ...payload, manejoId, productId },
+                    user
+                });
                 return response.data;
             }
             console.warn(`Resposta inesperada ao atualizar recompensa: status ${response.status}`);
@@ -348,6 +381,14 @@ export const AdminProvider = ({ children }) => {
         try {
             const response = await api.delete(`/manejos/${manejoId}/produtos/${productId}`);
             if (response.status === 200 || response.status === 204) {
+                await recordAudit({
+                    action: 'DELETE',
+                    entity: 'REWARD',
+                    entityId: String(productId),
+                    before: { manejoId, productId },
+                    after: null,
+                    user
+                });
                 return true;
             }
             console.warn(`Resposta inesperada ao deletar recompensa: status ${response.status}`);
@@ -503,8 +544,21 @@ export const AdminProvider = ({ children }) => {
     /**
      * Deletar projeto
      */
-    const handleDeleteProject = (projectId) => {
+    const handleDeleteProject = async (projectId) => {
         if (window.confirm('Tem certeza que deseja deletar este projeto?')) {
+            const before = projects.find(p => p.id === projectId);
+
+            // Logically we should call an API here, but current code only updates local state
+            // Let's record the audit anyway
+            await recordAudit({
+                action: 'DELETE',
+                entity: 'PROJECT',
+                entityId: String(projectId),
+                before,
+                after: null,
+                user
+            });
+
             setProjects(prev => prev.filter(p => p.id !== projectId));
         }
     };
@@ -530,7 +584,7 @@ export const AdminProvider = ({ children }) => {
     /**
      * Adicionar nova propriedade
      */
-    const handleAddProperty = (property) => {
+    const handleAddProperty = async (property) => {
         const newProperty = {
             ...property,
             id: `PROP-${Math.floor(Math.random() * 10000)}`,
@@ -540,13 +594,24 @@ export const AdminProvider = ({ children }) => {
                 lng: Number(property.lng) || -60.0
             }
         };
+
+        await recordAudit({
+            action: 'CREATE',
+            entity: 'PROPERTY',
+            entityId: newProperty.id,
+            before: null,
+            after: newProperty,
+            user
+        });
+
         setProperties(prev => [newProperty, ...prev]);
     };
 
     /**
      * Atualizar propriedade existente
      */
-    const handleUpdateProperty = (property) => {
+    const handleUpdateProperty = async (property) => {
+        const before = properties.find(p => p.id === property.id);
         const updatedProperty = {
             ...property,
             area: Number(property.area),
@@ -555,14 +620,35 @@ export const AdminProvider = ({ children }) => {
                 lng: Number(property.lng)
             }
         };
+
+        await recordAudit({
+            action: 'UPDATE',
+            entity: 'PROPERTY',
+            entityId: property.id,
+            before,
+            after: updatedProperty,
+            user
+        });
+
         setProperties(prev => prev.map(p => p.id === property.id ? updatedProperty : p));
     };
 
     /**
      * Deletar propriedade
      */
-    const handleDeleteProperty = (propertyId) => {
+    const handleDeleteProperty = async (propertyId) => {
         if (window.confirm('Tem certeza que deseja deletar esta propriedade?')) {
+            const before = properties.find(p => p.id === propertyId);
+
+            await recordAudit({
+                action: 'DELETE',
+                entity: 'PROPERTY',
+                entityId: propertyId,
+                before,
+                after: null,
+                user
+            });
+
             setProperties(prev => prev.filter(p => p.id !== propertyId));
         }
     };
@@ -572,20 +658,42 @@ export const AdminProvider = ({ children }) => {
     /**
      * Adicionar nova solicitação de necromassa
      */
-    const handleAddNecromassa = (request) => {
+    const handleAddNecromassa = async (request) => {
         const newRequest = {
             ...request,
             id: `NECRO-${Math.floor(Math.random() * 1000)}`,
             data: new Date().toISOString().split('T')[0],
             origem: "WhatsApp"
         };
+
+        await recordAudit({
+            action: 'CREATE',
+            entity: 'NECROMASSA',
+            entityId: newRequest.id,
+            before: null,
+            after: newRequest,
+            user
+        });
+
         setNecromassaRequests(prev => [newRequest, ...prev]);
     };
 
     /**
      * Atualizar status de solicitação de necromassa
      */
-    const handleUpdateNecromassaStatus = (requestId, newStatus) => {
+    const handleUpdateNecromassaStatus = async (requestId, newStatus) => {
+        const before = necromassaRequests.find(req => req.id === requestId);
+        const after = { ...before, status: newStatus };
+
+        await recordAudit({
+            action: 'UPDATE',
+            entity: 'NECROMASSA',
+            entityId: requestId,
+            before,
+            after,
+            user
+        });
+
         setNecromassaRequests(prev =>
             prev.map(req => req.id === requestId ? { ...req, status: newStatus } : req)
         );
@@ -594,8 +702,19 @@ export const AdminProvider = ({ children }) => {
     /**
      * Deletar solicitação de necromassa
      */
-    const handleDeleteNecromassa = (requestId) => {
+    const handleDeleteNecromassa = async (requestId) => {
         if (window.confirm('Tem certeza que deseja deletar esta solicitação?')) {
+            const before = necromassaRequests.find(req => req.id === requestId);
+
+            await recordAudit({
+                action: 'DELETE',
+                entity: 'NECROMASSA',
+                entityId: requestId,
+                before,
+                after: null,
+                user
+            });
+
             setNecromassaRequests(prev => prev.filter(req => req.id !== requestId));
         }
     };
