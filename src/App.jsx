@@ -6,6 +6,7 @@ import { CertificateView } from './pages/CertificateView';
 import { useAdmin } from './contexts/AdminContext';
 import { useAuth } from './contexts/AuthContext.jsx';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -48,6 +49,7 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <Analytics />
       <Routes>
         <Route path="/certificate/view" element={<CertificateView />} />
         <Route path="/*" element={
