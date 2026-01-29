@@ -20,6 +20,7 @@ export const Certificates = () => {
     const [editingId, setEditingId] = useState(null);
     const [formData, setFormData] = useState({
         sponsorName: '',
+        userEmail: '',
         projectName: '',
         date: new Date().toISOString().split('T')[0],
         blockchainLink: '',
@@ -61,6 +62,7 @@ export const Certificates = () => {
             setEditingId(cert.id);
             setFormData({
                 sponsorName: cert.sponsorName,
+                userEmail: cert.userEmail || '',
                 projectName: cert.projectName,
                 date: cert.date,
                 blockchainLink: cert.blockchainLink || '',
@@ -70,6 +72,7 @@ export const Certificates = () => {
             setEditingId(null);
             setFormData({
                 sponsorName: '',
+                userEmail: '',
                 projectName: '',
                 date: new Date().toISOString().split('T')[0],
                 blockchainLink: '',
@@ -99,6 +102,7 @@ export const Certificates = () => {
         try {
             const dataToSave = {
                 sponsorName: formData.sponsorName,
+                userEmail: formData.userEmail,
                 projectName: formData.projectName,
                 date: formData.date,
                 blockchainLink: formData.blockchainLink || '',
@@ -150,7 +154,7 @@ export const Certificates = () => {
         // Encode to base64 (Unicode safe)
         const json = JSON.stringify(viewData);
         const encoded = btoa(unescape(encodeURIComponent(json)));
-        window.open(`/certificate/view?d=${encoded}`, '_blank');
+        window.open(`https://arpt.site/certificate/view?d=${encoded}`, '_blank');
     };
 
     const getTypeColor = (type) => {
@@ -284,6 +288,14 @@ export const Certificates = () => {
                             onChange={handleInputChange}
                             fullWidth
                             required
+                        />
+                        <TextField
+                            label="Email do Usuário (Opcional)"
+                            name="userEmail"
+                            value={formData.userEmail}
+                            onChange={handleInputChange}
+                            fullWidth
+                            helperText="Opcional: use para vincular ao cadastro do usuário no site publico"
                         />
                         <TextField
                             select
