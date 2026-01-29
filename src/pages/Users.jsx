@@ -6,7 +6,8 @@ import {
     TextField, MenuItem, Avatar, TablePagination, CircularProgress,
     Snackbar, Alert
 } from '@mui/material';
-import { Add, Edit, Delete, ManageAccounts, CardMembership, Visibility } from '@mui/icons-material';
+import { Add, Edit, Delete, ManageAccounts, CardMembership, Visibility, History, QrCode, Public, PublicOff, Inventory } from '@mui/icons-material';
+import { QRCodeSVG } from 'qrcode.react';
 import { useAuth } from '../contexts/AuthContext';
 import { useAdmin } from '../contexts/AdminContext';
 import { api } from '../services/api';
@@ -47,6 +48,25 @@ export const Users = () => {
         type: 'Ouro'
     });
     const [savingCert, setSavingCert] = useState(false);
+
+    // Reward and History State
+    const [openRewardList, setOpenRewardList] = useState(false);
+    const [userRewards, setUserRewards] = useState([]);
+    const [loadingRewards, setLoadingRewards] = useState(false);
+    const [openHistoryDialog, setOpenHistoryDialog] = useState(false);
+    const [currentReward, setCurrentReward] = useState(null);
+    const [historyParts, setHistoryParts] = useState([]);
+    const [loadingHistory, setLoadingHistory] = useState(false);
+    const [historyFormData, setHistoryFormData] = useState({
+        id: null,
+        titulo: '',
+        descricao: '',
+        media_url: '',
+        media_type: 'image',
+        ordem: 0
+    });
+    const [savingHistory, setSavingHistory] = useState(false);
+
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
     const fetchUsers = useCallback(async () => {
@@ -125,6 +145,117 @@ export const Users = () => {
     const handleChangeRowsPerPage = (event) => {
         setPageSize(parseInt(event.target.value, 10));
         setPage(1);
+    };
+
+    const handleOpenRewardList = (user) => {
+        setSelectedUser(user);
+        fetchUserRewards(user.id);
+        setOpenRewardList(true);
+    };
+
+    const fetchUserRewards = async (userId) => {
+        setLoadingRewards(true);
+        try {
+            const token = await authUser.getIdToken();
+            const response = await api.get(`/admin/users/${userId}/purchases`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setUserRewards(response.data);
+        } catch (error) {
+            console.error('Erro ao buscar recompensas:', error);
+            setSnackbar({ open: true, message: 'Erro ao carregar recompensas', severity: 'error' });
+        } finally {
+            setLoadingRewards(false);
+        }
+    };
+
+    const handleTogglePublicHistory = async (reward) => {
+        try {
+            const token = await authUser.getIdToken();
+            const newState = !reward.is_historia_publica;
+            const response = await api.patch(`/produto/admin/purchases/${reward.id}/toggle-history`,
+                { isPublic: newState },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            setUserRewards(prev => prev.map(r => r.id === reward.id ? { ...r, ...response.data } : r));
+
+            if (currentReward?.id === reward.id) {
+                setCurrentReward(prev => ({ ...prev, ...response.data }));
+            }
+
+            setSnackbar({ open: true, message: `História ${newState ? 'tornada pública' : 'tornada privada'}`, severity: 'success' });
+        } catch (error) {
+            console.error('Erro ao toggle história:', error);
+            setSnackbar({ open: true, message: 'Erro ao atualizar status da história', severity: 'error' });
+        }
+    };
+
+    const handleOpenHistory = (reward) => {
+        setCurrentReward(reward);
+        fetchHistory(reward.id);
+        setHistoryFormData({ id: null, titulo: '', descricao: '', media_url: '', media_type: 'image', ordem: (historyParts?.length || 0) + 1 });
+        setOpenHistoryDialog(true);
+    };
+
+    const fetchHistory = async (rewardId) => {
+        setLoadingHistory(true);
+        try {
+            const token = await authUser.getIdToken();
+            const response = await api.get(`/produto/admin/purchases/${rewardId}/history`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setHistoryParts(response.data);
+        } catch (error) {
+            console.error('Erro ao buscar história:', error);
+            setSnackbar({ open: true, message: 'Erro ao carregar história', severity: 'error' });
+        } finally {
+            setLoadingHistory(false);
+        }
+    };
+
+    const handleSaveHistoryPart = async () => {
+        setSavingHistory(true);
+        try {
+            const token = await authUser.getIdToken();
+            if (historyFormData.id) {
+                // Update
+                const response = await api.put(`/produto/admin/history/${historyFormData.id}`, historyFormData, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setHistoryParts(prev => prev.map(p => p.id === historyFormData.id ? response.data : p));
+                setSnackbar({ open: true, message: 'Parte atualizada com sucesso', severity: 'success' });
+            } else {
+                // Create
+                const response = await api.post(`/produto/admin/purchases/${currentReward.id}/history`, historyFormData, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setHistoryParts(prev => [...prev, response.data].sort((a, b) => a.ordem - b.ordem));
+                setSnackbar({ open: true, message: 'Parte adicionada com sucesso', severity: 'success' });
+            }
+            // Reset form
+            setHistoryFormData({ id: null, titulo: '', descricao: '', media_url: '', media_type: 'image', ordem: historyParts.length + 1 });
+        } catch (error) {
+            console.error('Erro ao salvar parte da história:', error);
+            setSnackbar({ open: true, message: 'Erro ao salvar história', severity: 'error' });
+        } finally {
+            setSavingHistory(false);
+        }
+    };
+
+    const handleDeleteHistoryPart = async (partId) => {
+        if (!confirm('Excluir esta parte da história?')) return;
+        try {
+            const token = await authUser.getIdToken();
+            await api.delete(`/produto/admin/history/${partId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setHistoryParts(prev => prev.filter(p => p.id !== partId));
+            setSnackbar({ open: true, message: 'Parte removida com sucesso', severity: 'success' });
+        } catch (error) {
+            console.error('Erro ao excluir parte da história:', error);
+            setSnackbar({ open: true, message: 'Erro ao excluir história', severity: 'error' });
+        }
     };
 
     const handleOpenNew = () => {
@@ -248,6 +379,14 @@ export const Users = () => {
                                 </TableCell>
                                 <TableCell>{user.created_at ? new Date(user.created_at).toLocaleDateString() : user.createdAt}</TableCell>
                                 <TableCell align="right">
+                                    <IconButton
+                                        size="small"
+                                        color="warning"
+                                        onClick={() => handleOpenRewardList(user)}
+                                        title="Recompensas"
+                                    >
+                                        <Inventory />
+                                    </IconButton>
                                     <IconButton
                                         size="small"
                                         color="info"
@@ -530,6 +669,182 @@ export const Users = () => {
                     {snackbar.message}
                 </Alert>
             </Snackbar>
+
+            {/* Reward List Dialog */}
+            <Dialog open={openRewardList} onClose={() => setOpenRewardList(false)} maxWidth="md" fullWidth>
+                <DialogTitle>Recompensas de {selectedUser?.first_name || selectedUser?.name}</DialogTitle>
+                <DialogContent dividers>
+                    {loadingRewards ? (
+                        <Box display="flex" justifyContent="center" py={3}><CircularProgress /></Box>
+                    ) : userRewards.length === 0 ? (
+                        <Typography color="textSecondary" align="center" py={3}>Nenhuma recompensa encontrada.</Typography>
+                    ) : (
+                        <TableContainer>
+                            <Table size="small">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Produto</TableCell>
+                                        <TableCell>Data</TableCell>
+                                        <TableCell>Público</TableCell>
+                                        <TableCell align="right">Ações</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {userRewards.map((reward) => (
+                                        <TableRow key={reward.id}>
+                                            <TableCell>{reward.product_name}</TableCell>
+                                            <TableCell>{new Date(reward.created_at).toLocaleDateString()}</TableCell>
+                                            <TableCell>
+                                                <IconButton
+                                                    color={reward.is_historia_publica ? "success" : "default"}
+                                                    onClick={() => handleTogglePublicHistory(reward)}
+                                                >
+                                                    {reward.is_historia_publica ? <Public /> : <PublicOff />}
+                                                </IconButton>
+                                            </TableCell>
+                                            <TableCell align="right">
+                                                <Box display="flex" justifyContent="flex-end" gap={1}>
+                                                    {reward.is_historia_publica && (
+                                                        <IconButton
+                                                            size="small"
+                                                            color="info"
+                                                            onClick={() => {
+                                                                const url = `https://arpt.site/historia/${reward.historia_token}`;
+                                                                window.open(url, '_blank');
+                                                            }}
+                                                            title="Ver Página Pública"
+                                                        >
+                                                            <Visibility fontSize="small" />
+                                                        </IconButton>
+                                                    )}
+                                                    <IconButton
+                                                        size="small"
+                                                        color="primary"
+                                                        onClick={() => handleOpenHistory(reward)}
+                                                        title="Gerenciar História"
+                                                    >
+                                                        <History fontSize="small" />
+                                                    </IconButton>
+                                                </Box>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenRewardList(false)}>Fechar</Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* History Management Dialog */}
+            <Dialog open={openHistoryDialog} onClose={() => setOpenHistoryDialog(false)} maxWidth="md" fullWidth>
+                <DialogTitle>História do Produto: {currentReward?.product_name}</DialogTitle>
+                <DialogContent dividers>
+                    <Grid container spacing={3}>
+                        <Grid item xs={12} md={5}>
+                            <Typography variant="subtitle1" gutterBottom>Adicionar/Editar Parte</Typography>
+                            <Box display="flex" flexDirection="column" gap={2}>
+                                <TextField
+                                    label="Título"
+                                    fullWidth
+                                    value={historyFormData.titulo}
+                                    onChange={e => setHistoryFormData({ ...historyFormData, titulo: e.target.value })}
+                                />
+                                <TextField
+                                    label="Descrição"
+                                    fullWidth
+                                    multiline
+                                    rows={4}
+                                    value={historyFormData.descricao}
+                                    onChange={e => setHistoryFormData({ ...historyFormData, descricao: e.target.value })}
+                                />
+                                <TextField
+                                    label="URL da Mídia (opcional)"
+                                    fullWidth
+                                    value={historyFormData.media_url}
+                                    onChange={e => setHistoryFormData({ ...historyFormData, media_url: e.target.value })}
+                                />
+                                <TextField
+                                    select
+                                    label="Tipo de Mídia"
+                                    fullWidth
+                                    value={historyFormData.media_type}
+                                    onChange={e => setHistoryFormData({ ...historyFormData, media_type: e.target.value })}
+                                >
+                                    <MenuItem value="image">Imagem</MenuItem>
+                                    <MenuItem value="video">Vídeo</MenuItem>
+                                </TextField>
+                                <TextField
+                                    label="Ordem"
+                                    type="number"
+                                    fullWidth
+                                    value={historyFormData.ordem}
+                                    onChange={e => setHistoryFormData({ ...historyFormData, ordem: parseInt(e.target.value) })}
+                                />
+                                <Button
+                                    variant="contained"
+                                    onClick={handleSaveHistoryPart}
+                                    disabled={savingHistory || !historyFormData.titulo || !historyFormData.descricao}
+                                >
+                                    {historyFormData.id ? 'Atualizar Parte' : 'Adicionar Parte'}
+                                </Button>
+                                {historyFormData.id && (
+                                    <Button color="inherit" onClick={() => setHistoryFormData({ id: null, titulo: '', descricao: '', media_url: '', media_type: 'image', ordem: 0 })}>
+                                        Cancelar Edição
+                                    </Button>
+                                )}
+                            </Box>
+
+                            {currentReward?.is_historia_publica && currentReward?.historia_token && (
+                                <Box mt={4} textAlign="center" p={2} bgcolor="#f5f5f5" borderRadius={2}>
+                                    <Typography variant="caption" display="block" color="textSecondary" mb={1}>
+                                        QR CODE PARA HISTÓRIA PÚBLICA
+                                    </Typography>
+                                    <QRCodeSVG value={`https://arpt.site/historia/${currentReward.historia_token}`} size={128} />
+                                    <Typography variant="caption" display="block" mt={1}>
+                                        https://arpt.site/historia/{currentReward.historia_token}
+                                    </Typography>
+                                </Box>
+                            )}
+                        </Grid>
+                        <Grid item xs={12} md={7}>
+                            <Typography variant="subtitle1" gutterBottom>Linha do Tempo</Typography>
+                            {loadingHistory ? (
+                                <Box display="flex" justifyContent="center"><CircularProgress /></Box>
+                            ) : historyParts.length === 0 ? (
+                                <Typography color="textSecondary">Nenhuma parte da história adicionada.</Typography>
+                            ) : (
+                                <Box display="flex" flexDirection="column" gap={2}>
+                                    {historyParts.map((part) => (
+                                        <Paper key={part.id} variant="outlined" sx={{ p: 2 }}>
+                                            <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+                                                <Box>
+                                                    <Typography variant="subtitle2" color="primary">#{part.ordem} - {part.titulo}</Typography>
+                                                    <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{part.descricao}</Typography>
+                                                </Box>
+                                                <Box display="flex">
+                                                    <IconButton size="small" onClick={() => setHistoryFormData(part)}>
+                                                        <Edit fontSize="small" />
+                                                    </IconButton>
+                                                    <IconButton size="small" color="error" onClick={() => handleDeleteHistoryPart(part.id)}>
+                                                        <Delete fontSize="small" />
+                                                    </IconButton>
+                                                </Box>
+                                            </Box>
+                                        </Paper>
+                                    ))}
+                                </Box>
+                            )}
+                        </Grid>
+                    </Grid>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenHistoryDialog(false)}>Fechar</Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 };
