@@ -49,6 +49,9 @@ export const Users = () => {
     });
     const [savingCert, setSavingCert] = useState(false);
 
+    // User Details Modal State
+    const [openUserDetails, setOpenUserDetails] = useState(false);
+
     // Reward and History State
     const [openRewardList, setOpenRewardList] = useState(false);
     const [userRewards, setUserRewards] = useState([]);
@@ -147,6 +150,12 @@ export const Users = () => {
         setPage(1);
     };
 
+    const handleOpenUserDetails = (user) => {
+        setSelectedUser(user);
+        fetchUserRewards(user.id);
+        setOpenUserDetails(true);
+    };
+
     const handleOpenRewardList = (user) => {
         setSelectedUser(user);
         fetchUserRewards(user.id);
@@ -173,7 +182,7 @@ export const Users = () => {
         try {
             const token = await authUser.getIdToken();
             const newState = !reward.is_historia_publica;
-            const response = await api.patch(`/produto/admin/purchases/${reward.id}/toggle-history`,
+            const response = await api.patch(`/produtos/admin/purchases/${reward.id}/toggle-history`,
                 { isPublic: newState },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -202,7 +211,7 @@ export const Users = () => {
         setLoadingHistory(true);
         try {
             const token = await authUser.getIdToken();
-            const response = await api.get(`/produto/admin/purchases/${rewardId}/history`, {
+            const response = await api.get(`/produtos/admin/purchases/${rewardId}/history`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setHistoryParts(response.data);
@@ -220,14 +229,14 @@ export const Users = () => {
             const token = await authUser.getIdToken();
             if (historyFormData.id) {
                 // Update
-                const response = await api.put(`/produto/admin/history/${historyFormData.id}`, historyFormData, {
+                const response = await api.put(`/produtos/admin/history/${historyFormData.id}`, historyFormData, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setHistoryParts(prev => prev.map(p => p.id === historyFormData.id ? response.data : p));
                 setSnackbar({ open: true, message: 'Parte atualizada com sucesso', severity: 'success' });
             } else {
                 // Create
-                const response = await api.post(`/produto/admin/purchases/${currentReward.id}/history`, historyFormData, {
+                const response = await api.post(`/produtos/admin/purchases/${currentReward.id}/history`, historyFormData, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setHistoryParts(prev => [...prev, response.data].sort((a, b) => a.ordem - b.ordem));
@@ -247,7 +256,7 @@ export const Users = () => {
         if (!confirm('Excluir esta parte da história?')) return;
         try {
             const token = await authUser.getIdToken();
-            await api.delete(`/produto/admin/history/${partId}`, {
+            await api.delete(`/produtos/admin/history/${partId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setHistoryParts(prev => prev.filter(p => p.id !== partId));
@@ -379,6 +388,14 @@ export const Users = () => {
                                 </TableCell>
                                 <TableCell>{user.created_at ? new Date(user.created_at).toLocaleDateString() : user.createdAt}</TableCell>
                                 <TableCell align="right">
+                                    <IconButton
+                                        size="small"
+                                        color="default"
+                                        onClick={() => handleOpenUserDetails(user)}
+                                        title="Ver Detalhes do Usuário"
+                                    >
+                                        <Visibility />
+                                    </IconButton>
                                     <IconButton
                                         size="small"
                                         color="warning"
@@ -736,6 +753,120 @@ export const Users = () => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpenRewardList(false)}>Fechar</Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* User Details Dialog */}
+            <Dialog open={openUserDetails} onClose={() => setOpenUserDetails(false)} maxWidth="lg" fullWidth>
+                <DialogTitle>Detalhes do Usuário</DialogTitle>
+                <DialogContent dividers>
+                    {selectedUser && (
+                        <Grid container spacing={3} mb={4}>
+                            <Grid item xs={12} md={6}>
+                                <Typography variant="subtitle2" color="textSecondary">Nome Completo</Typography>
+                                <Typography variant="h6">{selectedUser.first_name ? `${selectedUser.first_name} ${selectedUser.last_name}` : selectedUser.name}</Typography>
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <Typography variant="subtitle2" color="textSecondary">Email</Typography>
+                                <Typography variant="body1">{selectedUser.email}</Typography>
+                            </Grid>
+                            <Grid item xs={6} md={3}>
+                                <Typography variant="subtitle2" color="textSecondary">CPF</Typography>
+                                <Typography variant="body1">{selectedUser.cpf || '-'}</Typography>
+                            </Grid>
+                            <Grid item xs={6} md={3}>
+                                <Typography variant="subtitle2" color="textSecondary">Telefone</Typography>
+                                <Typography variant="body1">{selectedUser.phone || '-'}</Typography>
+                            </Grid>
+                            <Grid item xs={6} md={3}>
+                                <Typography variant="subtitle2" color="textSecondary">Função</Typography>
+                                <Chip label={selectedUser.role} color={getRoleColor(selectedUser.role)} size="small" />
+                            </Grid>
+                            <Grid item xs={6} md={3}>
+                                <Typography variant="subtitle2" color="textSecondary">Status</Typography>
+                                <Chip label={selectedUser.status} color={getStatusColor(selectedUser.status)} size="small" />
+                            </Grid>
+                        </Grid>
+                    )}
+
+                    <Typography variant="h6" gutterBottom display="flex" alignItems="center" gap={1}>
+                        <Inventory color="primary" /> Histórico de Compras e Produtos
+                    </Typography>
+
+                    {loadingRewards ? (
+                        <Box display="flex" justifyContent="center" py={3}><CircularProgress /></Box>
+                    ) : userRewards.length === 0 ? (
+                        <Typography color="textSecondary" align="center" py={3}>Nenhuma compra encontrada para este usuário.</Typography>
+                    ) : (
+                        <TableContainer sx={{ border: '1px solid #e0e0e0', borderRadius: 1 }}>
+                            <Table size="small">
+                                <TableHead sx={{ bgcolor: '#f5f5f5' }}>
+                                    <TableRow>
+                                        <TableCell>Produto</TableCell>
+                                        <TableCell>Projeto</TableCell>
+                                        <TableCell>Data da Compra</TableCell>
+                                        <TableCell>História Pública</TableCell>
+                                        <TableCell align="right">Ações</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {userRewards.map((reward) => (
+                                        <TableRow key={reward.id} hover>
+                                            <TableCell>
+                                                <Box display="flex" alignItems="center" gap={2}>
+                                                    {reward.product_image && (
+                                                        <Avatar src={reward.product_image} variant="rounded" sx={{ width: 40, height: 40 }} />
+                                                    )}
+                                                    <Box>
+                                                        <Typography variant="body2" fontWeight="bold">{reward.product_name}</Typography>
+                                                        <Typography variant="caption" color="textSecondary">Qtd: {reward.purchase_qtd}</Typography>
+                                                    </Box>
+                                                </Box>
+                                            </TableCell>
+                                            <TableCell>{reward.management_name}</TableCell>
+                                            <TableCell>{new Date(reward.purchase_date).toLocaleDateString()} {new Date(reward.purchase_date).toLocaleTimeString()}</TableCell>
+                                            <TableCell>
+                                                <IconButton
+                                                    color={reward.is_historia_publica ? "success" : "default"}
+                                                    onClick={() => handleTogglePublicHistory(reward)}
+                                                >
+                                                    {reward.is_historia_publica ? <Public /> : <PublicOff />}
+                                                </IconButton>
+                                            </TableCell>
+                                            <TableCell align="right">
+                                                <Box display="flex" justifyContent="flex-end" gap={1}>
+                                                    {reward.is_historia_publica && (
+                                                        <IconButton
+                                                            size="small"
+                                                            color="info"
+                                                            onClick={() => {
+                                                                const url = `https://arpt.site/historia/${reward.historia_token}`;
+                                                                window.open(url, '_blank');
+                                                            }}
+                                                            title="Ver Página Pública"
+                                                        >
+                                                            <Visibility fontSize="small" />
+                                                        </IconButton>
+                                                    )}
+                                                    <Button
+                                                        variant="outlined"
+                                                        size="small"
+                                                        startIcon={<History />}
+                                                        onClick={() => handleOpenHistory(reward)}
+                                                    >
+                                                        Gerenciar História
+                                                    </Button>
+                                                </Box>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenUserDetails(false)}>Fechar</Button>
                 </DialogActions>
             </Dialog>
 
