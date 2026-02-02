@@ -1,7 +1,7 @@
 import { ThemeProvider, CssBaseline, CircularProgress, Box } from '@mui/material';
 import { theme } from './theme';
 import { Layout } from './components';
-import { Dashboard, Projects, Properties, Necromassa, Sponsors, Login, Users, Rewards, Certificates, Products, AuditLogs, GeminiSettings } from './pages';
+import { Dashboard, Projects, Properties, Necromassa, Sponsors, Login, Users, Rewards, Certificates, Products, AuditLogs, GeminiSettings, PaymentConfig } from './pages';
 import { CertificateView } from './pages/CertificateView';
 import { useAdmin } from './contexts/AdminContext';
 import { useAuth } from './contexts/AuthContext.jsx';
@@ -43,6 +43,7 @@ export default function App() {
       case 'certificates': return <Certificates />;
       case 'audit': return <AuditLogs />;
       case 'gemini-settings': return <GeminiSettings />;
+      case 'payment-config': return <PaymentConfig />;
       default: return <Dashboard />;
     }
   };

@@ -7,7 +7,8 @@ import {
 import {
   Dashboard, FolderOpen, People, Menu as MenuIcon,
   Landscape, Forest, HomeWork, Logout, ManageAccounts, CardGiftcard, CardMembership, History,
-  SettingsSuggest
+  SettingsSuggest,
+  Payment
 } from '@mui/icons-material';
 import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -48,6 +49,7 @@ export const Layout = ({ children }) => {
     { id: 'sponsors', label: 'Patrocinadores', icon: <People /> },
     { id: 'users', label: 'Gestão de Usuários', icon: <ManageAccounts /> },
     { id: 'audit', label: 'Log de Modificações', icon: <History /> },
+    { id: 'payment-config', label: 'Configurações de Pagamento', icon: <Payment /> }, // Using CardMembership as placeholder or we can import new icon
     { id: 'gemini-settings', label: 'Configuração IA', icon: <SettingsSuggest /> },
   ];
 
@@ -62,6 +64,7 @@ export const Layout = ({ children }) => {
       case 'products': return 'Gestão de Produtos';
       case 'users': return 'Gestão de Usuários';
       case 'certificates': return 'Certificados Avulsos';
+      case 'payment-config': return 'Configurações de Pagamento';
       case 'audit': return 'Log de Modificações';
       case 'gemini-settings': return 'Configuração IA';
       default: return 'ARPT Admin';
