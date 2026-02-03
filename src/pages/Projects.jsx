@@ -13,6 +13,7 @@ import { FieldAppEmbedded } from '../components/FieldAppEmbedded';
 import { ProjectProducts } from '../components/modules/project_tabs/ProjectProducts';
 import { ProjectDocs } from '../components/modules/project_tabs/ProjectDocs';
 import { ProjectIncidents } from '../components/modules/project_tabs/ProjectIncidents';
+import { CampaignAssistant } from '../components/CampaignAssistant';
 
 import { STATUS_PROJETO } from '../constants';
 import { useAdmin } from '../contexts/AdminContext';
@@ -277,6 +278,7 @@ export const Projects = () => {
                 <Tab label="Produtos" />
                 <Tab label="Documentos" />
                 <Tab label="Incidentes" />
+                <Tab label="Estratégia" />
               </Tabs>
 
               <Box flexGrow={1} p={3} overflow="auto">
@@ -336,6 +338,11 @@ export const Projects = () => {
                 {/* TAB 3 - Incidentes */}
                 {tabValue === 3 && (
                   <ProjectIncidents projectId={selectedProject.id} />
+                )}
+
+                {/* TAB 4 - Estratégia */}
+                {tabValue === 4 && (
+                  <CampaignAssistant project={selectedProject} />
                 )}
               </Box>
             </Box>

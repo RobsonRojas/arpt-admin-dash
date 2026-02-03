@@ -73,6 +73,7 @@ export const AIAssistant = ({ initialText, onApply, context = "", label = "Assis
                     onClose={handleMenuClose}
                 >
                     <MenuItem onClick={() => handleAction('improve')}>✨ Melhorar Escrita (Profissional)</MenuItem>
+                    <MenuItem onClick={() => handleAction('campaign_appeal')}>🎯 Otimizar para Campanha (Persuasivo)</MenuItem>
                     <MenuItem onClick={() => handleAction('fix')}>abc Corrigir Gramática</MenuItem>
                     <MenuItem onClick={() => handleAction('expand')}>➕ Expandir Texto</MenuItem>
                     <MenuItem onClick={() => handleAction('summarize')}>➖ Resumir</MenuItem>

@@ -137,6 +137,58 @@ const runWithFallback = async (operation) => {
     throw lastError || new Error("Nenhum modelo Gemini disponível ou cotas esgotadas.");
 };
 
+
+
+
+/**
+ * Gera uma estratégia completa de campanha de crowdfunding
+ */
+export const generateCampaignStrategy = async (project, products = [], rewards = []) => {
+    return runWithFallback(async (model, modelName) => {
+        const prodNames = products.map(p => `${p.nome} (R$ ${p.preco})`).join(", ");
+        const rewardNames = rewards.map(r => `${r.name} (R$ ${r.reward_price})`).join(", ");
+
+        const prompt = `
+            Atue como um Especialista Sênior em Crowdfunding e Marketing para Projetos Socioambientais na Amazônia.
+            
+            Analise os dados do projeto abaixo e crie uma ESTRATÉGIA DE CAMPANHA DE FINANCIAMENTO COLETIVO vencedora.
+            
+            DADOS DO PROJETO:
+            - Nome: ${project.descricao}
+            - Local: ${project.municipio} - ${project.estado}
+            - Proponente: ${project.proponente}
+            - Custo Operacional: R$ ${project.custo_operacional}
+            - Produtos Associados: ${prodNames || "Nenhum cadastrado ainda"}
+            - Recompensas Cadastradas: ${rewardNames || "Nenhuma cadastrada ainda"}
+            
+            Gere um plano de ação estruturado em MARKDOWN contendo:
+
+            # 1. Narrativa da Campanha (Storytelling)
+            Crie um "Gancho Emocional" e um "Pitch" curto (3 parágrafos) focado no impacto ambiental e social. A linguagem deve ser inspiradora, urgente e transparente.
+            
+            # 2. Estrutura de Recompensas (Análise e Sugestões)
+            Analise as recompensas atuais (se houver) e sugira melhorias ou novas ideias de recompensas (físicas, digitais e experiências) que aumentem o ticket médio.
+            
+            # 3. Plano de Ação de Marketing (4 Semanas)
+            - Semana 1: Aquecimento (O que postar? Quem contatar?)
+            - Semana 2: Lançamento (Ações de alto impacto)
+            - Semana 3: Sustentação (Como manter o ritmo?)
+            - Semana 4: Reta Final (Gatilhos de urgência)
+            
+            # 4. Sugestões de Canais e Parceiros
+            Liste tipos de parceiros ou influencers ideais para este tipo de projeto na Amazônia.
+
+            IMPORTANTE:
+            - Seja específico para o contexto da Amazônia (populações ribeirinhas, indígenas, preservação).
+            - Use formatação rica (negrito, tópicos) para facilitar a leitura.
+        `;
+
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        return response.text();
+    });
+};
+
 // Função genérica para melhoria de texto com IA
 export const improveText = async (text, context = "", type = "improve") => {
     if (!text || text.length < 5) return text;
@@ -153,6 +205,9 @@ export const improveText = async (text, context = "", type = "improve") => {
                 break;
             case "fix":
                 specificInstruction = "Corrija apenas erros gramaticais e de pontuação do texto abaixo, mantendo o estilo original.";
+                break;
+            case "campaign_appeal":
+                specificInstruction = "Reescreva o texto abaixo para torná-lo PERSUASIVO e EMOCIONANTE para uma campanha de doação/venda. Foque no impacto social/ambiental e no valor gerado para quem apoia. Use gatilhos mentais de propósito e urgência.";
                 break;
             case "improve":
             default:
