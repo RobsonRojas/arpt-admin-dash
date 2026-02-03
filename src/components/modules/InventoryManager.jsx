@@ -3,9 +3,9 @@ import {
   Box, Paper, Typography, Table, TableContainer, TableHead, TableRow,
   TableCell, TableBody, IconButton, Button, Dialog, DialogTitle, DialogContent,
   DialogActions, TextField, Select, MenuItem, FormControl, InputLabel, CircularProgress,
-  TablePagination
+  TablePagination, TableSortLabel, Collapse, Grid, InputAdornment
 } from '@mui/material';
-import { Edit, Add, ArrowBack, Park, Description, ContentCopy } from '@mui/icons-material';
+import { Edit, Add, ArrowBack, Park, Description, ContentCopy, FilterList, Tune } from '@mui/icons-material';
 import { TreeForm } from './TreeForm';
 import { useAdmin } from '../../contexts/AdminContext';
 import { generateDocument } from '../../services/gemini';
@@ -13,7 +13,6 @@ import MDEditor from '@uiw/react-md-editor';
 
 
 export const InventoryManager = ({ property, onClose }) => {
-  const [trees, setTrees] = useState([]);
   const [inventories, setInventories] = useState([]);
   const [viewState, setViewState] = useState("list");
   const [editingTree, setEditingTree] = useState(null);
@@ -22,7 +21,25 @@ export const InventoryManager = ({ property, onClose }) => {
   // Paginação
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [totalCount, setTotalCount] = useState(0);
+
+  // Dados Comletos (Frontend Logic)
+  const [allTrees, setAllTrees] = useState([]); // Store all fetched trees here
+
+  // Filtros e Ordenação
+  const [showFilters, setShowFilters] = useState(false);
+  const [sortBy, setSortBy] = useState('createdAt');
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [filters, setFilters] = useState({
+    plate: '',
+    specie: '',
+    popularName: '',
+    dapMin: '',
+    dapMax: '',
+    volumeMin: '',
+    volumeMax: '',
+    heightMin: '',
+    heightMax: ''
+  });
   const {
     getInventoriesByPropertyId,
     getTreesByInventoryId,
@@ -111,7 +128,7 @@ export const InventoryManager = ({ property, onClose }) => {
 
   const handleDelete = (treeId) => {
     if (window.confirm("Deseja remover esta árvore?")) {
-      setTrees(trees.filter(t => t.id !== treeId));
+      setAllTrees(allTrees.filter(t => t.id !== treeId));
     }
   };
 
@@ -159,33 +176,25 @@ export const InventoryManager = ({ property, onClose }) => {
 
   const loadTrees = async () => {
     try {
-      setLoadingTrees(true);
+      // Buscar TODAS as árvores (ou um número grande suficiente para "todas" neste contexto)
+      // A API suporta paginação, vamos pedir uma página grande para fazer a lógica no front como solicitado.
+      // Se houver MUITOS dados (milhares), seria melhor manter no back, mas o requisito é explícito.
+      const response = await getAllInventoryByPropertyId(property.id, 1, 10000);
 
-      // Buscar árvores com paginação (API usa page 1-based)
-      const response = await getAllInventoryByPropertyId(property.id, page + 1, rowsPerPage);
-
-      let allTrees = [];
-      let total = 0;
-
-      // Padrão identificado: { data: { inventories: [...], total: N } }
+      let treesData = [];
       if (response?.data?.inventories && Array.isArray(response.data.inventories)) {
-        allTrees = response.data.inventories;
-        total = response.data.total || 0;
+        treesData = response.data.inventories;
       } else if (Array.isArray(response)) {
-        // Fallback para caso retorne array direto (sem paginação ou estrutura antiga)
-        allTrees = response;
-        total = response.length;
+        treesData = response;
       } else if (response?.data && Array.isArray(response.data)) {
-        allTrees = response.data;
-        total = response.data.length;
+        treesData = response.data;
       }
 
-      setTrees(allTrees);
-      setTotalCount(total);
+      setAllTrees(treesData);
 
-      // Tentar inferir currentInventoryId a partir das árvores (primeira que tiver)
-      if (allTrees.length > 0) {
-        const firstTree = allTrees[0];
+      // Tentar inferir currentInventoryId
+      if (treesData.length > 0) {
+        const firstTree = treesData[0];
         const inferredId = firstTree.inventoryId || firstTree.inventory_id;
         if (inferredId && !currentInventoryId) {
           setCurrentInventoryId(inferredId);
@@ -196,11 +205,83 @@ export const InventoryManager = ({ property, onClose }) => {
 
     } catch (error) {
       console.error("Erro ao carregar árvores:", error);
-      setTrees([]);
-      setTotalCount(0);
+      setAllTrees([]);
     } finally {
       setLoadingTrees(false);
     }
+  };
+
+  // Lógica de Filtragem e Ordenação no Frontend
+  const filteredAndSortedTrees = React.useMemo(() => {
+    let result = [...allTrees];
+
+    // 1. Filtragem
+    if (filters.plate) {
+      result = result.filter(t => t.number?.toString().toLowerCase().includes(filters.plate.toLowerCase()));
+    }
+    if (filters.specie) {
+      result = result.filter(t => t.specieName?.toLowerCase().includes(filters.specie.toLowerCase()));
+    }
+    if (filters.popularName) {
+      result = result.filter(t => t.popularName?.toLowerCase().includes(filters.popularName.toLowerCase()));
+    }
+
+    // Numeric Ranges
+    if (filters.dapMin) result = result.filter(t => Number(t.dap) >= Number(filters.dapMin));
+    if (filters.dapMax) result = result.filter(t => Number(t.dap) <= Number(filters.dapMax));
+
+    if (filters.volumeMin) result = result.filter(t => Number(t.volume) >= Number(filters.volumeMin));
+    if (filters.volumeMax) result = result.filter(t => Number(t.volume) <= Number(filters.volumeMax));
+
+    if (filters.heightMin) result = result.filter(t => Number(t.height) >= Number(filters.heightMin));
+    if (filters.heightMax) result = result.filter(t => Number(t.height) <= Number(filters.heightMax));
+
+
+    // 2. Ordenação
+    result.sort((a, b) => {
+      let valA = a[sortBy];
+      let valB = b[sortBy];
+
+      // Handle null/undefined (optional)
+      if (valA === null || valA === undefined) valA = '';
+      if (valB === null || valB === undefined) valB = '';
+
+      // Numeric comparison for numeric fields
+      const numericFields = ['number', 'dap', 'cap', 'volume', 'height'];
+      if (numericFields.includes(sortBy)) {
+        valA = Number(valA) || 0;
+        valB = Number(valB) || 0;
+      } else {
+        valA = valA.toString().toLowerCase();
+        valB = valB.toString().toLowerCase();
+      }
+
+      if (valA < valB) {
+        return sortOrder === 'asc' ? -1 : 1;
+      }
+      if (valA > valB) {
+        return sortOrder === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+
+    return result;
+  }, [allTrees, filters, sortBy, sortOrder]);
+
+  // Paginação no Frontend
+  const paginatedTrees = React.useMemo(() => {
+    const start = page * rowsPerPage;
+    const end = start + rowsPerPage;
+    return filteredAndSortedTrees.slice(start, end);
+  }, [filteredAndSortedTrees, page, rowsPerPage]);
+
+  const applyFilters = () => {
+    setPage(0);
+    // Filters are applied automatically by useMemo when 'filters' state changes.
+    // The button acts more like a visual confirmation or refresh if we weren't reactive.
+    // Since input onChange updates state, it's already filtered. 
+    // If we want "Apply Info" behavior strictly, we'd need separate state for form inputs vs active filters.
+    // But for now, reactive is fine and usually preferred.
   };
 
   const handleChangePage = (event, newPage) => {
@@ -216,7 +297,36 @@ export const InventoryManager = ({ property, onClose }) => {
   useEffect(() => {
     loadTrees();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [property.id, page, rowsPerPage]);
+  }, [property.id]); // Only reload when property changes. Pagination/Sort/Filter is local.
+
+
+
+  const clearFilters = () => {
+    setFilters({
+      plate: '',
+      specie: '',
+      popularName: '',
+      dapMin: '',
+      dapMax: '',
+      volumeMin: '',
+      volumeMax: '',
+      heightMin: '',
+      heightMax: ''
+    });
+    setPage(0);
+    // Needed to set state and then load, relying on separate effect or just calling loadTrees directly with cleared state?
+    // Since loadTrees reads from state `filters`, we need to wait for state update or pass override. 
+    // Easier way: useEffect that listens to 'filters' might be too aggressive if typing. 
+    // Let's just reset state and let user click 'Apply' or handle it efficiently.
+    // Ideally:
+    // setFilters({...}); setActiveFilters({...});
+  };
+
+  const handleSortRequest = (property) => {
+    const isAsc = sortBy === property && sortOrder === 'asc';
+    setSortOrder(isAsc ? 'desc' : 'asc');
+    setSortBy(property);
+  };
 
   if (viewState === "form") {
     return (
@@ -257,6 +367,9 @@ export const InventoryManager = ({ property, onClose }) => {
             </Typography>
           </Box>
           <Box display="flex" gap={1}>
+            <Button variant="outlined" startIcon={<Tune />} onClick={() => setShowFilters(!showFilters)}>
+              Filtros
+            </Button>
             <Button variant="outlined" color="inherit" onClick={onClose}>
               Fechar
             </Button>
@@ -269,42 +382,165 @@ export const InventoryManager = ({ property, onClose }) => {
 
       </Paper>
 
+      <Collapse in={showFilters}>
+        <Paper sx={{ p: 2, mb: 2 }}>
+          <Typography variant="subtitle2" gutterBottom>Filtros Avançados</Typography>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={12} sm={6} md={2}>
+              <TextField
+                label="Nº Placa"
+                variant="outlined"
+                size="small"
+                fullWidth
+                value={filters.plate}
+                onChange={(e) => setFilters({ ...filters, plate: e.target.value })}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <TextField
+                label="Espécie"
+                variant="outlined"
+                size="small"
+                fullWidth
+                value={filters.specie}
+                onChange={(e) => setFilters({ ...filters, specie: e.target.value })}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <TextField
+                label="Nome Popular"
+                variant="outlined"
+                size="small"
+                fullWidth
+                value={filters.popularName}
+                onChange={(e) => setFilters({ ...filters, popularName: e.target.value })}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <Box display="flex" gap={1} alignItems="center">
+                <TextField label="DAP Min" size="small" type="number" value={filters.dapMin} onChange={(e) => setFilters({ ...filters, dapMin: e.target.value })} sx={{ width: '50%' }} />
+                <Typography>-</Typography>
+                <TextField label="Max" size="small" type="number" value={filters.dapMax} onChange={(e) => setFilters({ ...filters, dapMax: e.target.value })} sx={{ width: '50%' }} />
+              </Box>
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <Box display="flex" gap={1} alignItems="center">
+                <TextField label="Vol Min" size="small" type="number" value={filters.volumeMin} onChange={(e) => setFilters({ ...filters, volumeMin: e.target.value })} sx={{ width: '50%' }} />
+                <Typography>-</Typography>
+                <TextField label="Max" size="small" type="number" value={filters.volumeMax} onChange={(e) => setFilters({ ...filters, volumeMax: e.target.value })} sx={{ width: '50%' }} />
+              </Box>
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <Box display="flex" gap={1} alignItems="center">
+                <TextField label="Alt Min" size="small" type="number" value={filters.heightMin} onChange={(e) => setFilters({ ...filters, heightMin: e.target.value })} sx={{ width: '50%' }} />
+                <Typography>-</Typography>
+                <TextField label="Max" size="small" type="number" value={filters.heightMax} onChange={(e) => setFilters({ ...filters, heightMax: e.target.value })} sx={{ width: '50%' }} />
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={4} display="flex" gap={1} justifyContent="flex-end">
+              <Button onClick={() => { clearFilters(); setTimeout(loadTrees, 100); }}>Limpar</Button>
+              <Button variant="contained" onClick={applyFilters}>Filtrar</Button>
+            </Grid>
+          </Grid>
+        </Paper>
+      </Collapse>
+
       {/* TABELA */}
       <TableContainer component={Paper} sx={{ flexGrow: 1 }}>
         <Table stickyHeader size="small">
           <TableHead>
             <TableRow sx={{ bgcolor: '#f9fafb' }}>
-              <TableCell>Nº Placa</TableCell>
-              <TableCell>Espécie</TableCell>
-              <TableCell>DAP (cm)</TableCell>
-              <TableCell>Volume (m³)</TableCell>
-              <TableCell>Altura (m)</TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={sortBy === 'number'}
+                  direction={sortBy === 'number' ? sortOrder : 'asc'}
+                  onClick={() => handleSortRequest('number')}
+                >
+                  Nº Placa
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={sortBy === 'specieName'}
+                  direction={sortBy === 'specieName' ? sortOrder : 'asc'}
+                  onClick={() => handleSortRequest('specieName')}
+                >
+                  Espécie
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={sortBy === 'popularName'}
+                  direction={sortBy === 'popularName' ? sortOrder : 'asc'}
+                  onClick={() => handleSortRequest('popularName')}
+                >
+                  Nome Popular
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={sortBy === 'cap'}
+                  direction={sortBy === 'cap' ? sortOrder : 'asc'}
+                  onClick={() => handleSortRequest('cap')}
+                >
+                  CAP (cm)
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={sortBy === 'dap'}
+                  direction={sortBy === 'dap' ? sortOrder : 'asc'}
+                  onClick={() => handleSortRequest('dap')}
+                >
+                  DAP (cm)
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={sortBy === 'volume'}
+                  direction={sortBy === 'volume' ? sortOrder : 'asc'}
+                  onClick={() => handleSortRequest('volume')}
+                >
+                  Volume (m³)
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={sortBy === 'height'}
+                  direction={sortBy === 'height' ? sortOrder : 'asc'}
+                  onClick={() => handleSortRequest('height')}
+                >
+                  Altura (m)
+                </TableSortLabel>
+              </TableCell>
               <TableCell align="center">Ações</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {loadingTrees ? (
               <TableRow>
-                <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
+                <TableCell colSpan={8} align="center" sx={{ py: 3 }}>
                   <CircularProgress size={30} />
                   <Typography color="textSecondary" mt={1}>
                     Carregando árvores...
                   </Typography>
                 </TableCell>
               </TableRow>
-            ) : !Array.isArray(trees) || trees.length === 0 ? (
+            ) : paginatedTrees.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
+                <TableCell colSpan={8} align="center" sx={{ py: 3 }}>
                   <Typography color="textSecondary">
                     Nenhuma árvore cadastrada
                   </Typography>
                 </TableCell>
               </TableRow>
             ) : (
-              trees.map(tree => (
+              paginatedTrees.map(tree => (
                 <TableRow key={tree.id} hover>
                   <TableCell fontWeight="bold">{tree.number ?? '-'}</TableCell>
                   <TableCell>{tree.specieName}</TableCell>
+                  <TableCell>{tree.popularName || '-'}</TableCell>
+                  <TableCell>{tree.cap ? parseFloat(tree.cap).toFixed(2) : '-'} cm</TableCell>
                   <TableCell>{tree.dap ? parseFloat(tree.dap).toFixed(2) : '-'} cm</TableCell>
                   <TableCell>{tree.volume ? parseFloat(tree.volume).toFixed(2) : '-'} m³</TableCell>
                   <TableCell>{tree.height ? parseFloat(tree.height).toFixed(2) : '-'} m</TableCell>
@@ -338,7 +574,7 @@ export const InventoryManager = ({ property, onClose }) => {
       <TablePagination
         rowsPerPageOptions={[10, 25, 50, 100]}
         component="div"
-        count={totalCount}
+        count={filteredAndSortedTrees.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

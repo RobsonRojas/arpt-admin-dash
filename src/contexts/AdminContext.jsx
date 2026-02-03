@@ -204,10 +204,28 @@ export const AdminProvider = ({ children }) => {
         }
     }
 
-    const getAllInventoryByPropertyId = async (propertyId, page = 1, pageSize = 10) => {
+    const getAllInventoryByPropertyId = async (propertyId, page = 1, pageSize = 10, options = {}) => {
         try {
+            const { sortBy, sortOrder, filters } = options;
+            const params = { page, pageSize };
+
+            if (sortBy) params.sortBy = sortBy;
+            if (sortOrder) params.sortOrder = sortOrder;
+
+            if (filters) {
+                if (filters.plate) params.plate = filters.plate;
+                if (filters.specie) params.specie = filters.specie;
+                if (filters.popularName) params.popularName = filters.popularName;
+                if (filters.dapMin) params.dapMin = filters.dapMin;
+                if (filters.dapMax) params.dapMax = filters.dapMax;
+                if (filters.volumeMin) params.volumeMin = filters.volumeMin;
+                if (filters.volumeMax) params.volumeMax = filters.volumeMax;
+                if (filters.heightMin) params.heightMin = filters.heightMin;
+                if (filters.heightMax) params.heightMax = filters.heightMax;
+            }
+
             const response = await api.get(`/inventarios/${propertyId}/arvores`, {
-                params: { page, pageSize }
+                params
             });
             if (response.status === 200) {
                 return response.data;
