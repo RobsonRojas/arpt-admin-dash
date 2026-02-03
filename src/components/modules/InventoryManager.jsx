@@ -78,6 +78,10 @@ export const InventoryManager = ({ property, onClose }) => {
 
     // Normaliza payload para API
     const nowIso = new Date().toISOString();
+
+    // Remove null/undefined classificationId to satisfy Zod optional()
+    const validClassificationId = treeData.classificationId ? Number(treeData.classificationId) : undefined;
+
     const payload = {
       ...treeData,
       propertyId: Number(property.id),
@@ -96,6 +100,13 @@ export const InventoryManager = ({ property, onClose }) => {
       createdAt: treeData.createdAt || nowIso,
       updatedAt: nowIso,
     };
+
+    // Explicitly delete classificationId if it's not valid, preventing "null" from being sent
+    if (!validClassificationId) {
+      delete payload.classificationId;
+    } else {
+      payload.classificationId = validClassificationId;
+    }
 
     let result;
     if (editingTree && editingTree.id) {
