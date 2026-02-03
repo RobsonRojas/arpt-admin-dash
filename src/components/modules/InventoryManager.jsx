@@ -176,25 +176,59 @@ export const InventoryManager = ({ property, onClose }) => {
 
   const loadTrees = async () => {
     try {
-      // Buscar TODAS as árvores (ou um número grande suficiente para "todas" neste contexto)
-      // A API suporta paginação, vamos pedir uma página grande para fazer a lógica no front como solicitado.
-      // Se houver MUITOS dados (milhares), seria melhor manter no back, mas o requisito é explícito.
-      const response = await getAllInventoryByPropertyId(property.id, 1, 10000);
+      setLoadingTrees(true);
 
-      let treesData = [];
-      if (response?.data?.inventories && Array.isArray(response.data.inventories)) {
-        treesData = response.data.inventories;
-      } else if (Array.isArray(response)) {
-        treesData = response;
-      } else if (response?.data && Array.isArray(response.data)) {
-        treesData = response.data;
+      // Backend limit is 100. We need to fetch all pages to perform frontend sorting/filtering.
+      const BATCH_SIZE = 100;
+
+      // 1. Fetch first page to get total count
+      const firstPageResponse = await getAllInventoryByPropertyId(property.id, 1, BATCH_SIZE);
+
+      let combinedTrees = [];
+      let totalRecords = 0;
+
+      if (firstPageResponse?.data?.inventories && Array.isArray(firstPageResponse.data.inventories)) {
+        combinedTrees = [...firstPageResponse.data.inventories];
+        totalRecords = firstPageResponse.data.total || combinedTrees.length;
+      } else if (Array.isArray(firstPageResponse)) {
+        // Fallback for array response
+        combinedTrees = [...firstPageResponse];
+        totalRecords = combinedTrees.length;
+      } else if (firstPageResponse?.data && Array.isArray(firstPageResponse.data)) {
+        // Fallback generic data array
+        combinedTrees = [...firstPageResponse.data];
+        totalRecords = combinedTrees.length;
       }
 
-      setAllTrees(treesData);
+      // 2. Determine if more pages are needed
+      if (totalRecords > combinedTrees.length) {
+        const totalPages = Math.ceil(totalRecords / BATCH_SIZE);
+        const promises = [];
+
+        // Start from page 2
+        for (let p = 2; p <= totalPages; p++) {
+          promises.push(getAllInventoryByPropertyId(property.id, p, BATCH_SIZE));
+        }
+
+        if (promises.length > 0) {
+          const results = await Promise.all(promises);
+          results.forEach(res => {
+            if (res?.data?.inventories && Array.isArray(res.data.inventories)) {
+              combinedTrees = [...combinedTrees, ...res.data.inventories];
+            } else if (Array.isArray(res)) {
+              combinedTrees = [...combinedTrees, ...res];
+            } else if (res?.data && Array.isArray(res.data)) {
+              combinedTrees = [...combinedTrees, ...res.data];
+            }
+          });
+        }
+      }
+
+      setAllTrees(combinedTrees);
 
       // Tentar inferir currentInventoryId
-      if (treesData.length > 0) {
-        const firstTree = treesData[0];
+      if (combinedTrees.length > 0) {
+        const firstTree = combinedTrees[0];
         const inferredId = firstTree.inventoryId || firstTree.inventory_id;
         if (inferredId && !currentInventoryId) {
           setCurrentInventoryId(inferredId);
