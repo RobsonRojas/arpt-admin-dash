@@ -287,7 +287,7 @@ export const InventoryManager = ({ property, onClose }) => {
       if (valB === null || valB === undefined) valB = '';
 
       // Numeric comparison for numeric fields
-      const numericFields = ['number', 'dap', 'cap', 'volume', 'height'];
+      const numericFields = ['id', 'number', 'dap', 'cap', 'volume', 'height'];
       if (numericFields.includes(sortBy)) {
         valA = Number(valA) || 0;
         valB = Number(valB) || 0;
@@ -492,6 +492,15 @@ export const InventoryManager = ({ property, onClose }) => {
             <TableRow sx={{ bgcolor: '#f9fafb' }}>
               <TableCell>
                 <TableSortLabel
+                  active={sortBy === 'id'}
+                  direction={sortBy === 'id' ? sortOrder : 'asc'}
+                  onClick={() => handleSortRequest('id')}
+                >
+                  ID
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
                   active={sortBy === 'number'}
                   direction={sortBy === 'number' ? sortOrder : 'asc'}
                   onClick={() => handleSortRequest('number')}
@@ -577,6 +586,7 @@ export const InventoryManager = ({ property, onClose }) => {
             ) : (
               paginatedTrees.map(tree => (
                 <TableRow key={tree.id} hover>
+                  <TableCell>{tree.id}</TableCell>
                   <TableCell fontWeight="bold">{tree.number ?? '-'}</TableCell>
                   <TableCell>{tree.specieName}</TableCell>
                   <TableCell>{tree.popularName || '-'}</TableCell>
