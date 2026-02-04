@@ -44,7 +44,7 @@ Receita Realizada: R$ ${parseFloat(reportData.project.realized_revenue || 0).toF
 Progresso: ${((reportData.project.realized_revenue / reportData.project.target_fundraising) * 100).toFixed(1)}%
 
 VENDAS REALIZADAS
-${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${s.product} - ${s.quantity}un - R$ ${parseFloat(s.value).toFixed(2)}`).join('\n')}
+${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number(s.rewardPrice) === 0 ? "Doação" : s.product} - ${s.quantity}un - R$ ${parseFloat(s.value).toFixed(2)}`).join('\n')}
         `.trim();
         navigator.clipboard.writeText(text);
         alert("Relatório copiado para a área de transferência!");
@@ -110,8 +110,9 @@ ${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${s.prod
                                         <TableRow key={i}>
                                             <TableCell>{new Date(sale.date).toLocaleDateString('pt-BR')}</TableCell>
                                             <TableCell>
-                                                <Typography variant="body2">{sale.product}</Typography>
-                                                <Typography variant="caption" color="textSecondary">{sale.email}</Typography>
+                                                <Typography variant="body2">
+                                                    {Number(sale.rewardPrice) === 0 ? "Doação" : sale.product}
+                                                </Typography>
                                             </TableCell>
                                             <TableCell>{sale.quantity}</TableCell>
                                             <TableCell align="right">R$ {parseFloat(sale.value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
