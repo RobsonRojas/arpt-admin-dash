@@ -283,3 +283,59 @@ export const generateDocument = async (type, data) => {
     });
 };
 
+/**
+ * Gera um Modelo de Negócio (Business Model Canvas)
+ */
+export const generateBusinessModel = async (project) => {
+    return runWithFallback(async (model, modelName) => {
+        const prompt = `
+      Atue como um Consultor de Negócios Sênior especializado em Bioeconomia e Projetos Socioambientais na Amazônia.
+
+      Analise os dados do projeto abaixo e crie um MODELO DE NEGÓCIO (Business Model Canvas) detalhado e viável.
+
+      DADOS DO PROJETO:
+      - Nome: ${project.descricao}
+      - Local: ${project.municipio} - ${project.estado}
+      - Proponente: ${project.proponente}
+      - Área: ${project.tamanho} ${project.unidade_medida}
+      - Potencial: ${project.potencial || "Não especificado"}
+      - Resumo: ${project.resumo || "Não disponível"}
+
+      Gere uma análise estruturada em MARKDOWN cobrindo os 9 blocos do Canvas, mas adaptados para o contexto de impacto socioambiental:
+
+      # 1. Proposta de Valor
+      O que esse projeto entrega de único? (Ex: Carbono, Biodiversidade, Produtos Não-Madeireiros, Impacto Social)
+
+      # 2. Segmentos de Clientes
+      Quem paga pelo impacto? (Empresas ESG, Mercado de Carbono, Consumidores Conscientes, Governo?)
+
+      # 3. Canais
+      Como o produto/serviço chega ao cliente? (Plataformas, Parcerias B2B, Venda Direta?)
+
+      # 4. Relacionamento com Clientes
+      Como manter a confiança e recorrência? (Relatórios de Impacto, Visitas, Rastreabilidade?)
+
+      # 5. Fontes de Receita
+      Como o projeto monetiza? (Venda de créditos, produtos florestais, patrocínios, grants?)
+
+      # 6. Recursos Chave
+      O que é essencial? (Terra, Conhecimento Tradicional, Tecnologia de Monitoramento?)
+
+      # 7. Atividades Chave
+      O que precisa ser feito rotineiramente? (Fiscalização, Manejo, Coleta, Processamento?)
+
+      # 8. Parcerias Chave
+      Quem ajuda a viabilizar? (ONGs, Universidades, Empresas de Tecnologia, Lideranças Locais?)
+
+      # 9. Estrutura de Custos
+      Quais os maiores custos? (Operacional, Logística Fluvial, Certificações, Pessoal?)
+
+      Ao final, adicione uma breve "Análise SWOT" (Forças, Fraquezas, Oportunidades, Ameaças).
+      `;
+
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        return response.text();
+    });
+};
+

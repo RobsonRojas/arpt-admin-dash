@@ -1,14 +1,16 @@
 import React, { useState, useMemo } from 'react';
-import { Box, Paper, Toolbar, Typography, TextField, MenuItem, Button, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Drawer, Divider, List, ListItem, ListItemText, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress, LinearProgress } from '@mui/material';
+import { Box, Paper, Toolbar, Typography, TextField, MenuItem, Button, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Drawer, Divider, List, ListItem, ListItemText, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress, LinearProgress, Tabs, Tab } from '@mui/material';
 import { Search, Add, Visibility, Assessment, ContentCopy, PictureAsPdf } from '@mui/icons-material';
 import { StatusChip, RiskChip } from '../common/Chips';
 import MapEmbed from '../common/MapEmbed';
+import { CampaignAssistant } from '../CampaignAssistant';
 
 const ProjectsView = ({ projects, onStatusChange, onOpenCadastro }) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [filterStatus, setFilterStatus] = useState("Todos");
     const [selectedProject, setSelectedProject] = useState(null);
     const [reportProject, setReportProject] = useState(null);
+    const [tabValue, setTabValue] = useState(0);
 
     const filteredProjects = useMemo(() => {
         return projects.filter(project => {
@@ -54,18 +56,37 @@ const ProjectsView = ({ projects, onStatusChange, onOpenCadastro }) => {
                 </Table>
             </TableContainer>
 
-            <Drawer anchor="right" open={Boolean(selectedProject)} onClose={() => setSelectedProject(null)} PaperProps={{ sx: { width: { xs: '100%', md: 500 } } }}>
+            <Drawer
+                anchor="right"
+                open={Boolean(selectedProject)}
+                onClose={() => setSelectedProject(null)}
+                PaperProps={{ sx: { width: { xs: '100%', md: 600 } } }}
+            >
                 {selectedProject && (
                     <Box p={3} display="flex" flexDirection="column" height="100%">
                         <Typography variant="h6">{selectedProject.descricao}</Typography>
                         <Divider sx={{ my: 2 }} />
-                        <Box flexGrow={1}>
-                            <MapEmbed lat={-3.354} lng={-64.712} />
-                            <List>
-                                <ListItem><ListItemText primary="Proponente" secondary={selectedProject.proponente} /></ListItem>
-                                <ListItem><ListItemText primary="Área" secondary={`${selectedProject.tamanho} ${selectedProject.unidade_medida}`} /></ListItem>
-                                <ListItem><ListItemText primary="Risco Auditoria" secondary={<RiskChip level={selectedProject.auditoria.risco} />} /></ListItem>
-                            </List>
+                        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                            <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)} aria-label="project tabs">
+                                <Tab label="Visão Geral" />
+                                <Tab label="Estratégia" />
+                            </Tabs>
+                        </Box>
+
+                        <Box flexGrow={1} p={3} overflow="auto">
+                            {tabValue === 0 && (
+                                <>
+                                    <MapEmbed lat={-3.354} lng={-64.712} />
+                                    <List>
+                                        <ListItem><ListItemText primary="Proponente" secondary={selectedProject.proponente} /></ListItem>
+                                        <ListItem><ListItemText primary="Área" secondary={`${selectedProject.tamanho} ${selectedProject.unidade_medida}`} /></ListItem>
+                                        <ListItem><ListItemText primary="Risco Auditoria" secondary={<RiskChip level={selectedProject.auditoria.risco} />} /></ListItem>
+                                    </List>
+                                </>
+                            )}
+                            {tabValue === 1 && (
+                                <CampaignAssistant project={selectedProject} />
+                            )}
                         </Box>
                         <Box sx={{ mt: 2, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
                             {selectedProject.status === 'Em Análise' && (
