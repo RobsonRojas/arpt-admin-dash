@@ -5,6 +5,7 @@ import {
     Table, TableHead, TableRow, TableCell, TableBody, Paper, Divider
 } from '@mui/material';
 import { ContentCopy, PictureAsPdf } from '@mui/icons-material';
+import { api } from '../../services/api';
 
 /**
  * A reusable dialog component to display project revenue reports.
@@ -20,18 +21,13 @@ export const RevenueReportDialog = ({ open, onClose, project }) => {
     useEffect(() => {
         if (open && project) {
             setLoading(true);
-            // Dynamically import api to avoid circular dependencies if used in various places
-            import('../../services/api').then(({ api }) => {
-                api.get(`/manejos/${project.id}/revenue-report`)
-                    .then(res => setReportData(res.data))
-                    .catch(err => {
-                        console.error(err);
-                        setReportData(null);
-                        // Optional: alert or snackbar
-                        // window.alert("Erro ao carregar relatório.");
-                    })
-                    .finally(() => setLoading(false));
-            });
+            api.get(`/manejos/${project.id}/revenue-report`)
+                .then(res => setReportData(res.data))
+                .catch(err => {
+                    console.error(err);
+                    setReportData(null);
+                })
+                .finally(() => setLoading(false));
         }
     }, [open, project]);
 
