@@ -21,7 +21,7 @@ export const RevenueReportDialog = ({ open, onClose, project }) => {
         if (open && project) {
             setLoading(true);
             // Dynamically import api to avoid circular dependencies if used in various places
-            import('../../services/api').then(({ default: api }) => {
+            import('../../services/api').then(({ api }) => {
                 api.get(`/manejos/${project.id}/revenue-report`)
                     .then(res => setReportData(res.data))
                     .catch(err => {
