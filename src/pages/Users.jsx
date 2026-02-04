@@ -152,21 +152,22 @@ export const Users = () => {
 
     const handleOpenUserDetails = (user) => {
         setSelectedUser(user);
-        fetchUserRewards(user.id);
+        fetchUserRewards(user);
         setOpenUserDetails(true);
     };
 
     const handleOpenRewardList = (user) => {
         setSelectedUser(user);
-        fetchUserRewards(user.id);
+        fetchUserRewards(user);
         setOpenRewardList(true);
     };
 
-    const fetchUserRewards = async (userId) => {
+    const fetchUserRewards = async (user) => {
         setLoadingRewards(true);
         try {
             const token = await authUser.getIdToken();
-            const response = await api.get(`/admin/users/${userId}/purchases`, {
+            const response = await api.get(`/admin/users/${user.id}/purchases`, {
+                params: { email: user.email },
                 headers: { Authorization: `Bearer ${token}` }
             });
             setUserRewards(response.data);
