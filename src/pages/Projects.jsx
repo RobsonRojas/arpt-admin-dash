@@ -6,7 +6,7 @@ import {
   DialogContent, DialogActions, Drawer, List, ListItem, ListItemText, Divider,
   Tabs, Tab, Avatar
 } from '@mui/material';
-import { Search, Add, Edit, Visibility, Close, ContentCopy, Description, Image as ImageIcon } from '@mui/icons-material';
+import { Search, Add, Edit, Visibility, Close, ContentCopy, Description, Image as ImageIcon, Assessment } from '@mui/icons-material';
 import { StatusChip } from '../components/StatusChip';
 import { MapEmbed } from '../components/MapEmbed';
 import { FieldAppEmbedded } from '../components/FieldAppEmbedded';
@@ -14,6 +14,7 @@ import { ProjectProducts } from '../components/modules/project_tabs/ProjectProdu
 import { ProjectDocs } from '../components/modules/project_tabs/ProjectDocs';
 import { ProjectIncidents } from '../components/modules/project_tabs/ProjectIncidents';
 import { CampaignAssistant } from '../components/CampaignAssistant';
+import { RevenueReportDialog } from '../components/modules/RevenueReportDialog';
 
 import { STATUS_PROJETO } from '../constants';
 import { useAdmin } from '../contexts/AdminContext';
@@ -55,6 +56,9 @@ export const Projects = () => {
 
   // Tabs State
   const [tabValue, setTabValue] = useState(0);
+
+  // Revenue Report State
+  const [reportProject, setReportProject] = useState(null);
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -163,6 +167,14 @@ export const Projects = () => {
                         aria-label="Editar projeto"
                       >
                         <Edit />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() => setReportProject(p)}
+                        title="Relatório de Receitas"
+                        aria-label="Relatório de Receitas"
+                      >
+                        <Assessment />
                       </IconButton>
                       <IconButton
                         size="small"
@@ -378,6 +390,12 @@ export const Projects = () => {
             <Button onClick={() => setOpenDocDialog(false)}>Fechar</Button>
           </DialogActions>
         </Dialog>
+
+        <RevenueReportDialog
+          open={!!reportProject}
+          onClose={() => setReportProject(null)}
+          project={reportProject}
+        />
       </Box>
     </>
   );
