@@ -99,14 +99,9 @@ export const InventoryManager = ({ property, onClose }) => {
       classification: treeData.classification || 'Corte Futuro',
       createdAt: treeData.createdAt || nowIso,
       updatedAt: nowIso,
+      // Force classificationId to undefined if not valid, which removes it from JSON.stringify
+      classificationId: validClassificationId || undefined
     };
-
-    // Explicitly delete classificationId if it's not valid, preventing "null" from being sent
-    if (!validClassificationId) {
-      delete payload.classificationId;
-    } else {
-      payload.classificationId = validClassificationId;
-    }
 
     let result;
     if (editingTree && editingTree.id) {
