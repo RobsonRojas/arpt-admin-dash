@@ -5,7 +5,7 @@ import {
   DialogActions, TextField, Select, MenuItem, FormControl, InputLabel, CircularProgress,
   TablePagination, TableSortLabel, Collapse, Grid, InputAdornment
 } from '@mui/material';
-import { Edit, Add, ArrowBack, Park, Description, ContentCopy, FilterList, Tune } from '@mui/icons-material';
+import { Edit, Add, ArrowBack, Park, Description, ContentCopy, FilterList, Tune, Image as ImageIcon } from '@mui/icons-material';
 import { TreeForm } from './TreeForm';
 import { useAdmin } from '../../contexts/AdminContext';
 import { generateDocument } from '../../services/gemini';
@@ -47,6 +47,7 @@ export const InventoryManager = ({ property, onClose }) => {
     createInventory,
     createTree,
     updateTree,
+    getTreePhotos
   } = useAdmin();
 
   // Document Generation State
@@ -246,9 +247,33 @@ export const InventoryManager = ({ property, onClose }) => {
     } catch (error) {
       console.error("Erro ao carregar árvores:", error);
       setAllTrees([]);
-    } finally {
       setLoadingTrees(false);
     }
+  };
+
+  // State for Photo Modal
+  const [openPhotosModal, setOpenPhotosModal] = useState(false);
+  const [treePhotos, setTreePhotos] = useState([]);
+  const [loadingPhotos, setLoadingPhotos] = useState(false);
+
+  const handleOpenPhotos = async (treeId) => {
+    setLoadingPhotos(true);
+    setOpenPhotosModal(true);
+    setTreePhotos([]);
+    try {
+      const photos = await getTreePhotos(treeId);
+      setTreePhotos(photos || []);
+    } catch (error) {
+      console.error("Erro ao buscar fotos:", error);
+      setTreePhotos([]);
+    } finally {
+      setLoadingPhotos(false);
+    }
+  };
+
+  const handleClosePhotos = () => {
+    setOpenPhotosModal(false);
+    setTreePhotos([]);
   };
 
   // Lógica de Filtragem e Ordenação no Frontend
@@ -597,6 +622,14 @@ export const InventoryManager = ({ property, onClose }) => {
                   <TableCell align="center">
                     <IconButton
                       size="small"
+                      color="default"
+                      onClick={() => handleOpenPhotos(tree.id)}
+                      title="Ver Fotos"
+                    >
+                      <ImageIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      size="small"
                       color="primary"
                       onClick={() => handleEdit(tree)}
                       title="Editar"
@@ -689,6 +722,55 @@ export const InventoryManager = ({ property, onClose }) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDocDialog(false)}>Fechar</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Modal de Fotos */}
+      <Dialog open={openPhotosModal} onClose={handleClosePhotos} fullWidth maxWidth="md">
+        <DialogTitle>
+          Fotos da Árvore
+          <IconButton
+            onClick={handleClosePhotos}
+            sx={{ position: 'absolute', right: 8, top: 8 }}
+          >
+            <ArrowBack />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers>
+          {loadingPhotos ? (
+            <Box display="flex" justifyContent="center" p={3}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <Box display="flex" flexWrap="wrap" gap={2} justifyContent="center">
+              {treePhotos && treePhotos.length > 0 ? (
+                treePhotos.map((photo, index) => (
+                  <Box key={index} sx={{ textAlign: 'center' }}>
+                    <img
+                      src={photo.url}
+                      alt={photo.alt || `Foto ${index + 1}`}
+                      style={{
+                        maxWidth: '100%',
+                        maxHeight: '300px',
+                        objectFit: 'contain',
+                        borderRadius: '8px'
+                      }}
+                    />
+                    <Typography variant="caption" display="block" mt={1}>
+                      {photo.alt || `Foto ${index + 1}`}
+                    </Typography>
+                  </Box>
+                ))
+              ) : (
+                <Typography variant="body1" color="textSecondary" py={4}>
+                  Nenhuma foto disponível para esta árvore.
+                </Typography>
+              )}
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClosePhotos}>Fechar</Button>
         </DialogActions>
       </Dialog>
     </Box >
