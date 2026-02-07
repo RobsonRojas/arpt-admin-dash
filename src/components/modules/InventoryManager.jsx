@@ -243,6 +243,7 @@ export const InventoryManager = ({ property, onClose }) => {
       }
 
       setOpenCreateInventory(false);
+      setLoadingTrees(false);
 
     } catch (error) {
       console.error("Erro ao carregar árvores:", error);
