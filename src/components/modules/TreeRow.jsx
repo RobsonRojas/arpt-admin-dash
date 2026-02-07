@@ -1,8 +1,8 @@
-import React, { memo } from 'react';
+import React from 'react';
 import { TableRow, TableCell, IconButton } from '@mui/material';
-import { Edit, Description, Image as ImageIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { Edit, Description, Image as ImageIcon, DeleteOutline } from '@mui/icons-material';
 
-const TreeRow = memo(({ tree, onOpenPhotos, onEdit, onDelete, onGenerateDocument }) => {
+const TreeRow = ({ tree, onOpenPhotos, onEdit, onDelete, onGenerateDocument }) => {
     return (
         <TableRow hover>
             <TableCell>{tree.id}</TableCell>
@@ -46,13 +46,11 @@ const TreeRow = memo(({ tree, onOpenPhotos, onEdit, onDelete, onGenerateDocument
                     onClick={() => onDelete(tree.id)}
                     title="Excluir"
                 >
-                    <DeleteIcon fontSize="small" />
+                    <DeleteOutline fontSize="small" />
                 </IconButton>
             </TableCell>
         </TableRow>
     );
-});
-
-TreeRow.displayName = 'TreeRow';
+};
 
 export default TreeRow;
