@@ -20,6 +20,12 @@ export const InventoryManager = ({ property, onClose }) => {
   const [confirmingSave, setConfirmingSave] = useState(false); // UI loading state during save
   const [loadingTrees, setLoadingTrees] = useState(false);
 
+  // Bulk Upload State
+  const [openUploadDialog, setOpenUploadDialog] = useState(false);
+  const [uploadingFiles, setUploadingFiles] = useState(false);
+  const [uploadResults, setUploadResults] = useState(null);
+
+
   // Paginação
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -50,7 +56,10 @@ export const InventoryManager = ({ property, onClose }) => {
     createTree,
     updateTree,
     deleteTree,
-    getTreePhotos
+    getTreePhotos,
+    uploadTreePhoto,
+    createTreePhoto,
+    urlMidiasFiles
   } = useAdmin();
 
   // Document Generation State
@@ -170,6 +179,74 @@ export const InventoryManager = ({ property, onClose }) => {
       }
     }
   }, [deleteTree]);
+
+  const handleBulkUpload = async (event) => {
+    const files = Array.from(event.target.files);
+    if (files.length === 0) return;
+
+    setUploadingFiles(true);
+    setUploadResults([]);
+
+    const results = [];
+
+    for (const file of files) {
+      const fileName = file.name;
+      const match = fileName.match(/^(\d+)/);
+      const treeNumber = match ? parseInt(match[1]) : null;
+
+      if (!treeNumber) {
+        results.push({ name: fileName, status: 'error', message: 'Número da árvore não identificado no nome do arquivo (ex: 10.jpg).' });
+        continue;
+      }
+
+      const tree = allTrees.find(t => t.number === treeNumber);
+
+      if (!tree) {
+        results.push({ name: fileName, status: 'error', message: `Árvore nº ${treeNumber} não encontrada.` });
+        continue;
+      }
+
+      // Check if photo with same name already exists for this tree (simple check)
+      // Ideally we would check tree photos, but we might not have them loaded.
+      // We can skip checking for now or fetch photos if needed.
+      // Let's assume we proceed.
+
+      try {
+        const uploadResult = await uploadTreePhoto(tree.id, file);
+        if (!uploadResult) {
+          results.push({ name: fileName, status: 'error', message: 'Falha no upload.' });
+          continue;
+        }
+
+        const photoPayload = {
+          treeInventoryId: tree.id,
+          url: `${urlMidiasFiles}${uploadResult.filename || uploadResult.internalPath || file.name}`,
+          name: file.name,
+          alt: `Foto da árvore ${tree.number}`,
+          internalPath: uploadResult.filename || uploadResult.internalPath || file.name
+        };
+
+        const photoRecord = await createTreePhoto(photoPayload);
+        if (photoRecord) {
+          results.push({ name: fileName, status: 'success', message: 'Sucesso.' });
+        } else {
+          results.push({ name: fileName, status: 'warning', message: 'Upload OK, mas falha ao registrar.' });
+        }
+
+      } catch (error) {
+        console.error("Bulk upload error:", error);
+        results.push({ name: fileName, status: 'error', message: 'Erro desconhecido.' });
+      }
+    }
+
+    setUploadResults(results);
+    setUploadingFiles(false);
+  };
+
+  const handleCloseUploadDialog = () => {
+    setOpenUploadDialog(false);
+    setUploadResults(null);
+  };
 
   const handleCreateInventory = async () => {
     const now = new Date();
@@ -560,6 +637,13 @@ export const InventoryManager = ({ property, onClose }) => {
             <Button variant="contained" startIcon={<Add />} onClick={handleNew}>
               Cadastrar Árvore
             </Button>
+            <Button
+              variant="outlined"
+              onClick={() => setOpenUploadDialog(true)}
+              startIcon={<ImageIcon />}
+            >
+              Upload em Lote
+            </Button>
           </Box>
         </Box>
 
@@ -754,6 +838,77 @@ export const InventoryManager = ({ property, onClose }) => {
         labelRowsPerPage="Linhas por página"
         labelDisplayedRows={({ from, to, count }) => `${from}-${to} de ${count}`}
       />
+
+      {/* DIALOG DE UPLOAD EM LOTE */}
+      <Dialog open={openUploadDialog} onClose={handleCloseUploadDialog} maxWidth="md" fullWidth>
+        <DialogTitle>Upload de Fotos em Lote</DialogTitle>
+        <DialogContent dividers>
+          <Box mb={2}>
+            <Typography variant="body2" gutterBottom>
+              Selecione múltiplas fotos. O sistema tentará associar cada foto a uma árvore usando o número no início do nome do arquivo (ex: "10.jpg" -&gt; Árvore nº 10).
+            </Typography>
+            <Button
+              variant="contained"
+              component="label"
+              disabled={uploadingFiles}
+              startIcon={uploadingFiles ? <CircularProgress size={20} /> : <ImageIcon />}
+              sx={{ mt: 2 }}
+            >
+              Selecionar Arquivos
+              <input
+                type="file"
+                hidden
+                multiple
+                accept="image/*"
+                onChange={handleBulkUpload}
+              />
+            </Button>
+          </Box>
+
+          {uploadingFiles && (
+            <Box display="flex" flexDirection="column" alignItems="center" my={4}>
+              <CircularProgress />
+              <Typography variant="caption" mt={2}>Processando uploads...</Typography>
+            </Box>
+          )}
+
+          {uploadResults && (
+            <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: 400, mt: 2 }}>
+              <Table size="small" stickyHeader>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Arquivo</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell>Mensagem</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {uploadResults.map((res, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{res.name}</TableCell>
+                      <TableCell>
+                        <Typography
+                          color={res.status === 'success' ? 'success.main' : res.status === 'warning' ? 'warning.main' : 'error.main'}
+                          fontWeight="bold"
+                          variant="body2"
+                        >
+                          {res.status.toUpperCase()}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>{res.message}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseUploadDialog} disabled={uploadingFiles}>
+            Fechar
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Dialog open={openCreateInventory} onClose={() => setOpenCreateInventory(false)} fullWidth maxWidth="sm">
         <DialogTitle>Criar Inventário</DialogTitle>
