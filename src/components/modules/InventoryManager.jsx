@@ -16,6 +16,8 @@ export const InventoryManager = ({ property, onClose }) => {
   const [inventories, setInventories] = useState([]);
   const [viewState, setViewState] = useState("list");
   const [editingTree, setEditingTree] = useState(null);
+  const [pendingTreeData, setPendingTreeData] = useState(null); // Data waiting for confirmation
+  const [confirmingSave, setConfirmingSave] = useState(false); // UI loading state during save
   const [loadingTrees, setLoadingTrees] = useState(false);
 
   // Paginação
@@ -69,6 +71,30 @@ export const InventoryManager = ({ property, onClose }) => {
       endDate: formatDateOnly(oneYearLater),
     };
   });
+
+  const handleRequestConfirmation = (treeData) => {
+    setPendingTreeData(treeData);
+    setViewState("confirmation");
+  };
+
+  const handleCancelConfirmation = () => {
+    // Return to form with pending data so edits aren't lost
+    // We update editingTree to reflect the pending edits so the form re-initializes with them
+    // OR we pass it as initialData.
+    // Ideally, we just switch viewState back. But TreeForm uses initialData prop.
+    // If we switch back, TreeForm might re-mount with old initialData if we don't update editingTree.
+    // Let's update editingTree to be the pending data, but keep ID so it knows it's an edit.
+    setEditingTree(treeData => ({ ...treeData, ...pendingTreeData }));
+    setViewState("form");
+  };
+
+  const executeSaveTree = async () => {
+    if (!pendingTreeData) return;
+    setConfirmingSave(true);
+    await handleSaveTree(pendingTreeData);
+    setConfirmingSave(false);
+    setPendingTreeData(null);
+  };
 
   const handleSaveTree = async (treeData) => {
 
@@ -407,13 +433,99 @@ export const InventoryManager = ({ property, onClose }) => {
         </Box>
         <Paper elevation={0} variant="outlined">
           <TreeForm
-            initialData={editingTree}
-            onSave={handleSaveTree}
+            initialData={editingTree} // Will contain pending edits if returning from confirmation
+            onSave={handleRequestConfirmation}
             onCancel={() => setViewState("list")}
             propertyId={property.id}
             inventoryId={currentInventoryId}
           />
         </Paper>
+      </Box>
+    );
+  }
+
+  if (viewState === "confirmation") {
+    const original = editingTree || {};
+    const current = pendingTreeData || {};
+
+    // Helper to check for changes
+    const hasChanged = (key) => {
+      // Comparison logic: basic equality or loose equality for numbers/strings
+      // New tree: everything significant is "changed" effectively, but we only highlight vs nothing.
+      if (!editingTree) return true; // New tree, all is new
+      return original[key] != current[key];
+    };
+
+    const fields = [
+      { key: 'number', label: 'Nº Placa' },
+      { key: 'popularName', label: 'Nome Popular' },
+      { key: 'specieName', label: 'Espécie' },
+      { key: 'cap', label: 'CAP', format: v => v ? `${v} cm` : '-' },
+      { key: 'dap', label: 'DAP', format: v => v ? `${v} cm` : '-' },
+      { key: 'height', label: 'Altura Total', format: v => v ? `${v} m` : '-' },
+      { key: 'comercialHeight', label: 'Altura Comercial', format: v => v ? `${v} m` : '-' },
+      { key: 'volume', label: 'Volume', format: v => v ? `${v} m³` : '-' },
+      { key: 'cuttingVolume', label: 'Volume de Corte', format: v => v ? `${v} m³` : '-' },
+      { key: 'fuste', label: 'Fuste' },
+      { key: 'classification', label: 'Classificação' },
+    ];
+
+    return (
+      <Box p={3} sx={{ bgcolor: 'background.paper', height: '100%' }}>
+        <Typography variant="h6" gutterBottom>
+          Confirmar Alterações
+        </Typography>
+        <Typography variant="body2" color="textSecondary" mb={3}>
+          Verifique os dados abaixo antes de salvar. Valores alterados estão destacados.
+        </Typography>
+
+        <Paper variant="outlined" sx={{ mb: 3, overflow: 'hidden' }}>
+          <Table size="small">
+            <TableHead>
+              <TableRow sx={{ bgcolor: '#f5f5f5' }}>
+                <TableCell>Campo</TableCell>
+                <TableCell>Valor Original</TableCell>
+                <TableCell>Novo Valor</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {fields.map(field => {
+                const isDiff = hasChanged(field.key);
+                const valOriginal = field.format ? field.format(original[field.key]) : (original[field.key] || '-');
+                const valNew = field.format ? field.format(current[field.key]) : (current[field.key] || '-');
+
+                // If both empty/null, skip? No, explicit is better.
+
+                return (
+                  <TableRow key={field.key} sx={{ bgcolor: isDiff ? '#e3f2fd' : 'inherit' }}>
+                    <TableCell sx={{ fontWeight: 'bold' }}>{field.label}</TableCell>
+                    <TableCell sx={{ textDecoration: isDiff ? 'line-through' : 'none', color: isDiff ? 'text.secondary' : 'inherit' }}>
+                      {editingTree ? valOriginal : '-'}
+                    </TableCell>
+                    <TableCell sx={{ color: isDiff ? 'primary.main' : 'inherit', fontWeight: isDiff ? 'bold' : 'normal' }}>
+                      {valNew}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </Paper>
+
+        <Box display="flex" justifyContent="flex-end" gap={2}>
+          <Button onClick={handleCancelConfirmation} color="inherit">
+            Voltar e Editar
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={executeSaveTree}
+            disabled={confirmingSave}
+            startIcon={confirmingSave ? <CircularProgress size={20} color="inherit" /> : null}
+          >
+            {confirmingSave ? 'Salvando...' : 'Confirmar Salvar'}
+          </Button>
+        </Box>
       </Box>
     );
   }
