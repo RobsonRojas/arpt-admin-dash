@@ -10,7 +10,7 @@ import { TreeForm } from './TreeForm';
 import { useAdmin } from '../../contexts/AdminContext';
 import { generateDocument } from '../../services/gemini';
 import MDEditor from '@uiw/react-md-editor';
-
+import TreeRow from './TreeRow'; // Import TreeRow
 
 export const InventoryManager = ({ property, onClose }) => {
   const [inventories, setInventories] = useState([]);
@@ -123,10 +123,10 @@ export const InventoryManager = ({ property, onClose }) => {
     }
   };
 
-  const handleEdit = (tree) => {
+  const handleEdit = React.useCallback((tree) => {
     setEditingTree(tree);
     setViewState("form");
-  };
+  }, []);
 
   const handleNew = () => {
     setEditingTree(null);
@@ -166,7 +166,7 @@ export const InventoryManager = ({ property, onClose }) => {
   };
 
 
-  const handleGenerateDocument = async (tree) => {
+  const handleGenerateDocument = React.useCallback(async (tree) => {
     setLoadingDoc(true);
     setOpenDocDialog(true);
     setGeneratedDoc("Gerando documento, por favor aguarde...");
@@ -179,7 +179,7 @@ export const InventoryManager = ({ property, onClose }) => {
     } finally {
       setLoadingDoc(false);
     }
-  };
+  }, []);
 
   const loadTrees = async () => {
     try {
@@ -256,7 +256,7 @@ export const InventoryManager = ({ property, onClose }) => {
   const [treePhotos, setTreePhotos] = useState([]);
   const [loadingPhotos, setLoadingPhotos] = useState(false);
 
-  const handleOpenPhotos = async (treeId) => {
+  const handleOpenPhotos = React.useCallback(async (treeId) => {
     setLoadingPhotos(true);
     setOpenPhotosModal(true);
     setTreePhotos([]);
@@ -269,7 +269,7 @@ export const InventoryManager = ({ property, onClose }) => {
     } finally {
       setLoadingPhotos(false);
     }
-  };
+  }, [getTreePhotos]);
 
   const handleClosePhotos = () => {
     setOpenPhotosModal(false);
@@ -610,44 +610,13 @@ export const InventoryManager = ({ property, onClose }) => {
               </TableRow>
             ) : (
               paginatedTrees.map(tree => (
-                <TableRow key={tree.id} hover>
-                  <TableCell>{tree.id}</TableCell>
-                  <TableCell fontWeight="bold">{tree.number ?? '-'}</TableCell>
-                  <TableCell>{tree.specieName}</TableCell>
-                  <TableCell>{tree.popularName || '-'}</TableCell>
-                  <TableCell>{tree.cap ? parseFloat(tree.cap).toFixed(2) : '-'} cm</TableCell>
-                  <TableCell>{tree.dap ? parseFloat(tree.dap).toFixed(2) : '-'} cm</TableCell>
-                  <TableCell>{tree.volume ? parseFloat(tree.volume).toFixed(2) : '-'} m³</TableCell>
-                  <TableCell>{tree.height ? parseFloat(tree.height).toFixed(2) : '-'} m</TableCell>
-                  <TableCell align="center">
-                    <IconButton
-                      size="small"
-                      color="default"
-                      onClick={() => handleOpenPhotos(tree.id)}
-                      title="Ver Fotos"
-                    >
-                      <ImageIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      color="primary"
-                      onClick={() => handleEdit(tree)}
-                      title="Editar"
-                    >
-                      <Edit fontSize="small" />
-                    </IconButton>
-                    {tree.classification === 'Árvore Caída' && (
-                      <IconButton
-                        size="small"
-                        color="secondary"
-                        onClick={() => handleGenerateDocument(tree)}
-                        title="Gerar Documento"
-                      >
-                        <Description fontSize="small" />
-                      </IconButton>
-                    )}
-                  </TableCell>
-                </TableRow>
+                <TreeRow
+                  key={tree.id}
+                  tree={tree}
+                  onOpenPhotos={handleOpenPhotos}
+                  onEdit={handleEdit}
+                  onGenerateDocument={handleGenerateDocument}
+                />
               ))
             )}
           </TableBody>
