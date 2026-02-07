@@ -49,6 +49,7 @@ export const InventoryManager = ({ property, onClose }) => {
     createInventory,
     createTree,
     updateTree,
+    deleteTree,
     getTreePhotos
   } = useAdmin();
 
@@ -159,11 +160,16 @@ export const InventoryManager = ({ property, onClose }) => {
     setViewState("form");
   };
 
-  const handleDelete = (treeId) => {
-    if (window.confirm("Deseja remover esta árvore?")) {
-      setAllTrees(allTrees.filter(t => t.id !== treeId));
+  const handleDelete = React.useCallback(async (treeId) => {
+    if (window.confirm("Deseja remover esta árvore permanentemente?")) {
+      const success = await deleteTree(treeId);
+      if (success) {
+        setAllTrees(prev => prev.filter(t => t.id !== treeId));
+      } else {
+        alert("Erro ao remover árvore. Tente novamente.");
+      }
     }
-  };
+  }, [deleteTree]);
 
   const handleCreateInventory = async () => {
     const now = new Date();
@@ -728,6 +734,7 @@ export const InventoryManager = ({ property, onClose }) => {
                   tree={tree}
                   onOpenPhotos={handleOpenPhotos}
                   onEdit={handleEdit}
+                  onDelete={handleDelete}
                   onGenerateDocument={handleGenerateDocument}
                 />
               ))

@@ -281,6 +281,20 @@ export const AdminProvider = ({ children }) => {
         }
     }
 
+    const deleteTree = async (treeId) => {
+        try {
+            const response = await api.delete(`/arvores/${treeId}`);
+            if (response.status === 200) {
+                return true;
+            }
+            console.warn(`Resposta inesperada ao deletar árvore: status ${response.status}`);
+            return false;
+        } catch (error) {
+            console.error("Error deleting tree:", error);
+            return false;
+        }
+    }
+
     const uploadTreePhoto = async (treeId, file) => {
         try {
             const formData = new FormData();
@@ -862,6 +876,7 @@ export const AdminProvider = ({ children }) => {
         createInventory,
         createTree,
         updateTree,
+        deleteTree,
         uploadTreePhoto,
         createTreePhoto,
         getTreePhotos,
