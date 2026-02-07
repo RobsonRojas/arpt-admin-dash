@@ -345,6 +345,20 @@ export const AdminProvider = ({ children }) => {
         }
     }
 
+    const getTreeHistory = async (treeId) => {
+        try {
+            const response = await api.get(`/arvores/${treeId}/transactions`);
+            if (response.status === 200) {
+                return response.data;
+            }
+            console.warn(`Resposta inesperada ao buscar histórico da árvore: status ${response.status}`);
+            return [];
+        } catch (error) {
+            console.error("Error fetching tree history:", error);
+            return [];
+        }
+    }
+
     // ==================== REWARDS (PRODUTOS) MANAGEMENT ====================
 
     const getRewardsByManejoId = async (manejoId) => {
@@ -880,6 +894,7 @@ export const AdminProvider = ({ children }) => {
         uploadTreePhoto,
         createTreePhoto,
         getTreePhotos,
+        getTreeHistory,
 
         // Regras de Negócio - Rewards
         getRewardsByManejoId,

@@ -1,8 +1,8 @@
 import React from 'react';
 import { TableRow, TableCell, IconButton } from '@mui/material';
-import { Edit, Description, Image as ImageIcon, DeleteOutline } from '@mui/icons-material';
+import { Edit, Description, Image as ImageIcon, DeleteOutline, History } from '@mui/icons-material';
 
-const TreeRow = ({ tree, onOpenPhotos, onEdit, onDelete, onGenerateDocument }) => {
+const TreeRow = ({ tree, onOpenPhotos, onEdit, onDelete, onGenerateDocument, onViewHistory }) => {
     return (
         <TableRow hover>
             <TableCell>{tree.id}</TableCell>
@@ -29,6 +29,14 @@ const TreeRow = ({ tree, onOpenPhotos, onEdit, onDelete, onGenerateDocument }) =
                     title="Editar"
                 >
                     <Edit fontSize="small" />
+                </IconButton>
+                <IconButton
+                    size="small"
+                    color="secondary"
+                    onClick={() => onViewHistory(tree)}
+                    title="Histórico Blockchain"
+                >
+                    <History fontSize="small" />
                 </IconButton>
                 {tree.classification === 'Árvore Caída' && (
                     <IconButton
