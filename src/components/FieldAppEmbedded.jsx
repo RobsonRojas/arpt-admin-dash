@@ -75,7 +75,11 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
     const randomId = Math.floor(Math.random() * 100);
     setFormData(prev => ({
       ...prev,
-      fotos: [...prev.fotos, `https://picsum.photos/600?random=${randomId}`]
+      fotos: [...prev.fotos, {
+        src: `https://picsum.photos/600?random=${randomId}`,
+        alt: `Foto do projeto ${prev.descricao || 'Novo'} - ${randomId}`,
+        type: 'image/jpeg'
+      }]
     }));
   };
 
@@ -222,10 +226,6 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
         return (
           <Grid container spacing={3} sx={{ mt: 1 }}>
             <Grid item xs={12}>
-              import {AIAssistant} from './AIAssistant';
-
-              // ... inside FieldAppEmbedded ...
-
               <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
                 <Box>
                   <Typography variant="subtitle2">
@@ -301,7 +301,7 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
               {formData.fotos.map((f, i) => (
                 <Avatar
                   key={i}
-                  src={f}
+                  src={f.src || f.url || f}
                   variant="rounded"
                   sx={{ width: 80, height: 80 }}
                 />

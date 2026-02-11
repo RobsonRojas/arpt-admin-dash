@@ -114,6 +114,11 @@ export const AdminProvider = ({ children }) => {
             ...(p.expira_anos && { expira_anos: p.expira_anos }),
             ...(p.nome && { nome: p.nome }),
             ...(p.id_propriedade && { id_propriedade: p.id_propriedade }),
+            fotos: (p.fotos || []).map(f => ({
+                src: f.src || f.url || f,
+                alt: f.alt || `Foto do projeto ${p.descricao || ''}`.padEnd(10, '_'),
+                type: f.type || 'image/jpeg'
+            })),
         };
 
         return payload;
