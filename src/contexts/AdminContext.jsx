@@ -158,6 +158,35 @@ export const AdminProvider = ({ children }) => {
         }
     }
 
+    const createProject = async (newProject) => {
+        try {
+            const payload = normalizeProjectForApi(newProject);
+            // Remove ID for creation allowing backend/DB to assign
+            delete payload.id;
+
+            const response = await api.post('/manejos', payload);
+            if (response.status === 201 || response.status === 200) {
+                console.log('Projeto criado com sucesso na API.');
+                await recordAudit({
+                    action: 'CREATE',
+                    entity: 'PROJECT',
+                    entityId: String(response.data.id),
+                    before: null,
+                    after: newProject,
+                    user
+                });
+                await getProjects();
+                return response.data;
+            }
+            const unexpected = new Error(`Resposta inesperada ao criar projeto: status ${response.status}`);
+            console.warn(unexpected, response);
+            throw unexpected;
+        } catch (error) {
+            console.error('ERROR: Error creating project:', error);
+            throw error;
+        }
+    }
+
     const getProperties = async () => {
 
         try {
@@ -581,8 +610,8 @@ export const AdminProvider = ({ children }) => {
                 // Atualização via API para projeto existente
                 await updateProject(projectData);
             } else {
-                // Criação de novo projeto (mantém local por enquanto)
-                setProjects(prev => [projectData, ...prev]);
+                // Criação de novo projeto via API
+                await createProject(projectData);
             }
             setOpenCadastro(false);
             setEditingProject(null);
