@@ -44,7 +44,8 @@ export const Projects = () => {
     selectedProject,
     setSelectedProject,
     projects,
-    urlMidiasFiles
+    urlMidiasFiles,
+    properties
   } = useAdmin();
 
   const filteredProjects = getFilteredProjects();
@@ -253,6 +254,7 @@ export const Projects = () => {
               onClose={handleCloseCadastro}
               onSave={handleSaveProject}
               initialData={editingProject}
+              properties={properties}
             />
           </DialogContent>
         </Dialog>

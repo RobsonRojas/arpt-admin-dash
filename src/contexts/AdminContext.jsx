@@ -113,7 +113,7 @@ export const AdminProvider = ({ children }) => {
             ...(p.intervalo_tempo_manejo && { intervalo_tempo_manejo: p.intervalo_tempo_manejo }),
             ...(p.expira_anos && { expira_anos: p.expira_anos }),
             ...(p.nome && { nome: p.nome }),
-            ...(p.id_propriedade && { id_propriedade: p.id_propriedade }),
+            ...(p.id_propriedade && { id_propriedade: Number(p.id_propriedade) }),
             fotos: (p.fotos || []).map(f => ({
                 src: f.src || f.url || f,
                 alt: f.alt || `Foto do projeto ${p.descricao || ''}`.padEnd(10, '_'),
@@ -623,7 +623,8 @@ export const AdminProvider = ({ children }) => {
             setCurrentView('projects');
         } catch (error) {
             console.error('ERROR: Error saving project:', error);
-            window.alert('Não foi possível salvar o projeto. Verifique os dados e tente novamente.');
+            // Re-throw so the UI can handle the error display
+            throw error;
         }
     };
 

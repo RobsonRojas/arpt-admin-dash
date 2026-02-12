@@ -4,19 +4,20 @@ import {
   Stepper, Step, StepLabel, Alert, Avatar, Divider
 } from '@mui/material';
 import {
-  Map, CloudUpload, ArrowForward, CheckCircle, Save, AutoFixHigh
+  Map, CloudUpload, ArrowForward, CheckCircle, Save, AutoFixHigh, ContentCopy
 } from '@mui/icons-material';
 import MDEditor from '@uiw/react-md-editor';
 import '@uiw/react-md-editor/markdown-editor.css';
 import '@uiw/react-markdown-preview/markdown.css';
 import { ESTADOS, UNIDADES, POTENCIAIS } from '../constants';
 import { improveText } from '../services/gemini';
-import { CircularProgress } from '@mui/material';
+import { CircularProgress, IconButton, Snackbar } from '@mui/material';
 import { AIAssistant } from './AIAssistant';
 
-export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
+export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = [] }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [loadingAI, setLoadingAI] = useState({ resumo: false, detalhes: false });
+  const [errorLog, setErrorLog] = useState(null);
 
   const defaultState = {
     id: null,
@@ -30,6 +31,9 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
     longitude: 0,
     potencial: "Manejo de Madeira",
     data_submissao: new Date().toISOString().split('T')[0],
+    data_inicio: "",
+    data_termino: "",
+    id_propriedade: "",
     custo_operacional: "",
     ranking: 5,
     resumo: "",
@@ -41,13 +45,65 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
 
   const [formData, setFormData] = useState(defaultState);
 
+  // Load from local storage or initialData
   useEffect(() => {
     if (initialData) {
-      setFormData(initialData);
+      // Check for saved draft specific to this project ID
+      const draftKey = `project_draft_${initialData.id}`;
+      const savedDraft = localStorage.getItem(draftKey);
+
+      let baseData = { ...initialData };
+
+      // Ensure dates are formatted as YYYY-MM-DD for input[type="date"]
+      if (baseData.data_inicio && baseData.data_inicio.includes('T')) {
+        baseData.data_inicio = baseData.data_inicio.split('T')[0];
+      }
+      if (baseData.data_termino && baseData.data_termino.includes('T')) {
+        baseData.data_termino = baseData.data_termino.split('T')[0];
+      }
+
+      if (savedDraft) {
+        try {
+          const parsed = JSON.parse(savedDraft);
+          if (window.confirm(`Existe um rascunho salvo para ${initialData.descricao}. Deseja continuar editando?`)) {
+            setFormData(parsed);
+          } else {
+            setFormData(baseData);
+            localStorage.removeItem(draftKey);
+          }
+        } catch (e) {
+          console.error("Erro ao ler rascunho", e);
+          setFormData(baseData);
+        }
+      } else {
+        setFormData(baseData);
+      }
     } else {
-      setFormData(defaultState);
+      const savedDraft = localStorage.getItem('project_draft_new');
+      if (savedDraft) {
+        try {
+          const parsed = JSON.parse(savedDraft);
+          if (window.confirm("Existe um novo projeto em rascunho. Deseja continuar editando?")) {
+            setFormData(parsed);
+          } else {
+            setFormData(defaultState);
+            localStorage.removeItem('project_draft_new');
+          }
+        } catch (e) {
+          console.error("Erro ao ler rascunho", e);
+          setFormData(defaultState);
+        }
+      } else {
+        setFormData(defaultState);
+      }
     }
   }, [initialData]);
+
+  // Save to local storage
+  useEffect(() => {
+    const draftKey = initialData ? `project_draft_${initialData.id}` : 'project_draft_new';
+    localStorage.setItem(draftKey, JSON.stringify(formData));
+  }, [formData, initialData]);
 
   const steps = ['Identificação', 'Detalhes Técnicos', 'Resumo e Detalhes', 'Mídia', 'Revisão'];
 
@@ -83,7 +139,7 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
     }));
   };
 
-  const handleFinish = () => {
+  const handleFinish = async () => {
     if (!formData.descricao || !formData.municipio) {
       alert("Preencha os campos obrigatórios");
       return;
@@ -96,7 +152,19 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
       tamanho: Number(formData.tamanho)
     };
 
-    onSave(projectToSave);
+    try {
+      await onSave(projectToSave);
+      // Clear draft on success
+      const draftKey = initialData ? `project_draft_${initialData.id}` : 'project_draft_new';
+      localStorage.removeItem(draftKey);
+    } catch (error) {
+      console.error("Erro ao salvar projeto:", error);
+      let errorMsg = error.message;
+      if (error.response?.data) {
+        errorMsg = JSON.stringify(error.response.data, null, 2);
+      }
+      setErrorLog(errorMsg);
+    }
   };
 
   const renderStep = (step) => {
@@ -106,12 +174,54 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12}>
               <TextField
+                select
+                fullWidth
+                label="Propriedade Vinculada (Opcional)"
+                name="id_propriedade"
+                value={formData.id_propriedade || ""}
+                onChange={handleChange}
+                helperText="Selecione a propriedade à qual este projeto pertence"
+              >
+                <MenuItem value="">
+                  <em>Nenhuma</em>
+                </MenuItem>
+                {properties.map((prop) => (
+                  <MenuItem key={prop.id} value={prop.id}>
+                    {prop.nome} ({prop.municipio})
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
                 fullWidth
                 required
                 label="Nome do Projeto / Comunidade"
                 name="descricao"
                 value={formData.descricao}
                 onChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={6} sm={6}>
+              <TextField
+                fullWidth
+                type="date"
+                label="Data Início"
+                name="data_inicio"
+                value={formData.data_inicio || ""}
+                onChange={handleChange}
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            <Grid item xs={6} sm={6}>
+              <TextField
+                fullWidth
+                type="date"
+                label="Data Término"
+                name="data_termino"
+                value={formData.data_termino || ""}
+                onChange={handleChange}
+                InputLabelProps={{ shrink: true }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -144,25 +254,50 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
                 sx={{
                   p: 2,
                   bgcolor: '#f1f8e9',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center'
                 }}
               >
-                <Box>
-                  <Typography variant="subtitle2">Geolocalização</Typography>
-                  <Typography variant="caption">
-                    Lat: {Number(formData.latitude).toFixed(4)} / Long: {Number(formData.longitude).toFixed(4)}
-                  </Typography>
+                <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                  <Box>
+                    <Typography variant="subtitle2">Geolocalização</Typography>
+                    <Typography variant="caption">
+                      Insira manualmente ou use o GPS
+                    </Typography>
+                  </Box>
+                  <Button
+                    size="small"
+                    variant="contained"
+                    onClick={handleGeoLocation}
+                    startIcon={<Map />}
+                  >
+                    Obter GPS
+                  </Button>
                 </Box>
-                <Button
-                  size="small"
-                  variant="contained"
-                  onClick={handleGeoLocation}
-                  startIcon={<Map />}
-                >
-                  GPS
-                </Button>
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      label="Latitude"
+                      name="latitude"
+                      type="number"
+                      value={formData.latitude}
+                      onChange={handleChange}
+                      InputProps={{ inputProps: { step: "any" } }}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      label="Longitude"
+                      name="longitude"
+                      type="number"
+                      value={formData.longitude}
+                      onChange={handleChange}
+                      InputProps={{ inputProps: { step: "any" } }}
+                    />
+                  </Grid>
+                </Grid>
               </Paper>
             </Grid>
           </Grid>
@@ -386,7 +521,8 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
           display: 'flex',
           justifyContent: 'space-between',
           borderTop: '1px solid #eee',
-          pt: 2
+          pt: 2,
+          mt: 2
         }}
       >
         <Button
@@ -415,6 +551,46 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData }) => {
           </Button>
         )}
       </Box>
+
+      {/* Error Log Area */}
+      {errorLog && (
+        <Paper
+          sx={{
+            mt: 4,
+            p: 2,
+            bgcolor: '#ffebee',
+            border: '1px solid #ef5350',
+            position: 'relative'
+          }}
+        >
+          <Typography variant="subtitle2" color="error" gutterBottom>
+            Erro ao salvar projeto
+          </Typography>
+          <IconButton
+            size="small"
+            onClick={() => {
+              navigator.clipboard.writeText(errorLog);
+              alert("Log de erro copiado!");
+            }}
+            sx={{ position: 'absolute', top: 5, right: 5 }}
+          >
+            <ContentCopy fontSize="small" />
+          </IconButton>
+          <Box
+            component="pre"
+            sx={{
+              overflowX: 'auto',
+              fontSize: '0.75rem',
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
+              maxHeight: 200,
+              overflowY: 'auto'
+            }}
+          >
+            {errorLog}
+          </Box>
+        </Paper>
+      )}
     </Box>
   );
 };
