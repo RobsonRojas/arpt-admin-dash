@@ -45,7 +45,8 @@ export const Projects = () => {
     setSelectedProject,
     projects,
     urlMidiasFiles,
-    properties
+    properties,
+    statuses
   } = useAdmin();
 
   const filteredProjects = getFilteredProjects();
@@ -255,6 +256,7 @@ export const Projects = () => {
               onSave={handleSaveProject}
               initialData={editingProject}
               properties={properties}
+              statuses={statuses}
             />
           </DialogContent>
         </Dialog>

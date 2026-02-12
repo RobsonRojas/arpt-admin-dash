@@ -32,6 +32,7 @@ export const AdminProvider = ({ children }) => {
     // Dados
     const [projects, setProjects] = useState([]);
     const [properties, setProperties] = useState([]);
+    const [statuses, setStatuses] = useState([]);
     const [necromassaRequests, setNecromassaRequests] = useState(INITIAL_NECROMASSA);
     const [sponsors] = useState(MOCK_SPONSORS);
 
@@ -201,9 +202,20 @@ export const AdminProvider = ({ children }) => {
             }
         } catch (error) {
             console.error("Error fetching properties:", error);
-            alert("Não foi possível carregar as propriedades. Tente novamente mais tarde.");
+            // alert("Não foi possível carregar as propriedades. Tente novamente mais tarde.");
         }
 
+    };
+
+    const getStatuses = async () => {
+        try {
+            const response = await api.get('/manejos/states');
+            if (response.status === 200) {
+                setStatuses(response.data);
+            }
+        } catch (error) {
+            console.error("Error fetching statuses:", error);
+        }
     };
 
     const getInventoriesByPropertyId = async (propertyId) => {
@@ -868,6 +880,7 @@ export const AdminProvider = ({ children }) => {
     useEffect(() => {
         getProjects();
         getProperties();
+        getStatuses();
     }, []);
 
     // ==================== VALOR DO CONTEXTO ====================
@@ -877,6 +890,7 @@ export const AdminProvider = ({ children }) => {
         mobileOpen,
         projects,
         properties,
+        statuses,
         necromassaRequests,
         sponsors,
         openCadastro,

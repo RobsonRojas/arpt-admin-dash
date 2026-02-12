@@ -14,7 +14,7 @@ import { improveText } from '../services/gemini';
 import { CircularProgress, IconButton, Snackbar } from '@mui/material';
 import { AIAssistant } from './AIAssistant';
 
-export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = [] }) => {
+export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = [], statuses = [] }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [loadingAI, setLoadingAI] = useState({ resumo: false, detalhes: false });
   const [errorLog, setErrorLog] = useState(null);
@@ -34,6 +34,7 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
     data_inicio: "",
     data_termino: "",
     id_propriedade: "",
+    id_status: "",
     custo_operacional: "",
     ranking: 5,
     resumo: "",
@@ -60,6 +61,11 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
       }
       if (baseData.data_termino && baseData.data_termino.includes('T')) {
         baseData.data_termino = baseData.data_termino.split('T')[0];
+      }
+
+      // Ensure id_status is set (fallback to status or default)
+      if (!baseData.id_status && baseData.status) {
+        baseData.id_status = baseData.status;
       }
 
       if (savedDraft) {
@@ -187,7 +193,7 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
                 </MenuItem>
                 {properties.map((prop) => (
                   <MenuItem key={prop.id} value={prop.id}>
-                    {prop.nome} ({prop.municipio})
+                    {prop.name || prop.nome} ({prop.municipio || prop.address || prop.id_municipality || 'N/A'})
                   </MenuItem>
                 ))}
               </TextField>
@@ -201,6 +207,23 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
                 value={formData.descricao}
                 onChange={handleChange}
               />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                select
+                fullWidth
+                label="Status do Projeto"
+                name="id_status"
+                value={formData.id_status || ""}
+                onChange={handleChange}
+                helperText="Selecione o status atual do projeto"
+              >
+                {statuses.map((st) => (
+                  <MenuItem key={st.id} value={st.id}>
+                    {st.description}
+                  </MenuItem>
+                ))}
+              </TextField>
             </Grid>
             <Grid item xs={6} sm={6}>
               <TextField
