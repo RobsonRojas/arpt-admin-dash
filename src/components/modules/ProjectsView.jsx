@@ -139,7 +139,7 @@ const RevenueReportDialog = ({ open, onClose, project }) => {
             // It is `src/services/api.js`.
             // I'll import it.
 
-            import('../../services/api').then(({ default: api }) => {
+            import('../../services/api').then(({ api }) => {
                 api.get(`/manejos/${project.id}/revenue-report`)
                     .then(res => setReportData(res.data))
                     .catch(err => {
