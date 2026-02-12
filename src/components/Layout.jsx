@@ -9,7 +9,8 @@ import {
   Landscape, Forest, HomeWork, Logout, ManageAccounts, CardGiftcard, CardMembership, History,
   SettingsSuggest,
   Payment,
-  PermMedia
+  PermMedia,
+  BugReport
 } from '@mui/icons-material';
 import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -53,6 +54,7 @@ export const Layout = ({ children }) => {
     { id: 'payment-config', label: 'Configurações de Pagamento', icon: <Payment /> }, // Using CardMembership as placeholder or we can import new icon
     { id: 'media-manager', label: 'Gerenciador de Arquivos', icon: <PermMedia /> },
     { id: 'gemini-settings', label: 'Configuração IA', icon: <SettingsSuggest /> },
+    { id: 'error-logs', label: 'Log de Erros', icon: <BugReport /> },
   ];
 
   const getPageTitle = () => {
@@ -70,6 +72,7 @@ export const Layout = ({ children }) => {
       case 'audit': return 'Log de Modificações';
       case 'media-manager': return 'Gerenciador de Arquivos';
       case 'gemini-settings': return 'Configuração IA';
+      case 'error-logs': return 'Log de Erros';
       default: return 'ARPT Admin';
     }
   };

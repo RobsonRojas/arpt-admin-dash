@@ -12,6 +12,7 @@ import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
 import { recordAudit } from '../services/auditLog';
 import { api } from '../services/api';
+import { usePersistence } from '../hooks/usePersistence';
 
 export const Products = () => {
     const { user } = useAuth();
@@ -29,7 +30,9 @@ export const Products = () => {
     const [viewingProduct, setViewingProduct] = useState(null);
 
     // Form state
-    const [formData, setFormData] = useState({
+    // Form state with Persistence
+    const [persistenceKey, setPersistenceKey] = useState('product_draft_new');
+    const [formData, setFormData, clearDraft] = usePersistence(persistenceKey, {
         nome: '',
         info: '',
         preco: 0,
@@ -82,27 +85,38 @@ export const Products = () => {
 
     const handleOpenDialog = (product = null) => {
         setImgError(false); // Reset error state on open
+
+        let initialData;
+        let key;
+
         if (product) {
             setEditingProduct(product);
-            setFormData({
+            key = `product_draft_${product.id}`;
+            initialData = {
                 nome: product.nome,
                 info: product.info,
                 preco: product.preco,
                 prazo_entrega_meses: product.prazo_entrega_meses,
                 is_ativo: product.is_ativo,
                 foto_url: product.fotos?.[0]?.url || ''
-            });
+            };
         } else {
             setEditingProduct(null);
-            setFormData({
+            key = 'product_draft_new';
+            initialData = {
                 nome: '',
                 info: '',
                 preco: 0,
                 prazo_entrega_meses: 0,
                 is_ativo: true,
                 foto_url: ''
-            });
+            };
         }
+
+        setPersistenceKey(key);
+        // We set the initial data immediately. 
+        // If a draft exists, the usePersistence hook will overwrite this state asynchronously.
+        setFormData(initialData);
         setOpenDialog(true);
     };
 
@@ -155,6 +169,7 @@ export const Products = () => {
                 });
             }
 
+            await clearDraft(); // Clear draft on success
             handleCloseDialog();
             fetchProducts();
         } catch (err) {

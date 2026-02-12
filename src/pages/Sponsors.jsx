@@ -2,14 +2,43 @@ import React, { useState } from 'react';
 import {
   Box, Typography, Button, Table, TableContainer, TableHead,
   TableRow, TableCell, TableBody, Paper, IconButton, Avatar,
-  Chip, Drawer, List, ListItem, ListItemText,
+  Chip, Drawer, List, ListItem, ListItemText, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Grid
 } from '@mui/material';
-import { AccountBalanceWallet, Visibility } from '@mui/icons-material';
+import { AccountBalanceWallet, Visibility, Add } from '@mui/icons-material';
 import { useAdmin } from '../contexts/AdminContext';
+import { usePersistence } from '../hooks/usePersistence';
 
 export const Sponsors = () => {
   const { sponsors } = useAdmin();
   const [selectedSponsor, setSelectedSponsor] = useState(null);
+  const [openForm, setOpenForm] = useState(false);
+
+  // Persistence
+  const [persistenceKey, setPersistenceKey] = useState('sponsor_draft_new');
+  const [formData, setFormData, clearDraft] = usePersistence(persistenceKey, {
+    nome: '',
+    nivel: 'Bronze',
+    total_patrocinado: 0,
+    tipo: 'Empresa'
+  });
+
+  const handleOpenNew = () => {
+    setPersistenceKey('sponsor_draft_new');
+    setFormData({
+      nome: '',
+      nivel: 'Bronze',
+      total_patrocinado: 0,
+      tipo: 'Empresa'
+    });
+    setOpenForm(true);
+  };
+
+  const handleSave = () => {
+    // Mock save
+    console.log("Saving sponsor", formData);
+    clearDraft();
+    setOpenForm(false);
+  };
 
   return (
     <Box sx={{ animation: 'fadeIn 0.5s' }}>
@@ -18,7 +47,7 @@ export const Sponsors = () => {
           Gestão de Patrocinadores (RWA)
         </Typography>
         <Box display="flex" gap={2}>
-          <Button variant="contained" startIcon={<AccountBalanceWallet />}>
+          <Button variant="contained" startIcon={<Add />} onClick={handleOpenNew}>
             Nova Captação
           </Button>
         </Box>
@@ -89,6 +118,31 @@ export const Sponsors = () => {
           )}
         </Box>
       </Drawer>
-    </Box>
+
+      {/* Persistence Form Dialog */}
+      < Dialog open={openForm} onClose={() => setOpenForm(false)} maxWidth="sm" fullWidth >
+        <DialogTitle>Novo Patrocinador</DialogTitle>
+        <DialogContent dividers>
+          <Grid container spacing={2} pt={1}>
+            <Grid item xs={12}>
+              <TextField fullWidth label="Nome" value={formData.nome} onChange={e => setFormData({ ...formData, nome: e.target.value })} />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField fullWidth label="Nível" value={formData.nivel} onChange={e => setFormData({ ...formData, nivel: e.target.value })} />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField fullWidth label="Tipo" value={formData.tipo} onChange={e => setFormData({ ...formData, tipo: e.target.value })} />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField fullWidth type="number" label="Total Patrocinado" value={formData.total_patrocinado} onChange={e => setFormData({ ...formData, total_patrocinado: e.target.value })} />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenForm(false)}>Cancelar</Button>
+          <Button variant="contained" onClick={handleSave}>Salvar</Button>
+        </DialogActions>
+      </Dialog >
+    </Box >
   );
 };

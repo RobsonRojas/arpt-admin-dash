@@ -11,6 +11,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { useAuth } from '../contexts/AuthContext';
 import { useAdmin } from '../contexts/AdminContext';
 import { api } from '../services/api';
+import { usePersistence } from '../hooks/usePersistence';
 
 const ROLES = ['Administrador', 'Gestor', 'Operador', 'Visualizador'];
 const STATUS = ['Ativo', 'Inativo'];
@@ -26,7 +27,10 @@ export const Users = () => {
 
     const [openForm, setOpenForm] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
-    const [formData, setFormData] = useState({
+
+    // Form Persistence
+    const [persistenceKey, setPersistenceKey] = useState('user_draft_new');
+    const [formData, setFormData, clearDraft] = usePersistence(persistenceKey, {
         id: '',
         name: '',
         email: '',
@@ -269,6 +273,7 @@ export const Users = () => {
     };
 
     const handleOpenNew = () => {
+        setPersistenceKey('user_draft_new');
         setFormData({
             id: '',
             name: '',
@@ -281,6 +286,7 @@ export const Users = () => {
     };
 
     const handleOpenEdit = (user) => {
+        setPersistenceKey(`user_draft_${user.id}`);
         setFormData(user);
         setIsEditing(true);
         setOpenForm(true);
@@ -301,9 +307,11 @@ export const Users = () => {
                 createdAt: new Date().toISOString().split('T')[0],
             };
             setUsers([...users, newUser]);
+            clearDraft(); // Clear draft after save
         }
 
         setOpenForm(false);
+        if (isEditing) clearDraft(); // Also clear on edit save
     };
 
     const handleDelete = (userId) => {

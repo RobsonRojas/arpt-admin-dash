@@ -1,10 +1,13 @@
+import React, { useEffect } from 'react';
 import { ThemeProvider, CssBaseline, CircularProgress, Box } from '@mui/material';
 import { theme } from './theme';
 import { Layout } from './components';
-import { Dashboard, Projects, Properties, Necromassa, Sponsors, Login, Users, Rewards, Certificates, Products, AuditLogs, GeminiSettings, PaymentConfig, MediaManager } from './pages';
+import { Dashboard, Projects, Properties, Necromassa, Sponsors, Login, Users, Rewards, Certificates, Products, AuditLogs, GeminiSettings, PaymentConfig, MediaManager, ErrorLogs } from './pages';
 import { CertificateView } from './pages/CertificateView';
 import { useAdmin } from './contexts/AdminContext';
 import { useAuth } from './contexts/AuthContext.jsx';
+import { ErrorProvider, useError } from './contexts/ErrorContext';
+import { setupInterceptors } from './services/api';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
 
@@ -26,6 +29,14 @@ const PrivateRoute = ({ children }) => {
   return <Layout>{children}</Layout>;
 };
 
+const AxiosInterceptorSetup = () => {
+  const { logError } = useError();
+  useEffect(() => {
+    setupInterceptors(logError);
+  }, [logError]);
+  return null;
+};
+
 export default function App() {
   const { currentView } = useAdmin();
 
@@ -45,22 +56,26 @@ export default function App() {
       case 'gemini-settings': return <GeminiSettings />;
       case 'payment-config': return <PaymentConfig />;
       case 'media-manager': return <MediaManager />;
+      case 'error-logs': return <ErrorLogs />;
       default: return <Dashboard />;
     }
   };
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Analytics />
-      <Routes>
-        <Route path="/certificate/view" element={<CertificateView />} />
-        <Route path="/*" element={
-          <PrivateRoute>
-            {getViewComponent()}
-          </PrivateRoute>
-        } />
-      </Routes>
-    </ThemeProvider>
+    <ErrorProvider>
+      <AxiosInterceptorSetup />
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Analytics />
+        <Routes>
+          <Route path="/certificate/view" element={<CertificateView />} />
+          <Route path="/*" element={
+            <PrivateRoute>
+              {getViewComponent()}
+            </PrivateRoute>
+          } />
+        </Routes>
+      </ThemeProvider>
+    </ErrorProvider>
   );
 }

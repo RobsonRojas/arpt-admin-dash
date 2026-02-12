@@ -8,6 +8,7 @@ import {
 import { Add, Edit, Delete, Visibility, Close, Image as ImageIcon, Search, CardGiftcard, Refresh, BrokenImage } from '@mui/icons-material';
 import { AIAssistant } from '../components/AIAssistant';
 import { useAdmin } from '../contexts/AdminContext';
+import { usePersistence } from '../hooks/usePersistence';
 
 export const Rewards = () => {
     // Skip link for screen readers
@@ -39,7 +40,10 @@ export const Rewards = () => {
     const [openView, setOpenView] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [selectedReward, setSelectedReward] = useState(null);
-    const [formData, setFormData] = useState({
+
+    // Form state with Persistence
+    const [persistenceKey, setPersistenceKey] = useState('reward_draft_new');
+    const [formData, setFormData, clearDraft] = usePersistence(persistenceKey, {
         id: '',
         name: '',
         info: '',
@@ -83,6 +87,8 @@ export const Rewards = () => {
 
     const handleOpenNew = () => {
         setImgError(false); // Reset error
+        const key = 'reward_draft_new';
+        setPersistenceKey(key);
         setFormData({
             id: '',
             name: '',
@@ -98,6 +104,8 @@ export const Rewards = () => {
 
     const handleOpenEdit = (reward) => {
         setImgError(false); // Reset error
+        const key = `reward_draft_${reward.id}`;
+        setPersistenceKey(key);
         setFormData({
             id: reward.id || '',
             name: reward.name || '',
@@ -142,14 +150,15 @@ export const Rewards = () => {
                 const result = await updateReward(selectedManejoId, formData.id, payload);
                 if (result) {
                     await loadRewards();
+                    await clearDraft();
                     setOpenForm(false);
                 } else {
                     alert('Erro ao atualizar recompensa');
                 }
             } else {
-                const result = await createReward(selectedManejoId, payload);
                 if (result) {
                     await loadRewards();
+                    await clearDraft();
                     setOpenForm(false);
                 } else {
                     alert('Erro ao criar recompensa');

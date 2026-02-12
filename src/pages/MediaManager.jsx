@@ -10,12 +10,16 @@ import {
 } from '@mui/icons-material';
 import { api } from '../services/api';
 import { useAdmin } from '../contexts/AdminContext';
+import { usePersistence } from '../hooks/usePersistence';
 
 export const MediaManager = () => {
     const [files, setFiles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
-    const [searchTerm, setSearchTerm] = useState("");
+
+    // Persistence for search
+    const [searchTerm, setSearchTerm] = usePersistence('media_manager_search', "");
+
     const [selectedFile, setSelectedFile] = useState(null); // For preview modal
     const [notification, setNotification] = useState({ open: false, message: "", severity: "success" });
 

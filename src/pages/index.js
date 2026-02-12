@@ -12,3 +12,4 @@ export * from './AuditLogs';
 export * from './GeminiSettings';
 export { default as PaymentConfig } from './PaymentConfig';
 export { MediaManager } from './MediaManager';
+export { ErrorLogs } from './ErrorLogs';
