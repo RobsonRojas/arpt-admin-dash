@@ -14,7 +14,7 @@ import { saveModelConfig } from '../services/gemini';
 
 const ALL_POSSIBLE_MODELS = [
     { id: "gemini-1.5-flash", name: "Gemini 1.5 Flash", description: "Rápido e eficiente para a maioria das tarefas." },
-    { id: "gemini-1.5-pro", name: "Gemini 1.5 Pro", description: "Mais inteligente, ideal para textos complexos." },
+    { id: "gemini-1.5-pro-latest", name: "Gemini 1.5 Pro", description: "Mais inteligente, ideal para textos complexos." },
     { id: "gemini-pro", name: "Gemini Pro (Legacy)", description: "Versão legada do modelo Pro." }
 ];
 
@@ -38,8 +38,15 @@ export const GeminiSettings = () => {
                 const savedModels = docSnap.data().models || [];
                 // Merge with ALL_POSSIBLE_MODELS to ensure we have all available options
                 const merged = ALL_POSSIBLE_MODELS.map(pModel => {
-                    const saved = savedModels.find(s => s.id === pModel.id);
-                    return saved ? { ...pModel, ...saved } : { ...pModel, enabled: false, priority: 99 };
+                    let saved = savedModels.find(s => s.id === pModel.id);
+
+                    // Migration: Check for legacy ID for Pro model
+                    if (!saved && pModel.id === 'gemini-1.5-pro-latest') {
+                        saved = savedModels.find(s => s.id === 'gemini-1.5-pro');
+                    }
+
+                    // Use saved settings (enabled/priority) but ensure we use the NEW ID and Name from pModel
+                    return saved ? { ...pModel, enabled: saved.enabled, priority: saved.priority } : { ...pModel, enabled: false, priority: 99 };
                 }).sort((a, b) => a.priority - b.priority);
 
                 setModels(merged);

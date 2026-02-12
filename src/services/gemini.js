@@ -7,7 +7,7 @@ const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 // Default configuration if Firestore is empty
 const DEFAULT_MODELS = [
     { id: "gemini-1.5-flash", name: "Gemini 1.5 Flash", enabled: true, priority: 1 },
-    { id: "gemini-1.5-pro", name: "Gemini 1.5 Pro", enabled: true, priority: 2 },
+    { id: "gemini-1.5-pro-latest", name: "Gemini 1.5 Pro", enabled: true, priority: 2 },
     { id: "gemini-pro", name: "Gemini Pro (Legacy)", enabled: true, priority: 3 }
 ];
 
