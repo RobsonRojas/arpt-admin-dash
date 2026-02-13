@@ -13,3 +13,5 @@ export * from './GeminiSettings';
 export { default as PaymentConfig } from './PaymentConfig';
 export { MediaManager } from './MediaManager';
 export { ErrorLogs } from './ErrorLogs';
+export { Refunds } from './Refunds';
+export { default as ForestIntelligence } from './ForestIntelligence';

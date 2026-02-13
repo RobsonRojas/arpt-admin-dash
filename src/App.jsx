@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { ThemeProvider, CssBaseline, CircularProgress, Box } from '@mui/material';
 import { theme } from './theme';
 import { Layout } from './components';
-import { Dashboard, Projects, Properties, Necromassa, Sponsors, Login, Users, Rewards, Certificates, Products, AuditLogs, GeminiSettings, PaymentConfig, MediaManager, ErrorLogs } from './pages';
+import { Dashboard, Projects, Properties, Necromassa, Sponsors, Login, Users, Rewards, Certificates, Products, AuditLogs, GeminiSettings, PaymentConfig, MediaManager, ErrorLogs, Refunds, ForestIntelligence } from './pages';
 import { CertificateView } from './pages/CertificateView';
 import { useAdmin } from './contexts/AdminContext';
 import { useAuth } from './contexts/AuthContext.jsx';
@@ -40,7 +40,6 @@ const AxiosInterceptorSetup = () => {
 export default function App() {
   const { currentView } = useAdmin();
 
-  // Map currentView string to component
   const getViewComponent = () => {
     switch (currentView) {
       case 'dashboard': return <Dashboard />;
@@ -48,6 +47,7 @@ export default function App() {
       case 'properties': return <Properties />;
       case 'necromassa': return <Necromassa />;
       case 'sponsors': return <Sponsors />;
+      case 'refunds': return <Refunds />;
       case 'users': return <Users />;
       case 'rewards': return <Rewards />;
       case 'products': return <Products />;
@@ -56,6 +56,7 @@ export default function App() {
       case 'gemini-settings': return <GeminiSettings />;
       case 'payment-config': return <PaymentConfig />;
       case 'media-manager': return <MediaManager />;
+      case 'forest-intelligence': return <ForestIntelligence />;
       case 'error-logs': return <ErrorLogs />;
       default: return <Dashboard />;
     }

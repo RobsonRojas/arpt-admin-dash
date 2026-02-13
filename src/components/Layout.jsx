@@ -10,7 +10,9 @@ import {
   SettingsSuggest,
   Payment,
   PermMedia,
-  BugReport
+  BugReport,
+  Replay,
+  Psychology
 } from '@mui/icons-material';
 import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -49,10 +51,12 @@ export const Layout = ({ children }) => {
     { id: 'certificates', label: 'Certificados', icon: <CardMembership /> },
     { id: 'properties', label: 'Propriedades', icon: <HomeWork /> },
     { id: 'sponsors', label: 'Patrocinadores', icon: <People /> },
+    { id: 'refunds', label: 'Reembolsos', icon: <Replay /> },
     { id: 'users', label: 'Gestão de Usuários', icon: <ManageAccounts /> },
     { id: 'audit', label: 'Log de Modificações', icon: <History /> },
     { id: 'payment-config', label: 'Configurações de Pagamento', icon: <Payment /> }, // Using CardMembership as placeholder or we can import new icon
     { id: 'media-manager', label: 'Gerenciador de Arquivos', icon: <PermMedia /> },
+    { id: 'forest-intelligence', label: 'Inteligência Florestal', icon: <Psychology /> },
     { id: 'gemini-settings', label: 'Configuração IA', icon: <SettingsSuggest /> },
     { id: 'error-logs', label: 'Log de Erros', icon: <BugReport /> },
   ];
@@ -62,6 +66,7 @@ export const Layout = ({ children }) => {
       case 'dashboard': return 'Visão Geral';
       case 'necromassa': return 'Gestão de Necromassa';
       case 'sponsors': return 'Patrocinadores';
+      case 'refunds': return 'Gestão de Devoluções';
       case 'properties': return 'Gestão de Propriedades';
       case 'projects': return 'Gestão de Projetos';
       case 'rewards': return 'Gerenciamento de Recompensas';
@@ -72,6 +77,7 @@ export const Layout = ({ children }) => {
       case 'audit': return 'Log de Modificações';
       case 'media-manager': return 'Gerenciador de Arquivos';
       case 'gemini-settings': return 'Configuração IA';
+      case 'forest-intelligence': return 'Inteligência Florestal';
       case 'error-logs': return 'Log de Erros';
       default: return 'ARPT Admin';
     }
