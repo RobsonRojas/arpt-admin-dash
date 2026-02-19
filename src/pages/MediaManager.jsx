@@ -55,8 +55,8 @@ export const MediaManager = () => {
         formData.append('file', file);
 
         try {
-            // Endpoint defined in medias.routes.ts: POST /midias/upload
-            const response = await api.post('/midias/upload', formData, {
+            // Endpoint defined in medias.routes.ts: POST /medias/upload
+            const response = await api.post('/medias/upload', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
