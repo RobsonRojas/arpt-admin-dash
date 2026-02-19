@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Button, Grid, TextField, MenuItem, Paper, Typography,
-  Stepper, Step, StepLabel, Alert, Avatar, Divider
+  Stepper, Step, StepLabel, Alert, Avatar, Divider, Card, CardMedia, CardContent, CardActions
 } from '@mui/material';
 import {
-  Map, CloudUpload, ArrowForward, CheckCircle, Save, AutoFixHigh, ContentCopy
+  Map, ArrowForward, CheckCircle, Save, ContentCopy, Delete, Add, Image as ImageIcon
 } from '@mui/icons-material';
 import MDEditor from '@uiw/react-md-editor';
 import '@uiw/react-md-editor/markdown-editor.css';
@@ -134,14 +134,27 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
 
 
   const handleAddPhoto = () => {
-    const randomId = Math.floor(Math.random() * 100);
     setFormData(prev => ({
       ...prev,
       fotos: [...prev.fotos, {
-        src: `https://picsum.photos/600?random=${randomId}`,
-        alt: `Foto do projeto ${prev.descricao || 'Novo'} - ${randomId}`,
-        type: 'image/jpeg'
+        src: '',
+        alt: '',
+        type: 'image'
       }]
+    }));
+  };
+
+  const handleUpdatePhoto = (index, field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      fotos: prev.fotos.map((f, i) => i === index ? { ...f, [field]: value } : f)
+    }));
+  };
+
+  const handleRemovePhoto = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      fotos: prev.fotos.filter((_, i) => i !== index)
     }));
   };
 
@@ -438,37 +451,95 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
 
       case 3:
         return (
-          <Box sx={{ mt: 2, textAlign: 'center' }}>
-            <Button
-              variant="outlined"
-              component="label"
-              startIcon={<CloudUpload />}
-              onClick={handleAddPhoto}
-            >
-              Simular Upload
-            </Button>
-            <Box
-              sx={{
-                display: 'flex',
-                gap: 1,
-                mt: 2,
-                justifyContent: 'center',
-                flexWrap: 'wrap'
-              }}
-            >
-              {formData.fotos.map((f, i) => (
-                <Avatar
-                  key={i}
-                  src={f.src || f.url || f}
-                  variant="rounded"
-                  sx={{ width: 80, height: 80 }}
-                />
-              ))}
-              {formData.fotos.length === 0 && (
-                <Typography variant="caption" display="block">
-                  Sem fotos
+          <Box sx={{ mt: 2 }}>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+              <Box>
+                <Typography variant="subtitle2">Fotos do Manejo</Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Adicione URLs de imagens já carregadas no Gerenciador de Arquivos
                 </Typography>
-              )}
+              </Box>
+              <Button
+                variant="contained"
+                size="small"
+                startIcon={<Add />}
+                onClick={handleAddPhoto}
+              >
+                Adicionar Foto
+              </Button>
+            </Box>
+
+            {formData.fotos.length === 0 && (
+              <Paper variant="outlined" sx={{ p: 4, textAlign: 'center', bgcolor: '#fafafa' }}>
+                <ImageIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
+                <Typography color="text.secondary">Nenhuma foto adicionada</Typography>
+              </Paper>
+            )}
+
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {formData.fotos.map((foto, index) => (
+                <Card key={index} variant="outlined" sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'stretch' }}>
+                  {/* Preview */}
+                  <Box sx={{ width: { xs: '100%', sm: 120 }, minHeight: 120, bgcolor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    {(foto.src || foto.url) ? (
+                      <CardMedia
+                        component="img"
+                        image={foto.src || foto.url}
+                        alt={foto.alt || 'Foto'}
+                        sx={{ width: '100%', height: '100%', objectFit: 'cover', minHeight: 120 }}
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                      />
+                    ) : (
+                      <ImageIcon sx={{ fontSize: 40, color: 'text.disabled' }} />
+                    )}
+                  </Box>
+
+                  {/* Fields */}
+                  <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1.5, py: 1.5 }}>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      label="URL da Imagem (src)"
+                      placeholder="https://arpt.site/api/midias/files/exemplo.jpeg"
+                      value={foto.src || foto.url || ''}
+                      onChange={(e) => handleUpdatePhoto(index, 'src', e.target.value)}
+                    />
+                    <Box display="flex" gap={1}>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        label="Texto alternativo (alt)"
+                        placeholder="Descrição da foto"
+                        value={foto.alt || ''}
+                        onChange={(e) => handleUpdatePhoto(index, 'alt', e.target.value)}
+                      />
+                      <TextField
+                        select
+                        size="small"
+                        label="Tipo"
+                        value={foto.type || 'image'}
+                        onChange={(e) => handleUpdatePhoto(index, 'type', e.target.value)}
+                        sx={{ minWidth: 120 }}
+                      >
+                        <MenuItem value="image">Imagem</MenuItem>
+                        <MenuItem value="video">Vídeo</MenuItem>
+                      </TextField>
+                    </Box>
+                  </CardContent>
+
+                  {/* Actions */}
+                  <CardActions sx={{ px: 1, justifyContent: 'center' }}>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      onClick={() => handleRemovePhoto(index)}
+                      title="Remover foto"
+                    >
+                      <Delete />
+                    </IconButton>
+                  </CardActions>
+                </Card>
+              ))}
             </Box>
           </Box>
         );
