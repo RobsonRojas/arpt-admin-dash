@@ -270,7 +270,7 @@ export const AdminProvider = ({ children }) => {
                 if (filters.heightMax) params.heightMax = filters.heightMax;
             }
 
-            const response = await api.get(`/inventarios/${propertyId}/arvores`, {
+            const response = await api.get(`/propriedades/${propertyId}/arvores`, {
                 params
             });
             if (response.status === 200) {
@@ -402,6 +402,44 @@ export const AdminProvider = ({ children }) => {
         } catch (error) {
             console.error("Error fetching tree history:", error);
             return [];
+        }
+    }
+
+    // ==================== PROPERTY PHOTO MANAGEMENT ====================
+
+    const uploadPropertyPhoto = async (propertyId, file) => {
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const response = await api.post(`/medias/upload`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            if (response.status === 200 || response.status === 201) {
+                return response.data;
+            }
+            console.warn(`Resposta inesperada ao fazer upload de foto da propriedade: status ${response.status}`);
+            return null;
+        } catch (error) {
+            console.error("Error uploading property photo:", error);
+            return null;
+        }
+    }
+
+    const createPropertyPhoto = async (payload) => {
+        try {
+            const response = await api.post('/lugarfotos', payload);
+            if (response.status === 200 || response.status === 201 || response.status === 208) {
+                return response.data;
+            }
+            console.warn(`Resposta inesperada ao registrar foto da propriedade: status ${response.status}`);
+            return null;
+        } catch (error) {
+            console.error("Error creating property photo record:", error);
+            return null;
         }
     }
 
@@ -942,6 +980,8 @@ export const AdminProvider = ({ children }) => {
         deleteTree,
         uploadTreePhoto,
         createTreePhoto,
+        uploadPropertyPhoto,
+        createPropertyPhoto,
         getTreePhotos,
         getTreeHistory,
 

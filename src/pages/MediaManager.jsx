@@ -33,10 +33,15 @@ export const MediaManager = () => {
     const fetchFiles = async () => {
         setLoading(true);
         try {
-            // Endpoint defined in medias.routes.ts: GET /midias/files
-            const response = await api.get('/midias/files');
+            // List files from /uploads directory
+            const response = await api.get('/medias/files');
             if (response.data) {
-                setFiles(response.data);
+                // Build full URLs using urlMidiasFiles base
+                const filesWithUrls = response.data.map(f => ({
+                    ...f,
+                    url: `${urlMidiasFiles}${f.filename}`
+                }));
+                setFiles(filesWithUrls);
             }
         } catch (error) {
             console.error("Erro ao carregar arquivos:", error);

@@ -3,7 +3,7 @@ import {
   Box, Typography, Button, Table, TableContainer, TableHead,
   TableRow, TableCell, TableBody, Paper, IconButton, Avatar,
   Dialog, DialogTitle, DialogContent, DialogActions, Grid,
-  TextField, MenuItem, Drawer, Divider,
+  TextField, MenuItem, Drawer, Divider, CircularProgress,
 } from '@mui/material';
 import { Add, Visibility, Edit, CloudUpload, HomeWork, Park, Image as ImageIcon } from '@mui/icons-material';
 import { AIAssistant } from '../components/AIAssistant';
@@ -16,6 +16,8 @@ export const Properties = () => {
     properties,
     handleAddProperty,
     handleUpdateProperty,
+    uploadPropertyPhoto,
+    createPropertyPhoto,
     urlMidiasFiles
   } = useAdmin();
 
@@ -23,19 +25,25 @@ export const Properties = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedProp, setSelectedProp] = useState(null);
   const [openInventory, setOpenInventory] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const [formData, setFormData] = useState({
     id: '',
-    proprietario: '',
+    name: '',
+    address: '',
     car: '',
-    municipio: '',
-    area: '',
+    id_municipality: '',
+    area_he: '',
+    info: '',
     status: 'Regular',
     foto: '',
+    fotoFile: null,
     lat: '',
-    lng: ''
+    lng: '',
+    user_id: '',
   });
 
+  const fileInputRef = useRef(null);
   const skipRef = useRef(null);
 
   const handleSkip = (e) => {
@@ -53,14 +61,18 @@ export const Properties = () => {
   const handleOpenNew = () => {
     setFormData({
       id: '',
-      proprietario: '',
+      name: '',
+      address: '',
       car: '',
-      municipio: '',
-      area: '',
+      id_municipality: '',
+      area_he: '',
+      info: '',
       status: 'Regular',
       foto: '',
+      fotoFile: null,
       lat: '',
-      lng: ''
+      lng: '',
+      user_id: '',
     });
     setIsEditing(false);
     setOpenForm(true);
@@ -69,36 +81,80 @@ export const Properties = () => {
   const handleOpenEdit = (prop) => {
     setFormData({
       id: prop.id,
-      proprietario: prop.proprietario,
-      car: prop.car,
-      municipio: prop.municipio,
-      area: prop.area,
-      status: prop.status,
-      foto: prop.foto,
-      lat: prop.latitude,
-      lng: prop.longitude
+      name: prop.name || '',
+      address: prop.address || '',
+      car: prop.car || '',
+      id_municipality: prop.id_municipality || '',
+      area_he: prop.area_he || '',
+      info: prop.info || '',
+      status: prop.status || 'Regular',
+      foto: getPropertyImage(prop) || '',
+      fotoFile: null,
+      lat: prop.latitude || '',
+      lng: prop.longitude || '',
+      user_id: prop.user_id || '',
     });
     setIsEditing(true);
     setOpenForm(true);
   };
 
-  const handleUploadPhoto = () => {
-    setFormData({
-      ...formData,
-      foto: `https://picsum.photos/200?random=${Math.floor(Math.random() * 1000)}`
-    });
+  const handleFileSelect = (event) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setFormData({
+        ...formData,
+        foto: previewUrl,
+        fotoFile: file,
+      });
+    }
   };
 
-  const handleSave = () => {
-    if (!formData.proprietario || !formData.car) {
-      alert("Preencha os campos obrigatórios");
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleSave = async () => {
+    if (!formData.name) {
+      alert("Preencha o nome da propriedade");
       return;
     }
 
+    let photoInternalPath = null;
+
+    // If there's a new file to upload, upload it first
+    if (formData.fotoFile && formData.id) {
+      setUploading(true);
+      try {
+        const uploadResult = await uploadPropertyPhoto(formData.id, formData.fotoFile);
+        if (uploadResult) {
+          photoInternalPath = uploadResult.internalPath || uploadResult.filename;
+
+          // Register the photo in the lugarfotos table
+          await createPropertyPhoto({
+            id_propriedade: Number(formData.id),
+            url: `${urlMidiasFiles}${photoInternalPath}`,
+            alt: `Foto da propriedade ${formData.name}`,
+          });
+        }
+      } catch (error) {
+        console.error("Erro ao fazer upload da foto:", error);
+      } finally {
+        setUploading(false);
+      }
+    }
+
+    const dataToSave = {
+      ...formData,
+      ...(photoInternalPath && { image_internal_path: photoInternalPath }),
+    };
+    delete dataToSave.fotoFile;
+    delete dataToSave.foto;
+
     if (isEditing) {
-      handleUpdateProperty(formData);
+      handleUpdateProperty(dataToSave);
     } else {
-      handleAddProperty(formData);
+      handleAddProperty(dataToSave);
     }
 
     setOpenForm(false);
@@ -133,9 +189,9 @@ export const Properties = () => {
               <TableRow>
                 <TableCell>ID</TableCell>
                 <TableCell>Propriedade / CAR</TableCell>
+                <TableCell>Proprietário</TableCell>
                 <TableCell>Município</TableCell>
                 <TableCell>Área (ha)</TableCell>
-                {/* <TableCell>Status</TableCell> */}
                 <TableCell align="right">Ações</TableCell>
               </TableRow>
             </TableHead>
@@ -165,11 +221,20 @@ export const Properties = () => {
                       </Box>
                     </Box>
                   </TableCell>
+                  <TableCell>
+                    <Box>
+                      <Typography variant="body2">
+                        {row.owner_name || row.user_id || '—'}
+                      </Typography>
+                      {row.user_id && row.owner_name && (
+                        <Typography variant="caption" color="textSecondary">
+                          ID: {row.user_id}
+                        </Typography>
+                      )}
+                    </Box>
+                  </TableCell>
                   <TableCell>{row.id_municipality}</TableCell>
                   <TableCell>{row.area_he}</TableCell>
-                  {/* <TableCell>
-                  <StatusChip status={row.status} />
-                </TableCell> */}
                   <TableCell align="right">
                     <IconButton
                       size="small"
@@ -211,6 +276,11 @@ export const Properties = () => {
                 <Box flex={1}>
                   <Typography fontWeight="bold" variant="subtitle1">{row.name}</Typography>
                   <Typography variant="body2" color="textSecondary">{row.car}</Typography>
+                  {row.owner_name && (
+                    <Typography variant="caption" color="textSecondary">
+                      Proprietário: {row.owner_name}
+                    </Typography>
+                  )}
                 </Box>
               </Box>
 
@@ -245,9 +315,17 @@ export const Properties = () => {
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Nome do Proprietário"
-                value={formData.proprietario}
-                onChange={e => setFormData({ ...formData, proprietario: e.target.value })}
+                label="Nome da Propriedade"
+                value={formData.name}
+                onChange={e => setFormData({ ...formData, name: e.target.value })}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Endereço"
+                value={formData.address}
+                onChange={e => setFormData({ ...formData, address: e.target.value })}
               />
             </Grid>
             <Grid item xs={6}>
@@ -255,7 +333,7 @@ export const Properties = () => {
                 <Typography variant="caption">CAR (Cadastro Ambiental Rural)</Typography>
                 <AIAssistant
                   initialText={formData.car}
-                  context={`Propriedade: ${formData.proprietario}`}
+                  context={`Propriedade: ${formData.name}`}
                   onApply={(text) => setFormData({ ...formData, car: text })}
                   label="Corrigir"
                 />
@@ -270,9 +348,9 @@ export const Properties = () => {
             <Grid item xs={6}>
               <TextField
                 fullWidth
-                label="Município"
-                value={formData.municipio}
-                onChange={e => setFormData({ ...formData, municipio: e.target.value })}
+                label="Município (ID)"
+                value={formData.id_municipality}
+                onChange={e => setFormData({ ...formData, id_municipality: e.target.value })}
               />
             </Grid>
             <Grid item xs={6}>
@@ -280,8 +358,8 @@ export const Properties = () => {
                 fullWidth
                 type="number"
                 label="Área Total (ha)"
-                value={formData.area}
-                onChange={e => setFormData({ ...formData, area: e.target.value })}
+                value={formData.area_he}
+                onChange={e => setFormData({ ...formData, area_he: e.target.value })}
               />
             </Grid>
             <Grid item xs={6}>
@@ -298,6 +376,23 @@ export const Properties = () => {
               </TextField>
             </Grid>
             <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Informações Adicionais"
+                value={formData.info}
+                onChange={e => setFormData({ ...formData, info: e.target.value })}
+                multiline
+                rows={2}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                onChange={handleFileSelect}
+              />
               <Box
                 display="flex"
                 alignItems="center"
@@ -318,18 +413,24 @@ export const Properties = () => {
                 )}
                 <Button
                   variant="outlined"
-                  startIcon={<CloudUpload />}
-                  onClick={handleUploadPhoto}
+                  startIcon={uploading ? <CircularProgress size={18} /> : <CloudUpload />}
+                  onClick={handleUploadClick}
+                  disabled={uploading}
                 >
-                  Upload
+                  {uploading ? 'Enviando...' : 'Upload'}
                 </Button>
+                {formData.fotoFile && (
+                  <Typography variant="caption" color="success.main">
+                    {formData.fotoFile.name}
+                  </Typography>
+                )}
               </Box>
             </Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenForm(false)}>Cancelar</Button>
-          <Button variant="contained" onClick={handleSave}>
+          <Button variant="contained" onClick={handleSave} disabled={uploading}>
             {isEditing ? 'Atualizar' : 'Cadastrar'}
           </Button>
         </DialogActions>
@@ -353,7 +454,7 @@ export const Properties = () => {
               <Box
                 component="img"
                 src={getPropertyImage(selectedProp)}
-                alt={selectedProp.proprietario}
+                alt={selectedProp.name}
                 onError={(e) => { e.target.style.display = 'none'; }}
                 sx={{
                   width: '100%',
@@ -365,8 +466,13 @@ export const Properties = () => {
             )}
 
             <Typography variant="subtitle1" fontWeight="bold">
-              {selectedProp.proprietario}
+              {selectedProp.name}
             </Typography>
+            {selectedProp.owner_name && (
+              <Typography variant="body2" color="textSecondary">
+                Proprietário: {selectedProp.owner_name}
+              </Typography>
+            )}
             <Paper variant="outlined" sx={{ p: 2 }}>
               <Grid container spacing={1}>
                 <Grid item xs={6}>
