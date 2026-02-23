@@ -147,8 +147,11 @@ export const Products = () => {
                 fotos: formData.foto_url ? [{ url: formData.foto_url, alt: formData.nome, type: 'principal' }] : []
             };
 
+            const token = await user.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+
             if (editingProduct) {
-                await api.put(`/produtos/${editingProduct.id}`, payload);
+                await api.put(`/produtos/${editingProduct.id}`, payload, config);
                 await recordAudit({
                     action: 'UPDATE',
                     entity: 'PRODUCT',
@@ -158,7 +161,7 @@ export const Products = () => {
                     user
                 });
             } else {
-                const response = await api.post('/produtos', payload);
+                const response = await api.post('/produtos', payload, config);
                 await recordAudit({
                     action: 'CREATE',
                     entity: 'PRODUCT',
@@ -182,7 +185,8 @@ export const Products = () => {
         if (window.confirm('Tem certeza que deseja deletar este produto?')) {
             try {
                 const before = products.find(p => p.id === id);
-                await api.delete(`/produtos/${id}`);
+                const token = await user.getIdToken();
+                await api.delete(`/produtos/${id}`, { headers: { Authorization: `Bearer ${token}` } });
                 await recordAudit({
                     action: 'DELETE',
                     entity: 'PRODUCT',
