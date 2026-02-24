@@ -477,7 +477,9 @@ export const AdminProvider = ({ children }) => {
 
     const createReward = async (manejoId, payload) => {
         try {
-            const response = await api.post(`/manejos/${manejoId}/produtos`, payload);
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.post(`/manejos/${manejoId}/produtos`, payload, config);
             if (response.status === 201 || response.status === 200) {
                 await recordAudit({
                     action: 'CREATE',
@@ -499,9 +501,11 @@ export const AdminProvider = ({ children }) => {
 
     const updateReward = async (manejoId, productId, payload) => {
         try {
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
             // We don't easily have 'before' state here without fetching it first
             // or passing it. For now, let's use the payload as 'after'
-            const response = await api.put(`/manejos/${manejoId}/produtos/${productId}`, payload);
+            const response = await api.put(`/manejos/${manejoId}/produtos/${productId}`, payload, config);
             if (response.status === 200) {
                 await recordAudit({
                     action: 'UPDATE',
@@ -523,7 +527,9 @@ export const AdminProvider = ({ children }) => {
 
     const deleteReward = async (manejoId, productId) => {
         try {
-            const response = await api.delete(`/manejos/${manejoId}/produtos/${productId}`);
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.delete(`/manejos/${manejoId}/produtos/${productId}`, config);
             if (response.status === 200 || response.status === 204) {
                 await recordAudit({
                     action: 'DELETE',
