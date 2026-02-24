@@ -51,7 +51,7 @@ Produtos Vendidos: ${totalProdutos}
 Doações Recebidas: ${totalDoacoes}
 
 VENDAS REALIZADAS
-${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number(s.rewardPrice) === 0 ? "Doação" : s.product} - ${s.quantity}un (Prod: ${s.quantity * (s.qtdProducts || 0)}) - R$ ${parseFloat(s.value).toFixed(2)}`).join('\n')}
+${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number(s.rewardPrice) === 0 ? "Doação" : s.product} - ${s.quantity} un x ${s.qtdProducts || 0} itens/un = ${s.quantity * (s.qtdProducts || 0)} Itens - R$ ${parseFloat(s.value).toFixed(2)}`).join('\n')}
         `.trim();
         navigator.clipboard.writeText(text);
         alert("Relatório copiado para a área de transferência!");
@@ -61,6 +61,17 @@ ${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number
         const printWindow = window.open('', '', 'height=600,width=800');
         if (printWindow) {
             printWindow.document.write('<html><head><title>Relatório de Receitas</title>');
+            const styles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]')).map(s => s.outerHTML).join('');
+            printWindow.document.write(styles);
+            printWindow.document.write(`
+                <style>
+                    @media print {
+                        body { -webkit-print-color-adjust: exact; color-adjust: exact; print-color-adjust: exact; }
+                        .MuiTableCell-root { border: 1px solid #e0e0e0 !important; }
+                        * { -webkit-print-color-adjust: exact !important; color-adjust: exact !important; print-color-adjust: exact !important; }
+                    }
+                </style>
+            `);
             printWindow.document.write('</head><body >');
             const content = document.getElementById('revenue-report-content');
             if (content) {
@@ -72,8 +83,9 @@ ${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number
             printWindow.document.close();
             // Wait for content to load mostly for images if any, but text is instant
             setTimeout(() => {
+                printWindow.focus();
                 printWindow.print();
-            }, 500);
+            }, 1000);
         }
     };
 
@@ -85,8 +97,16 @@ ${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number
                     <Box p={4} textAlign="center"><CircularProgress /></Box>
                 ) : reportData ? (
                     <Box id="revenue-report-content">
-                        <Typography variant="h5" gutterBottom>{reportData.project.name}</Typography>
-                        <Typography color="textSecondary" gutterBottom>{reportData.project.location}</Typography>
+                        <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+                            <Box>
+                                <Typography variant="h5" gutterBottom>{reportData.project.name}</Typography>
+                                <Typography color="textSecondary" gutterBottom>{reportData.project.location}</Typography>
+                            </Box>
+                            <Typography variant="body2" color="textSecondary" textAlign="right">
+                                Gerado em:<br />
+                                <strong>{new Date().toLocaleString('pt-BR')}</strong>
+                            </Typography>
+                        </Box>
 
                         <Box my={3} p={2} bgcolor="#f5f5f5" borderRadius={1}>
                             <Typography variant="subtitle2">RESUMO FINANCEIRO</Typography>
@@ -111,9 +131,10 @@ ${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number
                                 <TableHead>
                                     <TableRow>
                                         <TableCell>Data</TableCell>
-                                        <TableCell>Produto</TableCell>
-                                        <TableCell>Qtd</TableCell>
-                                        <TableCell>Qtd Produtos</TableCell>
+                                        <TableCell>Produto / Recompensa</TableCell>
+                                        <TableCell align="center">Qtd</TableCell>
+                                        <TableCell align="center">Itens/Und</TableCell>
+                                        <TableCell align="center">Total Itens</TableCell>
                                         <TableCell align="right">Valor Est.</TableCell>
                                     </TableRow>
                                 </TableHead>
@@ -126,14 +147,15 @@ ${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number
                                                     {Number(sale.rewardPrice) === 0 ? "Doação" : sale.product}
                                                 </Typography>
                                             </TableCell>
-                                            <TableCell>{sale.quantity}</TableCell>
-                                            <TableCell>{sale.quantity * (sale.qtdProducts || 0)}</TableCell>
+                                            <TableCell align="center">{sale.quantity}</TableCell>
+                                            <TableCell align="center">{sale.qtdProducts || 0}</TableCell>
+                                            <TableCell align="center">{sale.quantity * (sale.qtdProducts || 0)}</TableCell>
                                             <TableCell align="right">R$ {parseFloat(sale.value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
                                         </TableRow>
                                     ))}
                                     {reportData.sales.length === 0 && (
                                         <TableRow>
-                                            <TableCell colSpan={5} align="center">Nenhuma venda registrada.</TableCell>
+                                            <TableCell colSpan={6} align="center">Nenhuma venda registrada.</TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>
