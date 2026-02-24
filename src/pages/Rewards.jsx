@@ -156,6 +156,7 @@ export const Rewards = () => {
                     alert('Erro ao atualizar recompensa');
                 }
             } else {
+                const result = await createReward(selectedManejoId, payload);
                 if (result) {
                     await loadRewards();
                     await clearDraft();
