@@ -50,6 +50,7 @@ export const Rewards = () => {
         retail_price: '',
         reward_price: '',
         reward_qtd: '',
+        prazo_entrega_meses: '',
         foto_url: ''
     });
 
@@ -96,6 +97,7 @@ export const Rewards = () => {
             retail_price: '',
             reward_price: '',
             reward_qtd: '',
+            prazo_entrega_meses: '',
             foto_url: ''
         });
         setIsEditing(false);
@@ -113,6 +115,7 @@ export const Rewards = () => {
             retail_price: reward.retail_price || '',
             reward_price: reward.reward_price || '',
             reward_qtd: reward.reward_qtd || '',
+            prazo_entrega_meses: reward.prazo_entrega_meses || '',
             foto_url: reward.foto_url || ''
         });
         setIsEditing(true);
@@ -142,6 +145,7 @@ export const Rewards = () => {
             retail_price: Number(formData.retail_price) || 0,
             reward_price: Number(formData.reward_price) || 0,
             reward_qtd: Number(formData.reward_qtd) || 0,
+            prazo_entrega_meses: Number(formData.prazo_entrega_meses) || 0,
             foto_url: formData.foto_url || ''
         };
 
@@ -487,6 +491,17 @@ export const Rewards = () => {
                                     value={formData.reward_qtd}
                                     onChange={e => setFormData({ ...formData, reward_qtd: e.target.value })}
                                     inputProps={{ min: '0' }}
+                                />
+                            </Grid>
+                            <Grid item xs={6}>
+                                <TextField
+                                    fullWidth
+                                    type="number"
+                                    label="Prazo Entrega (Meses)"
+                                    value={formData.prazo_entrega_meses}
+                                    onChange={e => setFormData({ ...formData, prazo_entrega_meses: e.target.value })}
+                                    inputProps={{ min: '0' }}
+                                    helperText="Após a compra"
                                 />
                             </Grid>
                             <Grid item xs={12}>
