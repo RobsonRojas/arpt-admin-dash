@@ -4,7 +4,7 @@ import {
     DialogActions, CircularProgress, LinearProgress, TableContainer,
     Table, TableHead, TableRow, TableCell, TableBody, Paper, Divider
 } from '@mui/material';
-import { ContentCopy, PictureAsPdf } from '@mui/icons-material';
+import { ContentCopy, PictureAsPdf, Description } from '@mui/icons-material';
 import { api } from '../../services/api';
 
 /**
@@ -89,6 +89,44 @@ ${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number
         }
     };
 
+    const handleExportODT = () => {
+        if (!reportData) return;
+        const totalProdutos = reportData.sales.reduce((acc, s) => acc + (s.quantity * (s.qtdProducts || 0)), 0);
+        const totalDoacoes = reportData.sales.filter(s => Number(s.rewardPrice) === 0).reduce((acc, s) => acc + s.quantity, 0);
+
+        const textLines = [
+            "RELATÓRIO DE RECEITAS",
+            `Projeto: ${reportData.project.name}`,
+            `Município: ${reportData.project.location}`,
+            "",
+            "METAS",
+            `Alvo da Captação: R$ ${parseFloat(reportData.project.target_fundraising || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+            `Receita Realizada: R$ ${parseFloat(reportData.project.realized_revenue || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+            `Progresso: ${((reportData.project.realized_revenue / reportData.project.target_fundraising) * 100).toFixed(1)}%`,
+            "",
+            "RESUMO DE ITENS",
+            `Produtos Vendidos: ${totalProdutos}`,
+            `Doações Recebidas: ${totalDoacoes}`,
+            "",
+            "VENDAS REALIZADAS",
+            ...reportData.sales.map(s => `${new Date(s.date).toLocaleDateString('pt-BR')} - ${Number(s.rewardPrice) === 0 ? "Doação" : s.product} - ${s.quantity} un x ${s.qtdProducts || 0} itens/un = ${s.quantity * (s.qtdProducts || 0)} Itens - R$ ${parseFloat(s.value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`)
+        ];
+
+        const xmlLines = textLines.map(line => `<text:p>${line.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</text:p>`).join('\\n   ');
+
+        const fodt = `<?xml version="1.0" encoding="UTF-8"?>\\n<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.text">\\n <office:body>\\n  <office:text>\\n   ${xmlLines}\\n  </office:text>\\n </office:body>\\n</office:document>`;
+
+        const blob = new Blob([fodt], { type: 'application/vnd.oasis.opendocument.text' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Relatorio_${reportData.project.name.replace(/\\s+/g, '_')}.odt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
     return (
         <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
             <DialogTitle>Relatório de Receitas</DialogTitle>
@@ -170,7 +208,8 @@ ${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose}>Fechar</Button>
-                <Button variant="outlined" startIcon={<ContentCopy />} onClick={handleCopy} disabled={!reportData}>Copiar Texto</Button>
+                <Button variant="outlined" startIcon={<ContentCopy />} onClick={handleCopy} disabled={!reportData}>Copiar</Button>
+                <Button variant="outlined" startIcon={<Description />} onClick={handleExportODT} disabled={!reportData}>Exportar ODT</Button>
                 <Button variant="contained" startIcon={<PictureAsPdf />} onClick={handlePrint} disabled={!reportData}>Imprimir / PDF</Button>
             </DialogActions>
         </Dialog>
