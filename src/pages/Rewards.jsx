@@ -45,6 +45,7 @@ export const Rewards = () => {
     const [persistenceKey, setPersistenceKey] = useState('reward_draft_new');
     const [formData, setFormData, clearDraft] = usePersistence(persistenceKey, {
         id: '',
+        id_manejo: '',
         name: '',
         info: '',
         retail_price: '',
@@ -92,6 +93,7 @@ export const Rewards = () => {
         setPersistenceKey(key);
         setFormData({
             id: '',
+            id_manejo: selectedManejoId,
             name: '',
             info: '',
             retail_price: '',
@@ -110,6 +112,7 @@ export const Rewards = () => {
         setPersistenceKey(key);
         setFormData({
             id: reward.id || '',
+            id_manejo: selectedManejoId,
             name: reward.name || '',
             info: reward.info || '',
             retail_price: reward.retail_price || '',
@@ -151,8 +154,12 @@ export const Rewards = () => {
 
         try {
             if (isEditing) {
-                const result = await updateReward(selectedManejoId, formData.id, payload);
+                const editPayload = { ...payload, id_manejo: formData.id_manejo };
+                const result = await updateReward(selectedManejoId, formData.id, editPayload);
                 if (result) {
+                    if (formData.id_manejo !== selectedManejoId) {
+                        alert('Recompensa movida com sucesso! A lista atual será atualizada.');
+                    }
                     await loadRewards();
                     await clearDraft();
                     setOpenForm(false);
@@ -435,6 +442,24 @@ export const Rewards = () => {
                     </DialogTitle>
                     <DialogContent dividers>
                         <Grid container spacing={2} pt={1}>
+                            {isEditing && (
+                                <Grid item xs={12}>
+                                    <TextField
+                                        select
+                                        fullWidth
+                                        label="Alterar Projeto (Manejo)"
+                                        value={formData.id_manejo || selectedManejoId}
+                                        onChange={e => setFormData({ ...formData, id_manejo: e.target.value })}
+                                        helperText="Selecione um novo projeto caso deseje mover esta recompensa"
+                                    >
+                                        {projects.map((project) => (
+                                            <MenuItem key={project.id} value={project.id}>
+                                                {project.descricao} - {project.municipio}
+                                            </MenuItem>
+                                        ))}
+                                    </TextField>
+                                </Grid>
+                            )}
                             <Grid item xs={12}>
                                 <TextField
                                     fullWidth
