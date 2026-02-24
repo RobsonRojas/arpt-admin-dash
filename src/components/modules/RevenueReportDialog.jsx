@@ -33,6 +33,9 @@ export const RevenueReportDialog = ({ open, onClose, project }) => {
 
     const handleCopy = () => {
         if (!reportData) return;
+        const totalProdutos = reportData.sales.reduce((acc, s) => acc + (s.quantity * (s.qtdProducts || 0)), 0);
+        const totalDoacoes = reportData.sales.filter(s => Number(s.rewardPrice) === 0).reduce((acc, s) => acc + s.quantity, 0);
+
         const text = `
 RELATÓRIO DE RECEITAS
 Projeto: ${reportData.project.name}
@@ -43,8 +46,12 @@ Alvo da Captação: R$ ${parseFloat(reportData.project.target_fundraising || 0).
 Receita Realizada: R$ ${parseFloat(reportData.project.realized_revenue || 0).toFixed(2)}
 Progresso: ${((reportData.project.realized_revenue / reportData.project.target_fundraising) * 100).toFixed(1)}%
 
+RESUMO DE ITENS
+Produtos Vendidos: ${totalProdutos}
+Doações Recebidas: ${totalDoacoes}
+
 VENDAS REALIZADAS
-${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number(s.rewardPrice) === 0 ? "Doação" : s.product} - ${s.quantity}un - R$ ${parseFloat(s.value).toFixed(2)}`).join('\n')}
+${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number(s.rewardPrice) === 0 ? "Doação" : s.product} - ${s.quantity}un (Prod: ${s.quantity * (s.qtdProducts || 0)}) - R$ ${parseFloat(s.value).toFixed(2)}`).join('\n')}
         `.trim();
         navigator.clipboard.writeText(text);
         alert("Relatório copiado para a área de transferência!");
@@ -87,6 +94,10 @@ ${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number
                                 <Typography><strong>Alvo da Captação:</strong> R$ {parseFloat(reportData.project.target_fundraising || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</Typography>
                                 <Typography><strong>Receita Realizada:</strong> R$ {parseFloat(reportData.project.realized_revenue || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</Typography>
                             </Box>
+                            <Box display="flex" justifyContent="space-between" mt={1}>
+                                <Typography><strong>Produtos Vendidos:</strong> {reportData.sales.reduce((acc, s) => acc + (s.quantity * (s.qtdProducts || 0)), 0)}</Typography>
+                                <Typography><strong>Doações Recebidas:</strong> {reportData.sales.filter(s => Number(s.rewardPrice) === 0).reduce((acc, s) => acc + s.quantity, 0)}</Typography>
+                            </Box>
                             <Box mt={1}>
                                 <Typography variant="caption">Progresso da Meta</Typography>
                                 <LinearProgress variant="determinate" value={Math.min((reportData.project.realized_revenue / reportData.project.target_fundraising) * 100, 100)} sx={{ height: 10, borderRadius: 5 }} />
@@ -102,6 +113,7 @@ ${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number
                                         <TableCell>Data</TableCell>
                                         <TableCell>Produto</TableCell>
                                         <TableCell>Qtd</TableCell>
+                                        <TableCell>Qtd Produtos</TableCell>
                                         <TableCell align="right">Valor Est.</TableCell>
                                     </TableRow>
                                 </TableHead>
@@ -115,12 +127,13 @@ ${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number
                                                 </Typography>
                                             </TableCell>
                                             <TableCell>{sale.quantity}</TableCell>
+                                            <TableCell>{sale.quantity * (sale.qtdProducts || 0)}</TableCell>
                                             <TableCell align="right">R$ {parseFloat(sale.value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
                                         </TableRow>
                                     ))}
                                     {reportData.sales.length === 0 && (
                                         <TableRow>
-                                            <TableCell colSpan={4} align="center">Nenhuma venda registrada.</TableCell>
+                                            <TableCell colSpan={5} align="center">Nenhuma venda registrada.</TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>
