@@ -17,12 +17,15 @@ import {
 import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
 import { setQuotaCallback } from '../services/gemini';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const DRAWER_WIDTH = 240;
 
 export const Layout = ({ children }) => {
-  const { currentView, mobileOpen, handleDrawerToggle, navigateTo } = useAdmin();
+  const { mobileOpen, handleDrawerToggle } = useAdmin();
   const { signOut } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Quota Notification State
   const [quotaMeta, setQuotaMeta] = useState({ open: false, model: "" });
@@ -43,44 +46,32 @@ export const Layout = ({ children }) => {
   };
 
   const menuItems = [
-    { id: 'dashboard', label: 'Sala de Situação', icon: <Dashboard /> },
-    { id: 'necromassa', label: 'Necromassa', icon: <Forest /> },
-    { id: 'projects', label: 'Gestão Projetos', icon: <FolderOpen /> },
-    { id: 'rewards', label: 'Recompensas', icon: <CardGiftcard /> },
-    { id: 'products', label: 'Produtos', icon: <CardGiftcard /> },
-    { id: 'certificates', label: 'Certificados', icon: <CardMembership /> },
-    { id: 'properties', label: 'Propriedades', icon: <HomeWork /> },
-    { id: 'sponsors', label: 'Patrocinadores', icon: <People /> },
-    { id: 'refunds', label: 'Reembolsos', icon: <Replay /> },
-    { id: 'users', label: 'Gestão de Usuários', icon: <ManageAccounts /> },
-    { id: 'audit', label: 'Log de Modificações', icon: <History /> },
-    { id: 'payment-config', label: 'Configurações de Pagamento', icon: <Payment /> }, // Using CardMembership as placeholder or we can import new icon
-    { id: 'media-manager', label: 'Gerenciador de Arquivos', icon: <PermMedia /> },
-    { id: 'forest-intelligence', label: 'Inteligência Florestal', icon: <Psychology /> },
-    { id: 'gemini-settings', label: 'Configuração IA', icon: <SettingsSuggest /> },
-    { id: 'error-logs', label: 'Log de Erros', icon: <BugReport /> },
+    { id: 'dashboard', label: 'Sala de Situação', icon: <Dashboard />, path: '/dashboard' },
+    { id: 'necromassa', label: 'Necromassa', icon: <Forest />, path: '/necromassa' },
+    { id: 'projects', label: 'Gestão Projetos', icon: <FolderOpen />, path: '/projects' },
+    { id: 'rewards', label: 'Recompensas', icon: <CardGiftcard />, path: '/rewards' },
+    { id: 'products', label: 'Produtos', icon: <CardGiftcard />, path: '/products' },
+    { id: 'certificates', label: 'Certificados', icon: <CardMembership />, path: '/certificates' },
+    { id: 'properties', label: 'Propriedades', icon: <HomeWork />, path: '/properties' },
+    { id: 'sponsors', label: 'Patrocinadores', icon: <People />, path: '/sponsors' },
+    { id: 'refunds', label: 'Reembolsos', icon: <Replay />, path: '/refunds' },
+    { id: 'users', label: 'Gestão de Usuários', icon: <ManageAccounts />, path: '/users' },
+    { id: 'audit', label: 'Log de Modificações', icon: <History />, path: '/audit' },
+    { id: 'payment-config', label: 'Configurações de Pagamento', icon: <Payment />, path: '/payment-config' },
+    { id: 'media-manager', label: 'Gerenciador de Arquivos', icon: <PermMedia />, path: '/media-manager' },
+    { id: 'forest-intelligence', label: 'Inteligência Florestal', icon: <Psychology />, path: '/forest-intelligence' },
+    { id: 'gemini-settings', label: 'Configuração IA', icon: <SettingsSuggest />, path: '/gemini-settings' },
+    { id: 'error-logs', label: 'Log de Erros', icon: <BugReport />, path: '/error-logs' },
   ];
 
   const getPageTitle = () => {
-    switch (currentView) {
-      case 'dashboard': return 'Visão Geral';
-      case 'necromassa': return 'Gestão de Necromassa';
-      case 'sponsors': return 'Patrocinadores';
-      case 'refunds': return 'Gestão de Devoluções';
-      case 'properties': return 'Gestão de Propriedades';
-      case 'projects': return 'Gestão de Projetos';
-      case 'rewards': return 'Gerenciamento de Recompensas';
-      case 'products': return 'Gestão de Produtos';
-      case 'users': return 'Gestão de Usuários';
-      case 'certificates': return 'Certificados Avulsos';
-      case 'payment-config': return 'Configurações de Pagamento';
-      case 'audit': return 'Log de Modificações';
-      case 'media-manager': return 'Gerenciador de Arquivos';
-      case 'gemini-settings': return 'Configuração IA';
-      case 'forest-intelligence': return 'Inteligência Florestal';
-      case 'error-logs': return 'Log de Erros';
-      default: return 'ARPT Admin';
-    }
+    const currentItem = menuItems.find(item => item.path === location.pathname);
+    if (currentItem) return currentItem.label;
+
+    // Fallbacks or special cases
+    if (location.pathname.startsWith('/projects/')) return 'Detalhes do Projeto';
+
+    return 'ARPT Admin';
   };
 
   const drawerContent = (
@@ -94,8 +85,11 @@ export const Layout = ({ children }) => {
         {menuItems.map((item) => (
           <ListItem key={item.id} disablePadding>
             <ListItemButton
-              selected={currentView === item.id}
-              onClick={() => navigateTo(item.id)}
+              selected={location.pathname === item.path}
+              onClick={() => {
+                navigate(item.path);
+                if (window.innerWidth < 600) handleDrawerToggle();
+              }}
             >
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.label} />

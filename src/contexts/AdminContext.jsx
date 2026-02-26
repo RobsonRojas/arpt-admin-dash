@@ -26,7 +26,6 @@ export const AdminProvider = ({ children }) => {
     const urlMidiasFiles = "https://arpt.site/api/midias/files/";
 
     // Navegação
-    const [currentView, setCurrentView] = useState('dashboard');
     const [mobileOpen, setMobileOpen] = useState(false);
 
     // Dados
@@ -676,7 +675,6 @@ export const AdminProvider = ({ children }) => {
             }
             setOpenCadastro(false);
             setEditingProject(null);
-            setCurrentView('projects');
         } catch (error) {
             console.error('ERROR: Error saving project:', error);
             // Re-throw so the UI can handle the error display
@@ -879,14 +877,6 @@ export const AdminProvider = ({ children }) => {
         setMobileOpen(!mobileOpen);
     };
 
-    /**
-     * Navegar para uma view específica
-     */
-    const navigateTo = (view) => {
-        setCurrentView(view);
-        if (mobileOpen) setMobileOpen(false);
-    };
-
     // ==================== REGRAS DE NEGÓCIO - FILTROS E BUSCA ====================
 
     /**
@@ -930,7 +920,6 @@ export const AdminProvider = ({ children }) => {
     // ==================== VALOR DO CONTEXTO ====================
     const value = {
         // Estados
-        currentView,
         mobileOpen,
         projects,
         properties,
@@ -945,7 +934,6 @@ export const AdminProvider = ({ children }) => {
         urlMidiasFiles,
 
         // Setters (para casos específicos)
-        setCurrentView,
         setMobileOpen,
         setSelectedProject,
         setSearchTerm,
@@ -972,7 +960,6 @@ export const AdminProvider = ({ children }) => {
 
         // Regras de Negócio - Navegação
         handleDrawerToggle,
-        navigateTo,
 
         // Regras de Negócio - Utilitários
         getFilteredProjects,

@@ -23,7 +23,7 @@ const PrivateRoute = ({ children }) => {
   }
 
   if (!user) {
-    return <Login />;
+    return <Navigate to="/login" replace />;
   }
 
   return <Layout>{children}</Layout>;
@@ -38,30 +38,6 @@ const AxiosInterceptorSetup = () => {
 };
 
 export default function App() {
-  const { currentView } = useAdmin();
-
-  const getViewComponent = () => {
-    switch (currentView) {
-      case 'dashboard': return <Dashboard />;
-      case 'projects': return <Projects />;
-      case 'properties': return <Properties />;
-      case 'necromassa': return <Necromassa />;
-      case 'sponsors': return <Sponsors />;
-      case 'refunds': return <Refunds />;
-      case 'users': return <Users />;
-      case 'rewards': return <Rewards />;
-      case 'products': return <Products />;
-      case 'certificates': return <Certificates />;
-      case 'audit': return <AuditLogs />;
-      case 'gemini-settings': return <GeminiSettings />;
-      case 'payment-config': return <PaymentConfig />;
-      case 'media-manager': return <MediaManager />;
-      case 'forest-intelligence': return <ForestIntelligence />;
-      case 'error-logs': return <ErrorLogs />;
-      default: return <Dashboard />;
-    }
-  };
-
   return (
     <ErrorProvider>
       <AxiosInterceptorSetup />
@@ -70,9 +46,29 @@ export default function App() {
         <Analytics />
         <Routes>
           <Route path="/certificate/view" element={<CertificateView />} />
-          <Route path="/*" element={
+          <Route path="/login" element={<Login />} />
+          <Route path="/" element={
             <PrivateRoute>
-              {getViewComponent()}
+              <Routes>
+                <Route index element={<Navigate to="/dashboard" replace />} />
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="projects" element={<Projects />} />
+                <Route path="properties" element={<Properties />} />
+                <Route path="necromassa" element={<Necromassa />} />
+                <Route path="sponsors" element={<Sponsors />} />
+                <Route path="refunds" element={<Refunds />} />
+                <Route path="users" element={<Users />} />
+                <Route path="rewards" element={<Rewards />} />
+                <Route path="products" element={<Products />} />
+                <Route path="certificates" element={<Certificates />} />
+                <Route path="audit" element={<AuditLogs />} />
+                <Route path="gemini-settings" element={<GeminiSettings />} />
+                <Route path="payment-config" element={<PaymentConfig />} />
+                <Route path="media-manager" element={<MediaManager />} />
+                <Route path="forest-intelligence" element={<ForestIntelligence />} />
+                <Route path="error-logs" element={<ErrorLogs />} />
+                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+              </Routes>
             </PrivateRoute>
           } />
         </Routes>
