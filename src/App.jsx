@@ -47,7 +47,7 @@ export default function App() {
         <Routes>
           <Route path="/certificate/view" element={<CertificateView />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/" element={
+          <Route path="/*" element={
             <PrivateRoute>
               <Routes>
                 <Route index element={<Navigate to="/dashboard" replace />} />
