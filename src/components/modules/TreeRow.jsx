@@ -1,8 +1,8 @@
 import React from 'react';
 import { TableRow, TableCell, IconButton } from '@mui/material';
-import { Edit, Description, Image as ImageIcon, DeleteOutline, History } from '@mui/icons-material';
+import { Edit, Description, Image as ImageIcon, DeleteOutline, History, PictureAsPdf } from '@mui/icons-material';
 
-const TreeRow = ({ tree, onOpenPhotos, onEdit, onDelete, onGenerateDocument, onViewHistory }) => {
+const TreeRow = ({ tree, onOpenPhotos, onEdit, onDelete, onGenerateDocument, onGenerateOfficialDocument, onViewHistory }) => {
     return (
         <TableRow hover>
             <TableCell>{tree.id}</TableCell>
@@ -39,14 +39,24 @@ const TreeRow = ({ tree, onOpenPhotos, onEdit, onDelete, onGenerateDocument, onV
                     <History fontSize="small" />
                 </IconButton>
                 {tree.classification === 'Árvore Caída' && (
-                    <IconButton
-                        size="small"
-                        color="secondary"
-                        onClick={() => onGenerateDocument(tree)}
-                        title="Gerar Documento"
-                    >
-                        <Description fontSize="small" />
-                    </IconButton>
+                    <>
+                        <IconButton
+                            size="small"
+                            color="info"
+                            onClick={() => onGenerateDocument(tree)}
+                            title="Gerar Requerimento (IA)"
+                        >
+                            <Description fontSize="small" />
+                        </IconButton>
+                        <IconButton
+                            size="small"
+                            color="secondary"
+                            onClick={() => onGenerateOfficialDocument(tree)}
+                            title="Gerar Documento Oficial (PDF)"
+                        >
+                            <PictureAsPdf fontSize="small" />
+                        </IconButton>
+                    </>
                 )}
                 <IconButton
                     size="small"

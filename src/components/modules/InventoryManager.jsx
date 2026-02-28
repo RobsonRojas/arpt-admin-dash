@@ -11,6 +11,7 @@ import { useAdmin } from '../../contexts/AdminContext';
 import { generateDocument } from '../../services/gemini';
 import MDEditor from '@uiw/react-md-editor';
 import TreeRow from './TreeRow'; // Import TreeRow
+import { api } from '../../services/api';
 
 export const InventoryManager = ({ property, onClose }) => {
   const [inventories, setInventories] = useState([]);
@@ -308,6 +309,25 @@ export const InventoryManager = ({ property, onClose }) => {
       setGeneratedDoc("Erro ao gerar documento. Tente novamente.");
     } finally {
       setLoadingDoc(false);
+    }
+  }, []);
+
+  const handleGenerateOfficialDocument = React.useCallback(async (tree) => {
+    try {
+      const response = await api.get(`/inventarios/arvores/${tree.id}/documento`, {
+        responseType: 'blob'
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `documento_arvore_${tree.number || tree.id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error("Erro ao baixar documento:", error);
+      alert("Erro ao gerar o documento oficial. Tente novamente.");
     }
   }, []);
 
@@ -843,6 +863,7 @@ export const InventoryManager = ({ property, onClose }) => {
                   onEdit={handleEdit}
                   onDelete={handleDelete}
                   onGenerateDocument={handleGenerateDocument}
+                  onGenerateOfficialDocument={handleGenerateOfficialDocument}
                   onViewHistory={handleViewHistory}
                 />
               ))
