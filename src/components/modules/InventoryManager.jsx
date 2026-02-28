@@ -321,13 +321,13 @@ export const InventoryManager = ({ property, onClose }) => {
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `documento_arvore_${tree.number || tree.id}.pdf`);
+      link.setAttribute('download', `documento_arvore_${tree.number || tree.id}.odt`);
       document.body.appendChild(link);
       link.click();
       link.remove();
     } catch (error) {
       console.error("Erro ao baixar documento:", error);
-      alert("Erro ao gerar o documento oficial. Tente novamente.");
+      alert("Erro ao gerar o documento oficial (ODT). Tente novamente.");
     }
   }, []);
 
