@@ -30,10 +30,12 @@ export const Rewards = () => {
         createReward,
         updateReward,
         deleteReward,
+        getProducts
     } = useAdmin();
 
     const [selectedManejoId, setSelectedManejoId] = useState('');
     const [rewards, setRewards] = useState([]);
+    const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [openForm, setOpenForm] = useState(false);
@@ -58,12 +60,25 @@ export const Rewards = () => {
     // Image Error State for View and Preview
     const [imgError, setImgError] = useState(false);
 
-    // Load rewards when manejo is selected
+    // Load products and rewards when manejo is selected
+    useEffect(() => {
+        loadProducts();
+    }, []);
+
     useEffect(() => {
         if (selectedManejoId) {
             loadRewards();
         }
     }, [selectedManejoId]);
+
+    const loadProducts = async () => {
+        try {
+            const data = await getProducts();
+            setProducts(data || []);
+        } catch (err) {
+            console.error('Error loading products:', err);
+        }
+    };
 
     const loadRewards = async () => {
         if (!selectedManejoId) return;
@@ -94,13 +109,11 @@ export const Rewards = () => {
         setFormData({
             id: '',
             id_manejo: selectedManejoId,
-            name: '',
-            info: '',
-            retail_price: '',
+            id_produto: '',
             reward_price: '',
             reward_qtd: '',
-            prazo_entrega_meses: '',
-            foto_url: ''
+            delivery: '',
+            qtd_products: ''
         });
         setIsEditing(false);
         setOpenForm(true);
@@ -113,13 +126,11 @@ export const Rewards = () => {
         setFormData({
             id: reward.id || '',
             id_manejo: selectedManejoId,
-            name: reward.name || '',
-            info: reward.info || '',
-            retail_price: reward.retail_price || '',
+            id_produto: reward.id_produto || '',
             reward_price: reward.reward_price || '',
             reward_qtd: reward.reward_qtd || '',
-            prazo_entrega_meses: reward.prazo_entrega_meses || '',
-            foto_url: reward.foto_url || ''
+            delivery: reward.delivery || '',
+            qtd_products: reward.qtd || ''
         });
         setIsEditing(true);
         setOpenForm(true);
@@ -132,8 +143,8 @@ export const Rewards = () => {
     };
 
     const handleSave = async () => {
-        if (!formData.name) {
-            alert('O nome é obrigatório');
+        if (!formData.id_produto && !isEditing) {
+            alert('A seleção de um produto é obrigatória');
             return;
         }
 
@@ -142,24 +153,16 @@ export const Rewards = () => {
             return;
         }
 
-        const payload = {
-            name: formData.name,
-            info: formData.info || '',
-            retail_price: Number(formData.retail_price) || 0,
-            reward_price: Number(formData.reward_price) || 0,
-            reward_qtd: Number(formData.reward_qtd) || 0,
-            prazo_entrega_meses: Number(formData.prazo_entrega_meses) || 0,
-            foto_url: formData.foto_url || ''
-        };
-
         try {
             if (isEditing) {
-                const editPayload = { ...payload, id_manejo: formData.id_manejo };
-                const result = await updateReward(selectedManejoId, formData.id, editPayload);
+                const payload = {
+                    reward_price: Number(formData.reward_price) || 0,
+                    reward_qtd: Number(formData.reward_qtd) || 0,
+                    delivery: formData.delivery,
+                    qtd_products: Number(formData.qtd_products) || 0
+                };
+                const result = await updateReward(selectedManejoId, formData.id, payload);
                 if (result) {
-                    if (formData.id_manejo !== selectedManejoId) {
-                        alert('Recompensa movida com sucesso! A lista atual será atualizada.');
-                    }
                     await loadRewards();
                     await clearDraft();
                     setOpenForm(false);
@@ -167,6 +170,13 @@ export const Rewards = () => {
                     alert('Erro ao atualizar recompensa');
                 }
             } else {
+                const payload = {
+                    id_produto: Number(formData.id_produto),
+                    reward_price: Number(formData.reward_price) || 0,
+                    reward_qtd: Number(formData.reward_qtd) || 0,
+                    delivery: formData.delivery,
+                    qtd_products: Number(formData.qtd_products) || 0
+                };
                 const result = await createReward(selectedManejoId, payload);
                 if (result) {
                     await loadRewards();
@@ -442,138 +452,83 @@ export const Rewards = () => {
                     </DialogTitle>
                     <DialogContent dividers>
                         <Grid container spacing={2} pt={1}>
-                            {isEditing && (
+                            {!isEditing && (
                                 <Grid item xs={12}>
                                     <TextField
                                         select
                                         fullWidth
-                                        label="Alterar Projeto (Manejo)"
-                                        value={formData.id_manejo || selectedManejoId}
-                                        onChange={e => setFormData({ ...formData, id_manejo: e.target.value })}
-                                        helperText="Selecione um novo projeto caso deseje mover esta recompensa"
+                                        label="Selecione o Produto *"
+                                        value={formData.id_produto}
+                                        onChange={e => {
+                                            const prod = products.find(p => p.id === e.target.value);
+                                            setFormData({
+                                                ...formData,
+                                                id_produto: e.target.value,
+                                                qtd_products: prod?.qtd_disponivel || 0
+                                            });
+                                        }}
                                     >
-                                        {projects.map((project) => (
-                                            <MenuItem key={project.id} value={project.id}>
-                                                {project.descricao} - {project.municipio}
+                                        {products.map((product) => (
+                                            <MenuItem key={product.id} value={product.id}>
+                                                {product.nome} (R$ {product.preco?.toLocaleString('pt-BR')})
                                             </MenuItem>
                                         ))}
                                     </TextField>
                                 </Grid>
                             )}
-                            <Grid item xs={12}>
-                                <TextField
-                                    fullWidth
-                                    label="Nome *"
-                                    value={formData.name}
-                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                                    <Typography variant="caption">Descrição / Informações</Typography>
-                                    <AIAssistant
-                                        initialText={formData.info}
-                                        context={`Recompensa: ${formData.name}`}
-                                        onApply={(text) => setFormData({ ...formData, info: text })}
-                                        label="Melhorar Descrição"
-                                    />
-                                </Box>
-                                <TextField
-                                    fullWidth
-                                    label="Informações Adicionais"
-                                    multiline
-                                    rows={3}
-                                    value={formData.info}
-                                    onChange={(e) => setFormData({ ...formData, info: e.target.value })}
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextField
-                                    fullWidth
-                                    type="number"
-                                    label="Preço Varejo"
-                                    value={formData.retail_price}
-                                    onChange={e => setFormData({ ...formData, retail_price: e.target.value })}
-                                    inputProps={{ step: '0.01', min: '0' }}
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextField
-                                    fullWidth
-                                    type="number"
-                                    label="Preço Recompensa"
-                                    value={formData.reward_price}
-                                    onChange={e => setFormData({ ...formData, reward_price: e.target.value })}
-                                    inputProps={{ step: '0.01', min: '0' }}
-                                    helperText="0 = Grátis"
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextField
-                                    fullWidth
-                                    type="number"
-                                    label="Quantidade Disponível"
-                                    value={formData.reward_qtd}
-                                    onChange={e => setFormData({ ...formData, reward_qtd: e.target.value })}
-                                    inputProps={{ min: '0' }}
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextField
-                                    fullWidth
-                                    type="number"
-                                    label="Prazo Entrega (Meses)"
-                                    value={formData.prazo_entrega_meses}
-                                    onChange={e => setFormData({ ...formData, prazo_entrega_meses: e.target.value })}
-                                    inputProps={{ min: '0' }}
-                                    helperText="Após a compra"
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    fullWidth
-                                    label="URL da Foto"
-                                    value={formData.foto_url}
-                                    onChange={e => {
-                                        setFormData({ ...formData, foto_url: e.target.value });
-                                        setImgError(false);
-                                    }}
-                                    helperText="URL da imagem da recompensa"
-                                />
-                            </Grid>
-                            {/* Image Preview */}
-                            <Grid item xs={12}>
-                                {formData.foto_url && !imgError ? (
-                                    <Box
-                                        display="flex"
-                                        justifyContent="center"
-                                        p={1}
-                                        border="1px dashed #ccc"
-                                        borderRadius={1}
-                                        bgcolor="grey.50"
-                                    >
-                                        <img
-                                            src={formData.foto_url}
-                                            alt="Preview"
-                                            style={{ maxWidth: '100%', maxHeight: 200, objectFit: 'contain' }}
-                                            onError={() => setImgError(true)}
+                            {formData.id_produto && (
+                                <>
+                                    <Grid item xs={12}>
+                                        <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
+                                            <Typography variant="subtitle2" color="primary">Dados do Produto Selecionado:</Typography>
+                                            <Typography variant="body2"><strong>Nome:</strong> {products.find(p => p.id === formData.id_produto)?.nome}</Typography>
+                                            <Typography variant="body2"><strong>Info:</strong> {products.find(p => p.id === formData.id_produto)?.info}</Typography>
+                                            <Typography variant="body2"><strong>Preço Varejo:</strong> R$ {products.find(p => p.id === formData.id_produto)?.preco?.toLocaleString('pt-BR')}</Typography>
+                                        </Paper>
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <TextField
+                                            fullWidth
+                                            type="number"
+                                            label="Preço Recompensa *"
+                                            value={formData.reward_price}
+                                            onChange={e => setFormData({ ...formData, reward_price: e.target.value })}
+                                            inputProps={{ step: '0.01', min: '0' }}
                                         />
-                                    </Box>
-                                ) : formData.foto_url && imgError && (
-                                    <Box
-                                        display="flex"
-                                        alignItems="center"
-                                        gap={1}
-                                        color="error.main"
-                                        bgcolor="error.light"
-                                        p={1}
-                                        borderRadius={1}
-                                    >
-                                        <BrokenImage fontSize="small" />
-                                        <Typography variant="caption">Não foi possível carregar a imagem</Typography>
-                                    </Box>
-                                )}
-                            </Grid>
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <TextField
+                                            fullWidth
+                                            type="number"
+                                            label="Quantidade Disponível *"
+                                            value={formData.reward_qtd}
+                                            onChange={e => setFormData({ ...formData, reward_qtd: e.target.value })}
+                                            inputProps={{ min: '0' }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <TextField
+                                            fullWidth
+                                            type="number"
+                                            label="Unidades de Produto *"
+                                            value={formData.qtd_products}
+                                            onChange={e => setFormData({ ...formData, qtd_products: e.target.value })}
+                                            inputProps={{ min: '1' }}
+                                            helperText="Qtde. de produtos nesta recompensa"
+                                        />
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <TextField
+                                            fullWidth
+                                            type="date"
+                                            label="Data de Entrega *"
+                                            value={formData.delivery ? (typeof formData.delivery === 'string' ? formData.delivery.split('T')[0] : new Date(formData.delivery).toISOString().split('T')[0]) : ''}
+                                            onChange={e => setFormData({ ...formData, delivery: e.target.value })}
+                                            InputLabelProps={{ shrink: true }}
+                                        />
+                                    </Grid>
+                                </>
+                            )}
                         </Grid>
                     </DialogContent>
                     <DialogActions>

@@ -442,6 +442,21 @@ export const AdminProvider = ({ children }) => {
         }
     }
 
+    const getProducts = async () => {
+        try {
+            const response = await api.get('/produtos');
+            if (response.status === 200) {
+                return response.data;
+            } else {
+                console.warn(`Resposta inesperada ao buscar produtos: status ${response.status}`);
+                return [];
+            }
+        } catch (error) {
+            console.error("Error fetching products:", error);
+            return [];
+        }
+    };
+
     // ==================== REWARDS (PRODUTOS) MANAGEMENT ====================
 
     const getRewardsByManejoId = async (manejoId) => {
@@ -979,6 +994,7 @@ export const AdminProvider = ({ children }) => {
         getTreeHistory,
 
         // Regras de Negócio - Rewards
+        getProducts,
         getRewardsByManejoId,
         getRewardById,
         createReward,
