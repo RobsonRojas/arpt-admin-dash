@@ -137,6 +137,11 @@ export const Products = () => {
     };
 
     const handleSave = async () => {
+        if (!formData.nome || formData.nome.length < 10) {
+            setSnackbar({ open: true, message: 'O nome do produto deve ter pelo menos 10 caracteres', severity: 'warning' });
+            return;
+        }
+
         try {
             const payload = {
                 nome: formData.nome,
@@ -144,7 +149,7 @@ export const Products = () => {
                 preco: Number(formData.preco),
                 prazo_entrega_meses: Number(formData.prazo_entrega_meses),
                 is_ativo: formData.is_ativo,
-                fotos: formData.foto_url ? [{ url: formData.foto_url, alt: formData.nome, type: 'principal' }] : []
+                fotos: formData.foto_url ? [{ src: formData.foto_url, alt: formData.nome.padEnd(10, '_'), type: 'principal' }] : []
             };
 
             const token = await user.getIdToken();
