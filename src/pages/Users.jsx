@@ -6,7 +6,7 @@ import {
     TextField, MenuItem, Avatar, TablePagination, CircularProgress,
     Snackbar, Alert
 } from '@mui/material';
-import { Add, Edit, Delete, ManageAccounts, CardMembership, Visibility, History, QrCode, Public, PublicOff, Inventory } from '@mui/icons-material';
+import { Add, Edit, Delete, ManageAccounts, CardMembership, Visibility, History, QrCode, Public, PublicOff, Inventory, Sync } from '@mui/icons-material';
 import { QRCodeSVG } from 'qrcode.react';
 import { useAuth } from '../contexts/AuthContext';
 import { useAdmin } from '../contexts/AdminContext';
@@ -73,6 +73,13 @@ export const Users = () => {
         ordem: 0
     });
     const [savingHistory, setSavingHistory] = useState(false);
+    const [inventories, setInventories] = useState([]);
+    const [trees, setTrees] = useState([]);
+    const [selectedInventory, setSelectedInventory] = useState('');
+    const [selectedTree, setSelectedTree] = useState('');
+    const [loadingInventories, setLoadingInventories] = useState(false);
+    const [loadingTrees, setLoadingTrees] = useState(false);
+    const [initializingFromTree, setInitializingFromTree] = useState(false);
 
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
@@ -269,6 +276,81 @@ export const Users = () => {
         } catch (error) {
             console.error('Erro ao excluir parte da história:', error);
             setSnackbar({ open: true, message: 'Erro ao excluir história', severity: 'error' });
+        }
+    };
+
+    const fetchPropertiesWithInventories = async () => {
+        setLoadingInventories(true);
+        try {
+            const token = await authUser.getIdToken();
+            const response = await api.get('/propriedades', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setInventories(response.data);
+        } catch (error) {
+            console.error('Erro ao buscar propriedades:', error);
+        } finally {
+            setLoadingInventories(false);
+        }
+    };
+
+    const fetchInventoryTrees = async (inventoryId) => {
+        setLoadingTrees(true);
+        try {
+            const token = await authUser.getIdToken();
+            const response = await api.get(`/inventarios/${inventoryId}/alltrees`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setTrees(response.data);
+        } catch (error) {
+            console.error('Erro ao buscar árvores:', error);
+        } finally {
+            setLoadingTrees(false);
+        }
+    };
+
+    const handleInitializeFromTree = async () => {
+        if (!selectedTree) return;
+        setInitializingFromTree(true);
+        try {
+            const token = await authUser.getIdToken();
+            await api.post(`/produtos/admin/purchases/${currentReward.id}/history/initialize-from-tree`,
+                { treeId: selectedTree },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setSnackbar({ open: true, message: 'História inicializada com sucesso', severity: 'success' });
+            fetchHistory(currentReward.id);
+            setSelectedInventory('');
+            setSelectedTree('');
+        } catch (error) {
+            console.error('Erro ao inicializar história:', error);
+            setSnackbar({ open: true, message: 'Erro ao inicializar história', severity: 'error' });
+        } finally {
+            setInitializingFromTree(false);
+        }
+    };
+
+    const handleSyncHistory = async () => {
+        setInitializingFromTree(true);
+        try {
+            const token = await authUser.getIdToken();
+            const response = await api.post(`/produtos/admin/purchases/${currentReward.id}/history/sync`,
+                {},
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setSnackbar({
+                open: true,
+                message: response.data.syncedCount > 0
+                    ? `Sincronizado com sucesso! ${response.data.syncedCount} novas partes adicionadas.`
+                    : 'Nenhuma nova atualização encontrada na árvore.',
+                severity: 'success'
+            });
+            fetchHistory(currentReward.id);
+        } catch (error) {
+            console.error('Erro ao sincronizar história:', error);
+            setSnackbar({ open: true, message: 'Erro ao sincronizar história', severity: 'error' });
+        } finally {
+            setInitializingFromTree(false);
         }
     };
 
@@ -951,11 +1033,96 @@ export const Users = () => {
                             )}
                         </Grid>
                         <Grid item xs={12} md={7}>
-                            <Typography variant="subtitle1" gutterBottom>Linha do Tempo</Typography>
+                            <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                                <Typography variant="subtitle1" gutterBottom>Linha do Tempo</Typography>
+                                {historyParts.length > 0 && (
+                                    <Button
+                                        size="small"
+                                        variant="outlined"
+                                        color="primary"
+                                        startIcon={initializingFromTree ? <CircularProgress size={16} /> : <Sync />}
+                                        onClick={handleSyncHistory}
+                                        disabled={initializingFromTree}
+                                    >
+                                        Sincronizar
+                                    </Button>
+                                )}
+                            </Box>
                             {loadingHistory ? (
                                 <Box display="flex" justifyContent="center"><CircularProgress /></Box>
                             ) : historyParts.length === 0 ? (
-                                <Typography color="textSecondary">Nenhuma parte da história adicionada.</Typography>
+                                <Box>
+                                    <Alert severity="info" sx={{ mb: 2 }}>
+                                        Este produto ainda não possui uma história. É obrigatório selecionar uma árvore do inventário para começar.
+                                    </Alert>
+                                    <Paper variant="outlined" sx={{ p: 2, bgcolor: '#fbfbfb' }}>
+                                        <Typography variant="subtitle2" gutterBottom>Inicializar História da Árvore</Typography>
+                                        <Box display="flex" flexDirection="column" gap={2}>
+                                            <TextField
+                                                select
+                                                label="Propriedade"
+                                                fullWidth
+                                                size="small"
+                                                value={selectedInventory}
+                                                onFocus={() => inventories.length === 0 && fetchPropertiesWithInventories()}
+                                                onChange={e => {
+                                                    setSelectedInventory(e.target.value);
+                                                    setSelectedTree('');
+                                                    // Fetch inventories for property
+                                                    const prop = inventories.find(p => p.id === e.target.value);
+                                                    // If prop has inventories, we might need another select, but let's simplify 
+                                                    // and assume we fetch all trees for all inventories of this property or similar
+                                                    // Actually, let's just use property id to get trees if that's easier or another select
+                                                }}
+                                            >
+                                                {loadingInventories ? <MenuItem disabled>Carregando...</MenuItem> :
+                                                    inventories.map(p => <MenuItem key={p.id} value={p.id}>{p.name}</MenuItem>)}
+                                            </TextField>
+
+                                            {selectedInventory && (
+                                                <Button
+                                                    size="small"
+                                                    onClick={async () => {
+                                                        const token = await authUser.getIdToken();
+                                                        const res = await api.get(`/propriedades/${selectedInventory}/inventarios`, {
+                                                            headers: { Authorization: `Bearer ${token}` }
+                                                        });
+                                                        if (res.data && res.data.length > 0) {
+                                                            fetchInventoryTrees(res.data[0].id);
+                                                        } else {
+                                                            setSnackbar({ open: true, message: 'Nenhum inventário encontrado para esta propriedade', severity: 'warning' });
+                                                        }
+                                                    }}
+                                                    disabled={loadingTrees}
+                                                >
+                                                    {loadingTrees ? 'Buscando...' : 'Ver Árvores do Inventário'}
+                                                </Button>
+                                            )}
+
+                                            <TextField
+                                                select
+                                                label="Árvore"
+                                                fullWidth
+                                                size="small"
+                                                disabled={!selectedInventory || trees.length === 0}
+                                                value={selectedTree}
+                                                onChange={e => setSelectedTree(e.target.value)}
+                                            >
+                                                {trees.map(t => <MenuItem key={t.id} value={t.id}>#{t.number} - {t.specieName}</MenuItem>)}
+                                            </TextField>
+
+                                            <Button
+                                                variant="contained"
+                                                color="primary"
+                                                onClick={handleInitializeFromTree}
+                                                disabled={!selectedTree || initializingFromTree}
+                                                startIcon={initializingFromTree ? <CircularProgress size={20} color="inherit" /> : <History />}
+                                            >
+                                                {initializingFromTree ? 'Inicializando...' : 'Inicializar com História da Árvore'}
+                                            </Button>
+                                        </Box>
+                                    </Paper>
+                                </Box>
                             ) : (
                                 <Box display="flex" flexDirection="column" gap={2}>
                                     {historyParts.map((part) => (
