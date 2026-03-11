@@ -910,12 +910,12 @@ export const Users = () => {
                                                     )}
                                                     <Box>
                                                         <Typography variant="body2" fontWeight="bold">{reward.product_name}</Typography>
-                                                        <Typography variant="caption" color="textSecondary">Qtd: {reward.purchase_qtd}</Typography>
+                                                        <Typography variant="caption" color="textSecondary">Qtd: {reward.qtd}</Typography>
                                                     </Box>
                                                 </Box>
                                             </TableCell>
                                             <TableCell>{reward.management_name}</TableCell>
-                                            <TableCell>{new Date(reward.purchase_date).toLocaleDateString()} {new Date(reward.purchase_date).toLocaleTimeString()}</TableCell>
+                                            <TableCell>{new Date(reward.created_at).toLocaleDateString()} {new Date(reward.created_at).toLocaleTimeString()}</TableCell>
                                             <TableCell>
                                                 <IconButton
                                                     color={reward.is_historia_publica ? "success" : "default"}
