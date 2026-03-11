@@ -1108,7 +1108,7 @@ export const Users = () => {
                                                 value={selectedTree}
                                                 onChange={e => setSelectedTree(e.target.value)}
                                             >
-                                                {trees.map(t => <MenuItem key={t.id} value={t.id}>#{t.number} - {t.specieName}</MenuItem>)}
+                                                {trees.map(t => <MenuItem key={t.id} value={t.id}>#{t.number} - {t.popularName || t.specieName}{t.classification ? ` (${t.classification})` : ''}</MenuItem>)}
                                             </TextField>
 
                                             <Button
