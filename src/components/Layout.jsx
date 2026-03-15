@@ -49,6 +49,7 @@ export const Layout = ({ children }) => {
     { id: 'dashboard', label: 'Sala de Situação', icon: <Dashboard />, path: '/dashboard' },
     { id: 'necromassa', label: 'Necromassa', icon: <Forest />, path: '/necromassa' },
     { id: 'projects', label: 'Gestão Projetos', icon: <FolderOpen />, path: '/projects' },
+    { id: 'adoptions', label: 'Gestão de Adoções', icon: <Forest />, path: '/adoptions' },
     { id: 'rewards', label: 'Recompensas', icon: <CardGiftcard />, path: '/rewards' },
     { id: 'products', label: 'Produtos', icon: <CardGiftcard />, path: '/products' },
     { id: 'certificates', label: 'Certificados', icon: <CardMembership />, path: '/certificates' },
