@@ -15,6 +15,8 @@ import { ProjectDocs } from '../components/modules/project_tabs/ProjectDocs';
 import { ProjectIncidents } from '../components/modules/project_tabs/ProjectIncidents';
 import { CampaignAssistant } from '../components/CampaignAssistant';
 import { RevenueReportDialog } from '../components/modules/RevenueReportDialog';
+import { CarbonReportDialog } from '../components/modules/CarbonReportDialog';
+import { Nature } from '@mui/icons-material';
 
 import { STATUS_PROJETO } from '../constants';
 import { useAdmin } from '../contexts/AdminContext';
@@ -61,6 +63,7 @@ export const Projects = () => {
 
   // Revenue Report State
   const [reportProject, setReportProject] = useState(null);
+  const [carbonReportProject, setCarbonReportProject] = useState(null);
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -177,6 +180,14 @@ export const Projects = () => {
                         aria-label="Relatório de Receitas"
                       >
                         <Assessment />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() => setCarbonReportProject(p)}
+                        title="Relatório de Carbono & ESG"
+                        aria-label="Relatório de Carbono & ESG"
+                      >
+                        <Nature color="success" />
                       </IconButton>
                       <IconButton
                         size="small"
@@ -399,6 +410,11 @@ export const Projects = () => {
           open={!!reportProject}
           onClose={() => setReportProject(null)}
           project={reportProject}
+        />
+        <CarbonReportDialog
+          open={!!carbonReportProject}
+          onClose={() => setCarbonReportProject(null)}
+          project={carbonReportProject}
         />
       </Box>
     </>
