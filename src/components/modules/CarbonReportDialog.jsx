@@ -161,6 +161,11 @@ Total de Árvores Inventariadas: ${reportData.summary.totalTrees}
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose}>Fechar</Button>
+                <Button variant="outlined" onClick={() => {
+                    const link = `https://arpt.site/carbon-report/${reportData.project.id}`;
+                    navigator.clipboard.writeText(link);
+                    alert("Link copiado!");
+                }} disabled={!reportData}>Link Público</Button>
                 <Button variant="outlined" startIcon={<ContentCopy />} onClick={handleCopy} disabled={!reportData}>Copiar Resumo</Button>
             </DialogActions>
         </Dialog>
