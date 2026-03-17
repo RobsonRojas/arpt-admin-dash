@@ -34,14 +34,14 @@ Localização: ${reportData.project.location}
 Área: ${reportData.project.area}
 
 METODOLOGIAS DE CARBONO (ESTIMATIVAS)
-1. IPCC GPG: ${reportData.summary.methodologies.ipcc.totalCarbonTon.toFixed(2)} tC (${reportData.summary.methodologies.ipcc.totalCO2Eq.toFixed(2)} tCO2eq)
-2. Chave et al. (2014): ${reportData.summary.methodologies.chave.totalCarbonTon.toFixed(2)} tC (${reportData.summary.methodologies.chave.totalCO2Eq.toFixed(2)} tCO2eq)
-3. Higuchi et al. (1998): ${reportData.summary.methodologies.higuchi.totalCarbonTon.toFixed(2)} tC (${reportData.summary.methodologies.higuchi.totalCO2Eq.toFixed(2)} tCO2eq)
+1. IPCC GPG: ${(reportData.summary.methodologies.ipcc.totalCarbonTon || 0).toFixed(2)} tC (${(reportData.summary.methodologies.ipcc.totalCO2Eq || 0).toFixed(2)} tCO2eq)
+2. Chave et al. (2014): ${(reportData.summary.methodologies.chave.totalCarbonTon || 0).toFixed(2)} tC (${(reportData.summary.methodologies.chave.totalCO2Eq || 0).toFixed(2)} tCO2eq)
+3. Higuchi et al. (1998): ${(reportData.summary.methodologies.higuchi.totalCarbonTon || 0).toFixed(2)} tC (${(reportData.summary.methodologies.higuchi.totalCO2Eq || 0).toFixed(2)} tCO2eq)
 
-MÉDIA DE CARBONO FIXADO: ${reportData.summary.averageCarbonTon.toFixed(2)} tC
+MÉDIA DE CARBONO FIXADO: ${(reportData.summary.averageCarbonTon || 0).toFixed(2)} tC
 
 MÉTRICAS ESG
-- Ambiental: Índice de Biodiversidade ${reportData.summary.esgMetrics.biodiversityIndex.toFixed(2)}
+- Ambiental: Índice de Biodiversidade ${(reportData.summary.esgMetrics.biodiversityIndex || 0).toFixed(2)}
 - Social: ${reportData.summary.esgMetrics.socialImpact}
 - Governança: ${reportData.summary.esgMetrics.governance}
 
@@ -75,8 +75,8 @@ Total de Árvores Inventariadas: ${reportData.summary.totalTrees}
                                     <Card variant="outlined" sx={{ height: '100%', borderColor: 'success.main' }}>
                                         <CardContent>
                                             <Typography variant="subtitle2" color="success.main">{m.name}</Typography>
-                                            <Typography variant="h4" sx={{ my: 1 }}>{m.totalCarbonTon.toFixed(2)} <Typography component="span" variant="body2">tC</Typography></Typography>
-                                            <Typography variant="body2" color="textSecondary">{m.totalCO2Eq.toFixed(2)} tCO2eq</Typography>
+                                            <Typography variant="h4" sx={{ my: 1 }}>{(m.totalCarbonTon || 0).toFixed(2)} <Typography component="span" variant="body2">tC</Typography></Typography>
+                                            <Typography variant="body2" color="textSecondary">{(m.totalCO2Eq || 0).toFixed(2)} tCO2eq</Typography>
                                         </CardContent>
                                     </Card>
                                 </Grid>
@@ -90,7 +90,7 @@ Total de Árvores Inventariadas: ${reportData.summary.totalTrees}
                                     <Nature color="success" />
                                     <Box>
                                         <Typography variant="subtitle2">Ambiental</Typography>
-                                        <Typography variant="body2">Biodiversidade: {reportData.summary.esgMetrics.biodiversityIndex.toFixed(2)}</Typography>
+                                        <Typography variant="body2">Biodiversidade: {(reportData.summary.esgMetrics.biodiversityIndex || 0).toFixed(2)}</Typography>
                                     </Box>
                                 </Box>
                             </Grid>
@@ -135,10 +135,10 @@ Total de Árvores Inventariadas: ${reportData.summary.totalTrees}
                                                 <Typography variant="body2">{tree.popularName}</Typography>
                                                 <Typography variant="caption" color="textSecondary"><i>{tree.specieName}</i></Typography>
                                             </TableCell>
-                                            <TableCell align="right">{tree.dap?.toFixed(2)}</TableCell>
-                                            <TableCell align="right">{tree.height?.toFixed(2)}</TableCell>
-                                            <TableCell align="right">{tree.volume?.toFixed(3)}</TableCell>
-                                            <TableCell align="right">{(tree.carbon.chave).toFixed(4)}</TableCell>
+                                            <TableCell align="right">{(tree.dap || 0).toFixed(2)}</TableCell>
+                                            <TableCell align="right">{(tree.height || 0).toFixed(2)}</TableCell>
+                                            <TableCell align="right">{(tree.volume || 0).toFixed(3)}</TableCell>
+                                            <TableCell align="right">{(tree.carbon?.chave || 0).toFixed(4)}</TableCell>
                                         </TableRow>
                                     ))}
                                     {reportData.trees.length > 50 && (
@@ -162,7 +162,7 @@ Total de Árvores Inventariadas: ${reportData.summary.totalTrees}
             <DialogActions>
                 <Button onClick={onClose}>Fechar</Button>
                 <Button variant="outlined" onClick={() => {
-                    const link = `https://arpt.site/carbon-report/${reportData.project.id}`;
+                    const link = `https://arpt.site/carbon-report/${reportData.project.slug || reportData.project.id}`;
                     navigator.clipboard.writeText(link);
                     alert("Link copiado!");
                 }} disabled={!reportData}>Link Público</Button>
