@@ -51,6 +51,28 @@ Total de Árvores Inventariadas: ${reportData.summary.totalTrees}
         alert("Relatório copiado!");
     };
 
+    const handleExport = async (format) => {
+        if (!reportData) return;
+        try {
+            const response = await api.get(`/manejos/${project.id}/carbon-report/export`, {
+                params: { format },
+                responseType: 'blob'
+            });
+            
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            const extension = format === 'pdf' ? 'pdf' : format === 'odt' ? 'odt' : 'docx';
+            link.setAttribute('download', `relatorio-carbono-${reportData.project.slug || reportData.project.id}.${extension}`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } catch (err) {
+            console.error(`Erro ao exportar ${format}:`, err);
+            alert(`Erro ao gerar arquivo ${format.toUpperCase()}.`);
+        }
+    };
+
     return (
         <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
             <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white' }}>
@@ -75,8 +97,8 @@ Total de Árvores Inventariadas: ${reportData.summary.totalTrees}
                                     <Card variant="outlined" sx={{ height: '100%', borderColor: 'success.main' }}>
                                         <CardContent>
                                             <Typography variant="subtitle2" color="success.main">{m.name}</Typography>
-                                            <Typography variant="h4" sx={{ my: 1 }}>{(m.totalCarbonTon || 0).toFixed(2)} <Typography component="span" variant="body2">tC</Typography></Typography>
-                                            <Typography variant="body2" color="textSecondary">{(m.totalCO2Eq || 0).toFixed(2)} tCO2eq</Typography>
+                                            <Typography variant="h4" sx={{ my: 1 }}>{Number(m.totalCarbonTon || 0).toFixed(2)} <Typography component="span" variant="body2">tC</Typography></Typography>
+                                            <Typography variant="body2" color="textSecondary">{Number(m.totalCO2Eq || 0).toFixed(2)} tCO2eq</Typography>
                                         </CardContent>
                                     </Card>
                                 </Grid>
@@ -90,7 +112,7 @@ Total de Árvores Inventariadas: ${reportData.summary.totalTrees}
                                     <Nature color="success" />
                                     <Box>
                                         <Typography variant="subtitle2">Ambiental</Typography>
-                                        <Typography variant="body2">Biodiversidade: {(reportData.summary.esgMetrics.biodiversityIndex || 0).toFixed(2)}</Typography>
+                                        <Typography variant="body2">Biodiversidade: {Number(reportData.summary.esgMetrics.biodiversityIndex || 0).toFixed(2)}</Typography>
                                     </Box>
                                 </Box>
                             </Grid>
@@ -135,10 +157,10 @@ Total de Árvores Inventariadas: ${reportData.summary.totalTrees}
                                                 <Typography variant="body2">{tree.popularName}</Typography>
                                                 <Typography variant="caption" color="textSecondary"><i>{tree.specieName}</i></Typography>
                                             </TableCell>
-                                            <TableCell align="right">{(tree.dap || 0).toFixed(2)}</TableCell>
-                                            <TableCell align="right">{(tree.height || 0).toFixed(2)}</TableCell>
-                                            <TableCell align="right">{(tree.volume || 0).toFixed(3)}</TableCell>
-                                            <TableCell align="right">{(tree.carbon?.chave || 0).toFixed(4)}</TableCell>
+                                            <TableCell align="right">{Number(tree.dap || 0).toFixed(2)}</TableCell>
+                                            <TableCell align="right">{Number(tree.height || 0).toFixed(2)}</TableCell>
+                                            <TableCell align="right">{Number(tree.volume || 0).toFixed(3)}</TableCell>
+                                            <TableCell align="right">{Number(tree.carbon?.chave || 0).toFixed(4)}</TableCell>
                                         </TableRow>
                                     ))}
                                     {reportData.trees.length > 50 && (
@@ -161,12 +183,17 @@ Total de Árvores Inventariadas: ${reportData.summary.totalTrees}
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose}>Fechar</Button>
-                <Button variant="outlined" onClick={() => {
+                <Box sx={{ flexGrow: 1 }} />
+                <Button size="small" variant="text" startIcon={<PictureAsPdf />} onClick={() => handleExport('pdf')} disabled={!reportData}>PDF</Button>
+                <Button size="small" variant="text" startIcon={<Description />} onClick={() => handleExport('odt')} disabled={!reportData}>ODT</Button>
+                <Button size="small" variant="text" startIcon={<Description />} onClick={() => handleExport('docx')} disabled={!reportData}>DOCX</Button>
+                <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+                <Button variant="outlined" size="small" onClick={() => {
                     const link = `https://arpt.site/carbon-report/${reportData.project.slug || reportData.project.id}`;
                     navigator.clipboard.writeText(link);
                     alert("Link copiado!");
                 }} disabled={!reportData}>Link Público</Button>
-                <Button variant="outlined" startIcon={<ContentCopy />} onClick={handleCopy} disabled={!reportData}>Copiar Resumo</Button>
+                <Button variant="outlined" size="small" startIcon={<ContentCopy />} onClick={handleCopy} disabled={!reportData}>Resumo</Button>
             </DialogActions>
         </Dialog>
     );
