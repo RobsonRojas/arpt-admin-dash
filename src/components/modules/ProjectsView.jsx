@@ -201,7 +201,7 @@ ${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${s.prod
                                 <Box mt={1}>
                                     <Typography variant="caption">Progresso da Meta</Typography>
                                     <LinearProgress variant="determinate" value={Math.min((reportData.project.realized_revenue / reportData.project.target_fundraising) * 100, 100)} sx={{ height: 10, borderRadius: 5 }} />
-                                    <Typography variant="caption" align="right" display="block">{((reportData.project.realized_revenue / reportData.project.target_fundraising) * 100).toFixed(1)}%</Typography>
+                                    <Typography variant="caption" align="right" display="block">{Number((reportData.project.realized_revenue / reportData.project.target_fundraising) * 100).toFixed(1)}%</Typography>
                                 </Box>
                             </Box>
 

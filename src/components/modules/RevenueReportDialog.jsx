@@ -97,12 +97,14 @@ ${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number
         const textLines = [
             "RELATÓRIO DE RECEITAS",
             `Projeto: ${reportData.project.name}`,
-            `Município: ${reportData.project.location}`,
+            `Município: ${reportData.project.municipio}`,
+            `Status: ${reportData.project.desc_status}`,
+            `Meta de Captação: R$ ${Number(reportData.project.target_fundraising).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+            `Valor Realizado: R$ ${Number(reportData.project.realized_revenue).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+            `Progresso: ${Number((reportData.project.realized_revenue / reportData.project.target_fundraising) * 100).toFixed(1)}%`,
             "",
-            "METAS",
-            `Alvo da Captação: R$ ${parseFloat(reportData.project.target_fundraising || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-            `Receita Realizada: R$ ${parseFloat(reportData.project.realized_revenue || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-            `Progresso: ${((reportData.project.realized_revenue / reportData.project.target_fundraising) * 100).toFixed(1)}%`,
+            "DETALHAMENTO DE RECEITAS",
+            ...reportData.revenues.map(r => `- ${r.description}: R$ ${Number(r.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} (${new Date(r.date).toLocaleDateString()})`),
             "",
             "RESUMO DE ITENS",
             `Produtos Vendidos: ${totalProdutos}`,
@@ -112,15 +114,15 @@ ${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number
             ...reportData.sales.map(s => `${new Date(s.date).toLocaleDateString('pt-BR')} - ${Number(s.rewardPrice) === 0 ? "Doação" : s.product} - ${s.quantity} un x ${s.qtdProducts || 0} itens/un = ${s.quantity * (s.qtdProducts || 0)} Itens - R$ ${parseFloat(s.value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`)
         ];
 
-        const xmlLines = textLines.map(line => `<text:p>${line.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</text:p>`).join('\\n   ');
+        const xmlLines = textLines.map(line => `<text:p>${line.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</text:p>`).join('\n   ');
 
-        const fodt = `<?xml version="1.0" encoding="UTF-8"?>\\n<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.text">\\n <office:body>\\n  <office:text>\\n   ${xmlLines}\\n  </office:text>\\n </office:body>\\n</office:document>`;
+        const fodt = `<?xml version="1.0" encoding="UTF-8"?>\n<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.text">\n <office:body>\n  <office:text>\n   ${xmlLines}\n  </office:text>\n </office:body>\n</office:document>`;
 
         const blob = new Blob([fodt], { type: 'application/vnd.oasis.opendocument.text' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `Relatorio_${reportData.project.name.replace(/\\s+/g, '_')}.odt`;
+        a.download = `Relatorio_${reportData.project.name.replace(/\s+/g, '_')}.odt`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -159,7 +161,7 @@ ${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number
                             <Box mt={1}>
                                 <Typography variant="caption">Progresso da Meta</Typography>
                                 <LinearProgress variant="determinate" value={Math.min((reportData.project.realized_revenue / reportData.project.target_fundraising) * 100, 100)} sx={{ height: 10, borderRadius: 5 }} />
-                                <Typography variant="caption" align="right" display="block">{((reportData.project.realized_revenue / reportData.project.target_fundraising) * 100).toFixed(1)}%</Typography>
+                                <Typography variant="caption" align="right" display="block">{Number((reportData.project.realized_revenue / reportData.project.target_fundraising) * 100).toFixed(1)}%</Typography>
                             </Box>
                         </Box>
 
