@@ -749,52 +749,95 @@ export const AdminProvider = ({ children }) => {
      * Adicionar nova propriedade
      */
     const handleAddProperty = async (property) => {
-        const newProperty = {
-            ...property,
-            id: `PROP-${Math.floor(Math.random() * 10000)}`,
-            area: Number(property.area),
-            coords: {
-                lat: Number(property.lat) || -3.0,
-                lng: Number(property.lng) || -60.0
+        try {
+            // Normalizar dados para envio à API
+            const payload = {
+                name: property.name || property.descricao || '',
+                address: property.address || '',
+                area_he: Number(property.area || property.area_he || 0),
+                longitude: Number(property.longitude || property.lng || -60.0),
+                latitude: Number(property.latitude || property.lat || -3.0),
+                id_municipality: Number(property.id_municipality || 1),
+                aquisition_year: Number(property.aquisition_year || new Date().getFullYear()),
+                info: property.info || property.descricao || '',
+                image_internal_path: property.image_internal_path || '/default/property.jpg',
+                user_id: user?.uid || ''
+            };
+
+            const response = await api.post('/propriedades/sync', payload);
+
+            if (response.status === 200 || response.status === 201) {
+                const newProperty = {
+                    id: response.data.id,
+                    ...payload
+                };
+
+                await recordAudit({
+                    action: 'CREATE',
+                    entity: 'PROPERTY',
+                    entityId: String(response.data.id),
+                    before: null,
+                    after: newProperty,
+                    user
+                });
+
+                setProperties(prev => [newProperty, ...prev]);
+                return newProperty;
             }
-        };
-
-        await recordAudit({
-            action: 'CREATE',
-            entity: 'PROPERTY',
-            entityId: newProperty.id,
-            before: null,
-            after: newProperty,
-            user
-        });
-
-        setProperties(prev => [newProperty, ...prev]);
+        } catch (error) {
+            console.error('ERROR: Error creating property:', error);
+            throw error;
+        }
     };
 
     /**
      * Atualizar propriedade existente
      */
     const handleUpdateProperty = async (property) => {
-        const before = properties.find(p => p.id === property.id);
-        const updatedProperty = {
-            ...property,
-            area: Number(property.area),
-            coords: {
-                lat: Number(property.lat),
-                lng: Number(property.lng)
+        try {
+            if (!property?.id) {
+                throw new Error('ID da propriedade é obrigatório para atualização');
             }
-        };
 
-        await recordAudit({
-            action: 'UPDATE',
-            entity: 'PROPERTY',
-            entityId: property.id,
-            before,
-            after: updatedProperty,
-            user
-        });
+            const before = properties.find(p => p.id === property.id);
 
-        setProperties(prev => prev.map(p => p.id === property.id ? updatedProperty : p));
+            // Normalizar dados para envio à API
+            const payload = {
+                name: property.name || property.descricao || '',
+                address: property.address || '',
+                area_he: Number(property.area || property.area_he || 0),
+                longitude: Number(property.longitude || property.lng || -60.0),
+                latitude: Number(property.latitude || property.lat || -3.0),
+                id_municipality: Number(property.id_municipality || 1),
+                aquisition_year: Number(property.aquisition_year || new Date().getFullYear()),
+                info: property.info || property.descricao || '',
+                image_internal_path: property.image_internal_path || '/default/property.jpg'
+            };
+
+            const response = await api.put(`/propriedades/${property.id}`, payload);
+
+            if (response.status === 200) {
+                const updatedProperty = {
+                    id: property.id,
+                    ...payload
+                };
+
+                await recordAudit({
+                    action: 'UPDATE',
+                    entity: 'PROPERTY',
+                    entityId: String(property.id),
+                    before,
+                    after: updatedProperty,
+                    user
+                });
+
+                setProperties(prev => prev.map(p => p.id === property.id ? updatedProperty : p));
+                return updatedProperty;
+            }
+        } catch (error) {
+            console.error('ERROR: Error updating property:', error);
+            throw error;
+        }
     };
 
     /**
@@ -802,19 +845,30 @@ export const AdminProvider = ({ children }) => {
      */
     const handleDeleteProperty = async (propertyId) => {
         if (window.confirm('Tem certeza que deseja deletar esta propriedade?')) {
-            const before = properties.find(p => p.id === propertyId);
+            try {
+                const before = properties.find(p => p.id === propertyId);
 
-            await recordAudit({
-                action: 'DELETE',
-                entity: 'PROPERTY',
-                entityId: propertyId,
-                before,
-                after: null,
-                user
-            });
+                const response = await api.delete(`/propriedades/sync/${propertyId}`);
 
-            setProperties(prev => prev.filter(p => p.id !== propertyId));
+                if (response.status === 200) {
+                    await recordAudit({
+                        action: 'DELETE',
+                        entity: 'PROPERTY',
+                        entityId: String(propertyId),
+                        before,
+                        after: null,
+                        user
+                    });
+
+                    setProperties(prev => prev.filter(p => p.id !== propertyId));
+                    return true;
+                }
+            } catch (error) {
+                console.error('ERROR: Error deleting property:', error);
+                throw error;
+            }
         }
+        return false;
     };
 
     // ==================== REGRAS DE NEGÓCIO - NECROMASSA ====================
