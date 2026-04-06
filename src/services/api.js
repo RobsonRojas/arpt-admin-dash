@@ -2,8 +2,8 @@ import axios from 'axios';
 import { auth } from './firebase';
 
 export const api = axios.create({
-    baseURL: "https://arpt.site/api",
-    // baseURL: "http://localhost:4001",
+    // baseURL: "https://arpt.site/api",
+    baseURL: "http://localhost:4001",
     timeout: 8 * 1000,
 });
 
@@ -16,6 +16,10 @@ api.interceptors.request.use(
             } catch (error) {
                 console.error("Error getting auth token:", error);
             }
+        } else {
+            // Optional: Log when no user is found for a request that might need it
+            // but don't block the request here, just let the backend decide.
+            console.warn(`[API Interceptor] No current user for request: ${config.method?.toUpperCase()} ${config.url}`);
         }
         return config;
     },

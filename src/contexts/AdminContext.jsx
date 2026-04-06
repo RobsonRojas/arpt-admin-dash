@@ -93,8 +93,11 @@ export const AdminProvider = ({ children }) => {
         const payload = {
             id: p.id,
             descricao: p.descricao || '',
+            descricao_en: p.descricao_en || '',
             resumo: p.resumo || '',
+            resumo_en: p.resumo_en || '',
             detalhes: p.detalhes || '',
+            detalhes_en: p.detalhes_en || '',
             estado: p.estado || '',
             municipio: p.municipio || '',
             potencial: p.potencial || '',
@@ -113,6 +116,7 @@ export const AdminProvider = ({ children }) => {
             ...(p.intervalo_tempo_manejo && { intervalo_tempo_manejo: p.intervalo_tempo_manejo }),
             ...(p.expira_anos && { expira_anos: p.expira_anos }),
             ...(p.nome && { nome: p.nome }),
+            ...(p.nome_en && { nome_en: p.nome_en }),
             ...(p.id_propriedade && { id_propriedade: Number(p.id_propriedade) }),
             fotos: (p.fotos || []).map(f => ({
                 src: f.src || f.url || f,
@@ -134,7 +138,12 @@ export const AdminProvider = ({ children }) => {
         try {
             const before = projects.find(p => p.id === newProject.id);
             const payload = normalizeProjectForApi(newProject);
-            const response = await api.put(`/manejos/${newProject.id}`, payload);
+            
+            // Manual token handling for reliability
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            
+            const response = await api.put(`/manejos/${newProject.id}`, payload, config);
             if (response.status === 200) {
                 console.log('Projeto atualizado com sucesso na API.');
 
@@ -169,7 +178,11 @@ export const AdminProvider = ({ children }) => {
             // Remove ID for creation allowing backend/DB to assign
             delete payload.id;
 
-            const response = await api.post('/manejos', payload);
+            // Manual token handling for reliability
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+
+            const response = await api.post('/manejos', payload, config);
             if (response.status === 201 || response.status === 200) {
                 console.log('Projeto criado com sucesso na API.');
                 await recordAudit({
@@ -286,7 +299,9 @@ export const AdminProvider = ({ children }) => {
 
     const createInventory = async (payload) => {
         try {
-            const response = await api.post('/inventarios', payload);
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.post('/inventarios', payload, config);
             if (response.status === 201 || response.status === 200) {
                 return response.data;
             }
@@ -300,7 +315,9 @@ export const AdminProvider = ({ children }) => {
 
     const createTree = async (inventoryId, payload) => {
         try {
-            const response = await api.post(`/arvores`, payload);
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.post(`/arvores`, payload, config);
             if (response.status === 201 || response.status === 200) {
                 return response.data;
             }
@@ -314,7 +331,9 @@ export const AdminProvider = ({ children }) => {
 
     const updateTree = async (treeId, payload) => {
         try {
-            const response = await api.put(`/arvores/${treeId}`, payload);
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.put(`/arvores/${treeId}`, payload, config);
             if (response.status === 200) {
                 return response.data;
             }
@@ -328,7 +347,9 @@ export const AdminProvider = ({ children }) => {
 
     const deleteTree = async (treeId) => {
         try {
-            const response = await api.delete(`/arvores/${treeId}`);
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.delete(`/arvores/${treeId}`, config);
             if (response.status === 200) {
                 return true;
             }
@@ -345,9 +366,11 @@ export const AdminProvider = ({ children }) => {
             const formData = new FormData();
             formData.append('file', file);
 
+            const token = await user?.getIdToken();
             const response = await api.post(`/arvores/${treeId}/photo_upload`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}`
                 },
             });
 
@@ -364,7 +387,9 @@ export const AdminProvider = ({ children }) => {
 
     const createTreePhoto = async (payload) => {
         try {
-            const response = await api.post('/arvorefotos', payload);
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.post('/arvorefotos', payload, config);
             if (response.status === 200 || response.status === 201) {
                 return response.data;
             }
@@ -411,9 +436,11 @@ export const AdminProvider = ({ children }) => {
             const formData = new FormData();
             formData.append('file', file);
 
+            const token = await user?.getIdToken();
             const response = await api.post(`/medias/upload`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}`
                 },
             });
 
@@ -430,7 +457,9 @@ export const AdminProvider = ({ children }) => {
 
     const createPropertyPhoto = async (payload) => {
         try {
-            const response = await api.post('/lugarfotos', payload);
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.post('/lugarfotos', payload, config);
             if (response.status === 200 || response.status === 201 || response.status === 208) {
                 return response.data;
             }
@@ -585,9 +614,15 @@ export const AdminProvider = ({ children }) => {
             let data = payload;
             let headers = {};
 
+            const token = await user?.getIdToken();
             if (payload instanceof FormData) {
                 data = payload;
-                headers = { 'Content-Type': 'multipart/form-data' };
+                headers = { 
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}`
+                };
+            } else {
+                headers = { Authorization: `Bearer ${token}` };
             }
 
             const response = await api.post(`/manejos/${manejoId}/docs`, data, { headers });
@@ -604,7 +639,9 @@ export const AdminProvider = ({ children }) => {
 
     const deleteDoc = async (manejoId, docId) => {
         try {
-            const response = await api.delete(`/manejos/${manejoId}/docs/${docId}`);
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.delete(`/manejos/${manejoId}/docs/${docId}`, config);
             if (response.status === 200 || response.status === 204) {
                 return true;
             }
@@ -634,7 +671,9 @@ export const AdminProvider = ({ children }) => {
 
     const createIncident = async (manejoId, payload) => {
         try {
-            const response = await api.post(`/manejos/${manejoId}/incidents`, payload);
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.post(`/manejos/${manejoId}/incidents`, payload, config);
             if (response.status === 201 || response.status === 200) {
                 return response.data;
             }
@@ -648,7 +687,9 @@ export const AdminProvider = ({ children }) => {
 
     const updateIncident = async (manejoId, incidentId, payload) => {
         try {
-            const response = await api.put(`/manejos/${manejoId}/incidents/${incidentId}`, payload);
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.put(`/manejos/${manejoId}/incidents/${incidentId}`, payload, config);
             if (response.status === 200) {
                 return response.data;
             }
@@ -662,7 +703,9 @@ export const AdminProvider = ({ children }) => {
 
     const deleteIncident = async (manejoId, incidentId) => {
         try {
-            const response = await api.delete(`/manejos/${manejoId}/incidents/${incidentId}`);
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.delete(`/manejos/${manejoId}/incidents/${incidentId}`, config);
             if (response.status === 200 || response.status === 204) {
                 return true;
             }
@@ -764,7 +807,9 @@ export const AdminProvider = ({ children }) => {
                 user_id: user?.uid || ''
             };
 
-            const response = await api.post('/propriedades/sync', payload);
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.post('/propriedades/sync', payload, config);
 
             if (response.status === 200 || response.status === 201) {
                 const newProperty = {
@@ -814,7 +859,9 @@ export const AdminProvider = ({ children }) => {
                 image_internal_path: property.image_internal_path || '/default/property.jpg'
             };
 
-            const response = await api.put(`/propriedades/${property.id}`, payload);
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.put(`/propriedades/${property.id}`, payload, config);
 
             if (response.status === 200) {
                 const updatedProperty = {
@@ -848,7 +895,9 @@ export const AdminProvider = ({ children }) => {
             try {
                 const before = properties.find(p => p.id === propertyId);
 
-                const response = await api.delete(`/propriedades/sync/${propertyId}`);
+                const token = await user?.getIdToken();
+                const config = { headers: { Authorization: `Bearer ${token}` } };
+                const response = await api.delete(`/propriedades/sync/${propertyId}`, config);
 
                 if (response.status === 200) {
                     await recordAudit({

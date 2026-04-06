@@ -84,7 +84,14 @@ Total de Árvores Inventariadas: ${reportData.summary.totalTrees}
                 ) : reportData ? (
                     <Box>
                         <Box mb={3}>
-                            <Typography variant="h5" color="primary">{reportData.project.name}</Typography>
+                            <Typography variant="h5" color="primary">
+                                {reportData.project.name}
+                                {reportData.project.name_en && (
+                                    <Typography component="span" variant="h6" color="textSecondary" sx={{ ml: 1, fontWeight: 400 }}>
+                                        / {reportData.project.name_en}
+                                    </Typography>
+                                )}
+                            </Typography>
                             <Typography color="textSecondary">{reportData.project.location} | {reportData.project.area}</Typography>
                         </Box>
 
@@ -96,7 +103,14 @@ Total de Árvores Inventariadas: ${reportData.summary.totalTrees}
                                 <Grid item xs={12} md={4} key={key}>
                                     <Card variant="outlined" sx={{ height: '100%', borderColor: 'success.main' }}>
                                         <CardContent>
-                                            <Typography variant="subtitle2" color="success.main">{m.name}</Typography>
+                                            <Typography variant="subtitle2" color="success.main">
+                                                {m.name}
+                                                {m.name_en && m.name_en !== m.name && (
+                                                    <Box component="span" display="block" variant="caption" sx={{ color: 'text.secondary', fontWeight: 400 }}>
+                                                        {m.name_en}
+                                                    </Box>
+                                                )}
+                                            </Typography>
                                             <Typography variant="h4" sx={{ my: 1 }}>{Number(m.totalCarbonTon || 0).toFixed(2)} <Typography component="span" variant="body2">tC</Typography></Typography>
                                             <Typography variant="body2" color="textSecondary">{Number(m.totalCO2Eq || 0).toFixed(2)} tCO2eq</Typography>
                                         </CardContent>
@@ -121,7 +135,14 @@ Total de Árvores Inventariadas: ${reportData.summary.totalTrees}
                                     <People color="info" />
                                     <Box>
                                         <Typography variant="subtitle2">Social</Typography>
-                                        <Typography variant="body2">{reportData.summary.esgMetrics.socialImpact}</Typography>
+                                        <Typography variant="body2">
+                                            {reportData.summary.esgMetrics.socialImpact}
+                                            {reportData.summary.esgMetrics.socialImpact_en && (
+                                                <Typography variant="caption" display="block" color="textSecondary">
+                                                    {reportData.summary.esgMetrics.socialImpact_en}
+                                                </Typography>
+                                            )}
+                                        </Typography>
                                     </Box>
                                 </Box>
                             </Grid>
@@ -130,7 +151,14 @@ Total de Árvores Inventariadas: ${reportData.summary.totalTrees}
                                     <Gavel color="warning" />
                                     <Box>
                                         <Typography variant="subtitle2">Governança</Typography>
-                                        <Typography variant="body2">{reportData.summary.esgMetrics.governance}</Typography>
+                                        <Typography variant="body2">
+                                            {reportData.summary.esgMetrics.governance}
+                                            {reportData.summary.esgMetrics.governance_en && (
+                                                <Typography variant="caption" display="block" color="textSecondary">
+                                                    {reportData.summary.esgMetrics.governance_en}
+                                                </Typography>
+                                            )}
+                                        </Typography>
                                     </Box>
                                 </Box>
                             </Grid>
@@ -154,7 +182,14 @@ Total de Árvores Inventariadas: ${reportData.summary.totalTrees}
                                         <TableRow key={tree.id}>
                                             <TableCell>{tree.number}</TableCell>
                                             <TableCell>
-                                                <Typography variant="body2">{tree.popularName}</Typography>
+                                                <Typography variant="body2">
+                                                    {tree.popularName}
+                                                    {tree.popularName_en && (
+                                                        <Box component="span" sx={{ color: 'text.secondary', ml: 0.5, fontSize: '0.85em' }}>
+                                                            ({tree.popularName_en})
+                                                        </Box>
+                                                    )}
+                                                </Typography>
                                                 <Typography variant="caption" color="textSecondary"><i>{tree.specieName}</i></Typography>
                                             </TableCell>
                                             <TableCell align="right">{Number(tree.dap || 0).toFixed(2)}</TableCell>

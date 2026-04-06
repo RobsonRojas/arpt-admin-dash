@@ -22,6 +22,7 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
   const defaultState = {
     id: null,
     descricao: "",
+    descricao_en: "",
     proponente: "Técnico Administrativo",
     estado: "Amazonas",
     municipio: "",
@@ -38,10 +39,13 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
     custo_operacional: "",
     ranking: 5,
     resumo: "",
+    resumo_en: "",
     detalhes: "",
+    detalhes_en: "",
     fotos: [],
     auditoria: { risco: "Baixo", alertas: [] },
-    status: "Em Análise"
+    status: "Em Análise",
+    translations: {}
   };
 
   const [formData, setFormData] = useState(defaultState);
@@ -66,6 +70,13 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
       // Ensure id_status is set (fallback to status or default)
       if (!baseData.id_status && baseData.status) {
         baseData.id_status = baseData.status;
+      }
+ 
+      // Map translations to local fields
+      if (baseData.translations && baseData.translations.en) {
+        baseData.descricao_en = baseData.translations.en.descricao || baseData.descricao_en;
+        baseData.resumo_en = baseData.translations.en.resumo || baseData.resumo_en;
+        baseData.detalhes_en = baseData.translations.en.detalhes || baseData.detalhes_en;
       }
 
       if (savedDraft) {
@@ -168,7 +179,15 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
       ...formData,
       id: formData.id || `PROJ-${Math.floor(Math.random() * 1000)}`,
       custo_operacional: Number(formData.custo_operacional),
-      tamanho: Number(formData.tamanho)
+      tamanho: Number(formData.tamanho),
+      translations: {
+        ...(formData.translations || {}),
+        en: {
+          descricao: formData.descricao_en,
+          resumo: formData.resumo_en,
+          detalhes: formData.detalhes_en
+        }
+      }
     };
 
     try {
@@ -215,9 +234,18 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
               <TextField
                 fullWidth
                 required
-                label="Nome do Projeto / Comunidade"
+                label="Nome do Projeto / Comunidade (PT)"
                 name="descricao"
                 value={formData.descricao}
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Project Name / Community (EN)"
+                name="descricao_en"
+                value={formData.descricao_en || ""}
                 onChange={handleChange}
               />
             </Grid>
@@ -400,10 +428,7 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
               <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
                 <Box>
                   <Typography variant="subtitle2">
-                    Resumo do Projeto
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Breve descrição do projeto (suporta Markdown)
+                    Resumo do Projeto (PT)
                   </Typography>
                 </Box>
                 <AIAssistant
@@ -417,7 +442,7 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
                   value={formData.resumo}
                   onChange={(value) => setFormData(prev => ({ ...prev, resumo: value || '' }))}
                   preview="edit"
-                  height={200}
+                  height={150}
                 />
               </Box>
             </Grid>
@@ -425,10 +450,30 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
               <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
                 <Box>
                   <Typography variant="subtitle2">
-                    Detalhes do Projeto
+                    Resumo do Projeto (EN)
                   </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Informações detalhadas sobre o projeto (suporta Markdown)
+                </Box>
+                <AIAssistant
+                  initialText={formData.resumo_en}
+                  context={`Project: ${formData.descricao_en || formData.descricao}`}
+                  onApply={(text) => setFormData(prev => ({ ...prev, resumo_en: text }))}
+                  label="Translate/Improve EN"
+                />
+              </Box>
+              <Box sx={{ mt: 1 }} data-color-mode="light">
+                <MDEditor
+                  value={formData.resumo_en}
+                  onChange={(value) => setFormData(prev => ({ ...prev, resumo_en: value || '' }))}
+                  preview="edit"
+                  height={150}
+                />
+              </Box>
+            </Grid>
+            <Grid item xs={12}>
+              <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                <Box>
+                  <Typography variant="subtitle2">
+                    Detalhes do Projeto (PT)
                   </Typography>
                 </Box>
                 <AIAssistant
@@ -442,7 +487,30 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
                   value={formData.detalhes}
                   onChange={(value) => setFormData(prev => ({ ...prev, detalhes: value || '' }))}
                   preview="edit"
-                  height={300}
+                  height={250}
+                />
+              </Box>
+            </Grid>
+            <Grid item xs={12}>
+              <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                <Box>
+                  <Typography variant="subtitle2">
+                    Detalhes do Projeto (EN)
+                  </Typography>
+                </Box>
+                <AIAssistant
+                  initialText={formData.detalhes_en}
+                  context={`Project: ${formData.descricao_en || formData.descricao}`}
+                  onApply={(text) => setFormData(prev => ({ ...prev, detalhes_en: text }))}
+                  label="Translate/Improve EN"
+                />
+              </Box>
+              <Box sx={{ mt: 1 }} data-color-mode="light">
+                <MDEditor
+                  value={formData.detalhes_en}
+                  onChange={(value) => setFormData(prev => ({ ...prev, detalhes_en: value || '' }))}
+                  preview="edit"
+                  height={250}
                 />
               </Box>
             </Grid>
@@ -547,12 +615,15 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
       case 4:
         return (
           <Box sx={{ mt: 2 }}>
-            <Alert severity="info">
+            <Alert severity="info" sx={{ mb: 2 }}>
               <Typography variant="subtitle2" gutterBottom>
                 Revisão Final {initialData ? "(Edição)" : "(Novo)"}
               </Typography>
               <Typography variant="body2">
-                <strong>Projeto:</strong> {formData.descricao}
+                <strong>Projeto (PT):</strong> {formData.descricao}
+              </Typography>
+              <Typography variant="body2">
+                <strong>Project (EN):</strong> {formData.descricao_en || "N/A"}
               </Typography>
               <Typography variant="body2">
                 <strong>Local:</strong> {formData.municipio} - {formData.estado}
@@ -568,7 +639,7 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
             {formData.resumo && (
               <Paper variant="outlined" sx={{ mt: 2, p: 2 }}>
                 <Typography variant="subtitle2" color="primary" gutterBottom>
-                  Resumo do Projeto
+                  Resumo do Projeto (PT)
                 </Typography>
                 <Divider sx={{ mb: 1 }} />
                 <Box data-color-mode="light">
@@ -577,14 +648,38 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
               </Paper>
             )}
 
+            {formData.resumo_en && (
+              <Paper variant="outlined" sx={{ mt: 2, p: 2 }}>
+                <Typography variant="subtitle2" color="primary" gutterBottom>
+                  Resumo do Projeto (EN)
+                </Typography>
+                <Divider sx={{ mb: 1 }} />
+                <Box data-color-mode="light">
+                  <MDEditor.Markdown source={formData.resumo_en} style={{ whiteSpace: 'pre-wrap' }} />
+                </Box>
+              </Paper>
+            )}
+
             {formData.detalhes && (
               <Paper variant="outlined" sx={{ mt: 2, p: 2 }}>
                 <Typography variant="subtitle2" color="primary" gutterBottom>
-                  Detalhes do Projeto
+                  Detalhes do Projeto (PT)
                 </Typography>
                 <Divider sx={{ mb: 1 }} />
                 <Box data-color-mode="light">
                   <MDEditor.Markdown source={formData.detalhes} style={{ whiteSpace: 'pre-wrap' }} />
+                </Box>
+              </Paper>
+            )}
+
+            {formData.detalhes_en && (
+              <Paper variant="outlined" sx={{ mt: 2, p: 2 }}>
+                <Typography variant="subtitle2" color="primary" gutterBottom>
+                  Detalhes do Projeto (EN)
+                </Typography>
+                <Divider sx={{ mb: 1 }} />
+                <Box data-color-mode="light">
+                  <MDEditor.Markdown source={formData.detalhes_en} style={{ whiteSpace: 'pre-wrap' }} />
                 </Box>
               </Paper>
             )}
