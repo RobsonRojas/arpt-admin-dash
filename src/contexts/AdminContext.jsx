@@ -52,6 +52,25 @@ export const AdminProvider = ({ children }) => {
     }
 
     // Helper: normaliza payload para API (tipos e campos exigidos)
+    // Synchronize API headers whenever user state changes
+    useEffect(() => {
+        const syncAuthHeader = async () => {
+            if (user) {
+                try {
+                    const token = await user.getIdToken();
+                    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+                    console.log("[AdminContext] Global Auth Header Sync Successful");
+                } catch (error) {
+                    console.error("[AdminContext] Error syncing auth header:", error);
+                }
+            } else {
+                delete api.defaults.headers.common['Authorization'];
+            }
+        };
+
+        syncAuthHeader();
+    }, [user]);
+
     const normalizeProjectForApi = (p) => {
         const statusMap = {
             'Em breve': 1,
@@ -139,9 +158,10 @@ export const AdminProvider = ({ children }) => {
             const before = projects.find(p => p.id === newProject.id);
             const payload = normalizeProjectForApi(newProject);
             
-            // Manual token handling for reliability
-            const token = await user?.getIdToken();
+            // Manual token handling with forced refresh for reliability
+            const token = await user?.getIdToken(true);
             const config = { headers: { Authorization: `Bearer ${token}` } };
+            console.log(`[AdminContext] Updating project ${newProject.id} with forced token refresh.`);
             
             const response = await api.put(`/manejos/${newProject.id}`, payload, config);
             if (response.status === 200) {

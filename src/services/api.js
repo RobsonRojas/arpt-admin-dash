@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { auth } from './firebase';
+import { getAuth } from 'firebase/auth';
 
 export const api = axios.create({
     // baseURL: "https://arpt.site/api",
@@ -9,16 +9,19 @@ export const api = axios.create({
 
 api.interceptors.request.use(
     async (config) => {
-        if (auth?.currentUser) {
+        const authInstance = getAuth();
+        const currentUser = authInstance.currentUser;
+
+        if (currentUser) {
             try {
-                const token = await auth.currentUser.getIdToken();
+                // Force fresh token to be sure it's not expired
+                const token = await currentUser.getIdToken(true);
                 config.headers.Authorization = `Bearer ${token}`;
+                console.log(`[API Interceptor] Token attached to ${config.method?.toUpperCase()} ${config.url}`);
             } catch (error) {
-                console.error("Error getting auth token:", error);
+                console.error("[API Interceptor] Error getting auth token:", error);
             }
         } else {
-            // Optional: Log when no user is found for a request that might need it
-            // but don't block the request here, just let the backend decide.
             console.warn(`[API Interceptor] No current user for request: ${config.method?.toUpperCase()} ${config.url}`);
         }
         return config;
