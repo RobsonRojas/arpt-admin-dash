@@ -21,6 +21,7 @@ export const RevenueReportDialog = ({ open, onClose, project }) => {
     useEffect(() => {
         if (open && project) {
             setLoading(true);
+            console.log(`>>> [RevenueReportDialog] Requesting report for project:`, project.id);
             api.get(`/manejos/${project.id}/revenue-report`)
                 .then(res => setReportData(res.data))
                 .catch(err => {
