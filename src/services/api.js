@@ -2,8 +2,8 @@ import axios from 'axios';
 import { getAuth } from 'firebase/auth';
 
 export const api = axios.create({
-    // baseURL: "https://arpt.site/api",
-    baseURL: "http://localhost:4001",
+    baseURL: "https://arpt.site/api",
+    // baseURL: "http://localhost:4001",
     timeout: 8 * 1000,
 });
 
