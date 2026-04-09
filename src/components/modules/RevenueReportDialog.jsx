@@ -7,6 +7,8 @@ import {
 import { ContentCopy, PictureAsPdf, Description } from '@mui/icons-material';
 import { api } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
+import { PreCadForm } from './PreCadForm';
+import { Edit, Add } from '@mui/icons-material';
 
 /**
  * A reusable dialog component to display project revenue reports.
@@ -18,34 +20,33 @@ import { useAuth } from '../../contexts/AuthContext';
 export const RevenueReportDialog = ({ open, onClose, project }) => {
     const [reportData, setReportData] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [openPreCadForm, setOpenPreCadForm] = useState(false);
+    const [selectedPreCad, setSelectedPreCad] = useState(null);
 
     const { user } = useAuth();
 
     useEffect(() => {
-        const fetchReport = async () => {
-            if (open && project && user) {
-                setLoading(true);
-                try {
-                    console.log(`>>> [RevenueReportDialog] Requesting report for project:`, project.id);
-                    // Manually get token for extra reliability, matching AdminContext pattern
-                    const token = await user.getIdToken(true);
-                    const config = {
-                        headers: { Authorization: `Bearer ${token}` }
-                    };
-                    
-                    const res = await api.get(`/manejos/${project.id}/revenue-report`, config);
-                    setReportData(res.data);
-                } catch (err) {
-                    console.error(">>> [RevenueReportDialog] Error fetching report:", err);
-                    setReportData(null);
-                } finally {
-                    setLoading(false);
-                }
-            }
-        };
-
         fetchReport();
     }, [open, project, user]);
+
+    const fetchReport = async () => {
+        if (open && project && user) {
+            setLoading(true);
+            try {
+                const token = await user.getIdToken(true);
+                const config = {
+                    headers: { Authorization: `Bearer ${token}` }
+                };
+                const res = await api.get(`/manejos/${project.id}/revenue-report`, config);
+                setReportData(res.data);
+            } catch (err) {
+                console.error(">>> [RevenueReportDialog] Error fetching report:", err);
+                setReportData(null);
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
 
     const handleCopy = () => {
         if (!reportData) return;
@@ -146,19 +147,45 @@ ${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number
     };
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-            <DialogTitle>Relatório de Receitas</DialogTitle>
-            <DialogContent dividers>
+        <>
+        <Dialog 
+            open={open} 
+            onClose={onClose} 
+            maxWidth="md" 
+            fullWidth 
+            fullScreen={{ xs: true, sm: false }}
+        >
+            <DialogTitle sx={{ 
+                display: 'flex', 
+                flexDirection: { xs: 'column', sm: 'row' },
+                justifyContent: 'space-between', 
+                alignItems: { xs: 'flex-start', sm: 'center' },
+                gap: 2,
+                p: { xs: 2, sm: 3 }
+            }}>
+                Relatório de Receitas
+                <Button 
+                    variant="contained" 
+                    color="primary" 
+                    size="medium" 
+                    startIcon={<Add />}
+                    fullWidth={{ xs: true, sm: false }}
+                    onClick={() => { setSelectedPreCad(null); setOpenPreCadForm(true); }}
+                >
+                    Nova Venda Manual
+                </Button>
+            </DialogTitle>
+            <DialogContent dividers sx={{ p: { xs: 1, sm: 3 } }}>
                 {loading ? (
                     <Box p={4} textAlign="center"><CircularProgress /></Box>
                 ) : reportData ? (
                     <Box id="revenue-report-content">
-                        <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+                        <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems="flex-start" gap={2}>
                             <Box>
                                 <Typography variant="h5" gutterBottom>{reportData.project.name}</Typography>
                                 <Typography color="textSecondary" gutterBottom>{reportData.project.location}</Typography>
                             </Box>
-                            <Typography variant="body2" color="textSecondary" textAlign="right">
+                            <Typography variant="body2" color="textSecondary" textAlign={{ xs: 'left', sm: 'right' }}>
                                 Gerado em:<br />
                                 <strong>{new Date().toLocaleString('pt-BR')}</strong>
                             </Typography>
@@ -166,15 +193,21 @@ ${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number
 
                         <Box my={3} p={2} bgcolor="#f5f5f5" borderRadius={1}>
                             <Typography variant="subtitle2">RESUMO FINANCEIRO</Typography>
-                            <Box display="flex" justifyContent="space-between" mt={1}>
-                                <Typography><strong>Alvo da Captação:</strong> R$ {parseFloat(reportData.project.target_fundraising || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</Typography>
-                                <Typography><strong>Receita Realizada:</strong> R$ {parseFloat(reportData.project.realized_revenue || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</Typography>
-                            </Box>
-                            <Box display="flex" justifyContent="space-between" mt={1}>
-                                <Typography><strong>Produtos Vendidos:</strong> {reportData.sales.reduce((acc, s) => acc + (s.quantity * (s.qtdProducts || 0)), 0)}</Typography>
-                                <Typography><strong>Doações Recebidas:</strong> {reportData.sales.filter(s => Number(s.rewardPrice) === 0).reduce((acc, s) => acc + s.quantity, 0)}</Typography>
-                            </Box>
-                            <Box mt={1}>
+                            <Grid container spacing={2} sx={{ mt: 1 }}>
+                                <Grid item xs={12} sm={6}>
+                                    <Typography variant="body2"><strong>Alvo da Captação:</strong> R$ {parseFloat(reportData.project.target_fundraising || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <Typography variant="body2"><strong>Receita Realizada:</strong> R$ {parseFloat(reportData.project.realized_revenue || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <Typography variant="body2"><strong>Produtos Vendidos:</strong> {reportData.sales.reduce((acc, s) => acc + (s.quantity * (s.qtdProducts || 0)), 0)}</Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <Typography variant="body2"><strong>Doações Recebidas:</strong> {reportData.sales.filter(s => Number(s.rewardPrice) === 0).reduce((acc, s) => acc + s.quantity, 0)}</Typography>
+                                </Grid>
+                            </Grid>
+                            <Box mt={2}>
                                 <Typography variant="caption">Progresso da Meta</Typography>
                                 <LinearProgress variant="determinate" value={Math.min((reportData.project.realized_revenue / reportData.project.target_fundraising) * 100, 100)} sx={{ height: 10, borderRadius: 5 }} />
                                 <Typography variant="caption" align="right" display="block">{Number((reportData.project.realized_revenue / reportData.project.target_fundraising) * 100).toFixed(1)}%</Typography>
@@ -182,16 +215,16 @@ ${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number
                         </Box>
 
                         <Typography variant="h6" gutterBottom mt={3}>Vendas Realizadas</Typography>
-                        <TableContainer component={Paper} variant="outlined">
+                        <TableContainer component={Paper} variant="outlined" sx={{ overflowX: 'auto' }}>
                             <Table size="small">
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell>Data</TableCell>
-                                        <TableCell>Produto / Recompensa</TableCell>
+                                        <TableCell sx={{ minWidth: 100 }}>Data</TableCell>
+                                        <TableCell>Produto</TableCell>
                                         <TableCell align="center">Qtd</TableCell>
-                                        <TableCell align="center">Itens/Und</TableCell>
-                                        <TableCell align="center">Total Itens</TableCell>
+                                        <TableCell align="center" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>Total Itens</TableCell>
                                         <TableCell align="right">Valor Est.</TableCell>
+                                        <TableCell align="right">Ação</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -199,19 +232,34 @@ ${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number
                                         <TableRow key={i}>
                                             <TableCell>{new Date(sale.date).toLocaleDateString('pt-BR')}</TableCell>
                                             <TableCell>
-                                                <Typography variant="body2">
+                                                <Typography variant="body2" sx={{ 
+                                                    maxWidth: { xs: 120, sm: 'none' },
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                    whiteSpace: 'nowrap'
+                                                }}>
                                                     {Number(sale.rewardPrice) === 0 ? "Doação" : sale.product}
                                                 </Typography>
                                             </TableCell>
                                             <TableCell align="center">{sale.quantity}</TableCell>
-                                            <TableCell align="center">{sale.qtdProducts || 0}</TableCell>
-                                            <TableCell align="center">{sale.quantity * (sale.qtdProducts || 0)}</TableCell>
+                                            <TableCell align="center" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
+                                                {sale.quantity * (sale.qtdProducts || 0)}
+                                            </TableCell>
                                             <TableCell align="right">R$ {parseFloat(sale.value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
+                                            <TableCell align="right">
+                                                <IconButton 
+                                                    size="small" 
+                                                    title="Editar" 
+                                                    onClick={() => { setSelectedPreCad(sale); setOpenPreCadForm(true); }}
+                                                >
+                                                    <Edit fontSize="small" />
+                                                </IconButton>
+                                            </TableCell>
                                         </TableRow>
                                     ))}
                                     {reportData.sales.length === 0 && (
                                         <TableRow>
-                                            <TableCell colSpan={6} align="center">Nenhuma venda registrada.</TableCell>
+                                            <TableCell colSpan={7} align="center">Nenhuma venda registrada.</TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>
@@ -224,12 +272,29 @@ ${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number
                     </Typography>
                 )}
             </DialogContent>
-            <DialogActions>
-                <Button onClick={onClose}>Fechar</Button>
-                <Button variant="outlined" startIcon={<ContentCopy />} onClick={handleCopy} disabled={!reportData}>Copiar</Button>
-                <Button variant="outlined" startIcon={<Description />} onClick={handleExportODT} disabled={!reportData}>Exportar ODT</Button>
-                <Button variant="contained" startIcon={<PictureAsPdf />} onClick={handlePrint} disabled={!reportData}>Imprimir / PDF</Button>
+            <DialogActions sx={{ 
+                p: { xs: 2, sm: 3 }, 
+                flexDirection: { xs: 'column', sm: 'row' },
+                gap: 1
+            }}>
+                <Box sx={{ flexGrow: 1, display: 'flex', gap: 1, width: { xs: '100%', sm: 'auto' } }}>
+                    <Button fullWidth variant="outlined" startIcon={<ContentCopy />} onClick={handleCopy} disabled={!reportData}>Copiar</Button>
+                    <Button fullWidth variant="outlined" startIcon={<Description />} onClick={handleExportODT} disabled={!reportData}>Exportar</Button>
+                </Box>
+                <Box sx={{ display: 'flex', gap: 1, width: { xs: '100%', sm: 'auto' } }}>
+                    <Button fullWidth variant="contained" startIcon={<PictureAsPdf />} onClick={handlePrint} disabled={!reportData}>PDF</Button>
+                    <Button onClick={onClose}>Fechar</Button>
+                </Box>
             </DialogActions>
         </Dialog>
+
+        <PreCadForm
+            open={openPreCadForm}
+            onClose={() => setOpenPreCadForm(false)}
+            project={project}
+            purchase={selectedPreCad}
+            onSave={fetchReport}
+        />
+        </>
     );
 };

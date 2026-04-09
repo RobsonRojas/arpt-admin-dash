@@ -1006,6 +1006,52 @@ export const AdminProvider = ({ children }) => {
         }
     };
 
+    const registerManualPurchase = async (payload) => {
+        try {
+            const token = await user?.getIdToken(true);
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.post('/admin/pagamentos/register', payload, config);
+            if (response.status === 201 || response.status === 200) {
+                await recordAudit({
+                    action: 'CREATE',
+                    entity: 'PURCHASE',
+                    entityId: String(response.data.data?.id || 'manual'),
+                    before: null,
+                    after: payload,
+                    user
+                });
+                return response.data;
+            }
+            return null;
+        } catch (error) {
+            console.error("Error registering manual purchase:", error);
+            throw error;
+        }
+    };
+
+    const updatePurchase = async (purchaseId, payload) => {
+        try {
+            const token = await user?.getIdToken(true);
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.put(`/admin/pagamentos/${purchaseId}`, payload, config);
+            if (response.status === 200) {
+                await recordAudit({
+                    action: 'UPDATE',
+                    entity: 'PURCHASE',
+                    entityId: String(purchaseId),
+                    before: null,
+                    after: payload,
+                    user
+                });
+                return response.data;
+            }
+            return null;
+        } catch (error) {
+            console.error("Error updating purchase:", error);
+            throw error;
+        }
+    };
+
     // ==================== REGRAS DE NEGÓCIO - NAVEGAÇÃO ====================
 
     /**
@@ -1134,6 +1180,10 @@ export const AdminProvider = ({ children }) => {
         createIncident,
         updateIncident,
         deleteIncident,
+
+        // Regras de Negócio - Pagamentos
+        registerManualPurchase,
+        updatePurchase,
     };
 
     return (
