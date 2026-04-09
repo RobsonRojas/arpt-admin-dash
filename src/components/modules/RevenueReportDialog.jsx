@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import {
     Box, Typography, Button, Dialog, DialogTitle, DialogContent,
     DialogActions, CircularProgress, LinearProgress, TableContainer,
-    Table, TableHead, TableRow, TableCell, TableBody, Paper, Divider
+    Table, TableHead, TableRow, TableCell, TableBody, Paper, Divider,
+    IconButton, Grid
 } from '@mui/material';
 import { ContentCopy, PictureAsPdf, Description } from '@mui/icons-material';
 import { api } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { PreCadForm } from './PreCadForm';
-import { Edit, Add } from '@mui/icons-material';
+import { Edit, Add, Email } from '@mui/icons-material';
 
 /**
  * A reusable dialog component to display project revenue reports.
@@ -45,6 +46,22 @@ export const RevenueReportDialog = ({ open, onClose, project }) => {
             } finally {
                 setLoading(false);
             }
+        }
+    };
+
+    const handleResendEmail = async (saleId) => {
+        if (!window.confirm("Deseja reenviar o e-mail de finalização de cadastro para este usuário?")) return;
+        
+        try {
+            const token = await user.getIdToken(true);
+            const config = {
+                headers: { Authorization: `Bearer ${token}` }
+            };
+            await api.post(`/admin/pagamentos/${saleId}/resend-email`, {}, config);
+            alert("E-mail de reenvio solicitado com sucesso!");
+        } catch (err) {
+            console.error(">>> [RevenueReportDialog] Error resending email:", err);
+            alert("Erro ao reenviar e-mail. Verifique os logs.");
         }
     };
 
@@ -247,13 +264,23 @@ ${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number
                                             </TableCell>
                                             <TableCell align="right">R$ {parseFloat(sale.value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
                                             <TableCell align="right">
-                                                <IconButton 
-                                                    size="small" 
-                                                    title="Editar" 
-                                                    onClick={() => { setSelectedPreCad(sale); setOpenPreCadForm(true); }}
-                                                >
-                                                    <Edit fontSize="small" />
-                                                </IconButton>
+                                                <Box display="flex" justifyContent="flex-end" gap={0.5}>
+                                                    <IconButton 
+                                                        size="small" 
+                                                        title="Reenviar E-mail de Cadastro" 
+                                                        color="primary"
+                                                        onClick={() => handleResendEmail(sale.id || sale.purchase_id)}
+                                                    >
+                                                        <Email fontSize="small" />
+                                                    </IconButton>
+                                                    <IconButton 
+                                                        size="small" 
+                                                        title="Editar" 
+                                                        onClick={() => { setSelectedPreCad(sale); setOpenPreCadForm(true); }}
+                                                    >
+                                                        <Edit fontSize="small" />
+                                                    </IconButton>
+                                                </Box>
                                             </TableCell>
                                         </TableRow>
                                     ))}
