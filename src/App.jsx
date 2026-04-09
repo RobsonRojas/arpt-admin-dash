@@ -38,6 +38,11 @@ const AxiosInterceptorSetup = () => {
 };
 
 export default function App() {
+  useEffect(() => {
+    console.log(`🚀 [Build Info] App version: 11.0.1 - Deployed: ${new Date().toLocaleString()}`);
+    console.log(`📌 [Debug] Build Fix: Hardened Auth Headers & PWA Cache Buster v1`);
+  }, []);
+
   return (
     <ErrorProvider>
       <AxiosInterceptorSetup />

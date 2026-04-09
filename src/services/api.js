@@ -17,16 +17,20 @@ api.interceptors.request.use(
                 // Force fresh token to be sure it's not expired
                 const token = await currentUser.getIdToken(true);
                 
-                // Ensure headers object exists
-                config.headers = config.headers || {};
-                config.headers.Authorization = `Bearer ${token}`;
+                // Use .set for AxiosHeaders (Axios 1.x) or direct assignment for plain objects
+                if (config.headers && typeof config.headers.set === 'function') {
+                    config.headers.set('Authorization', `Bearer ${token}`);
+                } else {
+                    config.headers = config.headers || {};
+                    config.headers['Authorization'] = `Bearer ${token}`;
+                }
                 
-                console.log(`>>> [API Interceptor] Token attached successfully to: ${config.url}`);
+                console.log(`>>> [API Interceptor] Token attached successfully [v2] to: ${config.url}`);
             } catch (error) {
                 console.error(">>> [API Interceptor] Error getting auth token:", error);
             }
         } else {
-            console.warn(`>>> [API Interceptor] No current user found for request: ${config.method?.toUpperCase()} ${config.url}`);
+            console.warn(`>>> [API Interceptor] No current user found (singleton auth) for request: ${config.method?.toUpperCase()} ${config.url}`);
         }
         return config;
     },
