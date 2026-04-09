@@ -6,6 +6,7 @@ import {
 } from '@mui/material';
 import { ContentCopy, PictureAsPdf, Description } from '@mui/icons-material';
 import { api } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 
 /**
  * A reusable dialog component to display project revenue reports.
@@ -18,19 +19,33 @@ export const RevenueReportDialog = ({ open, onClose, project }) => {
     const [reportData, setReportData] = useState(null);
     const [loading, setLoading] = useState(false);
 
+    const { user } = useAuth();
+
     useEffect(() => {
-        if (open && project) {
-            setLoading(true);
-            console.log(`>>> [RevenueReportDialog] Requesting report for project:`, project.id);
-            api.get(`/manejos/${project.id}/revenue-report`)
-                .then(res => setReportData(res.data))
-                .catch(err => {
-                    console.error(err);
+        const fetchReport = async () => {
+            if (open && project && user) {
+                setLoading(true);
+                try {
+                    console.log(`>>> [RevenueReportDialog] Requesting report for project:`, project.id);
+                    // Manually get token for extra reliability, matching AdminContext pattern
+                    const token = await user.getIdToken(true);
+                    const config = {
+                        headers: { Authorization: `Bearer ${token}` }
+                    };
+                    
+                    const res = await api.get(`/manejos/${project.id}/revenue-report`, config);
+                    setReportData(res.data);
+                } catch (err) {
+                    console.error(">>> [RevenueReportDialog] Error fetching report:", err);
                     setReportData(null);
-                })
-                .finally(() => setLoading(false));
-        }
-    }, [open, project]);
+                } finally {
+                    setLoading(false);
+                }
+            }
+        };
+
+        fetchReport();
+    }, [open, project, user]);
 
     const handleCopy = () => {
         if (!reportData) return;

@@ -12,22 +12,21 @@ api.interceptors.request.use(
     async (config) => {
         const currentUser = auth?.currentUser;
 
-        console.log(`>>> [API Request] ${config.method?.toUpperCase()} ${config.url}`, {
-            hasUser: !!currentUser,
-            userEmail: currentUser?.email
-        });
-
         if (currentUser) {
             try {
                 // Force fresh token to be sure it's not expired
                 const token = await currentUser.getIdToken(true);
+                
+                // Ensure headers object exists
+                config.headers = config.headers || {};
                 config.headers.Authorization = `Bearer ${token}`;
-                console.log(`>>> [API Interceptor] Token attached to ${config.url.substring(0, 50)}...`);
+                
+                console.log(`>>> [API Interceptor] Token attached successfully to: ${config.url}`);
             } catch (error) {
                 console.error(">>> [API Interceptor] Error getting auth token:", error);
             }
         } else {
-            console.warn(`>>> [API Interceptor] No current user for request: ${config.method?.toUpperCase()} ${config.url}`);
+            console.warn(`>>> [API Interceptor] No current user found for request: ${config.method?.toUpperCase()} ${config.url}`);
         }
         return config;
     },
