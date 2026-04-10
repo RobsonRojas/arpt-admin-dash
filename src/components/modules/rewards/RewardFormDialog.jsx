@@ -25,7 +25,7 @@ export const RewardFormDialog = ({
                         <TextField
                             select
                             fullWidth
-                            label="Selecione o Produto *"
+                            label={isEditing ? "Alterar Produto Associado *" : "Selecione o Produto *"}
                             value={formData.id_produto}
                             onChange={e => {
                                 const prod = products.find(p => p.id === e.target.value);
@@ -35,6 +35,7 @@ export const RewardFormDialog = ({
                                     qtd_products: prod?.qtd_disponivel || 0
                                 });
                             }}
+                            helperText={isEditing ? "Selecione um novo produto se desejar alterar a associação desta recompensa" : "Escolha o produto base para esta recompensa"}
                         >
                             {products.map((product) => (
                                 <MenuItem key={product.id} value={product.id}>
@@ -43,6 +44,7 @@ export const RewardFormDialog = ({
                             ))}
                         </TextField>
                     </Grid>
+
                     {formData.id_produto && (
                         <>
                             <Grid item xs={12}>
