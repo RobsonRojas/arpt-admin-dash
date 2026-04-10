@@ -34,11 +34,14 @@ export const Products = () => {
     const [persistenceKey, setPersistenceKey] = useState('product_draft_new');
     const [formData, setFormData, clearDraft] = usePersistence(persistenceKey, {
         nome: '',
+        nome_en: '',
         info: '',
+        info_en: '',
         preco: 0,
         prazo_entrega_meses: 0,
         is_ativo: true,
-        foto_url: ''
+        foto_url: '',
+        translations: {}
     });
 
     // Image Error State for View and Preview
@@ -94,22 +97,33 @@ export const Products = () => {
             key = `product_draft_${product.id}`;
             initialData = {
                 nome: product.nome,
+                nome_en: product.nome_en || '',
                 info: product.info,
+                info_en: product.info_en || '',
                 preco: product.preco,
                 prazo_entrega_meses: product.prazo_entrega_meses,
                 is_ativo: product.is_ativo,
-                foto_url: product.fotos?.[0]?.url || ''
+                foto_url: product.fotos?.[0]?.url || '',
+                translations: product.translations || {}
             };
+            // Map translations to local fields
+            if (product.translations && product.translations.en) {
+                initialData.nome_en = product.translations.en.nome || '';
+                initialData.info_en = product.translations.en.info || '';
+            }
         } else {
             setEditingProduct(null);
             key = 'product_draft_new';
             initialData = {
                 nome: '',
+                nome_en: '',
                 info: '',
+                info_en: '',
                 preco: 0,
                 prazo_entrega_meses: 0,
                 is_ativo: true,
-                foto_url: ''
+                foto_url: '',
+                translations: {}
             };
         }
 
@@ -145,10 +159,19 @@ export const Products = () => {
         try {
             const payload = {
                 nome: formData.nome,
+                nome_en: formData.nome_en,
                 info: formData.info,
+                info_en: formData.info_en,
                 preco: Number(formData.preco),
                 prazo_entrega_meses: Number(formData.prazo_entrega_meses),
                 is_ativo: formData.is_ativo,
+                translations: {
+                    ...(formData.translations || {}),
+                    en: {
+                        nome: formData.nome_en,
+                        info: formData.info_en
+                    }
+                },
                 fotos: formData.foto_url ? [{ src: formData.foto_url, alt: formData.nome.padEnd(10, '_'), type: 'principal' }] : []
             };
 
@@ -352,28 +375,53 @@ export const Products = () => {
                 <DialogContent dividers>
                     <Box display="flex" flexDirection="column" gap={2}>
                         <TextField
-                            label="Nome do Produto"
+                            label="Nome do Produto (PT)"
                             fullWidth
                             value={formData.nome}
                             onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
                         />
+                        <TextField
+                            label="Nome do Produto (EN)"
+                            fullWidth
+                            value={formData.nome_en}
+                            onChange={(e) => setFormData({ ...formData, nome_en: e.target.value })}
+                        />
                         <Grid item xs={12}>
                             <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                                <Typography variant="caption">Descrição / Informações</Typography>
+                                <Typography variant="caption">Descrição / Informações (PT)</Typography>
                                 <AIAssistant
                                     initialText={formData.info}
                                     context={`Produto: ${formData.nome}`}
                                     onApply={(text) => setFormData({ ...formData, info: text })}
-                                    label="Melhorar Descrição"
+                                    label="Melhorar Descrição PT"
                                 />
                             </Box>
                             <TextField
                                 fullWidth
-                                label="Informações Adicionais"
+                                label="Informações Adicionais (PT)"
                                 multiline
                                 rows={3}
                                 value={formData.info}
                                 onChange={(e) => setFormData({ ...formData, info: e.target.value })}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                                <Typography variant="caption">Descrição / Informações (EN)</Typography>
+                                <AIAssistant
+                                    initialText={formData.info_en}
+                                    context={`Product: ${formData.nome_en || formData.nome}`}
+                                    onApply={(text) => setFormData({ ...formData, info_en: text })}
+                                    label="Improve Description EN"
+                                />
+                            </Box>
+                            <TextField
+                                fullWidth
+                                label="Additional Info (EN)"
+                                multiline
+                                rows={3}
+                                value={formData.info_en}
+                                onChange={(e) => setFormData({ ...formData, info_en: e.target.value })}
                             />
                         </Grid>
                         <Box display="flex" gap={2}>
@@ -499,9 +547,14 @@ export const Products = () => {
                                 )}
                             </Grid>
                             <Grid item xs={12}>
-                                <Typography variant="subtitle2" color="textSecondary">Descrição</Typography>
+                                <Typography variant="subtitle2" color="textSecondary">Descrição (PT)</Typography>
                                 <Typography variant="body1" paragraph>
                                     {viewingProduct.info || "Sem descrição."}
+                                </Typography>
+
+                                <Typography variant="subtitle2" color="textSecondary">Descrição (EN)</Typography>
+                                <Typography variant="body1" paragraph>
+                                    {viewingProduct.translations?.en?.info || viewingProduct.info_en || "No description available."}
                                 </Typography>
 
                                 <Box display="flex" justifyContent="space-between" mt={2}>

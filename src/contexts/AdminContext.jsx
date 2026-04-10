@@ -52,6 +52,25 @@ export const AdminProvider = ({ children }) => {
     }
 
     // Helper: normaliza payload para API (tipos e campos exigidos)
+    // Synchronize API headers whenever user state changes
+    useEffect(() => {
+        const syncAuthHeader = async () => {
+            if (user) {
+                try {
+                    const token = await user.getIdToken();
+                    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+                    console.log("[AdminContext] Global Auth Header Sync Successful");
+                } catch (error) {
+                    console.error("[AdminContext] Error syncing auth header:", error);
+                }
+            } else {
+                delete api.defaults.headers.common['Authorization'];
+            }
+        };
+
+        syncAuthHeader();
+    }, [user]);
+
     const normalizeProjectForApi = (p) => {
         const statusMap = {
             'Em breve': 1,
@@ -93,8 +112,11 @@ export const AdminProvider = ({ children }) => {
         const payload = {
             id: p.id,
             descricao: p.descricao || '',
+            descricao_en: p.descricao_en || '',
             resumo: p.resumo || '',
+            resumo_en: p.resumo_en || '',
             detalhes: p.detalhes || '',
+            detalhes_en: p.detalhes_en || '',
             estado: p.estado || '',
             municipio: p.municipio || '',
             potencial: p.potencial || '',
@@ -113,6 +135,7 @@ export const AdminProvider = ({ children }) => {
             ...(p.intervalo_tempo_manejo && { intervalo_tempo_manejo: p.intervalo_tempo_manejo }),
             ...(p.expira_anos && { expira_anos: p.expira_anos }),
             ...(p.nome && { nome: p.nome }),
+            ...(p.nome_en && { nome_en: p.nome_en }),
             ...(p.id_propriedade && { id_propriedade: Number(p.id_propriedade) }),
             fotos: (p.fotos || []).map(f => ({
                 src: f.src || f.url || f,
@@ -134,7 +157,13 @@ export const AdminProvider = ({ children }) => {
         try {
             const before = projects.find(p => p.id === newProject.id);
             const payload = normalizeProjectForApi(newProject);
-            const response = await api.put(`/manejos/${newProject.id}`, payload);
+            
+            // Manual token handling with forced refresh for reliability
+            const token = await user?.getIdToken(true);
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            console.log(`[AdminContext] Updating project ${newProject.id} with forced token refresh.`);
+            
+            const response = await api.put(`/manejos/${newProject.id}`, payload, config);
             if (response.status === 200) {
                 console.log('Projeto atualizado com sucesso na API.');
 
@@ -169,7 +198,11 @@ export const AdminProvider = ({ children }) => {
             // Remove ID for creation allowing backend/DB to assign
             delete payload.id;
 
-            const response = await api.post('/manejos', payload);
+            // Manual token handling for reliability
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+
+            const response = await api.post('/manejos', payload, config);
             if (response.status === 201 || response.status === 200) {
                 console.log('Projeto criado com sucesso na API.');
                 await recordAudit({
@@ -286,7 +319,9 @@ export const AdminProvider = ({ children }) => {
 
     const createInventory = async (payload) => {
         try {
-            const response = await api.post('/inventarios', payload);
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.post('/inventarios', payload, config);
             if (response.status === 201 || response.status === 200) {
                 return response.data;
             }
@@ -300,7 +335,9 @@ export const AdminProvider = ({ children }) => {
 
     const createTree = async (inventoryId, payload) => {
         try {
-            const response = await api.post(`/arvores`, payload);
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.post(`/arvores`, payload, config);
             if (response.status === 201 || response.status === 200) {
                 return response.data;
             }
@@ -314,7 +351,9 @@ export const AdminProvider = ({ children }) => {
 
     const updateTree = async (treeId, payload) => {
         try {
-            const response = await api.put(`/arvores/${treeId}`, payload);
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.put(`/arvores/${treeId}`, payload, config);
             if (response.status === 200) {
                 return response.data;
             }
@@ -328,7 +367,9 @@ export const AdminProvider = ({ children }) => {
 
     const deleteTree = async (treeId) => {
         try {
-            const response = await api.delete(`/arvores/${treeId}`);
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.delete(`/arvores/${treeId}`, config);
             if (response.status === 200) {
                 return true;
             }
@@ -345,9 +386,11 @@ export const AdminProvider = ({ children }) => {
             const formData = new FormData();
             formData.append('file', file);
 
+            const token = await user?.getIdToken();
             const response = await api.post(`/arvores/${treeId}/photo_upload`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}`
                 },
             });
 
@@ -364,7 +407,9 @@ export const AdminProvider = ({ children }) => {
 
     const createTreePhoto = async (payload) => {
         try {
-            const response = await api.post('/arvorefotos', payload);
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.post('/arvorefotos', payload, config);
             if (response.status === 200 || response.status === 201) {
                 return response.data;
             }
@@ -411,9 +456,11 @@ export const AdminProvider = ({ children }) => {
             const formData = new FormData();
             formData.append('file', file);
 
+            const token = await user?.getIdToken();
             const response = await api.post(`/medias/upload`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}`
                 },
             });
 
@@ -430,7 +477,9 @@ export const AdminProvider = ({ children }) => {
 
     const createPropertyPhoto = async (payload) => {
         try {
-            const response = await api.post('/lugarfotos', payload);
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.post('/lugarfotos', payload, config);
             if (response.status === 200 || response.status === 201 || response.status === 208) {
                 return response.data;
             }
@@ -585,9 +634,15 @@ export const AdminProvider = ({ children }) => {
             let data = payload;
             let headers = {};
 
+            const token = await user?.getIdToken();
             if (payload instanceof FormData) {
                 data = payload;
-                headers = { 'Content-Type': 'multipart/form-data' };
+                headers = { 
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}`
+                };
+            } else {
+                headers = { Authorization: `Bearer ${token}` };
             }
 
             const response = await api.post(`/manejos/${manejoId}/docs`, data, { headers });
@@ -604,7 +659,9 @@ export const AdminProvider = ({ children }) => {
 
     const deleteDoc = async (manejoId, docId) => {
         try {
-            const response = await api.delete(`/manejos/${manejoId}/docs/${docId}`);
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.delete(`/manejos/${manejoId}/docs/${docId}`, config);
             if (response.status === 200 || response.status === 204) {
                 return true;
             }
@@ -634,7 +691,9 @@ export const AdminProvider = ({ children }) => {
 
     const createIncident = async (manejoId, payload) => {
         try {
-            const response = await api.post(`/manejos/${manejoId}/incidents`, payload);
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.post(`/manejos/${manejoId}/incidents`, payload, config);
             if (response.status === 201 || response.status === 200) {
                 return response.data;
             }
@@ -648,7 +707,9 @@ export const AdminProvider = ({ children }) => {
 
     const updateIncident = async (manejoId, incidentId, payload) => {
         try {
-            const response = await api.put(`/manejos/${manejoId}/incidents/${incidentId}`, payload);
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.put(`/manejos/${manejoId}/incidents/${incidentId}`, payload, config);
             if (response.status === 200) {
                 return response.data;
             }
@@ -662,7 +723,9 @@ export const AdminProvider = ({ children }) => {
 
     const deleteIncident = async (manejoId, incidentId) => {
         try {
-            const response = await api.delete(`/manejos/${manejoId}/incidents/${incidentId}`);
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.delete(`/manejos/${manejoId}/incidents/${incidentId}`, config);
             if (response.status === 200 || response.status === 204) {
                 return true;
             }
@@ -749,52 +812,99 @@ export const AdminProvider = ({ children }) => {
      * Adicionar nova propriedade
      */
     const handleAddProperty = async (property) => {
-        const newProperty = {
-            ...property,
-            id: `PROP-${Math.floor(Math.random() * 10000)}`,
-            area: Number(property.area),
-            coords: {
-                lat: Number(property.lat) || -3.0,
-                lng: Number(property.lng) || -60.0
+        try {
+            // Normalizar dados para envio à API
+            const payload = {
+                name: property.name || property.descricao || '',
+                address: property.address || '',
+                area_he: Number(property.area || property.area_he || 0),
+                longitude: Number(property.longitude || property.lng || -60.0),
+                latitude: Number(property.latitude || property.lat || -3.0),
+                id_municipality: Number(property.id_municipality || 1),
+                aquisition_year: Number(property.aquisition_year || new Date().getFullYear()),
+                info: property.info || property.descricao || '',
+                image_internal_path: property.image_internal_path || '/default/property.jpg',
+                user_id: user?.uid || ''
+            };
+
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.post('/propriedades/sync', payload, config);
+
+            if (response.status === 200 || response.status === 201) {
+                const newProperty = {
+                    id: response.data.id,
+                    ...payload
+                };
+
+                await recordAudit({
+                    action: 'CREATE',
+                    entity: 'PROPERTY',
+                    entityId: String(response.data.id),
+                    before: null,
+                    after: newProperty,
+                    user
+                });
+
+                setProperties(prev => [newProperty, ...prev]);
+                return newProperty;
             }
-        };
-
-        await recordAudit({
-            action: 'CREATE',
-            entity: 'PROPERTY',
-            entityId: newProperty.id,
-            before: null,
-            after: newProperty,
-            user
-        });
-
-        setProperties(prev => [newProperty, ...prev]);
+        } catch (error) {
+            console.error('ERROR: Error creating property:', error);
+            throw error;
+        }
     };
 
     /**
      * Atualizar propriedade existente
      */
     const handleUpdateProperty = async (property) => {
-        const before = properties.find(p => p.id === property.id);
-        const updatedProperty = {
-            ...property,
-            area: Number(property.area),
-            coords: {
-                lat: Number(property.lat),
-                lng: Number(property.lng)
+        try {
+            if (!property?.id) {
+                throw new Error('ID da propriedade é obrigatório para atualização');
             }
-        };
 
-        await recordAudit({
-            action: 'UPDATE',
-            entity: 'PROPERTY',
-            entityId: property.id,
-            before,
-            after: updatedProperty,
-            user
-        });
+            const before = properties.find(p => p.id === property.id);
 
-        setProperties(prev => prev.map(p => p.id === property.id ? updatedProperty : p));
+            // Normalizar dados para envio à API
+            const payload = {
+                name: property.name || property.descricao || '',
+                address: property.address || '',
+                area_he: Number(property.area || property.area_he || 0),
+                longitude: Number(property.longitude || property.lng || -60.0),
+                latitude: Number(property.latitude || property.lat || -3.0),
+                id_municipality: Number(property.id_municipality || 1),
+                aquisition_year: Number(property.aquisition_year || new Date().getFullYear()),
+                info: property.info || property.descricao || '',
+                image_internal_path: property.image_internal_path || '/default/property.jpg'
+            };
+
+            const token = await user?.getIdToken();
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.put(`/propriedades/${property.id}`, payload, config);
+
+            if (response.status === 200) {
+                const updatedProperty = {
+                    id: property.id,
+                    ...payload
+                };
+
+                await recordAudit({
+                    action: 'UPDATE',
+                    entity: 'PROPERTY',
+                    entityId: String(property.id),
+                    before,
+                    after: updatedProperty,
+                    user
+                });
+
+                setProperties(prev => prev.map(p => p.id === property.id ? updatedProperty : p));
+                return updatedProperty;
+            }
+        } catch (error) {
+            console.error('ERROR: Error updating property:', error);
+            throw error;
+        }
     };
 
     /**
@@ -802,19 +912,32 @@ export const AdminProvider = ({ children }) => {
      */
     const handleDeleteProperty = async (propertyId) => {
         if (window.confirm('Tem certeza que deseja deletar esta propriedade?')) {
-            const before = properties.find(p => p.id === propertyId);
+            try {
+                const before = properties.find(p => p.id === propertyId);
 
-            await recordAudit({
-                action: 'DELETE',
-                entity: 'PROPERTY',
-                entityId: propertyId,
-                before,
-                after: null,
-                user
-            });
+                const token = await user?.getIdToken();
+                const config = { headers: { Authorization: `Bearer ${token}` } };
+                const response = await api.delete(`/propriedades/sync/${propertyId}`, config);
 
-            setProperties(prev => prev.filter(p => p.id !== propertyId));
+                if (response.status === 200) {
+                    await recordAudit({
+                        action: 'DELETE',
+                        entity: 'PROPERTY',
+                        entityId: String(propertyId),
+                        before,
+                        after: null,
+                        user
+                    });
+
+                    setProperties(prev => prev.filter(p => p.id !== propertyId));
+                    return true;
+                }
+            } catch (error) {
+                console.error('ERROR: Error deleting property:', error);
+                throw error;
+            }
         }
+        return false;
     };
 
     // ==================== REGRAS DE NEGÓCIO - NECROMASSA ====================
@@ -880,6 +1003,52 @@ export const AdminProvider = ({ children }) => {
             });
 
             setNecromassaRequests(prev => prev.filter(req => req.id !== requestId));
+        }
+    };
+
+    const registerManualPurchase = async (payload) => {
+        try {
+            const token = await user?.getIdToken(true);
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.post('/admin/pagamentos/register', payload, config);
+            if (response.status === 201 || response.status === 200) {
+                await recordAudit({
+                    action: 'CREATE',
+                    entity: 'PURCHASE',
+                    entityId: String(response.data.data?.id || 'manual'),
+                    before: null,
+                    after: payload,
+                    user
+                });
+                return response.data;
+            }
+            return null;
+        } catch (error) {
+            console.error("Error registering manual purchase:", error);
+            throw error;
+        }
+    };
+
+    const updatePurchase = async (purchaseId, payload) => {
+        try {
+            const token = await user?.getIdToken(true);
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.put(`/admin/pagamentos/${purchaseId}`, payload, config);
+            if (response.status === 200) {
+                await recordAudit({
+                    action: 'UPDATE',
+                    entity: 'PURCHASE',
+                    entityId: String(purchaseId),
+                    before: null,
+                    after: payload,
+                    user
+                });
+                return response.data;
+            }
+            return null;
+        } catch (error) {
+            console.error("Error updating purchase:", error);
+            throw error;
         }
     };
 
@@ -1011,6 +1180,10 @@ export const AdminProvider = ({ children }) => {
         createIncident,
         updateIncident,
         deleteIncident,
+
+        // Regras de Negócio - Pagamentos
+        registerManualPurchase,
+        updatePurchase,
     };
 
     return (

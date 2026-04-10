@@ -22,9 +22,11 @@ export const Certificates = () => {
         sponsorName: '',
         userEmail: '',
         projectName: '',
+        projectName_en: '',
         date: new Date().toISOString().split('T')[0],
         blockchainLink: '',
-        type: 'Ouro'
+        type: 'Ouro',
+        type_en: ''
     });
     const [submitting, setSubmitting] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
@@ -64,9 +66,11 @@ export const Certificates = () => {
                 sponsorName: cert.sponsorName,
                 userEmail: cert.userEmail || '',
                 projectName: cert.projectName,
+                projectName_en: cert.projectName_en || '',
                 date: cert.date,
                 blockchainLink: cert.blockchainLink || '',
-                type: cert.type || 'Ouro'
+                type: cert.type || 'Ouro',
+                type_en: cert.type_en || ''
             });
         } else {
             setEditingId(null);
@@ -74,9 +78,11 @@ export const Certificates = () => {
                 sponsorName: '',
                 userEmail: '',
                 projectName: '',
+                projectName_en: '',
                 date: new Date().toISOString().split('T')[0],
                 blockchainLink: '',
-                type: 'Ouro'
+                type: 'Ouro',
+                type_en: ''
             });
         }
         setOpenDialog(true);
@@ -104,9 +110,11 @@ export const Certificates = () => {
                 sponsorName: formData.sponsorName,
                 userEmail: formData.userEmail,
                 projectName: formData.projectName,
+                projectName_en: formData.projectName_en || '',
                 date: formData.date,
                 blockchainLink: formData.blockchainLink || '',
-                type: formData.type
+                type: formData.type,
+                type_en: formData.type_en || ''
             };
 
             if (editingId) {
@@ -147,9 +155,11 @@ export const Certificates = () => {
         const viewData = {
             sponsorName: cert.sponsorName,
             projectName: cert.projectName,
+            projectName_en: cert.projectName_en || cert.projectName,
             date: cert.date,
             blockchainLink: cert.blockchainLink,
-            type: cert.type || 'Ouro'
+            type: cert.type || 'Ouro',
+            type_en: cert.type_en || cert.type
         };
         // Encode to base64 (Unicode safe)
         const json = JSON.stringify(viewData);
@@ -266,21 +276,31 @@ export const Certificates = () => {
                 <DialogTitle>{editingId ? 'Editar Certificado' : 'Novo Certificado'}</DialogTitle>
                 <DialogContent dividers>
                     <Box display="flex" flexDirection="column" gap={2} pt={1}>
-                        <TextField
-                            select
-                            label="Tipo de Certificado"
-                            name="type"
-                            value={formData.type}
-                            onChange={handleInputChange}
-                            fullWidth
-                            required
-                        >
-                            {CERTIFICATE_TYPES.map((option) => (
-                                <MenuItem key={option} value={option}>
-                                    {option}
-                                </MenuItem>
-                            ))}
-                        </TextField>
+                        <Box display="flex" gap={2}>
+                            <TextField
+                                select
+                                label="Tipo de Certificado (PT)"
+                                name="type"
+                                value={formData.type}
+                                onChange={handleInputChange}
+                                fullWidth
+                                required
+                            >
+                                {CERTIFICATE_TYPES.map((option) => (
+                                    <MenuItem key={option} value={option}>
+                                        {option}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                            <TextField
+                                label="Certificate Type (EN)"
+                                name="type_en"
+                                value={formData.type_en}
+                                onChange={handleInputChange}
+                                fullWidth
+                                placeholder="e.g. Gold"
+                            />
+                        </Box>
                         <TextField
                             label="Nome do Patrocinador"
                             name="sponsorName"
@@ -299,10 +319,17 @@ export const Certificates = () => {
                         />
                         <TextField
                             select
-                            label="Nome do Projeto / Título"
+                            label="Nome do Projeto / Título (PT)"
                             name="projectName"
                             value={formData.projectName}
-                            onChange={handleInputChange}
+                            onChange={(e) => {
+                                const p = projects.find(proj => proj.descricao === e.target.value);
+                                setFormData({
+                                    ...formData,
+                                    projectName: e.target.value,
+                                    projectName_en: p?.descricao_en || ''
+                                });
+                            }}
                             fullWidth
                             required
                             helperText="Selecione um projeto existente"
@@ -313,6 +340,13 @@ export const Certificates = () => {
                                 </MenuItem>
                             ))}
                         </TextField>
+                        <TextField
+                            label="Project Name / Title (EN)"
+                            name="projectName_en"
+                            value={formData.projectName_en}
+                            onChange={handleInputChange}
+                            fullWidth
+                        />
                         <TextField
                             label="Data de Emissão"
                             name="date"

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { ThemeProvider, CssBaseline, CircularProgress, Box } from '@mui/material';
 import { theme } from './theme';
 import { Layout } from './components';
-import { Dashboard, Projects, Properties, Necromassa, Sponsors, Login, Users, Rewards, Certificates, Products, AuditLogs, GeminiSettings, PaymentConfig, MediaManager, ErrorLogs, Refunds, ForestIntelligence } from './pages';
+import { Dashboard, Projects, Properties, Necromassa, Sponsors, Login, Users, Rewards, Certificates, Products, AuditLogs, GeminiSettings, PaymentConfig, MediaManager, ErrorLogs, Refunds, ForestIntelligence, Adoptions } from './pages';
 import { CertificateView } from './pages/CertificateView';
 import { useAdmin } from './contexts/AdminContext';
 import { useAuth } from './contexts/AuthContext.jsx';
@@ -38,6 +38,11 @@ const AxiosInterceptorSetup = () => {
 };
 
 export default function App() {
+  useEffect(() => {
+    console.log(`🚀 [Build Info] App version: 11.0.1 - Deployed: ${new Date().toLocaleString()}`);
+    console.log(`📌 [Debug] Build Fix: Hardened Auth Headers & PWA Cache Buster v1`);
+  }, []);
+
   return (
     <ErrorProvider>
       <AxiosInterceptorSetup />
@@ -66,6 +71,7 @@ export default function App() {
                 <Route path="payment-config" element={<PaymentConfig />} />
                 <Route path="media-manager" element={<MediaManager />} />
                 <Route path="forest-intelligence" element={<ForestIntelligence />} />
+                <Route path="adoptions" element={<Adoptions />} />
                 <Route path="error-logs" element={<ErrorLogs />} />
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
               </Routes>
