@@ -64,6 +64,7 @@ export default function App() {
                 <Route path="refunds" element={<Refunds />} />
                 <Route path="users" element={<Users />} />
                 <Route path="rewards" element={<Rewards />} />
+                <Route path="physical-pieces" element={<PhysicalPieces />} />
                 <Route path="products" element={<Products />} />
                 <Route path="certificates" element={<Certificates />} />
                 <Route path="audit" element={<AuditLogs />} />

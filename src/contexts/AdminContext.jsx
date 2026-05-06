@@ -157,12 +157,12 @@ export const AdminProvider = ({ children }) => {
         try {
             const before = projects.find(p => p.id === newProject.id);
             const payload = normalizeProjectForApi(newProject);
-            
+
             // Manual token handling with forced refresh for reliability
             const token = await user?.getIdToken(true);
             const config = { headers: { Authorization: `Bearer ${token}` } };
             console.log(`[AdminContext] Updating project ${newProject.id} with forced token refresh.`);
-            
+
             const response = await api.put(`/manejos/${newProject.id}`, payload, config);
             if (response.status === 200) {
                 console.log('Projeto atualizado com sucesso na API.');
@@ -612,6 +612,63 @@ export const AdminProvider = ({ children }) => {
         }
     }
 
+    // ==================== PHYSICAL PIECES MANAGEMENT ====================
+
+    const getPhysicalPieces = async () => {
+        try {
+            const response = await api.get('/admin/pecas');
+            if (response.status === 200) {
+                return response.data;
+            }
+            return [];
+        } catch (error) {
+            console.error("Error fetching physical pieces:", error);
+            return [];
+        }
+    }
+
+    const createPhysicalPiece = async (payload) => {
+        try {
+            const response = await api.post('/admin/pecas', payload);
+            if (response.status === 201) {
+                await recordAudit({
+                    action: 'CREATE',
+                    entity: 'PHYSICAL_PIECE',
+                    entityId: String(response.data.id),
+                    before: null,
+                    after: response.data,
+                    user
+                });
+                return response.data;
+            }
+            return null;
+        } catch (error) {
+            console.error("Error creating physical piece:", error);
+            return null;
+        }
+    }
+
+    const attributePhysicalPiece = async (pieceId, userId) => {
+        try {
+            const response = await api.post(`/admin/pecas/${pieceId}/atribuir`, { id_usuario: userId });
+            if (response.status === 200) {
+                await recordAudit({
+                    action: 'UPDATE',
+                    entity: 'PHYSICAL_PIECE',
+                    entityId: String(pieceId),
+                    before: null,
+                    after: { pieceId, userId, action: 'atribuir' },
+                    user
+                });
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error("Error attributing physical piece:", error);
+            return false;
+        }
+    }
+
     // ==================== DOCS MANAGEMENT ====================
 
     const getDocsByManejoId = async (manejoId) => {
@@ -637,7 +694,7 @@ export const AdminProvider = ({ children }) => {
             const token = await user?.getIdToken();
             if (payload instanceof FormData) {
                 data = payload;
-                headers = { 
+                headers = {
                     'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${token}`
                 };

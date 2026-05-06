@@ -40,6 +40,7 @@ export const Products = () => {
         preco: 0,
         prazo_entrega_meses: 0,
         is_ativo: true,
+        is_physical_reward: false,
         foto_url: '',
         translations: {}
     });
@@ -103,6 +104,7 @@ export const Products = () => {
                 preco: product.preco,
                 prazo_entrega_meses: product.prazo_entrega_meses,
                 is_ativo: product.is_ativo,
+                is_physical_reward: product.is_physical_reward || false,
                 foto_url: product.fotos?.[0]?.url || '',
                 translations: product.translations || {}
             };
@@ -122,6 +124,7 @@ export const Products = () => {
                 preco: 0,
                 prazo_entrega_meses: 0,
                 is_ativo: true,
+                is_physical_reward: false,
                 foto_url: '',
                 translations: {}
             };
@@ -165,6 +168,7 @@ export const Products = () => {
                 preco: Number(formData.preco),
                 prazo_entrega_meses: Number(formData.prazo_entrega_meses),
                 is_ativo: formData.is_ativo,
+                is_physical_reward: formData.is_physical_reward,
                 translations: {
                     ...(formData.translations || {}),
                     en: {
@@ -486,11 +490,20 @@ export const Products = () => {
                         <FormControlLabel
                             control={
                                 <Switch
-                                    checked={formData.is_ativo}
-                                    onChange={(e) => setFormData({ ...formData, is_ativo: e.target.checked })}
+                                    checked={formData.is_active}
+                                    onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
                                 />
                             }
                             label="Produto Ativo"
+                        />
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={formData.is_physical_reward}
+                                    onChange={(e) => setFormData({ ...formData, is_physical_reward: e.target.checked })}
+                                />
+                            }
+                            label="Gera Recompensa Física (Placa Metálica)"
                         />
                     </Box>
                 </DialogContent>

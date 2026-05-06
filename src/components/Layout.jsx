@@ -51,6 +51,7 @@ export const Layout = ({ children }) => {
     { id: 'projects', label: 'Gestão Projetos', icon: <FolderOpen />, path: '/projects' },
     { id: 'adoptions', label: 'Gestão de Adoções', icon: <Forest />, path: '/adoptions' },
     { id: 'rewards', label: 'Recompensas', icon: <CardGiftcard />, path: '/rewards' },
+    { id: 'physical-pieces', label: 'Peças Físicas', icon: <QrCode />, path: '/physical-pieces' },
     { id: 'products', label: 'Produtos', icon: <CardGiftcard />, path: '/products' },
     { id: 'certificates', label: 'Certificados', icon: <CardMembership />, path: '/certificates' },
     { id: 'properties', label: 'Propriedades', icon: <HomeWork />, path: '/properties' },
