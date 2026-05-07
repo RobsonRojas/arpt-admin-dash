@@ -3,9 +3,10 @@ import {
     Box, Typography, Button, Table, TableContainer, TableHead,
     TableRow, TableCell, TableBody, Paper, IconButton, Chip,
     Dialog, DialogTitle, DialogContent, DialogActions, TextField,
-    MenuItem, CircularProgress, Alert, Snackbar, Grid, Autocomplete
+    MenuItem, CircularProgress, Alert, Snackbar, Grid, Autocomplete,
+    Checkbox
 } from '@mui/material';
-import { Add, QrCode, AssignmentInd, Refresh, Download, History } from '@mui/icons-material';
+import { Add, QrCode, AssignmentInd, Refresh, Download, History, PictureAsPdf } from '@mui/icons-material';
 import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
@@ -25,8 +26,11 @@ export const PhysicalPieces = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+    const [selectedIds, setSelectedIds] = useState([]);
+    const [downloadingBulk, setDownloadingBulk] = useState(false);
 
     // New Piece Dialog state
+    // ... (rest of state)
     const [openDialog, setOpenDialog] = useState(false);
     const [selectedPropertyId, setSelectedPropertyId] = useState('');
     const [inventories, setInventories] = useState([]);
@@ -48,6 +52,7 @@ export const PhysicalPieces = () => {
         ]);
         setPieces(piecesData || []);
         setProducts(productsData?.filter(p => p.is_physical_reward) || []);
+        setSelectedIds([]); // Clear selection on refresh
         setLoading(false);
     };
 
@@ -55,6 +60,7 @@ export const PhysicalPieces = () => {
         fetchData();
     }, []);
 
+    // ... (useEffect for property/inventory)
     useEffect(() => {
         if (selectedPropertyId) {
             getInventoriesByPropertyId(selectedPropertyId).then(data => setInventories(data || []));
@@ -109,11 +115,61 @@ export const PhysicalPieces = () => {
         window.open(`${api.defaults.baseURL}/admin/pecas/${pieceId}/label`, '_blank');
     };
 
+    const toggleSelect = (id) => {
+        setSelectedIds(prev => 
+            prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+        );
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedIds.length === pieces.length && pieces.length > 0) {
+            setSelectedIds([]);
+        } else {
+            setSelectedIds(pieces.map(p => p.id));
+        }
+    };
+
+    const downloadBulkLabels = async () => {
+        if (selectedIds.length === 0) return;
+        setDownloadingBulk(true);
+        try {
+            const response = await api.post('/admin/pecas/labels/bulk', { ids: selectedIds }, {
+                responseType: 'blob'
+            });
+            
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `labels-bulk-${new Date().toISOString().split('T')[0]}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            
+            setSnackbar({ open: true, message: 'PDF de etiquetas gerado com sucesso', severity: 'success' });
+        } catch (error) {
+            console.error("Error downloading bulk labels:", error);
+            setSnackbar({ open: true, message: 'Erro ao baixar etiquetas', severity: 'error' });
+        } finally {
+            setDownloadingBulk(false);
+        }
+    };
+
     return (
         <Box sx={{ p: 3 }}>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
                 <Typography variant="h5" fontWeight="bold">Gestão de Peças Físicas (Recompensas)</Typography>
                 <Box display="flex" gap={2}>
+                    {selectedIds.length > 0 && (
+                        <Button 
+                            variant="outlined" 
+                            color="secondary" 
+                            startIcon={downloadingBulk ? <CircularProgress size={20} /> : <PictureAsPdf />} 
+                            onClick={downloadBulkLabels}
+                            disabled={downloadingBulk}
+                        >
+                            Baixar Selecionados ({selectedIds.length})
+                        </Button>
+                    )}
                     <Button startIcon={<Refresh />} onClick={fetchData}>Atualizar</Button>
                     <Button variant="contained" startIcon={<Add />} onClick={() => setOpenDialog(true)}>Nova Peça</Button>
                 </Box>
@@ -126,6 +182,13 @@ export const PhysicalPieces = () => {
                     <Table>
                         <TableHead>
                             <TableRow>
+                                <TableCell padding="checkbox">
+                                    <Checkbox 
+                                        indeterminate={selectedIds.length > 0 && selectedIds.length < pieces.length}
+                                        checked={pieces.length > 0 && selectedIds.length === pieces.length}
+                                        onChange={toggleSelectAll}
+                                    />
+                                </TableCell>
                                 <TableCell>ID / Slug</TableCell>
                                 <TableCell>Produto</TableCell>
                                 <TableCell>Árvore Origem</TableCell>
@@ -136,7 +199,13 @@ export const PhysicalPieces = () => {
                         </TableHead>
                         <TableBody>
                             {pieces.map((piece) => (
-                                <TableRow key={piece.id}>
+                                <TableRow key={piece.id} hover selected={selectedIds.includes(piece.id)}>
+                                    <TableCell padding="checkbox">
+                                        <Checkbox 
+                                            checked={selectedIds.includes(piece.id)}
+                                            onChange={() => toggleSelect(piece.id)}
+                                        />
+                                    </TableCell>
                                     <TableCell>
                                         <Typography variant="body2" fontWeight="bold">{piece.slug}</Typography>
                                         <Typography variant="caption" color="textSecondary">{piece.id}</Typography>
@@ -167,7 +236,7 @@ export const PhysicalPieces = () => {
                                 </TableRow>
                             ))}
                             {pieces.length === 0 && (
-                                <TableRow><TableCell colSpan={6} align="center">Nenhuma peça encontrada</TableCell></TableRow>
+                                <TableRow><TableCell colSpan={7} align="center">Nenhuma peça encontrada</TableCell></TableRow>
                             )}
                         </TableBody>
                     </Table>
