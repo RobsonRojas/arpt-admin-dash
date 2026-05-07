@@ -30,12 +30,16 @@ export default function Dropshipping() {
     logoUrl: '',
     primaryColor: '#58820F',
     seoTitle: '',
-    seoDescription: ''
+    seoDescription: '',
+    splitPlatform: 0.10,
+    splitDropshipper: 0.20,
+    splitProducer: 0.70
   });
 
   const [catalog, setCatalog] = useState([]);
   const [availableProducts, setAvailableProducts] = useState([]);
   const [sales, setSales] = useState([]);
+  const [analytics, setAnalytics] = useState(null);
 
   useEffect(() => {
     fetchStoreData();
@@ -62,12 +66,16 @@ export default function Dropshipping() {
           logoUrl: config?.logoUrl || '',
           primaryColor: config?.primaryColor || '#58820F',
           seoTitle: config?.seoTitle || '',
-          seoDescription: config?.seoDescription || ''
+          seoDescription: config?.seoDescription || '',
+          splitPlatform: config?.splitPlatform ?? 0.10,
+          splitDropshipper: config?.splitDropshipper ?? 0.20,
+          splitProducer: config?.splitProducer ?? 0.70
         });
 
-        // Fetch products and sales
+        // Fetch products, sales and analytics
         fetchCatalog(myStore.id);
         fetchSales(myStore.id);
+        fetchAnalytics(myStore.id);
       }
       
       // Fetch all available products to pick from
@@ -91,6 +99,15 @@ export default function Dropshipping() {
     }
   };
 
+  const fetchAnalytics = async (storeId) => {
+    try {
+      const res = await api.get(`/manejos/dropshipping/stores/${storeId}/analytics`);
+      setAnalytics(res.data);
+    } catch (err) {
+      console.error("Error fetching analytics", err);
+    }
+  };
+
   const fetchSales = async (storeId) => {
     try {
       const res = await api.get(`/manejos/dropshipping/stores/${storeId}/sales`);
@@ -111,21 +128,25 @@ export default function Dropshipping() {
           logoUrl: storeForm.logoUrl,
           primaryColor: storeForm.primaryColor,
           seoTitle: storeForm.seoTitle,
-          seoDescription: storeForm.seoDescription
+          seoDescription: storeForm.seoDescription,
+          splitPlatform: Number(storeForm.splitPlatform),
+          splitDropshipper: Number(storeForm.splitDropshipper),
+          splitProducer: Number(storeForm.splitProducer)
         }
       };
       
-      // For simplicity in this demo, just creating if not exists (POST)
-      // Ideally we should have a PUT/PATCH if store exists
       if (!store) {
          const res = await api.post('/manejos/dropshipping/stores', payload);
          setStore(res.data);
+         alert("Loja criada com sucesso!");
       } else {
-         alert("Atualização de loja existente precisa ser implementada no backend");
+         const res = await api.put(`/manejos/dropshipping/stores/${store.id}`, payload);
+         setStore(res.data);
+         alert("Loja atualizada com sucesso!");
       }
     } catch (error) {
       console.error("Error saving store", error);
-      alert("Erro ao salvar loja");
+      alert("Erro ao salvar loja: " + (error.response?.data?.error || ""));
     }
   };
 
@@ -167,6 +188,23 @@ export default function Dropshipping() {
               <TextField fullWidth label="SEO Title" value={storeForm.seoTitle} onChange={e => setStoreForm({...storeForm, seoTitle: e.target.value})} margin="normal" />
               <TextField fullWidth label="SEO Description" value={storeForm.seoDescription} onChange={e => setStoreForm({...storeForm, seoDescription: e.target.value})} margin="normal" multiline rows={3} />
               <TextField fullWidth label="Google Analytics ID" value={storeForm.google_analytics_id} onChange={e => setStoreForm({...storeForm, google_analytics_id: e.target.value})} margin="normal" />
+            </Grid>
+          </Grid>
+
+          <Divider sx={{ my: 3 }} />
+          <Typography variant="h6" gutterBottom>Divisão de Receita (Split)</Typography>
+          <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+            Configure a porcentagem de divisão para cada venda (ex: 0.10 = 10%). A soma deve ser 1.0.
+          </Typography>
+          <Grid container spacing={3}>
+            <Grid item xs={12} sm={4}>
+              <TextField fullWidth label="Plataforma (ex: 0.10)" value={storeForm.splitPlatform} onChange={e => setStoreForm({...storeForm, splitPlatform: e.target.value})} margin="normal" type="number" inputProps={{ step: 0.01 }} />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField fullWidth label="Dropshipper (ex: 0.20)" value={storeForm.splitDropshipper} onChange={e => setStoreForm({...storeForm, splitDropshipper: e.target.value})} margin="normal" type="number" inputProps={{ step: 0.01 }} />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField fullWidth label="Produtor (ex: 0.70)" value={storeForm.splitProducer} onChange={e => setStoreForm({...storeForm, splitProducer: e.target.value})} margin="normal" type="number" inputProps={{ step: 0.01 }} />
             </Grid>
           </Grid>
           <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>

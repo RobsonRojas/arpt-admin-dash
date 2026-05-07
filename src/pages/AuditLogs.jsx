@@ -9,6 +9,7 @@ import { Visibility, Restore, FilterList, History } from '@mui/icons-material';
 import { fetchAuditLogs, recordAudit } from '../services/auditLog';
 import { useAuth } from '../contexts/AuthContext';
 import { useAdmin } from '../contexts/AdminContext';
+import { api } from '../services/api';
 
 export const AuditLogs = () => {
     const { user } = useAuth();
@@ -59,7 +60,6 @@ export const AuditLogs = () => {
                 'PROPERTY': adminContext.handleUpdateProperty,
                 'REWARD': (obj) => adminContext.updateReward(obj.manejoId, obj.productId, obj),
                 'PRODUCT': async (obj) => {
-                    const { api } = await import('../services/api');
                     return api.put(`/produtos/${obj.id}`, obj);
                 }
             };
