@@ -6,6 +6,7 @@ import { StatusChip } from '../../components/StatusChip';
 import { ProjectProducts } from '../../components/modules/project_tabs/ProjectProducts';
 import { ProjectDocs } from '../../components/modules/project_tabs/ProjectDocs';
 import { ProjectIncidents } from '../../components/modules/project_tabs/ProjectIncidents';
+import { ProjectTeam } from '../../components/modules/project_tabs/ProjectTeam';
 import { CampaignAssistant } from '../../components/CampaignAssistant';
 
 export const ProjectDetailsDrawer = ({ 
@@ -60,6 +61,7 @@ export const ProjectDetailsDrawer = ({
             <Tab label="Produtos" />
             <Tab label="Documentos" />
             <Tab label="Incidentes" />
+            <Tab label="Equipe" />
             <Tab label="Estratégia" />
           </Tabs>
 
@@ -124,8 +126,13 @@ export const ProjectDetailsDrawer = ({
               <ProjectIncidents projectId={selectedProject.id} />
             )}
 
-            {/* TAB 4 - Estratégia */}
+            {/* TAB 4 - Equipe */}
             {tabValue === 4 && (
+              <ProjectTeam projectId={selectedProject.id} />
+            )}
+
+            {/* TAB 5 - Estratégia */}
+            {tabValue === 5 && (
               <CampaignAssistant project={selectedProject} />
             )}
           </Box>
