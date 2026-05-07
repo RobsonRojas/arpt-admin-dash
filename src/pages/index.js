@@ -17,3 +17,4 @@ export { Refunds } from './Refunds';
 export { default as ForestIntelligence } from './ForestIntelligence';
 export * from './Adoptions';
 export * from './PhysicalPieces';
+export * from './Notifications';

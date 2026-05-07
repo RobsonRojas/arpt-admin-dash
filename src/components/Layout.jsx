@@ -12,7 +12,8 @@ import {
   PermMedia,
   BugReport,
   Replay,
-  Psychology
+  Psychology,
+  Notifications
 } from '@mui/icons-material';
 import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -57,6 +58,7 @@ export const Layout = ({ children }) => {
     { id: 'properties', label: 'Propriedades', icon: <HomeWork />, path: '/properties' },
     { id: 'sponsors', label: 'Patrocinadores', icon: <People />, path: '/sponsors' },
     { id: 'refunds', label: 'Reembolsos', icon: <Replay />, path: '/refunds' },
+    { id: 'notifications', label: 'Central de Notificações', icon: <Notifications />, path: '/notifications' },
     { id: 'users', label: 'Gestão de Usuários', icon: <ManageAccounts />, path: '/users' },
     { id: 'audit', label: 'Log de Modificações', icon: <History />, path: '/audit' },
     { id: 'payment-config', label: 'Configurações de Pagamento', icon: <Payment />, path: '/payment-config' },
