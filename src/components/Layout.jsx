@@ -13,7 +13,9 @@ import {
   BugReport,
   Replay,
   Psychology,
-  Notifications
+  Notifications,
+  Code,
+  QrCode
 } from '@mui/icons-material';
 import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -65,6 +67,7 @@ export const Layout = ({ children }) => {
     { id: 'media-manager', label: 'Gerenciador de Arquivos', icon: <PermMedia />, path: '/media-manager' },
     { id: 'forest-intelligence', label: 'Inteligência Florestal', icon: <Psychology />, path: '/forest-intelligence' },
     { id: 'gemini-settings', label: 'Configuração IA', icon: <SettingsSuggest />, path: '/gemini-settings' },
+    { id: 'developer-settings', label: 'Configurações Dev', icon: <Code />, path: '/developer-settings' },
     { id: 'error-logs', label: 'Log de Erros', icon: <BugReport />, path: '/error-logs' },
   ];
 

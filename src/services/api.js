@@ -1,9 +1,16 @@
 import axios from 'axios';
 import { auth } from './firebase';
 
+const getBaseURL = () => {
+    if (typeof window !== 'undefined') {
+        const savedURL = localStorage.getItem('arpt_api_url');
+        if (savedURL) return savedURL;
+    }
+    return "https://arpt.site/api";
+};
+
 export const api = axios.create({
-    baseURL: "https://arpt.site/api",
-    // baseURL: "http://localhost:4001",
+    baseURL: getBaseURL(),
     timeout: 8 * 1000,
 });
 console.log('>>> [API.js] Module loaded and api instance created');
