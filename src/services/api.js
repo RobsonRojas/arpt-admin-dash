@@ -19,6 +19,12 @@ api.interceptors.request.use(
     async (config) => {
         const currentUser = auth?.currentUser;
 
+        if (import.meta.env.VITE_SKIP_AUTH === 'true') {
+            config.headers = config.headers || {};
+            config.headers['Authorization'] = `Bearer test-admin-token`;
+            return config;
+        }
+
         if (currentUser) {
             try {
                 // Force fresh token to be sure it's not expired

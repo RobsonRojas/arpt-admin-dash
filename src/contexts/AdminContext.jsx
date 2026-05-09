@@ -1168,10 +1168,12 @@ export const AdminProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        getProjects();
-        getProperties();
-        getStatuses();
-    }, []);
+        if (user) {
+            getProjects();
+            getProperties();
+            getStatuses();
+        }
+    }, [user]);
 
     // ==================== VALOR DO CONTEXTO ====================
     const value = {

@@ -21,6 +21,16 @@ export function AuthProvider({ children }) {
       return;
     }
     const unsub = onAuthStateChanged(auth, (u) => {
+      // Bypass for testing
+      if (import.meta.env.VITE_SKIP_AUTH === 'true') {
+        setUser({ 
+          email: 'admin@arpt.com.br', 
+          uid: 'test-uid',
+          getIdToken: async () => 'test-admin-token'
+        });
+        setLoading(false);
+        return;
+      }
       setUser(u);
       setLoading(false);
     }, (err) => {
