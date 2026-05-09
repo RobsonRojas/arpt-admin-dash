@@ -3,7 +3,7 @@ import {
   Box, Paper, Typography, Table, TableContainer, TableHead, TableRow,
   TableCell, TableBody, IconButton, Button, Dialog, DialogTitle, DialogContent,
   DialogActions, TextField, Select, MenuItem, FormControl, InputLabel, CircularProgress,
-  TablePagination, TableSortLabel, Collapse, Grid, InputAdornment
+  TablePagination, TableSortLabel, Collapse, Grid, InputAdornment, Switch, FormControlLabel
 } from '@mui/material';
 import { Edit, Add, ArrowBack, Park, Description, ContentCopy, FilterList, Tune, Image as ImageIcon } from '@mui/icons-material';
 import { TreeForm } from './TreeForm';
@@ -20,6 +20,8 @@ export const InventoryManager = ({ property, onClose }) => {
   const [pendingTreeData, setPendingTreeData] = useState(null); // Data waiting for confirmation
   const [confirmingSave, setConfirmingSave] = useState(false); // UI loading state during save
   const [loadingTrees, setLoadingTrees] = useState(false);
+  const [isPublic, setIsPublic] = useState(false);
+  const [updatingVisibility, setUpdatingVisibility] = useState(false);
 
   // Bulk Upload State
   const [openUploadDialog, setOpenUploadDialog] = useState(false);
@@ -66,6 +68,7 @@ export const InventoryManager = ({ property, onClose }) => {
     getTreeHistory,
     uploadTreePhoto,
     createTreePhoto,
+    updateInventoryVisibility,
     urlMidiasFiles
   } = useAdmin();
 
@@ -331,6 +334,27 @@ export const InventoryManager = ({ property, onClose }) => {
     }
   }, []);
 
+  const handleToggleVisibility = async (event) => {
+    if (!currentInventoryId) return;
+    
+    const newValue = event.target.checked;
+    setUpdatingVisibility(true);
+    
+    try {
+      const result = await updateInventoryVisibility(currentInventoryId, newValue);
+      if (result) {
+        setIsPublic(newValue);
+      } else {
+        alert("Erro ao atualizar visibilidade.");
+      }
+    } catch (error) {
+      console.error("Erro ao alternar visibilidade:", error);
+      alert("Erro ao alternar visibilidade.");
+    } finally {
+      setUpdatingVisibility(false);
+    }
+  };
+
   const loadTrees = async () => {
     try {
       setLoadingTrees(true);
@@ -383,12 +407,17 @@ export const InventoryManager = ({ property, onClose }) => {
 
       setAllTrees(combinedTrees);
 
-      // Tentar inferir currentInventoryId
-      if (combinedTrees.length > 0) {
+      // Tentar inferir currentInventoryId e visibilidade
+      if (firstPageResponse?.data && firstPageResponse.data.inventoryId) {
+        setCurrentInventoryId(firstPageResponse.data.inventoryId);
+        setIsPublic(firstPageResponse.data.is_public || false);
+      } else if (combinedTrees.length > 0) {
         const firstTree = combinedTrees[0];
         const inferredId = firstTree.inventoryId || firstTree.inventory_id;
         if (inferredId && !currentInventoryId) {
           setCurrentInventoryId(inferredId);
+          // Se não veio no data root, talvez não tenhamos is_public aqui.
+          // O backend agora retorna no getInventoryByPropertyId.
         }
       }
 
@@ -669,6 +698,26 @@ export const InventoryManager = ({ property, onClose }) => {
             <Typography variant="body2" color="textSecondary">
               Propriedade: {property.name || property.proprietario}
             </Typography>
+            {currentInventoryId && (
+              <Box display="flex" alignItems="center" mt={1}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={isPublic}
+                      onChange={handleToggleVisibility}
+                      disabled={updatingVisibility}
+                      size="small"
+                    />
+                  }
+                  label={
+                    <Typography variant="caption" sx={{ fontWeight: 'bold', color: isPublic ? 'success.main' : 'text.secondary' }}>
+                      {isPublic ? 'INVENTÁRIO PÚBLICO' : 'INVENTÁRIO PRIVADO'}
+                    </Typography>
+                  }
+                />
+                {updatingVisibility && <CircularProgress size={16} sx={{ ml: 1 }} />}
+              </Box>
+            )}
           </Box>
           <Box display="flex" gap={1}>
             <Button variant="outlined" startIcon={<Tune />} onClick={() => setShowFilters(!showFilters)}>

@@ -332,6 +332,21 @@ export const AdminProvider = ({ children }) => {
             return null;
         }
     }
+    
+    const updateInventoryVisibility = async (inventoryId, isPublic) => {
+        try {
+            const token = await user?.getIdToken(true);
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.patch(`/inventarios/${inventoryId}`, { is_public: isPublic }, config);
+            if (response.status === 200) {
+                return response.data;
+            }
+            return null;
+        } catch (error) {
+            console.error("Error updating inventory visibility:", error);
+            return null;
+        }
+    }
 
     const createTree = async (inventoryId, payload) => {
         try {
@@ -1207,6 +1222,7 @@ export const AdminProvider = ({ children }) => {
         getDashboardStats,
         getAllInventoryByPropertyId,
         getInventoriesByPropertyId,
+        updateInventoryVisibility,
         getTreesByInventoryId,
         createInventory,
         createTree,
