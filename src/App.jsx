@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { ThemeProvider, CssBaseline, CircularProgress, Box } from '@mui/material';
 import { theme } from './theme';
 import { Layout } from './components';
-import { Dashboard, Projects, Properties, Necromassa, Sponsors, Login, Users, Rewards, Certificates, Products, AuditLogs, GeminiSettings, PaymentConfig, MediaManager, ErrorLogs, Refunds, ForestIntelligence, Adoptions, PhysicalPieces, Notifications, DeveloperSettings } from './pages';
+import { Dashboard, Projects, Properties, Necromassa, Sponsors, Login, Users, Rewards, Certificates, Products, AuditLogs, GeminiSettings, PaymentConfig, MediaManager, ErrorLogs, Refunds, ForestIntelligence, Adoptions, PhysicalPieces, Notifications, DeveloperSettings, ProductSimulation } from './pages';
 import { CertificateView } from './pages/CertificateView';
 import { useAdmin } from './contexts/AdminContext';
 import { useAuth } from './contexts/AuthContext.jsx';
@@ -76,6 +76,7 @@ export default function App() {
                 <Route path="adoptions" element={<Adoptions />} />
                 <Route path="developer-settings" element={<DeveloperSettings />} />
                 <Route path="error-logs" element={<ErrorLogs />} />
+                <Route path="product-simulation" element={<ProductSimulation />} />
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
               </Routes>
             </PrivateRoute>

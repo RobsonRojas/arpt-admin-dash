@@ -15,7 +15,8 @@ import {
   Psychology,
   Notifications,
   Code,
-  QrCode
+  QrCode,
+  TrendingUp
 } from '@mui/icons-material';
 import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -56,6 +57,7 @@ export const Layout = ({ children }) => {
     { id: 'rewards', label: 'Recompensas', icon: <CardGiftcard />, path: '/rewards' },
     { id: 'physical-pieces', label: 'Peças Físicas', icon: <QrCode />, path: '/physical-pieces' },
     { id: 'products', label: 'Produtos', icon: <CardGiftcard />, path: '/products' },
+    { id: 'product-simulation', label: 'Simulação de Produto', icon: <TrendingUp />, path: '/product-simulation' },
     { id: 'certificates', label: 'Certificados', icon: <CardMembership />, path: '/certificates' },
     { id: 'properties', label: 'Propriedades', icon: <HomeWork />, path: '/properties' },
     { id: 'sponsors', label: 'Patrocinadores', icon: <People />, path: '/sponsors' },

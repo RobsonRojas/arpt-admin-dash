@@ -19,3 +19,4 @@ export * from './Adoptions';
 export * from './PhysicalPieces';
 export * from './Notifications';
 export * from './DeveloperSettings';
+export * from './ProductSimulation';
