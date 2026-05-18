@@ -69,7 +69,13 @@ export const ProductSimulation = () => {
         if (!selectedManejo) return;
         const fetchInventarios = async () => {
             try {
-                const response = await api.get(`/manejos/${selectedManejo.id}/inventarios`);
+                const propriedadeId = selectedManejo.id_propriedade || selectedManejo.idPropriedade || selectedManejo.id_propriedades;
+                if (!propriedadeId) {
+                    console.warn('[ProductSimulation] selectedManejo missing property ID:', selectedManejo);
+                    setSnackbar({ open: true, message: 'Este projeto de manejo não possui propriedade associada', severity: 'warning' });
+                    return;
+                }
+                const response = await api.get(`/propriedades/${propriedadeId}/inventarios`);
                 const data = Array.isArray(response.data) ? response.data : (response.data?.data || []);
                 setInventarios(data);
                 if (data.length > 0) {
@@ -89,8 +95,14 @@ export const ProductSimulation = () => {
         const fetchTrees = async () => {
             setTreesLoading(true);
             try {
-                const response = await api.get(`/inventarios/${selectedInventario.id}/trees`);
-                const data = Array.isArray(response.data) ? response.data : (response.data?.data || []);
+                const response = await api.get(`/inventarios/${selectedInventario.id}/arvores`);
+                const data = Array.isArray(response.data)
+                    ? response.data
+                    : (Array.isArray(response.data?.data)
+                        ? response.data.data
+                        : (Array.isArray(response.data?.data?.inventories)
+                            ? response.data.data.inventories
+                            : (response.data?.inventories || [])));
                 setTrees(data);
             } catch (err) {
                 console.error('Error fetching trees:', err);
@@ -182,6 +194,11 @@ export const ProductSimulation = () => {
         );
     });
 
+    const [triggerCrash, setTriggerCrash] = useState(false);
+    if (triggerCrash) {
+        throw new Error("Erro Crítico Simulado: Falha de Renderização de Teste!");
+    }
+
     return (
         <Box sx={{ animation: 'fadeIn 0.5s', p: 3 }}>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
@@ -193,6 +210,14 @@ export const ProductSimulation = () => {
                         Selecione uma árvore do inventário para simular a receita potencial com produtos compatíveis.
                     </Typography>
                 </Box>
+                <Button 
+                    variant="outlined" 
+                    color="error" 
+                    onClick={() => setTriggerCrash(true)}
+                    sx={{ borderRadius: 2 }}
+                >
+                    Simular Erro Crítico
+                </Button>
             </Box>
 
             {/* Stepper */}
@@ -366,9 +391,9 @@ export const ProductSimulation = () => {
                                                     {tree.specie_name || tree.specieName || '-'}
                                                 </Typography>
                                             </TableCell>
-                                            <TableCell>{(tree.dap || tree.dbh || 0).toFixed(1)}</TableCell>
-                                            <TableCell>{(tree.height || tree.altura || 0).toFixed(1)}</TableCell>
-                                            <TableCell>{(tree.volume || 0).toFixed(3)}</TableCell>
+                                            <TableCell>{Number(tree.dap || tree.dbh || 0).toFixed(1)}</TableCell>
+                                            <TableCell>{Number(tree.height || tree.altura || 0).toFixed(1)}</TableCell>
+                                            <TableCell>{Number(tree.volume || 0).toFixed(3)}</TableCell>
                                         </TableRow>
                                     ))}
                                     {filteredTrees.length === 0 && (
@@ -410,9 +435,9 @@ export const ProductSimulation = () => {
                                     Árvore #{selectedTree.number || selectedTree.numero} — {selectedTree.specie_name || selectedTree.specieName || 'Espécie desconhecida'}
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary">
-                                    DAP: {(selectedTree.dap || selectedTree.dbh || 0).toFixed(1)} cm
-                                    {' · '}Altura: {(selectedTree.height || selectedTree.altura || 0).toFixed(1)} m
-                                    {' · '}Volume: {(selectedTree.volume || 0).toFixed(3)} m³
+                                    DAP: {Number(selectedTree.dap || selectedTree.dbh || 0).toFixed(1)} cm
+                                    {' · '}Altura: {Number(selectedTree.height || selectedTree.altura || 0).toFixed(1)} m
+                                    {' · '}Volume: {Number(selectedTree.volume || 0).toFixed(3)} m³
                                 </Typography>
                             </Box>
                         </Box>
@@ -468,7 +493,7 @@ export const ProductSimulation = () => {
                                                                 {product.info || 'Sem descrição'}
                                                             </Typography>
                                                             <Chip
-                                                                label={`R$ ${(product.preco || 0).toFixed(2)}`}
+                                                                label={`R$ ${Number(product.preco || 0).toFixed(2)}`}
                                                                 size="small"
                                                                 color="success"
                                                                 variant="outlined"
@@ -520,7 +545,7 @@ export const ProductSimulation = () => {
                                             Receita Total Estimada
                                         </Typography>
                                         <Typography variant="h3" fontWeight={700}>
-                                            R$ {(simulationResult.total_revenue || 0).toFixed(2)}
+                                            R$ {Number(simulationResult.total_revenue || simulationResult.totalRevenue || 0).toFixed(2)}
                                         </Typography>
                                         <Typography variant="body2" sx={{ opacity: 0.7, mt: 0.5 }}>
                                             {selectedProductIds.length} produto{selectedProductIds.length !== 1 ? 's' : ''} · Estimativa baseada em volume calculado
@@ -544,14 +569,14 @@ export const ProductSimulation = () => {
                                                         <TableRow key={index}>
                                                             <TableCell>
                                                                 <Typography variant="body2" fontWeight={500}>
-                                                                    {item.product_name || item.nome}
+                                                                    {item.product_name || item.nome || item.name}
                                                                 </Typography>
                                                             </TableCell>
-                                                            <TableCell>{(item.volume || 0).toFixed(3)} m³</TableCell>
-                                                            <TableCell>R$ {(item.unit_price || item.preco || 0).toFixed(2)}</TableCell>
+                                                            <TableCell>{Number(item.volume || simulationResult.estimatedVolume || 0).toFixed(3)} m³</TableCell>
+                                                            <TableCell>R$ {Number(item.unit_price || item.preco || item.price || 0).toFixed(2)}</TableCell>
                                                             <TableCell>
                                                                 <Typography fontWeight={600} color="success.main">
-                                                                    R$ {(item.subtotal || 0).toFixed(2)}
+                                                                    R$ {Number(item.subtotal || item.revenue || 0).toFixed(2)}
                                                                 </Typography>
                                                             </TableCell>
                                                         </TableRow>

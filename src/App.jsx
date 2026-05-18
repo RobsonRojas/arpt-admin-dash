@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { ThemeProvider, CssBaseline, CircularProgress, Box } from '@mui/material';
 import { theme } from './theme';
-import { Layout } from './components';
+import { Layout, ErrorBoundary } from './components';
 import { Dashboard, Projects, Properties, Necromassa, Sponsors, Login, Users, Rewards, Certificates, Products, AuditLogs, GeminiSettings, PaymentConfig, MediaManager, ErrorLogs, Refunds, ForestIntelligence, Adoptions, PhysicalPieces, Notifications, DeveloperSettings, ProductSimulation } from './pages';
 import { CertificateView } from './pages/CertificateView';
 import { useAdmin } from './contexts/AdminContext';
@@ -54,7 +54,8 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/*" element={
             <PrivateRoute>
-              <Routes>
+              <ErrorBoundary>
+                <Routes>
                 <Route index element={<Navigate to="/dashboard" replace />} />
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="projects" element={<Projects />} />
@@ -79,8 +80,9 @@ export default function App() {
                 <Route path="product-simulation" element={<ProductSimulation />} />
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
               </Routes>
-            </PrivateRoute>
-          } />
+            </ErrorBoundary>
+          </PrivateRoute>
+        } />
         </Routes>
       </ThemeProvider>
     </ErrorProvider>

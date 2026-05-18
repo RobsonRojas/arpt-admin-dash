@@ -28,6 +28,7 @@ export const PhysicalPieces = () => {
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
     const [selectedIds, setSelectedIds] = useState([]);
     const [downloadingBulk, setDownloadingBulk] = useState(false);
+    const [downloadingLabel, setDownloadingLabel] = useState({});
 
     // New Piece Dialog state
     // ... (rest of state)
@@ -111,8 +112,26 @@ export const PhysicalPieces = () => {
         }
     };
 
-    const downloadLabel = (pieceId) => {
-        window.open(`${api.defaults.baseURL}/admin/pecas/${pieceId}/label`, '_blank');
+    const downloadLabel = async (pieceId) => {
+        setDownloadingLabel(prev => ({ ...prev, [pieceId]: true }));
+        try {
+            const response = await api.get(`/admin/pecas/${pieceId}/label`, {
+                responseType: 'blob'
+            });
+            const url = window.URL.createObjectURL(new Blob([response.data], { type: 'image/png' }));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `label-${pieceId}.png`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Error downloading label:', error);
+            setSnackbar({ open: true, message: 'Erro ao baixar etiqueta', severity: 'error' });
+        } finally {
+            setDownloadingLabel(prev => ({ ...prev, [pieceId]: false }));
+        }
     };
 
     const toggleSelect = (id) => {
@@ -221,8 +240,15 @@ export const PhysicalPieces = () => {
                                     </TableCell>
                                     <TableCell>{piece.id_usuario ? `User ID: ${piece.id_usuario}` : 'Não atribuído'}</TableCell>
                                     <TableCell align="right">
-                                        <IconButton size="small" title="Baixar Placa" onClick={() => downloadLabel(piece.id)}>
-                                            <Download />
+                                        <IconButton
+                                            size="small"
+                                            title="Baixar Placa"
+                                            onClick={() => downloadLabel(piece.id)}
+                                            disabled={!!downloadingLabel[piece.id]}
+                                        >
+                                            {downloadingLabel[piece.id]
+                                                ? <CircularProgress size={16} />
+                                                : <Download />}
                                         </IconButton>
                                         <IconButton 
                                             size="small" 
