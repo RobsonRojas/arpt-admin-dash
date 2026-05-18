@@ -196,6 +196,11 @@ export const Products = () => {
                     after: { ...payload, id: editingProduct.id },
                     user
                 });
+                if (payload.is_physical_reward) {
+                    setSnackbar({ open: true, message: 'Produto atualizado e geração de recompensa física ativada com sucesso!', severity: 'success' });
+                } else {
+                    setSnackbar({ open: true, message: 'Produto atualizado com sucesso!', severity: 'success' });
+                }
             } else {
                 const response = await api.post('/produtos', payload, config);
                 await recordAudit({
@@ -206,6 +211,11 @@ export const Products = () => {
                     after: payload,
                     user
                 });
+                if (payload.is_physical_reward) {
+                    setSnackbar({ open: true, message: 'Produto criado e geração de recompensa física ativada com sucesso!', severity: 'success' });
+                } else {
+                    setSnackbar({ open: true, message: 'Produto criado com sucesso!', severity: 'success' });
+                }
             }
 
             await clearDraft(); // Clear draft on success
@@ -502,8 +512,8 @@ export const Products = () => {
                         <FormControlLabel
                             control={
                                 <Switch
-                                    checked={formData.is_active}
-                                    onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                                    checked={formData.is_ativo}
+                                    onChange={(e) => setFormData({ ...formData, is_ativo: e.target.checked })}
                                 />
                             }
                             label="Produto Ativo"
