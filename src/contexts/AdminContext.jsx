@@ -1259,6 +1259,11 @@ export const AdminProvider = ({ children }) => {
         // Regras de Negócio - Pagamentos
         registerManualPurchase,
         updatePurchase,
+
+        // Regras de Negócio - Peças Físicas (Recompensas)
+        getPhysicalPieces,
+        createPhysicalPiece,
+        attributePhysicalPiece,
     };
 
     return (
