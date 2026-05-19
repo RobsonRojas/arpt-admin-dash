@@ -19,7 +19,8 @@ export const PhysicalPieces = () => {
         attributePhysicalPiece,
         getProducts,
         getInventoriesByPropertyId,
-        getTreesByInventoryId
+        getTreesByInventoryId,
+        getUsers
     } = useAdmin();
 
     const [pieces, setPieces] = useState([]);
@@ -44,15 +45,19 @@ export const PhysicalPieces = () => {
     const [openAttrDialog, setOpenAttrDialog] = useState(false);
     const [selectedPiece, setSelectedPiece] = useState(null);
     const [userId, setUserId] = useState('');
+    const [users, setUsers] = useState([]);
+    const [selectedUserForAttr, setSelectedUserForAttr] = useState(null);
 
     const fetchData = async () => {
         setLoading(true);
-        const [piecesData, productsData] = await Promise.all([
+        const [piecesData, productsData, usersData] = await Promise.all([
             getPhysicalPieces(),
-            getProducts()
+            getProducts(),
+            getUsers(1000)
         ]);
         setPieces(piecesData || []);
         setProducts(productsData?.filter(p => p.is_physical_reward) || []);
+        setUsers(usersData?.users || []);
         setSelectedIds([]); // Clear selection on refresh
         setLoading(false);
     };
@@ -254,7 +259,12 @@ export const PhysicalPieces = () => {
                                             size="small" 
                                             color="primary" 
                                             title="Atribuir a Cliente"
-                                            onClick={() => { setSelectedPiece(piece); setOpenAttrDialog(true); }}
+                                            onClick={() => {
+                                                setSelectedPiece(piece);
+                                                setSelectedUserForAttr(null);
+                                                setUserId('');
+                                                setOpenAttrDialog(true);
+                                            }}
                                         >
                                             <AssignmentInd />
                                         </IconButton>
@@ -321,22 +331,34 @@ export const PhysicalPieces = () => {
             </Dialog>
 
             {/* Attribution Dialog */}
-            <Dialog open={openAttrDialog} onClose={() => setOpenAttrDialog(false)}>
+            <Dialog open={openAttrDialog} onClose={() => setOpenAttrDialog(false)} maxWidth="sm" fullWidth>
                 <DialogTitle>Atribuir Peça a Cliente</DialogTitle>
                 <DialogContent>
                     <Box pt={1}>
-                        <Typography variant="body2" gutterBottom>Digite o ID do usuário (cliente) que adquiriu esta peça.</Typography>
-                        <TextField 
-                            fullWidth label="ID do Usuário" 
-                            type="number"
-                            value={userId}
-                            onChange={(e) => setUserId(e.target.value)}
+                        <Typography variant="body2" gutterBottom sx={{ mb: 2 }}>
+                            Busque e selecione o cliente para atribuir esta peça física.
+                        </Typography>
+                        <Autocomplete
+                            options={users}
+                            getOptionLabel={(option) => {
+                                if (!option) return '';
+                                const name = option.first_name ? `${option.first_name} ${option.last_name}` : option.name || '';
+                                return `#${option.id} - ${name} (${option.email})`;
+                            }}
+                            renderInput={(params) => <TextField {...params} label="Buscar Cliente" />}
+                            value={selectedUserForAttr}
+                            onChange={(e, val) => {
+                                setSelectedUserForAttr(val);
+                                setUserId(val ? String(val.id) : '');
+                            }}
+                            isOptionEqualToValue={(option, val) => option?.id === val?.id}
+                            fullWidth
                         />
                     </Box>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpenAttrDialog(false)}>Cancelar</Button>
-                    <Button variant="contained" onClick={handleAttribute}>Atribuir</Button>
+                    <Button variant="contained" onClick={handleAttribute} disabled={!userId}>Atribuir</Button>
                 </DialogActions>
             </Dialog>
 

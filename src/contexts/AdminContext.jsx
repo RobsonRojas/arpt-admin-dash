@@ -684,6 +684,25 @@ export const AdminProvider = ({ children }) => {
         }
     }
 
+    const getUsers = async (limit = 1000) => {
+        try {
+            const token = await user?.getIdToken();
+            const config = {
+                headers: { Authorization: `Bearer ${token}` },
+                params: { page: 1, limit }
+            };
+            const response = await api.get('/admin/users', config);
+            if (response.status === 200) {
+                return response.data;
+            }
+            return { users: [], total: 0 };
+        } catch (error) {
+            console.error("Error fetching users:", error);
+            return { users: [], total: 0 };
+        }
+    }
+
+
     // ==================== DOCS MANAGEMENT ====================
 
     const getDocsByManejoId = async (manejoId) => {
@@ -1264,6 +1283,7 @@ export const AdminProvider = ({ children }) => {
         getPhysicalPieces,
         createPhysicalPiece,
         attributePhysicalPiece,
+        getUsers,
     };
 
     return (
