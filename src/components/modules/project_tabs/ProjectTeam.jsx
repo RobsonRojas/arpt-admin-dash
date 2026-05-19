@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Box, Typography, List, ListItem, ListItemText, ListItemSecondaryAction, 
-  IconButton, Button, Dialog, DialogTitle, DialogContent, DialogActions,
+  Box, Typography, IconButton, Button, Dialog, DialogTitle, DialogContent, DialogActions,
   TextField, MenuItem, Select, FormControl, InputLabel, CircularProgress,
-  Divider, Alert, Tooltip
+  Alert, Tooltip, Table, TableBody, TableCell, TableContainer, TableHead,
+  TableRow, Paper, Chip, Avatar
 } from '@mui/material';
 import { Delete, Edit, PersonAdd, Mail } from '@mui/icons-material';
 import { api } from '../../../services/api';
@@ -78,6 +78,20 @@ export const ProjectTeam = ({ projectId }) => {
     }
   };
 
+  const handleResendInvite = async (invitationId) => {
+    setActionLoading(true);
+    try {
+      await api.post(`/manejos/${projectId}/invitations/${invitationId}/resend`);
+      alert('Convite reenviado com sucesso.');
+      fetchData();
+    } catch (err) {
+      console.error('Error resending invitation:', err);
+      alert('Erro ao reenviar convite.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const handleEditRole = async () => {
     try {
       await api.patch(`/manejos/${projectId}/members/${selectedMember.id}`, {
@@ -92,6 +106,29 @@ export const ProjectTeam = ({ projectId }) => {
   };
 
   if (loading) return <Box display="flex" justifyContent="center" p={3}><CircularProgress /></Box>;
+
+  const combinedList = [
+    ...members.map(m => ({
+      key: `member-${m.id}`,
+      type: 'member',
+      id: m.id,
+      name: `${m.first_name || ''} ${m.last_name || ''}`.trim() || m.email,
+      email: m.email,
+      role: m.role,
+      status: 'active',
+      date: m.created_at ? new Date(m.created_at).toLocaleDateString() : 'N/A'
+    })),
+    ...invitations.map(i => ({
+      key: `invite-${i.id}`,
+      type: 'invitation',
+      id: i.id,
+      name: 'Pendente',
+      email: i.email,
+      role: i.role,
+      status: 'pending',
+      date: i.expires_at ? `Expira em: ${new Date(i.expires_at).toLocaleDateString()}` : 'N/A'
+    }))
+  ];
 
   return (
     <Box>
@@ -109,79 +146,112 @@ export const ProjectTeam = ({ projectId }) => {
 
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
-      <Typography variant="subtitle2" color="textSecondary" sx={{ mb: 1, mt: 2 }}>Membros Ativos</Typography>
-      <List>
-        {members.length === 0 ? (
-          <Typography variant="body2" color="textSecondary" align="center" py={2}>
-            Nenhum membro ativo.
-          </Typography>
-        ) : (
-          members.map((member) => (
-            <React.Fragment key={member.id}>
-              <ListItem>
-                <ListItemText
-                  primary={`${member.first_name || ''} ${member.last_name || ''}`.trim() || member.email}
-                  secondary={
-                    <Box component="span" display="flex" alignItems="center" gap={1}>
-                      <Typography variant="caption" sx={{ fontWeight: 'bold', textTransform: 'uppercase', color: 'primary.main' }}>
-                        {member.role}
-                      </Typography>
-                      <Typography variant="caption" color="textSecondary">
-                        • {member.email}
-                      </Typography>
-                    </Box>
-                  }
-                />
-                <ListItemSecondaryAction>
-                  <Tooltip title="Alterar Cargo">
-                    <IconButton edge="end" size="small" onClick={() => {
-                      setSelectedMember(member);
-                      setEditRole(member.role);
-                      setEditOpen(true);
-                    }}>
-                      <Edit fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Remover">
-                    <IconButton edge="end" size="small" color="error" onClick={() => handleRemove(member.id)}>
-                      <Delete fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                </ListItemSecondaryAction>
-              </ListItem>
-              <Divider variant="inset" component="li" />
-            </React.Fragment>
-          ))
-        )}
-      </List>
-
-      {invitations.length > 0 && (
-        <>
-          <Typography variant="subtitle2" color="textSecondary" sx={{ mb: 1, mt: 3 }}>Convites Pendentes</Typography>
-          <List>
-            {invitations.map((invitation) => (
-              <React.Fragment key={invitation.id}>
-                <ListItem>
-                  <ListItemText
-                    primary={invitation.email}
-                    secondary={
-                      <Box component="span" display="flex" alignItems="center" gap={1}>
-                        <Typography variant="caption" sx={{ fontWeight: 'bold', textTransform: 'uppercase', color: 'warning.main' }}>
-                          Pendente ({invitation.role})
+      <TableContainer component={Paper} variant="outlined" sx={{ mt: 2, borderRadius: 2, overflow: 'hidden' }}>
+        <Table>
+          <TableHead sx={{ backgroundColor: 'action.hover' }}>
+            <TableRow>
+              <TableCell sx={{ fontWeight: 'bold' }}>Membro</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>Cargo</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>Detalhes</TableCell>
+              <TableCell align="right" sx={{ fontWeight: 'bold', pr: 3 }}>Ações</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {combinedList.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
+                  <Typography variant="body2" color="textSecondary">
+                    Nenhum membro ou convite pendente.
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            ) : (
+              combinedList.map((item) => (
+                <TableRow key={item.key} hover>
+                  <TableCell>
+                    <Box display="flex" alignItems="center" gap={2}>
+                      <Avatar sx={{ 
+                        bgcolor: item.status === 'active' ? 'primary.light' : 'warning.light',
+                        color: item.status === 'active' ? 'primary.contrastText' : 'warning.contrastText',
+                        width: 36,
+                        height: 36,
+                        fontSize: '0.875rem',
+                        fontWeight: 'bold'
+                      }}>
+                        {item.status === 'active' ? item.name.charAt(0).toUpperCase() : '?'}
+                      </Avatar>
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                          {item.name}
                         </Typography>
                         <Typography variant="caption" color="textSecondary">
-                          • Expira em: {new Date(invitation.expires_at).toLocaleDateString()}
+                          {item.email}
                         </Typography>
                       </Box>
-                    }
-                  />
-                </ListItem>
-                <Divider variant="inset" component="li" />
-              </React.Fragment>
-            ))}
-          </List>
-        </>
-      )}
+                    </Box>
+                  </TableCell>
+                  <TableCell>
+                    <Chip 
+                      label={item.role.toUpperCase()} 
+                      size="small" 
+                      variant="outlined" 
+                      color="primary"
+                      sx={{ fontWeight: 'bold', fontSize: '0.675rem' }}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Chip 
+                      label={item.status === 'active' ? 'ATIVO' : 'PENDENTE'} 
+                      size="small"
+                      color={item.status === 'active' ? 'success' : 'warning'}
+                      sx={{ fontWeight: 'bold', fontSize: '0.675rem', borderRadius: 1 }}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="caption" color="textSecondary">
+                      {item.date}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right" sx={{ pr: 2 }}>
+                    <Box display="flex" justifyContent="flex-end" gap={1}>
+                      {item.status === 'active' ? (
+                        <>
+                          <Tooltip title="Alterar Cargo">
+                            <IconButton size="small" onClick={() => {
+                              setSelectedMember(members.find(m => m.id === item.id));
+                              setEditRole(item.role);
+                              setEditOpen(true);
+                            }}>
+                              <Edit fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Remover Membro">
+                            <IconButton size="small" color="error" onClick={() => handleRemove(item.id)}>
+                              <Delete fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </>
+                      ) : (
+                        <Tooltip title="Reenviar Convite">
+                          <IconButton 
+                            size="small" 
+                            color="primary" 
+                            onClick={() => handleResendInvite(item.id)} 
+                            disabled={actionLoading}
+                          >
+                            <Mail fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
       {/* Invite Dialog */}
       <Dialog open={inviteOpen} onClose={() => setInviteOpen(false)} fullWidth maxWidth="xs">
