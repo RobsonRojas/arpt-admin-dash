@@ -21,3 +21,4 @@ export * from './Adoptions';
 export * from './PhysicalPieces';
 export * from './Notifications';
 export { default as Dropshipping } from './Dropshipping';
+export * from './ManejoLogs';

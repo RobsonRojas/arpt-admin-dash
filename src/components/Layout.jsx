@@ -65,6 +65,7 @@ export const Layout = ({ children }) => {
     { id: 'notifications', label: 'Central de Notificações', icon: <Notifications />, path: '/notifications' },
     { id: 'users', label: 'Gestão de Usuários', icon: <ManageAccounts />, path: '/users' },
     { id: 'audit', label: 'Log de Modificações', icon: <History />, path: '/audit' },
+    { id: 'manejo-logs', label: 'Log de Manejo', icon: <History />, path: '/manejo-logs' },
     { id: 'payment-config', label: 'Configurações de Pagamento', icon: <Payment />, path: '/payment-config' },
     { id: 'media-manager', label: 'Gerenciador de Arquivos', icon: <PermMedia />, path: '/media-manager' },
     { id: 'forest-intelligence', label: 'Inteligência Florestal', icon: <Psychology />, path: '/forest-intelligence' },
