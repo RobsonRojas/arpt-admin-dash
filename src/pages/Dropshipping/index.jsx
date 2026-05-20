@@ -19,6 +19,13 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import InfoIcon from '@mui/icons-material/Info';
+import PeopleIcon from '@mui/icons-material/People';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import DeleteIcon from '@mui/icons-material/Delete';
+import HistoryIcon from '@mui/icons-material/History';
+import UndoIcon from '@mui/icons-material/Undo';
+import EmailIcon from '@mui/icons-material/Email';
+import ShieldIcon from '@mui/icons-material/Shield';
 import { 
   ResponsiveContainer, ComposedChart, Bar, Line, XAxis, YAxis, 
   CartesianGrid, Tooltip, Legend, BarChart, Cell
@@ -76,6 +83,12 @@ export default function Dropshipping() {
   const [funnelData, setFunnelData] = useState({ visitors: 0, cartAdditions: 0, checkouts: 0, conversionRate: 0 });
   const [opps, setOpps] = useState([]);
   const [warnings, setWarnings] = useState([]);
+  const [members, setMembers] = useState([]);
+  const [actionsLog, setActionsLog] = useState([]);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteRole, setInviteRole] = useState('Vendedor');
+  const [inviting, setInviting] = useState(false);
   const [startDate, setStartDate] = useState(() => {
     const d = new Date();
     d.setDate(d.getDate() - 30);
@@ -119,6 +132,12 @@ export default function Dropshipping() {
   }, [store?.id, startDate, endDate, scale]);
 
   useEffect(() => {
+    if (store?.id && tabValue === 5) {
+      fetchStoreTeam(store.id);
+    }
+  }, [store?.id, tabValue]);
+
+  useEffect(() => {
     fetchStoreData();
   }, []);
 
@@ -156,6 +175,7 @@ export default function Dropshipping() {
         fetchCatalog(myStore.id);
         fetchSales(myStore.id);
         fetchAnalytics(myStore.id);
+        fetchStoreTeam(myStore.id);
       }
       
       // Fetch all available products to pick from
@@ -213,6 +233,87 @@ export default function Dropshipping() {
       setSales(res.data);
     } catch (err) {
       console.error("Error fetching sales", err);
+    }
+  };
+
+  const fetchStoreTeam = async (storeId) => {
+    try {
+      const [membersRes, logsRes] = await Promise.all([
+        api.get(`/api/v1/dropshipping/stores/${storeId}/members`),
+        api.get(`/api/v1/dropshipping/stores/${storeId}/actions-log`)
+      ]);
+      setMembers(membersRes.data);
+      setActionsLog(logsRes.data);
+    } catch (err) {
+      console.error("Error fetching team/logs", err);
+    }
+  };
+
+  const handleInviteMember = async () => {
+    if (!inviteEmail.trim()) return alert("Por favor, informe o e-mail");
+    setInviting(true);
+    try {
+      await api.post(`/api/v1/dropshipping/stores/${store.id}/members/invite`, {
+        email: inviteEmail.trim(),
+        role: inviteRole
+      });
+      alert("Convite enviado com sucesso!");
+      setInviteOpen(false);
+      setInviteEmail('');
+      setInviteRole('Vendedor');
+      fetchStoreTeam(store.id);
+    } catch (err) {
+      alert("Erro ao enviar convite: " + (err.response?.data?.error || err.message));
+    } finally {
+      setInviting(false);
+    }
+  };
+
+  const handleResendInvite = async (memberId) => {
+    try {
+      await api.post(`/api/v1/dropshipping/stores/${store.id}/members/${memberId}/resend`);
+      alert("Convite reenviado com sucesso!");
+      fetchStoreTeam(store.id);
+    } catch (err) {
+      alert("Erro ao reenviar convite: " + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const handleUpdateRole = async (memberId, newRole) => {
+    try {
+      await api.put(`/api/v1/dropshipping/stores/${store.id}/members/${memberId}`, {
+        role: newRole
+      });
+      alert("Cargo atualizado com sucesso!");
+      fetchStoreTeam(store.id);
+    } catch (err) {
+      alert("Erro ao atualizar cargo: " + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const handleRemoveMember = async (memberId) => {
+    if (!window.confirm("Deseja realmente remover este membro da equipe?")) return;
+    try {
+      await api.delete(`/api/v1/dropshipping/stores/${store.id}/members/${memberId}`);
+      alert("Membro removido com sucesso!");
+      fetchStoreTeam(store.id);
+    } catch (err) {
+      alert("Erro ao remover membro: " + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const handleRevertAction = async (logId) => {
+    if (!window.confirm("Deseja realmente reverter esta alteração? Isso modificará o banco de dados para o estado anterior da ação.")) return;
+    try {
+      await api.post(`/api/v1/dropshipping/stores/${store.id}/actions-log/${logId}/revert`);
+      alert("Ação revertida com sucesso!");
+      // Full refresh to ensure consistency of catalog, store data, members, and logs
+      await fetchStoreData();
+      if (store?.id) {
+        await fetchStoreTeam(store.id);
+      }
+    } catch (err) {
+      alert("Erro ao reverter ação: " + (err.response?.data?.error || err.message));
     }
   };
 
@@ -336,6 +437,7 @@ export default function Dropshipping() {
           <Tab label="Vendas & Comissões" />
           <Tab label="Marketing Hub & Assets" />
           <Tab label="Analytics Pro" />
+          <Tab label="Equipe & Auditoria" />
         </Tabs>
       </Box>
 
@@ -1163,6 +1265,288 @@ export default function Dropshipping() {
               </Grid>
 
             </Grid>
+          </Box>
+        )}
+      </TabPanel>
+
+      {/* TAB 5: TEAM MANAGEMENT & AUDIT LOGS */}
+      <TabPanel value={tabValue} index={5}>
+        {!store ? (
+          <Alert severity="warning" sx={{ borderRadius: 2 }}>
+            Você precisa criar e salvar uma loja antes de gerenciar a sua equipe de vendas.
+          </Alert>
+        ) : (
+          <Box>
+            <Grid container spacing={3} sx={{ mb: 3 }}>
+              <Grid item xs={12} sm={4}>
+                <Paper variant="outlined" sx={{ p: 2, borderRadius: 3, textAlign: 'center', bgcolor: '#f8fafc' }}>
+                  <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 'bold' }}>Total de Membros</Typography>
+                  <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#1e293b', mt: 1 }}>
+                    {members.filter(m => m.status === 'Ativo').length}
+                  </Typography>
+                </Paper>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Paper variant="outlined" sx={{ p: 2, borderRadius: 3, textAlign: 'center', bgcolor: '#f8fafc' }}>
+                  <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 'bold' }}>Convites Pendentes</Typography>
+                  <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#fbbf24', mt: 1 }}>
+                    {members.filter(m => m.status === 'Pendente').length}
+                  </Typography>
+                </Paper>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Paper variant="outlined" sx={{ p: 2, borderRadius: 3, textAlign: 'center', bgcolor: '#f8fafc', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    startIcon={<PersonAddIcon />}
+                    onClick={() => setInviteOpen(true)}
+                    sx={{ borderRadius: 2.5, textTransform: 'none', fontWeight: 'bold', py: 1.2, px: 3 }}
+                  >
+                    Convidar Membro
+                  </Button>
+                </Paper>
+              </Grid>
+            </Grid>
+
+            <Grid container spacing={4}>
+              {/* Members List Column */}
+              <Grid item xs={12} md={7}>
+                <Paper variant="outlined" sx={{ p: 3, borderRadius: 3 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
+                    <PeopleIcon color="primary" />
+                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Equipe da Loja</Typography>
+                  </Box>
+
+                  {members.length === 0 ? (
+                    <Typography color="textSecondary" sx={{ fontStyle: 'italic', py: 3, textAlign: 'center' }}>
+                      Nenhum membro ou convite registrado na equipe desta loja.
+                    </Typography>
+                  ) : (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      {members.map(m => (
+                        <Card key={m.id} variant="outlined" sx={{ borderRadius: 2.5, p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Box 
+                              sx={{ 
+                                width: 44, 
+                                height: 44, 
+                                borderRadius: '50%', 
+                                bgcolor: m.status === 'Ativo' ? '#dcfce7' : '#fef9c3', 
+                                display: 'flex', 
+                                justifyContent: 'center', 
+                                alignItems: 'center',
+                                color: m.status === 'Ativo' ? '#15803d' : '#a16207',
+                                fontWeight: 'bold'
+                              }}
+                            >
+                              {m.first_name ? m.first_name[0].toUpperCase() : <PeopleIcon size="small" />}
+                            </Box>
+                            <Box>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
+                                {m.first_name ? `${m.first_name} ${m.last_name || ''}` : 'Convidado Pendente'}
+                              </Typography>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <EmailIcon sx={{ fontSize: 13, color: '#64748b' }} />
+                                <Typography variant="caption" color="textSecondary">
+                                  {m.email}
+                                </Typography>
+                              </Box>
+                              {m.status === 'Pendente' && m.token_convite && (
+                                <Typography variant="caption" sx={{ color: '#0284c7', display: 'block', mt: 0.5, fontFamily: 'monospace' }}>
+                                  Token: {m.token_convite.slice(0, 8)}...
+                                </Typography>
+                              )}
+                            </Box>
+                          </Box>
+
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+                            <Chip 
+                              label={m.status} 
+                              size="small" 
+                              color={m.status === 'Ativo' ? 'success' : 'warning'} 
+                              variant="outlined" 
+                            />
+                            
+                            <FormControl size="small" sx={{ minWidth: 110 }}>
+                              <Select
+                                value={m.role}
+                                onChange={(e) => handleUpdateRole(m.id, e.target.value)}
+                                sx={{ borderRadius: 1.5, height: 32, fontSize: '0.8rem' }}
+                              >
+                                <MenuItem value="Admin">Admin</MenuItem>
+                                <MenuItem value="Vendedor">Vendedor</MenuItem>
+                              </Select>
+                            </FormControl>
+
+                            {m.status === 'Pendente' && (
+                              <>
+                                <Button
+                                  size="small"
+                                  variant="outlined"
+                                  color="primary"
+                                  startIcon={<ContentCopyIcon />}
+                                  onClick={() => handleCopyText(`${window.location.origin}/cadastro?token=${m.token_convite}`)}
+                                  sx={{ borderRadius: 1.5, height: 32, textTransform: 'none', fontSize: '0.75rem' }}
+                                >
+                                  Copiar
+                                </Button>
+                                <Button
+                                  size="small"
+                                  variant="outlined"
+                                  color="warning"
+                                  onClick={() => handleResendInvite(m.id)}
+                                  sx={{ borderRadius: 1.5, height: 32, textTransform: 'none', fontSize: '0.75rem' }}
+                                >
+                                  Reenviar
+                                </Button>
+                              </>
+                            )}
+
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              color="error"
+                              onClick={() => handleRemoveMember(m.id)}
+                              sx={{ minWidth: 32, width: 32, height: 32, p: 0, borderRadius: 1.5 }}
+                            >
+                              <DeleteIcon sx={{ fontSize: 18 }} />
+                            </Button>
+                          </Box>
+                        </Card>
+                      ))}
+                    </Box>
+                  )}
+                </Paper>
+              </Grid>
+
+              {/* Audit Logs Column */}
+              <Grid item xs={12} md={5}>
+                <Paper variant="outlined" sx={{ p: 3, borderRadius: 3, display: 'flex', flexDirection: 'column', height: '100%', minHeight: 400 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
+                    <HistoryIcon color="primary" />
+                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Trilha de Auditoria (Logs)</Typography>
+                  </Box>
+
+                  {actionsLog.length === 0 ? (
+                    <Typography color="textSecondary" sx={{ fontStyle: 'italic', py: 3, textAlign: 'center' }}>
+                      Nenhuma ação registrada no log de auditoria.
+                    </Typography>
+                  ) : (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxHeight: 600, overflowY: 'auto', pr: 0.5 }}>
+                      {actionsLog.map(log => {
+                        const isReversible = log.acao === 'update_branding' || log.acao === 'curate_product';
+                        let actionText = log.acao;
+                        let actionColor = 'inherit';
+
+                        if (log.acao === 'update_branding') {
+                          actionText = 'Atualizou a identidade visual e branding da vitrine';
+                          actionColor = '#2563eb';
+                        } else if (log.acao === 'curate_product') {
+                          actionText = 'Curu ou modificou o catálogo de produtos da loja';
+                          actionColor = '#16a34a';
+                        } else if (log.acao.startsWith('revert_')) {
+                          actionText = `Desfez/Reverteu a ação: ${log.acao.replace('revert_', '')}`;
+                          actionColor = '#dc2626';
+                        }
+
+                        return (
+                          <Paper key={log.id} variant="outlined" sx={{ p: 2, borderRadius: 2.5, bgcolor: log.acao.startsWith('revert_') ? '#fef2f2' : 'white' }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: actionColor }}>
+                                {log.acao.startsWith('revert_') ? 'Reversão Efetuada' : 'Ação de Gerenciamento'}
+                              </Typography>
+                              <Typography variant="caption" color="textSecondary">
+                                {new Date(log.created_at).toLocaleString('pt-BR')}
+                              </Typography>
+                            </Box>
+
+                            <Typography variant="body2" sx={{ mb: 2 }}>
+                              {actionText}
+                            </Typography>
+
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <ShieldIcon sx={{ fontSize: 13, color: '#64748b' }} />
+                                <Typography variant="caption" color="textSecondary">
+                                  Por: {log.first_name ? `${log.first_name} ${log.last_name || ''}` : log.user_email}
+                                </Typography>
+                              </Box>
+
+                              {isReversible && (
+                                <Button
+                                  size="small"
+                                  variant="contained"
+                                  color="warning"
+                                  startIcon={<UndoIcon />}
+                                  onClick={() => handleRevertAction(log.id)}
+                                  sx={{ borderRadius: 1.5, py: 0.4, textTransform: 'none', fontSize: '0.7rem', fontWeight: 'bold' }}
+                                >
+                                  Desfazer
+                                </Button>
+                              )}
+                            </Box>
+                          </Paper>
+                        );
+                      })}
+                    </Box>
+                  )}
+                </Paper>
+              </Grid>
+            </Grid>
+
+            {/* Invitation Dialog Modal */}
+            <Dialog 
+              open={inviteOpen} 
+              onClose={() => setInviteOpen(false)}
+              PaperProps={{ sx: { borderRadius: 4, p: 2, maxWidth: 450, width: '100%' } }}
+            >
+              <DialogTitle sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
+                <PersonAddIcon color="success" /> Convidar Novo Membro
+              </DialogTitle>
+              <DialogContent>
+                <Typography variant="body2" color="textSecondary" sx={{ mb: 3 }}>
+                  Envie um convite por e-mail para cadastrar um novo integrante na equipe de vendas da sua loja.
+                </Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 1 }}>
+                  <TextField
+                    fullWidth
+                    label="Endereço de E-mail"
+                    variant="outlined"
+                    type="email"
+                    value={inviteEmail}
+                    onChange={e => setInviteEmail(e.target.value)}
+                    placeholder="nome@exemplo.com"
+                  />
+
+                  <FormControl fullWidth>
+                    <InputLabel>Papel na Equipe</InputLabel>
+                    <Select
+                      value={inviteRole}
+                      label="Papel na Equipe"
+                      onChange={e => setInviteRole(e.target.value)}
+                    >
+                      <MenuItem value="Vendedor">Vendedor (Catálogo, Vendas)</MenuItem>
+                      <MenuItem value="Admin">Administrador da Loja (Equipe, Configuração)</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Box>
+              </DialogContent>
+              <DialogActions sx={{ px: 3, pb: 2 }}>
+                <Button onClick={() => setInviteOpen(false)} color="inherit" sx={{ fontWeight: 'bold' }}>
+                  Cancelar
+                </Button>
+                <Button 
+                  onClick={handleInviteMember} 
+                  variant="contained" 
+                  color="success"
+                  disabled={inviting}
+                  sx={{ fontWeight: 'bold', borderRadius: 2 }}
+                >
+                  {inviting ? 'Enviando...' : 'Enviar Convite'}
+                </Button>
+              </DialogActions>
+            </Dialog>
           </Box>
         )}
       </TabPanel>

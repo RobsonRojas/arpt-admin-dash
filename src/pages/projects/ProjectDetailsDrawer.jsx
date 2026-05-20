@@ -8,6 +8,7 @@ import { ProjectDocs } from '../../components/modules/project_tabs/ProjectDocs';
 import { ProjectIncidents } from '../../components/modules/project_tabs/ProjectIncidents';
 import { ProjectTeam } from '../../components/modules/project_tabs/ProjectTeam';
 import { CampaignAssistant } from '../../components/CampaignAssistant';
+import { ProjectSpends } from '../../components/modules/project_tabs/ProjectSpends';
 
 export const ProjectDetailsDrawer = ({ 
   selectedProject, 
@@ -63,6 +64,7 @@ export const ProjectDetailsDrawer = ({
             <Tab label="Incidentes" />
             <Tab label="Equipe" />
             <Tab label="Estratégia" />
+            <Tab label="Custos & Despesas" />
           </Tabs>
 
           <Box flexGrow={1} p={{ xs: 2, md: 3 }} overflow="auto">
@@ -134,6 +136,11 @@ export const ProjectDetailsDrawer = ({
             {/* TAB 5 - Estratégia */}
             {tabValue === 5 && (
               <CampaignAssistant project={selectedProject} />
+            )}
+
+            {/* TAB 6 - Custos & Despesas */}
+            {tabValue === 6 && (
+              <ProjectSpends projectId={selectedProject.id} />
             )}
           </Box>
         </Box>
