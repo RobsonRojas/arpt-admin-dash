@@ -419,23 +419,30 @@ export default function Dropshipping() {
   );
 
   return (
-    <Box sx={{ p: 1 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Box>
-          <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Dashboard Dropshipping</Typography>
+    <Box sx={{ p: { xs: 1, sm: 2 } }}>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', gap: 1.5, mb: 3 }}>
+        <Box sx={{ minWidth: 0 }}>
+          <Typography variant="h4" sx={{ fontWeight: 'bold', fontSize: { xs: '1.4rem', sm: '2rem' } }}>Dashboard Dropshipping</Typography>
           <Typography variant="caption" color="textSecondary">
             Gerencie sua marca, cure catálogos de origem Amazônica e impulsione suas vendas verdes.
           </Typography>
         </Box>
-        <Chip icon={<StorefrontIcon />} label={store ? `Loja Ativa: ${store.name}` : "Nenhuma loja cadastrada"} color={store ? "success" : "warning"} />
+        <Chip icon={<StorefrontIcon />} label={store ? `Loja Ativa: ${store.name}` : "Nenhuma loja cadastrada"} color={store ? "success" : "warning"} sx={{ flexShrink: 0 }} />
       </Box>
       
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
-        <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)}>
+        <Tabs
+          value={tabValue}
+          onChange={(e, v) => setTabValue(v)}
+          variant="scrollable"
+          scrollButtons="auto"
+          allowScrollButtonsMobile
+          sx={{ '& .MuiTab-root': { minHeight: 48, py: 1.5, fontSize: { xs: '0.75rem', sm: '0.875rem' } } }}
+        >
           <Tab label="Configuração da Loja" />
           <Tab label="Catálogo de Curação" />
           <Tab label="Vendas & Comissões" />
-          <Tab label="Marketing Hub & Assets" />
+          <Tab label="Marketing Hub" />
           <Tab label="Analytics Pro" />
           <Tab label="Equipe & Auditoria" />
         </Tabs>
@@ -454,7 +461,7 @@ export default function Dropshipping() {
           <Typography variant="body2" color="textSecondary" sx={{ mb: 3 }}>
             Descreva que tipo de loja você deseja criar (público-alvo, nicho, estilo) e nossa IA criará uma marca personalizada, escolherá um slogan memorável, configurará o visual ideal e pré-selecionará os melhores produtos ecológicos.
           </Typography>
-          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+          <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'stretch', sm: 'flex-start' } }}>
             <TextField 
               fullWidth 
               variant="outlined" 
@@ -470,7 +477,7 @@ export default function Dropshipping() {
               onClick={handleGenerateAI}
               disabled={aiGenerating}
               startIcon={aiGenerating ? <CircularProgress size={16} color="inherit" /> : <AutoAwesomeIcon />}
-              sx={{ px: 4, borderRadius: 2, textTransform: 'none', fontWeight: 'bold' }}
+              sx={{ px: 4, py: { xs: 1.5, sm: 1 }, borderRadius: 2, textTransform: 'none', fontWeight: 'bold', whiteSpace: 'nowrap', minHeight: 48 }}
             >
               {aiGenerating ? 'Gerando...' : 'Gerar com IA'}
             </Button>
@@ -544,8 +551,15 @@ export default function Dropshipping() {
                 </Grid>
               </Grid>
 
-              <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
-                <Button variant="contained" color="success" size="large" onClick={handleSaveStore} sx={{ px: 4, borderRadius: 2.5, fontWeight: 'bold' }}>
+              <Box sx={{ mt: 4, display: 'flex', justifyContent: { xs: 'stretch', sm: 'flex-end' } }}>
+                <Button
+                  variant="contained"
+                  color="success"
+                  size="large"
+                  fullWidth={true}
+                  onClick={handleSaveStore}
+                  sx={{ px: 4, py: { xs: 1.5, sm: 1 }, borderRadius: 2.5, fontWeight: 'bold', minHeight: 48, maxWidth: { sm: 200 } }}
+                >
                   Salvar Loja
                 </Button>
               </Box>
@@ -660,7 +674,7 @@ export default function Dropshipping() {
               <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>Seu Catálogo Selecionado</Typography>
               {catalog.length === 0 ? (
                 <Typography color="textSecondary" sx={{ fontStyle: 'italic' }}>
-                  Nenhum produto adicionado ainda. Escolha produtos da lista à direita!
+                  Nenhum produto adicionado ainda. Escolha produtos da lista abaixo!
                 </Typography>
               ) : (
                 <Grid container spacing={2}>
@@ -691,11 +705,12 @@ export default function Dropshipping() {
           {/* Available products list to select */}
           <Grid item xs={12} md={6}>
             <Paper variant="outlined" sx={{ p: 3, borderRadius: 3 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Adicionar Produtos</Typography>
                 <TextField 
                   size="small" 
                   placeholder="Pesquisar..." 
+                  sx={{ minWidth: 140 }}
                   onChange={(e) => {
                     const val = e.target.value.toLowerCase();
                     document.querySelectorAll('.available-prod-card').forEach(el => {
@@ -732,7 +747,7 @@ export default function Dropshipping() {
                             fullWidth
                             disabled={inCatalog} 
                             onClick={() => handleAddProduct(prod.id)}
-                            sx={{ borderRadius: 1.5, textTransform: 'none', fontWeight: 'bold' }}
+                            sx={{ borderRadius: 1.5, textTransform: 'none', fontWeight: 'bold', minHeight: 40 }}
                           >
                             {inCatalog ? 'Já no Catálogo' : 'Adicionar'}
                           </Button>
@@ -1102,7 +1117,7 @@ export default function Dropshipping() {
                   <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2 }}>
                     Tendência de Vendas e Margens de Comissão
                   </Typography>
-                  <Box sx={{ width: '100%', height: 350 }}>
+                  <Box sx={{ width: '100%', height: { xs: 250, md: 350 } }}>
                     {perfData.length === 0 ? (
                       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                         <Typography color="textSecondary" sx={{ fontStyle: 'italic' }}>
@@ -1113,13 +1128,13 @@ export default function Dropshipping() {
                       <ResponsiveContainer width="100%" height="100%">
                         <ComposedChart data={perfData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
                           <CartesianGrid stroke="#f1f5f9" strokeDasharray="3 3" />
-                          <XAxis dataKey="time_bucket" stroke="#64748b" style={{ fontSize: '0.75rem' }} />
-                          <YAxis stroke="#64748b" style={{ fontSize: '0.75rem' }} />
+                          <XAxis dataKey="time_bucket" stroke="#64748b" style={{ fontSize: '0.7rem' }} />
+                          <YAxis stroke="#64748b" style={{ fontSize: '0.7rem' }} />
                           <Tooltip 
-                            contentStyle={{ borderRadius: 8, border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}
+                            contentStyle={{ borderRadius: 8, border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', fontSize: '0.75rem' }}
                             formatter={(value, name) => [`R$ ${Number(value).toFixed(2)}`, name === 'gross_sales' ? 'Faturamento Bruto' : 'Comissão Dropshipper']}
                           />
-                          <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: '0.85rem' }} />
+                          <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: '0.75rem' }} />
                           <Bar dataKey="gross_sales" fill="#2e7d32" radius={[4, 4, 0, 0]} maxBarSize={45} />
                           <Line type="monotone" dataKey="net_commissions" stroke="#fbbf24" strokeWidth={3} dot={{ r: 4 }} />
                         </ComposedChart>
@@ -1139,7 +1154,7 @@ export default function Dropshipping() {
                     Acompanhe as taxas de conversão de visitantes a apoios ecológicos realizados.
                   </Typography>
 
-                  <Box sx={{ width: '100%', height: 260, flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+                  <Box sx={{ width: '100%', height: { xs: 200, md: 260 }, flexGrow: 1, display: 'flex', alignItems: 'center' }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
                         layout="vertical"
@@ -1151,8 +1166,8 @@ export default function Dropshipping() {
                         margin={{ top: 0, right: 30, left: 10, bottom: 0 }}
                       >
                         <XAxis type="number" hide />
-                        <YAxis dataKey="stage" type="category" stroke="#64748b" style={{ fontSize: '0.85rem', fontWeight: 'bold' }} width={70} />
-                        <Tooltip formatter={(value) => [value, 'Quantidade']} />
+                        <YAxis dataKey="stage" type="category" stroke="#64748b" style={{ fontSize: '0.8rem', fontWeight: 'bold' }} width={65} />
+                        <Tooltip formatter={(value) => [value, 'Quantidade']} contentStyle={{ fontSize: '0.75rem' }} />
                         <Bar dataKey="count" radius={[0, 4, 4, 0]} barSize={25}>
                           <Cell fill="#64748b" />
                           <Cell fill="#fbbf24" />
