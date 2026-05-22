@@ -66,8 +66,13 @@ export default function Dropshipping() {
     splitProducer: 0.70,
     visualPreset: 'classic_wood',
     globalMarkupPercentage: 15,
-    aiSlogan: ''
+    aiSlogan: '',
+    custom_domain: ''
   });
+
+  const [domainStatus, setDomainStatus] = useState('none');
+  const [verifyingDomain, setVerifyingDomain] = useState(false);
+  const [selectedProvider, setSelectedProvider] = useState('generic');
 
   const [catalog, setCatalog] = useState([]);
   const [availableProducts, setAvailableProducts] = useState([]);
@@ -168,8 +173,15 @@ export default function Dropshipping() {
           splitProducer: config?.splitProducer ?? 0.70,
           visualPreset: myStore.visual_preset || 'classic_wood',
           globalMarkupPercentage: myStore.global_markup_percentage ?? 15,
-          aiSlogan: myStore.ai_slogan || ''
+          aiSlogan: myStore.ai_slogan || '',
+          custom_domain: myStore.custom_domain || ''
         });
+
+        if (myStore.custom_domain) {
+          checkDomainStatus(myStore.id);
+        } else {
+          setDomainStatus('none');
+        }
 
         // Fetch products, sales and analytics
         fetchCatalog(myStore.id);
@@ -187,6 +199,36 @@ export default function Dropshipping() {
       console.error("Error fetching dropshipping data", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const checkDomainStatus = async (storeId) => {
+    try {
+      setVerifyingDomain(true);
+      const res = await api.get(`/manejos/dropshipping/stores/${storeId}/domain/status`);
+      if (res.data) {
+        setDomainStatus(res.data.status);
+      }
+    } catch (err) {
+      console.error("Error verifying domain", err);
+    } finally {
+      setVerifyingDomain(false);
+    }
+  };
+
+  const handleAttachDomain = async () => {
+    if (!store) return alert("Crie a loja primeiro");
+    if (!storeForm.custom_domain) return alert("Informe o domínio customizado (ex: minha-loja.com.br)");
+    
+    try {
+      setVerifyingDomain(true);
+      const res = await api.post(`/manejos/dropshipping/stores/${store.id}/domain`, { custom_domain: storeForm.custom_domain });
+      setDomainStatus(res.data.status);
+      alert("Domínio vinculado! Configure os registros DNS em seu provedor.");
+    } catch (err) {
+      alert("Erro ao vincular domínio: " + (err.response?.data?.error || err.message));
+    } finally {
+      setVerifyingDomain(false);
     }
   };
 
@@ -533,6 +575,129 @@ export default function Dropshipping() {
                   <TextField fullWidth label="Google Search Console ID" value={storeForm.google_search_console_id} onChange={e => setStoreForm({...storeForm, google_search_console_id: e.target.value})} margin="normal" />
                 </Grid>
               </Grid>
+
+              <Divider sx={{ my: 4 }} />
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Domínio Customizado</Typography>
+                {verifyingDomain && <CircularProgress size={24} />}
+              </Box>
+              <Typography variant="caption" color="textSecondary" display="block" sx={{ mb: 2 }}>
+                Conecte seu próprio domínio (ex: www.minha-loja.com.br) para sua vitrine dropshipping.
+              </Typography>
+              
+              <Grid container spacing={3} alignItems="center">
+                <Grid item xs={12} sm={8}>
+                  <TextField 
+                    fullWidth 
+                    label="Seu Domínio (ex: minha-loja.com.br)" 
+                    value={storeForm.custom_domain} 
+                    onChange={e => setStoreForm({...storeForm, custom_domain: e.target.value})} 
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <Button 
+                    variant="outlined" 
+                    fullWidth 
+                    onClick={handleAttachDomain}
+                    disabled={verifyingDomain}
+                    sx={{ height: 56 }}
+                  >
+                    Vincular Domínio
+                  </Button>
+                </Grid>
+              </Grid>
+
+              {storeForm.custom_domain && (
+                <Box sx={{ mt: 3, p: 2, bgcolor: '#f5f5f5', borderRadius: 2, border: '1px solid #e0e0e0' }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
+                    Status do Domínio: 
+                    <Chip 
+                      label={domainStatus === 'verified' ? 'Verificado (Online)' : domainStatus === 'failed' ? 'Falha (Verifique DNS)' : 'Pendente / Verificando...'} 
+                      color={domainStatus === 'verified' ? 'success' : domainStatus === 'failed' ? 'error' : 'warning'} 
+                      size="small" 
+                      sx={{ ml: 1 }} 
+                    />
+                  </Typography>
+                  
+                  {domainStatus !== 'verified' && (
+                    <Box sx={{ mt: 2 }}>
+                      <Typography variant="body2" sx={{ mb: 2 }}>
+                        Para ativar seu domínio, selecione o seu provedor e siga as instruções abaixo:
+                      </Typography>
+                      
+                      <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+                        <InputLabel>Provedor de Domínio</InputLabel>
+                        <Select
+                          value={selectedProvider}
+                          label="Provedor de Domínio"
+                          onChange={(e) => setSelectedProvider(e.target.value)}
+                        >
+                          <MenuItem value="generic">Genérico (Outros)</MenuItem>
+                          <MenuItem value="registrobr">Registro.br</MenuItem>
+                          <MenuItem value="godaddy">GoDaddy</MenuItem>
+                          <MenuItem value="hostinger">Hostinger</MenuItem>
+                          <MenuItem value="locaweb">LocaWeb</MenuItem>
+                          <MenuItem value="hostgator">HostGator</MenuItem>
+                        </Select>
+                      </FormControl>
+
+                      {selectedProvider === 'registrobr' && (
+                        <Alert severity="info" sx={{ mb: 2, borderRadius: 2 }}>
+                          <strong>No Registro.br:</strong> Acesse "Zonas de DNS" -> "Editar Zona" -> "Nova Entrada". Crie a entrada WWW como CNAME e, para o domínio raiz (se suportado), deixe em branco com tipo A.
+                        </Alert>
+                      )}
+                      {selectedProvider === 'godaddy' && (
+                        <Alert severity="info" sx={{ mb: 2, borderRadius: 2 }}>
+                          <strong>No GoDaddy:</strong> Vá em "Gerenciamento de DNS". Clique em "Adicionar" um novo registro CNAME para "www" apontando para o valor abaixo, e um registro A para "@".
+                        </Alert>
+                      )}
+                      {selectedProvider === 'hostinger' && (
+                        <Alert severity="info" sx={{ mb: 2, borderRadius: 2 }}>
+                          <strong>Na Hostinger:</strong> Vá na seção "Editor de Zona DNS". Adicione ou edite o registro CNAME com o nome "www" apontando para o valor abaixo.
+                        </Alert>
+                      )}
+                      {selectedProvider === 'locaweb' && (
+                        <Alert severity="info" sx={{ mb: 2, borderRadius: 2 }}>
+                          <strong>Na LocaWeb:</strong> No Painel de Controle, vá em "Registro de Domínios" -> "Gerenciar DNS". Adicione a entrada CNAME para "www".
+                        </Alert>
+                      )}
+                      {selectedProvider === 'hostgator' && (
+                        <Alert severity="info" sx={{ mb: 2, borderRadius: 2 }}>
+                          <strong>Na HostGator:</strong> No cPanel, abra "Zone Editor". Clique em "+ CNAME Record" e adicione a entrada "www".
+                        </Alert>
+                      )}
+
+                      <Paper variant="outlined" sx={{ p: 1.5, bgcolor: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Box>
+                          <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 'bold' }}>Tipo: CNAME</Typography>
+                          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                            <strong>Nome:</strong> www<br/>
+                            <strong>Valor:</strong> cname.vercel-dns.com.
+                          </Typography>
+                        </Box>
+                        <Button size="small" startIcon={<ContentCopyIcon />} onClick={() => handleCopyText('cname.vercel-dns.com.')}>
+                          Copiar Valor
+                        </Button>
+                      </Paper>
+                      <Paper variant="outlined" sx={{ p: 1.5, bgcolor: 'white', mt: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Box>
+                          <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 'bold' }}>Tipo: A (Opcional para domínio raiz sem www)</Typography>
+                          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                            <strong>Nome:</strong> @<br/>
+                            <strong>Valor:</strong> 76.76.21.21
+                          </Typography>
+                        </Box>
+                        <Button size="small" startIcon={<ContentCopyIcon />} onClick={() => handleCopyText('76.76.21.21')}>
+                          Copiar Valor
+                        </Button>
+                      </Paper>
+                      <Typography variant="caption" color="textSecondary" sx={{ mt: 1, display: 'block' }}>
+                        * A propagação do DNS pode levar algumas horas. Clique em Vincular Domínio novamente para forçar uma re-verificação.
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+              )}
 
               <Divider sx={{ my: 4 }} />
               <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>Divisão Automática de Receita (Revenue Split)</Typography>

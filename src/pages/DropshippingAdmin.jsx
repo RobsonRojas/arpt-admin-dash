@@ -160,6 +160,113 @@ function CatalogModal({ store, allProducts, onClose, onSuccess }) {
   );
 }
 
+// ─── Domain Admin Modal ───────────────────────────────────────────────────────
+function DomainAdminModal({ store, onClose, onSuccess }) {
+  const [customDomain, setCustomDomain] = useState(store.custom_domain || '');
+  const [loading, setLoading] = useState(false);
+
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      await api.put(`/api/v1/admin/dropshipping/stores/${store.id}/domain`, {
+        custom_domain: customDomain.trim(),
+      });
+      alert('Domínio atualizado com sucesso!');
+      onSuccess();
+      onClose();
+    } catch (err) {
+      alert('Erro: ' + (err.response?.data?.error || err.message));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open onClose={onClose} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
+      <DialogTitle sx={{ fontWeight: 'bold' }}>
+        Gerenciar Domínio — {store.name}
+      </DialogTitle>
+      <DialogContent sx={{ pt: 2 }}>
+        <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+          Substitua o domínio customizado desta loja. Deixe em branco para remover o domínio atual.
+        </Typography>
+        <TextField
+          label="Domínio Customizado"
+          value={customDomain}
+          onChange={e => setCustomDomain(e.target.value)}
+          fullWidth
+          variant="outlined"
+          placeholder="ex: www.minha-loja.com.br"
+        />
+      </DialogContent>
+      <DialogActions sx={{ px: 3, pb: 3, gap: 1 }}>
+        <Button onClick={onClose} color="inherit">Cancelar</Button>
+        <Button variant="contained" color="primary" onClick={handleSave} disabled={loading}>
+          {loading ? <CircularProgress size={18} color="inherit" /> : 'Salvar Domínio'}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+// ─── Vercel Config Panel ────────────────────────────────────────────────────
+function VercelConfigPanel() {
+  const [config, setConfig] = useState({ VERCEL_API_TOKEN: '', VERCEL_PROJECT_ID: '' });
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    api.get('/api/v1/admin/dropshipping/config').then(res => {
+      if (res.data) setConfig(res.data);
+    });
+  }, []);
+
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      await api.put('/api/v1/admin/dropshipping/config', config);
+      alert('Configurações salvas com sucesso!');
+    } catch (err) {
+      alert('Erro ao salvar: ' + (err.response?.data?.error || err.message));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Paper variant="outlined" sx={{ p: 3, borderRadius: 3, mb: 3 }}>
+      <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 2 }}>
+        Integração Vercel (Configuração de Domínios)
+      </Typography>
+      <Grid container spacing={2} alignItems="center">
+        <Grid item xs={12} sm={5}>
+          <TextField
+            size="small"
+            label="Vercel API Token"
+            type="password"
+            value={config.VERCEL_API_TOKEN}
+            onChange={e => setConfig({...config, VERCEL_API_TOKEN: e.target.value})}
+            fullWidth
+          />
+        </Grid>
+        <Grid item xs={12} sm={5}>
+          <TextField
+            size="small"
+            label="Vercel Project ID"
+            value={config.VERCEL_PROJECT_ID}
+            onChange={e => setConfig({...config, VERCEL_PROJECT_ID: e.target.value})}
+            fullWidth
+          />
+        </Grid>
+        <Grid item xs={12} sm={2}>
+          <Button variant="contained" fullWidth onClick={handleSave} disabled={loading}>
+            Salvar
+          </Button>
+        </Grid>
+      </Grid>
+    </Paper>
+  );
+}
+
 // ─── Main Page ──────────────────────────────────────────────────────────────
 export function DropshippingAdmin() {
   const [loading, setLoading] = useState(true);
@@ -172,6 +279,7 @@ export function DropshippingAdmin() {
 
   const [transferStore, setTransferStore] = useState(null);
   const [catalogStore, setCatalogStore] = useState(null);
+  const [domainStore, setDomainStore] = useState(null);
 
   const fetchAll = async () => {
     setLoading(true);
@@ -212,6 +320,8 @@ export function DropshippingAdmin() {
         <Box display="flex" justifyContent="center" py={8}><CircularProgress /></Box>
       ) : (
         <>
+          <VercelConfigPanel />
+
           {/* KPI Row */}
           <Grid container spacing={2} sx={{ mb: 3 }}>
             {[
@@ -297,6 +407,7 @@ export function DropshippingAdmin() {
                   <TableRow sx={{ bgcolor: '#f8fafc' }}>
                     <TableCell sx={{ fontWeight: 'bold' }}>Nome da Loja</TableCell>
                     <TableCell sx={{ fontWeight: 'bold' }}>Slug / URL</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Domínio</TableCell>
                     <TableCell sx={{ fontWeight: 'bold' }}>Dono (UID)</TableCell>
                     <TableCell sx={{ fontWeight: 'bold' }} align="center">Produtos</TableCell>
                     <TableCell sx={{ fontWeight: 'bold' }} align="center">Criado em</TableCell>
@@ -317,6 +428,13 @@ export function DropshippingAdmin() {
                         <Chip label={store.slug} size="small" variant="outlined" sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }} />
                       </TableCell>
                       <TableCell>
+                        {store.custom_domain ? (
+                          <Chip label={store.custom_domain} size="small" color={store.domain_status === 'verified' ? 'success' : 'warning'} />
+                        ) : (
+                          <Typography variant="caption" color="textSecondary">-</Typography>
+                        )}
+                      </TableCell>
+                      <TableCell>
                         <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
                           {store.user_id?.substring(0, 16)}...
                         </Typography>
@@ -330,6 +448,11 @@ export function DropshippingAdmin() {
                         </Typography>
                       </TableCell>
                       <TableCell align="right">
+                        <Tooltip title="Gerenciar Domínio">
+                          <IconButton size="small" color="primary" onClick={() => setDomainStore(store)}>
+                            <Store fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
                         <Tooltip title="Transferir Proprietário">
                           <IconButton size="small" color="warning" onClick={() => setTransferStore(store)}>
                             <SwapHoriz fontSize="small" />
@@ -369,6 +492,13 @@ export function DropshippingAdmin() {
           store={catalogStore}
           allProducts={allProducts}
           onClose={() => setCatalogStore(null)}
+          onSuccess={fetchAll}
+        />
+      )}
+      {domainStore && (
+        <DomainAdminModal
+          store={domainStore}
+          onClose={() => setDomainStore(null)}
           onSuccess={fetchAll}
         />
       )}
