@@ -643,7 +643,7 @@ export default function Dropshipping() {
 
                       {selectedProvider === 'registrobr' && (
                         <Alert severity="info" sx={{ mb: 2, borderRadius: 2 }}>
-                          <strong>No Registro.br:</strong> Acesse "Zonas de DNS" -> "Editar Zona" -> "Nova Entrada". Crie a entrada WWW como CNAME e, para o domínio raiz (se suportado), deixe em branco com tipo A.
+                          <strong>No Registro.br:</strong> Acesse "Zonas de DNS" {"->"} "Editar Zona" {"->"} "Nova Entrada". Crie a entrada WWW como CNAME e, para o domínio raiz (se suportado), deixe em branco com tipo A.
                         </Alert>
                       )}
                       {selectedProvider === 'godaddy' && (
@@ -658,7 +658,7 @@ export default function Dropshipping() {
                       )}
                       {selectedProvider === 'locaweb' && (
                         <Alert severity="info" sx={{ mb: 2, borderRadius: 2 }}>
-                          <strong>Na LocaWeb:</strong> No Painel de Controle, vá em "Registro de Domínios" -> "Gerenciar DNS". Adicione a entrada CNAME para "www".
+                          <strong>Na LocaWeb:</strong> No Painel de Controle, vá em "Registro de Domínios" {"->"} "Gerenciar DNS". Adicione a entrada CNAME para "www".
                         </Alert>
                       )}
                       {selectedProvider === 'hostgator' && (

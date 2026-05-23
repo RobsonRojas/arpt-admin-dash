@@ -4,7 +4,7 @@ import {
   Button, Switch, FormControlLabel, Divider, CircularProgress,
   Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TextField
 } from '@mui/material';
-import api from '../services/api';
+import { api } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { Download, DeleteForever, Security } from '@mui/icons-material';
 

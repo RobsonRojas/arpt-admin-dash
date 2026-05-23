@@ -56,6 +56,14 @@ export const Users = () => {
     // User Details Modal State
     const [openUserDetails, setOpenUserDetails] = useState(false);
 
+    // LGPD State Variables
+    const [userConsents, setUserConsents] = useState([]);
+    const [loadingConsents, setLoadingConsents] = useState(false);
+    const [exportingData, setExportingData] = useState(false);
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [deleteConfirmationPhrase, setDeleteConfirmationPhrase] = useState('');
+    const [deletingUser, setDeletingUser] = useState(false);
+
     // Reward and History State
     const [openRewardList, setOpenRewardList] = useState(false);
     const [userRewards, setUserRewards] = useState([]);
@@ -164,7 +172,63 @@ export const Users = () => {
     const handleOpenUserDetails = (user) => {
         setSelectedUser(user);
         fetchUserRewards(user);
+        fetchUserConsents(user.id);
         setOpenUserDetails(true);
+    };
+
+    const fetchUserConsents = async (userId) => {
+        setLoadingConsents(true);
+        try {
+            const token = await authUser.getIdToken();
+            const response = await api.get(`/admin/users/${userId}/consents`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setUserConsents(response.data.consents || []);
+        } catch (error) {
+            console.error('Erro ao buscar consentimentos do usuário:', error);
+            setSnackbar({ open: true, message: 'Erro ao carregar consentimentos da LGPD', severity: 'error' });
+        } finally {
+            setLoadingConsents(false);
+        }
+    };
+
+    const handleExportData = async (userId) => {
+        setExportingData(true);
+        try {
+            const token = await authUser.getIdToken();
+            await api.post(`/admin/users/${userId}/data-export`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setSnackbar({ open: true, message: 'Solicitação de exportação enviada com sucesso! Um e-mail será enviado em breve.', severity: 'success' });
+        } catch (error) {
+            console.error('Erro ao solicitar exportação de dados:', error);
+            setSnackbar({ open: true, message: 'Erro ao solicitar exportação de dados', severity: 'error' });
+        } finally {
+            setExportingData(false);
+        }
+    };
+
+    const handleDeleteUserConfirm = async () => {
+        if (deleteConfirmationPhrase !== 'CONFIRMAR EXCLUSAO') {
+            setSnackbar({ open: true, message: 'Frase de confirmação incorreta', severity: 'warning' });
+            return;
+        }
+        setDeletingUser(true);
+        try {
+            const token = await authUser.getIdToken();
+            await api.post(`/admin/users/${selectedUser.id}/delete-account`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setSnackbar({ open: true, message: 'Usuário excluído e anonimizado com sucesso', severity: 'success' });
+            setOpenDeleteDialog(false);
+            setOpenUserDetails(false);
+            fetchUsers(); // Refresh the list
+        } catch (error) {
+            console.error('Erro ao excluir usuário:', error);
+            setSnackbar({ open: true, message: 'Erro ao excluir e anonimizar usuário', severity: 'error' });
+        } finally {
+            setDeletingUser(false);
+        }
     };
 
     const handleOpenRewardList = (user) => {
@@ -880,6 +944,73 @@ export const Users = () => {
                         </Grid>
                     )}
 
+                    <Box mt={3} mb={4} p={2} sx={{ border: '1px solid #e0e0e0', borderRadius: 1 }}>
+                        <Typography variant="h6" gutterBottom display="flex" alignItems="center" gap={1} sx={{ fontWeight: 'bold' }}>
+                            Compliance LGPD
+                        </Typography>
+                        
+                        {loadingConsents ? (
+                            <Box display="flex" justifyContent="center" py={2}>
+                                <CircularProgress size={24} />
+                            </Box>
+                        ) : (
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} md={6}>
+                                    <Typography variant="subtitle2" color="textSecondary" gutterBottom>Histórico de Consentimento</Typography>
+                                    {userConsents.length === 0 ? (
+                                        <Typography variant="body2" color="textSecondary">Nenhum registro de consentimento encontrado.</Typography>
+                                    ) : (
+                                        <Box display="flex" flexDirection="column" gap={1} mt={1} maxH="200px" sx={{ overflowY: 'auto' }}>
+                                            {userConsents.map((consent) => (
+                                                <Box key={consent.id} display="flex" justifyContent="space-between" alignItems="center" p={1} sx={{ bgcolor: '#f5f5f5', borderRadius: 1 }}>
+                                                    <Typography variant="caption" fontWeight="bold">
+                                                        {consent.consent_type === 'TERMS_OF_SERVICE' ? 'Termos de Serviço' : 
+                                                         consent.consent_type === 'PRIVACY_POLICY' ? 'Política de Privacidade' : 
+                                                         consent.consent_type === 'DATA_PROCESSING' ? 'Processamento de Dados' : consent.consent_type} (v{consent.policy_version})
+                                                    </Typography>
+                                                    <Box display="flex" alignItems="center" gap={1}>
+                                                        <Chip 
+                                                            label={consent.granted ? "Aceito" : "Rejeitado"} 
+                                                            color={consent.granted ? "success" : "error"} 
+                                                            size="small" 
+                                                        />
+                                                        <Typography variant="caption" color="textSecondary">
+                                                            {new Date(consent.created_at).toLocaleDateString()}
+                                                        </Typography>
+                                                    </Box>
+                                                </Box>
+                                            ))}
+                                        </Box>
+                                    )}
+                                </Grid>
+                                
+                                <Grid item xs={12} md={6} display="flex" flexDirection="column" justifyContent="center" gap={2}>
+                                    <Typography variant="subtitle2" color="textSecondary">Ações de Privacidade (LGPD)</Typography>
+                                    <Box display="flex" gap={2}>
+                                        <Button 
+                                            variant="outlined" 
+                                            color="primary"
+                                            disabled={exportingData}
+                                            onClick={() => handleExportData(selectedUser.id)}
+                                        >
+                                            {exportingData ? 'Solicitando...' : 'Exportar Dados (Portabilidade)'}
+                                        </Button>
+                                        <Button 
+                                            variant="contained" 
+                                            color="error"
+                                            onClick={() => {
+                                                setDeleteConfirmationPhrase('');
+                                                setOpenDeleteDialog(true);
+                                            }}
+                                        >
+                                            Excluir / Anonimizar Usuário
+                                        </Button>
+                                    </Box>
+                                </Grid>
+                            </Grid>
+                        )}
+                    </Box>
+
                     <Typography variant="h6" gutterBottom display="flex" alignItems="center" gap={1}>
                         <Inventory color="primary" /> Histórico de Compras e Produtos
                     </Typography>
@@ -1150,6 +1281,42 @@ export const Users = () => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpenHistoryDialog(false)}>Fechar</Button>
+                </DialogActions>
+            </Dialog>
+            {/* Delete/Anonymize LGPD Confirmation Dialog */}
+            <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)} maxWidth="xs" fullWidth>
+                <DialogTitle sx={{ fontWeight: 'bold' }}>Excluir e Anonimizar Usuário</DialogTitle>
+                <DialogContent dividers>
+                    <Typography variant="body2" color="textSecondary" paragraph>
+                        Esta ação irá excluir permanentemente e anonimizar todas as informações de identificação pessoal (PII) deste usuário de acordo com a LGPD.
+                    </Typography>
+                    <Typography variant="body2" color="error" fontWeight="bold" paragraph>
+                        Esta ação é irreversível!
+                    </Typography>
+                    <Typography variant="body2" gutterBottom>
+                        Para confirmar, digite a frase abaixo exatamente como exibida:
+                    </Typography>
+                    <Typography variant="subtitle2" color="error.main" align="center" sx={{ bgcolor: '#ffebee', p: 1, borderRadius: 1, mb: 2, fontWeight: 'bold', letterSpacing: 1 }}>
+                        CONFIRMAR EXCLUSAO
+                    </Typography>
+                    <TextField
+                        fullWidth
+                        size="small"
+                        value={deleteConfirmationPhrase}
+                        onChange={e => setDeleteConfirmationPhrase(e.target.value)}
+                        placeholder="Digite a frase de confirmação"
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenDeleteDialog(false)}>Cancelar</Button>
+                    <Button 
+                        variant="contained" 
+                        color="error" 
+                        onClick={handleDeleteUserConfirm}
+                        disabled={deletingUser || deleteConfirmationPhrase !== 'CONFIRMAR EXCLUSAO'}
+                    >
+                        {deletingUser ? 'Excluindo...' : 'Confirmar Exclusão'}
+                    </Button>
                 </DialogActions>
             </Dialog>
         </Box>
