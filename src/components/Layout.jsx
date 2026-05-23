@@ -17,7 +17,8 @@ import {
   Code,
   QrCode,
   TrendingUp,
-  Storefront
+  Storefront,
+  Security
 } from '@mui/icons-material';
 import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -74,6 +75,7 @@ export const Layout = ({ children }) => {
     { id: 'developer-settings', label: 'Configurações Dev', icon: <Code />, path: '/developer-settings' },
     { id: 'error-logs', label: 'Log de Erros', icon: <BugReport />, path: '/error-logs' },
     { id: 'dropshipping-admin', label: 'Admin Dropshipping', icon: <Storefront />, path: '/dropshipping-admin' },
+    { id: 'privacy-settings', label: 'Privacidade (LGPD)', icon: <Security />, path: '/privacy-settings' },
   ];
 
   const getPageTitle = () => {

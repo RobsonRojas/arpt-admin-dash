@@ -55,7 +55,13 @@ export const setupInterceptors = (logError) => {
     api.interceptors.response.use(
         (response) => response,
         (error) => {
-            logError(error, 'API');
+            if (error.response && error.response.status === 451) {
+                if (typeof window !== 'undefined' && !window.location.pathname.includes('/privacy-settings')) {
+                    window.location.href = '/privacy-settings';
+                }
+            } else {
+                logError(error, 'API');
+            }
             return Promise.reject(error);
         }
     );
