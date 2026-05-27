@@ -12,6 +12,7 @@ export const Dashboard = () => {
     <Grid container spacing={3} sx={{ animation: 'fadeIn 0.5s' }}>
       <Grid item xs={12} sm={6} md={3}>
         <StatCard 
+          testId="kpi-card-area"
           title="Área Total" 
           value={`${stats.area} ha`} 
           subtext="Sob Gestão" 
@@ -21,6 +22,7 @@ export const Dashboard = () => {
       </Grid>
       <Grid item xs={12} sm={6} md={3}>
         <StatCard 
+          testId="kpi-card-investment"
           title="Investimento" 
           value={`R$ ${stats.investimento.toLocaleString()}`} 
           subtext="Total" 
@@ -30,6 +32,7 @@ export const Dashboard = () => {
       </Grid>
       <Grid item xs={12} sm={6} md={3}>
         <StatCard 
+          testId="kpi-card-projects"
           title="Pendências" 
           value={stats.pendentes} 
           subtext="Projetos" 
@@ -39,6 +42,7 @@ export const Dashboard = () => {
       </Grid>
       <Grid item xs={12} sm={6} md={3}>
         <StatCard 
+          testId="kpi-card-rwa"
           title="RWA Ativos" 
           value={stats.aprovados} 
           subtext="Tokenizados" 

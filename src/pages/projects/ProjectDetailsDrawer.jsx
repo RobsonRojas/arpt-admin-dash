@@ -64,7 +64,7 @@ export const ProjectDetailsDrawer = ({
             <Tab label="Incidentes" />
             <Tab label="Equipe" />
             <Tab label="Estratégia" />
-            <Tab label="Custos & Despesas" />
+            <Tab label="Custos & Despesas" data-testid="despesas-tab" />
           </Tabs>
 
           <Box flexGrow={1} p={{ xs: 2, md: 3 }} overflow="auto">

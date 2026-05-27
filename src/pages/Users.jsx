@@ -496,7 +496,7 @@ export const Users = () => {
             </Box>
 
             <TableContainer component={Paper}>
-                <Table>
+                <Table data-testid="users-table">
                     <TableHead sx={{ bgcolor: '#f9fafb' }}>
                         <TableRow>
                             <TableCell>ID</TableCell>
@@ -510,7 +510,7 @@ export const Users = () => {
                     </TableHead>
                     <TableBody>
                         {users.map((user) => (
-                            <TableRow key={user.id} hover>
+                            <TableRow key={user.id} hover data-testid="user-row">
                                 <TableCell>
                                     <Typography variant="body2" fontWeight="medium">
                                         {user.id}
@@ -988,6 +988,7 @@ export const Users = () => {
                                     <Typography variant="subtitle2" color="textSecondary">Ações de Privacidade (LGPD)</Typography>
                                     <Box display="flex" gap={2}>
                                         <Button 
+                                            data-testid="lgpd-export-btn"
                                             variant="outlined" 
                                             color="primary"
                                             disabled={exportingData}
@@ -996,6 +997,7 @@ export const Users = () => {
                                             {exportingData ? 'Solicitando...' : 'Exportar Dados (Portabilidade)'}
                                         </Button>
                                         <Button 
+                                            data-testid="lgpd-anonymize-btn"
                                             variant="contained" 
                                             color="error"
                                             onClick={() => {
@@ -1310,6 +1312,7 @@ export const Users = () => {
                 <DialogActions>
                     <Button onClick={() => setOpenDeleteDialog(false)}>Cancelar</Button>
                     <Button 
+                        data-testid="lgpd-confirm-btn"
                         variant="contained" 
                         color="error" 
                         onClick={handleDeleteUserConfirm}

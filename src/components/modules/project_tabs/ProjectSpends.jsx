@@ -166,7 +166,7 @@ export const ProjectSpends = ({ projectId }) => {
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h6" fontWeight="bold" color="primary">Gestão de Despesas & Custos</Typography>
-        <Button variant="contained" startIcon={<Add />} onClick={() => handleOpenDialog()} sx={{ borderRadius: 2 }}>
+        <Button data-testid="despesa-add-btn" variant="contained" startIcon={<Add />} onClick={() => handleOpenDialog()} sx={{ borderRadius: 2 }}>
           Nova Despesa
         </Button>
       </Box>
@@ -286,7 +286,7 @@ export const ProjectSpends = ({ projectId }) => {
                         </TableRow>
                       ) : (
                         despesas.map((item) => (
-                          <TableRow key={item.id} hover>
+                          <TableRow key={item.id} hover data-testid="despesa-row">
                             <TableCell>{formatDate(item.data_despesa)}</TableCell>
                             <TableCell sx={{ fontWeight: 500 }}>{item.nome}</TableCell>
                             <TableCell>
@@ -345,7 +345,7 @@ export const ProjectSpends = ({ projectId }) => {
         <DialogTitle sx={{ fontWeight: 'bold', pb: 1 }}>
           {editingSpend ? 'Editar Registro de Despesa' : 'Novo Registro de Despesa'}
         </DialogTitle>
-        <DialogContent sx={{ pt: 1 }}>
+        <DialogContent sx={{ pt: 1 }} data-testid="despesa-form">
           <Box display="flex" flexDirection="column" gap={2} pt={1}>
             <TextField
               label="Nome da Despesa"
