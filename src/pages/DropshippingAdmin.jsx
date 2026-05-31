@@ -6,8 +6,9 @@ import {
   Chip, IconButton, Tooltip, Alert, InputAdornment
 } from '@mui/material';
 import {
-  Search, Edit, Inventory2, TrendingUp, Store, People, SwapHoriz
+  Search, Edit, Inventory2, TrendingUp, Store, People, SwapHoriz, MailOutline
 } from '@mui/icons-material';
+
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis,
   CartesianGrid, Tooltip as RechartsTooltip, Legend
@@ -209,6 +210,91 @@ function DomainAdminModal({ store, onClose, onSuccess }) {
   );
 }
 
+// ─── Register Dropshipper Modal ─────────────────────────────────────────────
+function RegisterDropshipperModal({ onClose, onSuccess }) {
+  const [formData, setFormData] = useState({ name: '', email: '', subdomain: '' });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    if (!formData.name.trim() || !formData.email.trim() || !formData.subdomain.trim()) {
+      return setError('Todos os campos são obrigatórios.');
+    }
+    if (!/^[a-z0-9-]+$/.test(formData.subdomain)) {
+      return setError('O subdomínio deve conter apenas letras minúsculas, números e hífens.');
+    }
+    setLoading(true);
+    setError('');
+    try {
+      await api.post('/api/v1/admin/dropshipping/dropshippers', {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        subdomain: formData.subdomain.trim(),
+      });
+      alert('Dropshipper registrado com sucesso! O e-mail com as credenciais foi enviado.');
+      onSuccess();
+      onClose();
+    } catch (err) {
+      setError(err.response?.data?.error || err.response?.data?.message || err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open onClose={onClose} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
+      <DialogTitle sx={{ fontWeight: 'bold' }}>
+        Registrar Novo Dropshipper
+      </DialogTitle>
+      <DialogContent sx={{ pt: 2 }}>
+        {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>{error}</Alert>}
+        
+        <Box component="form" onSubmit={handleSave} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, mt: 1 }}>
+          <TextField
+            label="Nome Completo"
+            value={formData.name}
+            onChange={e => setFormData({ ...formData, name: e.target.value })}
+            fullWidth
+            required
+            variant="outlined"
+            placeholder="Ex: João Silva"
+          />
+          <TextField
+            label="E-mail"
+            type="email"
+            value={formData.email}
+            onChange={e => setFormData({ ...formData, email: e.target.value })}
+            fullWidth
+            required
+            variant="outlined"
+            placeholder="Ex: joao@email.com"
+          />
+          <TextField
+            label="Subdomínio da Loja"
+            value={formData.subdomain}
+            onChange={e => setFormData({ ...formData, subdomain: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
+            fullWidth
+            required
+            variant="outlined"
+            placeholder="Ex: joaostore"
+            helperText="Este subdomínio será o endereço público da loja (ex: joaostore.arpt.site)"
+            InputProps={{
+              endAdornment: <InputAdornment position="end">.arpt.site</InputAdornment>,
+            }}
+          />
+        </Box>
+      </DialogContent>
+      <DialogActions sx={{ px: 3, pb: 3, gap: 1 }}>
+        <Button onClick={onClose} color="inherit" disabled={loading}>Cancelar</Button>
+        <Button variant="contained" color="success" onClick={handleSave} disabled={loading}>
+          {loading ? <CircularProgress size={18} color="inherit" /> : 'Registrar Dropshipper'}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
 // ─── Vercel Config Panel ────────────────────────────────────────────────────
 function VercelConfigPanel() {
   const [config, setConfig] = useState({ VERCEL_API_TOKEN: '', VERCEL_PROJECT_ID: '' });
@@ -280,6 +366,8 @@ export function DropshippingAdmin() {
   const [transferStore, setTransferStore] = useState(null);
   const [catalogStore, setCatalogStore] = useState(null);
   const [domainStore, setDomainStore] = useState(null);
+  const [registerModalOpen, setRegisterModalOpen] = useState(false);
+
 
   const fetchAll = async () => {
     setLoading(true);
@@ -309,12 +397,24 @@ export function DropshippingAdmin() {
   return (
     <Box sx={{ p: { xs: 2, md: 3 } }}>
       {/* Page Header */}
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" fontWeight="bold">Administração de Dropshipping</Typography>
-        <Typography variant="body2" color="textSecondary">
-          Gerencie lojas, transfira propriedades, aloque catálogos e monitore receitas da plataforma.
-        </Typography>
+      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+        <Box>
+          <Typography variant="h4" fontWeight="bold">Administração de Dropshipping</Typography>
+          <Typography variant="body2" color="textSecondary">
+            Gerencie lojas, transfira propriedades, aloque catálogos e monitore receitas da plataforma.
+          </Typography>
+        </Box>
+        <Button
+          variant="contained"
+          color="success"
+          startIcon={<Store />}
+          onClick={() => setRegisterModalOpen(true)}
+          sx={{ borderRadius: 2, px: 3, py: 1, fontWeight: 'bold' }}
+        >
+          Registrar Dropshipper
+        </Button>
       </Box>
+
 
       {loading ? (
         <Box display="flex" justifyContent="center" py={8}><CircularProgress /></Box>
@@ -463,7 +563,25 @@ export function DropshippingAdmin() {
                             <Inventory2 fontSize="small" />
                           </IconButton>
                         </Tooltip>
+                        <Tooltip title="Reenviar Convite / Credenciais">
+                          <IconButton
+                            size="small"
+                            color="info"
+                            onClick={async () => {
+                              if (!window.confirm(`Tem certeza que deseja reenviar o convite com novas credenciais para ${store.name}?`)) return;
+                              try {
+                                await api.post(`/api/v1/admin/dropshipping/stores/${store.id}/resend-invite`);
+                                alert('Convite e credenciais reenviados com sucesso!');
+                              } catch (err) {
+                                alert('Erro: ' + (err.response?.data?.error || err.message));
+                              }
+                            }}
+                          >
+                            <MailOutline fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
                       </TableCell>
+
                     </TableRow>
                   ))}
                 </TableBody>
@@ -502,6 +620,13 @@ export function DropshippingAdmin() {
           onSuccess={fetchAll}
         />
       )}
+      {registerModalOpen && (
+        <RegisterDropshipperModal
+          onClose={() => setRegisterModalOpen(false)}
+          onSuccess={fetchAll}
+        />
+      )}
     </Box>
+
   );
 }
