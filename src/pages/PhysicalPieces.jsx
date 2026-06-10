@@ -6,17 +6,18 @@ import {
     MenuItem, CircularProgress, Alert, Snackbar, Grid, Autocomplete,
     Checkbox
 } from '@mui/material';
-import { Add, QrCode, AssignmentInd, Refresh, Download, History, PictureAsPdf } from '@mui/icons-material';
+import { Add, QrCode, AssignmentInd, Refresh, Download, History, PictureAsPdf, Delete } from '@mui/icons-material';
 import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
-
 export const PhysicalPieces = () => {
     const { 
         properties, 
         getPhysicalPieces, 
         createPhysicalPiece, 
         attributePhysicalPiece,
+        associateTagToPhysicalPiece,
+        disassociateTagFromPhysicalPiece,
         getProducts,
         getInventoriesByPropertyId,
         getTreesByInventoryId,
@@ -47,6 +48,15 @@ export const PhysicalPieces = () => {
     const [userId, setUserId] = useState('');
     const [users, setUsers] = useState([]);
     const [selectedUserForAttr, setSelectedUserForAttr] = useState(null);
+
+    // Tag Association state
+    const [openTagDialog, setOpenTagDialog] = useState(false);
+    const [tagValue, setTagValue] = useState('');
+    const [tagPropertyId, setTagPropertyId] = useState('');
+    const [tagInventories, setTagInventories] = useState([]);
+    const [tagInventoryId, setTagInventoryId] = useState('');
+    const [tagTrees, setTagTrees] = useState([]);
+    const [tagSourceTree, setTagSourceTree] = useState(null);
 
     const fetchData = async () => {
         setLoading(true);
@@ -85,6 +95,24 @@ export const PhysicalPieces = () => {
         setSelectedTree(null);
     }, [selectedInventoryId]);
 
+    useEffect(() => {
+        if (tagPropertyId) {
+            getInventoriesByPropertyId(tagPropertyId).then(data => setTagInventories(data || []));
+        } else {
+            setTagInventories([]);
+        }
+        setTagInventoryId('');
+    }, [tagPropertyId]);
+
+    useEffect(() => {
+        if (tagInventoryId) {
+            getTreesByInventoryId(tagInventoryId, 1, 1000).then(res => setTagTrees(res?.data?.inventories || []));
+        } else {
+            setTagTrees([]);
+        }
+        setTagSourceTree(null);
+    }, [tagInventoryId]);
+
     const handleCreate = async () => {
         if (!selectedTree || !selectedProductId) {
             setSnackbar({ open: true, message: 'Selecione uma árvore e um produto', severity: 'warning' });
@@ -114,6 +142,46 @@ export const PhysicalPieces = () => {
             fetchData();
         } else {
             setSnackbar({ open: true, message: 'Erro ao atribuir peça', severity: 'error' });
+        }
+    };
+
+    const handleAssociateTag = async () => {
+        if (!tagValue.trim()) {
+            setSnackbar({ open: true, message: 'Insira o valor da etiqueta', severity: 'warning' });
+            return;
+        }
+        if (!tagSourceTree) {
+            setSnackbar({ open: true, message: 'Selecione a árvore de origem (obrigatório)', severity: 'warning' });
+            return;
+        }
+        try {
+            const res = await associateTagToPhysicalPiece(selectedPiece.id, tagValue, tagSourceTree.id);
+            if (res) {
+                setSnackbar({ open: true, message: 'Etiqueta associada com sucesso', severity: 'success' });
+                setTagValue('');
+                fetchData();
+                setSelectedPiece(prev => ({
+                    ...prev,
+                    labels: [...(prev.labels || []), { id: res.id || Math.random(), tag_value: tagValue, source_tree_id: tagSourceTree.id }]
+                }));
+            }
+        } catch (error) {
+            const errMsg = error.response?.data?.message || 'Erro ao associar etiqueta';
+            setSnackbar({ open: true, message: errMsg, severity: 'error' });
+        }
+    };
+
+    const handleDisassociateTag = async (labelId) => {
+        const ok = await disassociateTagFromPhysicalPiece(selectedPiece.id, labelId);
+        if (ok) {
+            setSnackbar({ open: true, message: 'Etiqueta desassociada com sucesso', severity: 'success' });
+            fetchData();
+            setSelectedPiece(prev => ({
+                ...prev,
+                labels: (prev.labels || []).filter(l => l.id !== labelId)
+            }));
+        } else {
+            setSnackbar({ open: true, message: 'Erro ao desassociar etiqueta', severity: 'error' });
         }
     };
 
@@ -268,6 +336,21 @@ export const PhysicalPieces = () => {
                                         >
                                             <AssignmentInd />
                                         </IconButton>
+                                        <IconButton
+                                            size="small"
+                                            color="secondary"
+                                            title="Gerenciar Etiquetas"
+                                            onClick={() => {
+                                                setSelectedPiece(piece);
+                                                setTagValue('');
+                                                setTagPropertyId('');
+                                                setTagInventoryId('');
+                                                setTagSourceTree(null);
+                                                setOpenTagDialog(true);
+                                            }}
+                                        >
+                                            <QrCode />
+                                        </IconButton>
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -359,6 +442,115 @@ export const PhysicalPieces = () => {
                 <DialogActions>
                     <Button onClick={() => setOpenAttrDialog(false)}>Cancelar</Button>
                     <Button variant="contained" onClick={handleAttribute} disabled={!userId}>Atribuir</Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Tag Association Dialog */}
+            <Dialog open={openTagDialog} onClose={() => setOpenTagDialog(false)} maxWidth="md" fullWidth>
+                <DialogTitle>Gerenciar Etiquetas - {selectedPiece?.slug}</DialogTitle>
+                <DialogContent dividers>
+                    <Grid container spacing={3}>
+                        {/* Left Side: Current Tags */}
+                        <Grid item xs={12} md={6}>
+                            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                                Etiquetas Associadas
+                            </Typography>
+                            <Box sx={{ maxHeight: 300, overflowY: 'auto', pr: 1 }}>
+                                {selectedPiece?.labels?.map((label) => (
+                                    <Box 
+                                        key={label.id} 
+                                        display="flex" 
+                                        justifyContent="space-between" 
+                                        alignItems="center" 
+                                        p={1.5} 
+                                        sx={{ 
+                                            bgcolor: 'action.hover', 
+                                            mb: 1, 
+                                            borderRadius: 1,
+                                            border: '1px solid',
+                                            borderColor: 'divider'
+                                        }}
+                                    >
+                                        <Box>
+                                            <Typography variant="body2"><strong>Código:</strong> {label.tag_value}</Typography>
+                                            <Typography variant="caption" color="textSecondary">
+                                                Árvore Origem ID: {label.source_tree_id}
+                                            </Typography>
+                                        </Box>
+                                        <IconButton size="small" color="error" onClick={() => handleDisassociateTag(label.id)}>
+                                            <Delete fontSize="small" />
+                                        </IconButton>
+                                    </Box>
+                                ))}
+                                {(!selectedPiece?.labels || selectedPiece.labels.length === 0) && (
+                                    <Typography variant="body2" color="textSecondary" sx={{ fontStyle: 'italic', py: 2 }}>
+                                        Nenhuma etiqueta associada a esta peça física. O status atual é DRAFT.
+                                    </Typography>
+                                )}
+                            </Box>
+                        </Grid>
+
+                        {/* Right Side: Associate New Tag Form */}
+                        <Grid item xs={12} md={6}>
+                            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                                Associar Nova Etiqueta
+                            </Typography>
+                            <Grid container spacing={2} pt={1}>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        fullWidth
+                                        label="Código da Etiqueta (QR / Barcode)"
+                                        placeholder="Ex: ARPT-ET-12345"
+                                        value={tagValue}
+                                        onChange={(e) => setTagValue(e.target.value)}
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        select fullWidth label="Propriedade da Árvore"
+                                        value={tagPropertyId}
+                                        onChange={(e) => setTagPropertyId(e.target.value)}
+                                    >
+                                        {properties.map(p => <MenuItem key={p.id} value={p.id}>{p.name}</MenuItem>)}
+                                    </TextField>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        select fullWidth label="Inventário"
+                                        value={tagInventoryId}
+                                        onChange={(e) => setTagInventoryId(e.target.value)}
+                                        disabled={!tagPropertyId}
+                                    >
+                                        {tagInventories.map(i => <MenuItem key={i.id} value={i.id}>Inventário {i.id}</MenuItem>)}
+                                    </TextField>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Autocomplete
+                                        options={tagTrees}
+                                        getOptionLabel={(option) => `Árvore #${option.number} - ${option.specieName}`}
+                                        renderInput={(params) => <TextField {...params} label="Árvore Origem (Obrigatório)" required />}
+                                        value={tagSourceTree}
+                                        onChange={(e, val) => setTagSourceTree(val)}
+                                        disabled={!tagInventoryId}
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Button 
+                                        variant="contained" 
+                                        color="primary" 
+                                        fullWidth 
+                                        onClick={handleAssociateTag}
+                                        disabled={!tagValue.trim() || !tagSourceTree}
+                                    >
+                                        Associar e Tornar Pública
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenTagDialog(false)}>Fechar</Button>
                 </DialogActions>
             </Dialog>
 

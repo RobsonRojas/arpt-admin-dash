@@ -684,6 +684,57 @@ export const AdminProvider = ({ children }) => {
         }
     }
 
+    const associateTagToPhysicalPiece = async (pieceId, tagValue, sourceTreeId) => {
+        try {
+            const token = await user?.getIdToken();
+            const response = await api.post(`/admin/pecas/${pieceId}/labels`, {
+                tag_value: tagValue,
+                source_tree_id: sourceTreeId
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.status === 201 || response.status === 200) {
+                await recordAudit({
+                    action: 'UPDATE',
+                    entity: 'PHYSICAL_PIECE',
+                    entityId: String(pieceId),
+                    before: null,
+                    after: { pieceId, tagValue, sourceTreeId, action: 'associate_tag' },
+                    user
+                });
+                return response.data;
+            }
+            return null;
+        } catch (error) {
+            console.error("Error associating tag to physical piece:", error);
+            throw error;
+        }
+    }
+
+    const disassociateTagFromPhysicalPiece = async (pieceId, labelId) => {
+        try {
+            const token = await user?.getIdToken();
+            const response = await api.delete(`/admin/pecas/${pieceId}/labels/${labelId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.status === 200) {
+                await recordAudit({
+                    action: 'UPDATE',
+                    entity: 'PHYSICAL_PIECE',
+                    entityId: String(pieceId),
+                    before: null,
+                    after: { pieceId, labelId, action: 'disassociate_tag' },
+                    user
+                });
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error("Error disassociating tag from physical piece:", error);
+            return false;
+        }
+    }
+
     const getUsers = async (limit = 1000) => {
         try {
             const token = await user?.getIdToken();
@@ -1283,6 +1334,8 @@ export const AdminProvider = ({ children }) => {
         getPhysicalPieces,
         createPhysicalPiece,
         attributePhysicalPiece,
+        associateTagToPhysicalPiece,
+        disassociateTagFromPhysicalPiece,
         getUsers,
     };
 
