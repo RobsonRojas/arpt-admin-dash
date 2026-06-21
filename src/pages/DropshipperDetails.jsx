@@ -4,8 +4,9 @@ import {
   Box, Typography, Paper, Grid, Card, CardContent, Button, CircularProgress,
   Divider, IconButton
 } from '@mui/material';
-import { ArrowBack, Store, Person, ContactMail, VpnKey, Public, Event } from '@mui/icons-material';
+import { ArrowBack, Store, Person, ContactMail, VpnKey, Public, Event, Edit } from '@mui/icons-material';
 import { api } from '../services/api';
+import { EditDropshipperModal } from './EditDropshipperModal';
 
 export function DropshipperDetails() {
   const { id } = useParams();
@@ -13,22 +14,25 @@ export function DropshipperDetails() {
   const [loading, setLoading] = useState(true);
   const [store, setStore] = useState(null);
   const [error, setError] = useState('');
+  const [editModalOpen, setEditModalOpen] = useState(false);
+
+  const fetchDetails = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get(`/api/v1/admin/dropshipping/dropshippers/${id}`);
+      setStore(response.data);
+    } catch (err) {
+      setError('Failed to load dropshipper details. ' + (err.response?.data?.error || err.message));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchDetails = async () => {
-      try {
-        const response = await api.get(`/api/v1/admin/dropshipping/dropshippers/${id}`);
-        setStore(response.data);
-      } catch (err) {
-        setError('Failed to load dropshipper details. ' + (err.response?.data?.error || err.message));
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchDetails();
   }, [id]);
 
-  if (loading) {
+  if (loading && !store) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" height="60vh">
         <CircularProgress />
@@ -49,12 +53,24 @@ export function DropshipperDetails() {
 
   return (
     <Box sx={{ p: { xs: 2, md: 3 } }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, gap: 2 }}>
-        <IconButton onClick={() => navigate('/dropshipping-admin')} color="primary">
-          <ArrowBack />
-        </IconButton>
-        <Typography variant="h4" fontWeight="bold">Detalhes do Dropshipper</Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <IconButton onClick={() => navigate('/dropshipping-admin')} color="primary">
+            <ArrowBack />
+          </IconButton>
+          <Typography variant="h4" fontWeight="bold">Detalhes do Dropshipper</Typography>
+        </Box>
+        <Button variant="outlined" startIcon={<Edit />} onClick={() => setEditModalOpen(true)}>
+          Editar
+        </Button>
       </Box>
+
+      <EditDropshipperModal 
+        open={editModalOpen} 
+        onClose={() => setEditModalOpen(false)} 
+        store={store} 
+        onUpdateSuccess={fetchDetails} 
+      />
 
       <Grid container spacing={3}>
         {/* Profile Card */}
