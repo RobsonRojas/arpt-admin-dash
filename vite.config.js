@@ -3,6 +3,26 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks(id) {
+                    if (id.includes('node_modules')) {
+                        if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+                            return 'vendor-react';
+                        }
+                        if (id.includes('@mui') || id.includes('@emotion')) {
+                            return 'vendor-mui';
+                        }
+                        if (id.includes('recharts') || id.includes('d3')) {
+                            return 'vendor-charts';
+                        }
+                        return 'vendor';
+                    }
+                }
+            }
+        }
+    },
     plugins: [
         react(),
         VitePWA({
@@ -30,7 +50,7 @@ export default defineConfig({
                 ]
             },
             workbox: {
-                maximumFileSizeToCacheInBytes: 3000000
+                maximumFileSizeToCacheInBytes: 5242880
             }
         })
     ]

@@ -6,8 +6,9 @@ import {
   Chip, IconButton, Tooltip, Alert, InputAdornment
 } from '@mui/material';
 import {
-  Search, Edit, Inventory2, TrendingUp, Store, People, SwapHoriz, MailOutline
+  Search, Edit, Inventory2, TrendingUp, Store, People, SwapHoriz, MailOutline, Visibility
 } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis,
@@ -362,6 +363,7 @@ export function DropshippingAdmin() {
   const [allProducts, setAllProducts] = useState([]);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const navigate = useNavigate();
 
   const [transferStore, setTransferStore] = useState(null);
   const [catalogStore, setCatalogStore] = useState(null);
@@ -548,6 +550,11 @@ export function DropshippingAdmin() {
                         </Typography>
                       </TableCell>
                       <TableCell align="right">
+                        <Tooltip title="Ver Detalhes">
+                          <IconButton size="small" color="primary" onClick={() => navigate(`/dropshipping-admin/${store.id}`)}>
+                            <Visibility fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
                         <Tooltip title="Gerenciar Domínio">
                           <IconButton size="small" color="primary" onClick={() => setDomainStore(store)}>
                             <Store fontSize="small" />
