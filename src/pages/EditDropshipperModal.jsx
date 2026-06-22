@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Dialog, DialogTitle, DialogContent, DialogActions, 
-  Button, TextField, Grid, CircularProgress
+  Button, TextField, Grid, CircularProgress, Box, Typography,
+  FormControl, InputLabel, Select, MenuItem, Avatar, IconButton
 } from '@mui/material';
+import { CloudUpload, Delete } from '@mui/icons-material';
 import { api } from '../services/api';
 
 export function EditDropshipperModal({ open, onClose, store, onUpdateSuccess }) {
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [mediaList, setMediaList] = useState([]);
   const [formData, setFormData] = useState({
     store_name: '',
     slug: '',
@@ -22,7 +26,8 @@ export function EditDropshipperModal({ open, onClose, store, onUpdateSuccess }) 
     address_complement: '',
     address_neighborhood: '',
     address_city: '',
-    address_state: ''
+    address_state: '',
+    logoFilename: ''
   });
 
   useEffect(() => {
@@ -42,10 +47,52 @@ export function EditDropshipperModal({ open, onClose, store, onUpdateSuccess }) 
         address_complement: store.address_complement || '',
         address_neighborhood: store.address_neighborhood || '',
         address_city: store.address_city || '',
-        address_state: store.address_state || ''
+        address_state: store.address_state || '',
+        logoFilename: ''
       });
+      
+      if (store.config) {
+        try {
+           const parsed = typeof store.config === 'string' ? JSON.parse(store.config) : store.config;
+           setFormData(prev => ({ ...prev, logoFilename: parsed.logoFilename || '' }));
+        } catch(e) {}
+      }
     }
   }, [store, open]);
+
+  useEffect(() => {
+    if (open) {
+      api.get('/midias/list')
+         .then(res => {
+            const images = res.data.filter(f => f.type === 'image');
+            setMediaList(images);
+         })
+         .catch(err => console.error('Error fetching media:', err));
+    }
+  }, [open]);
+
+  const handleUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const formPayload = new FormData();
+    formPayload.append('file', file);
+    setUploading(true);
+    try {
+      const res = await api.post('/medias/upload', formPayload, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      if (res.data?.filename) {
+         setFormData(prev => ({ ...prev, logoFilename: res.data.filename }));
+         // Refresh list
+         const filesRes = await api.get('/midias/list');
+         setMediaList(filesRes.data.filter(f => f.type === 'image'));
+      }
+    } catch (err) {
+      alert('Erro ao fazer upload da imagem: ' + (err.response?.data?.error || err.message));
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -80,6 +127,51 @@ export function EditDropshipperModal({ open, onClose, store, onUpdateSuccess }) 
             </Grid>
             <Grid item xs={12}>
               <TextField fullWidth label="Domínio Customizado" name="custom_domain" value={formData.custom_domain} onChange={handleChange} margin="dense" helperText="Ex: loja.com.br" />
+            </Grid>
+            <Grid item xs={12}>
+              <Box sx={{ border: '1px solid #e0e0e0', borderRadius: 1, p: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
+                {formData.logoFilename ? (
+                  <Avatar 
+                    src={import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL.replace('/api', '')}/midias/files/${formData.logoFilename}` : `https://arpt.site/midias/files/${formData.logoFilename}`} 
+                    variant="rounded" 
+                    sx={{ width: 80, height: 80 }} 
+                  />
+                ) : (
+                  <Avatar variant="rounded" sx={{ width: 80, height: 80, bgcolor: 'grey.200' }} />
+                )}
+                <Box sx={{ flexGrow: 1 }}>
+                  <FormControl fullWidth size="small" margin="dense">
+                    <InputLabel>Logo da Loja</InputLabel>
+                    <Select
+                      name="logoFilename"
+                      value={formData.logoFilename}
+                      onChange={handleChange}
+                      label="Logo da Loja"
+                    >
+                      <MenuItem value=""><em>Nenhuma</em></MenuItem>
+                      {mediaList.map(media => (
+                        <MenuItem key={media.filename} value={media.filename}>
+                          {media.filename}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Box>
+                <Box>
+                  <input
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    id="logo-upload-file"
+                    type="file"
+                    onChange={handleUpload}
+                  />
+                  <label htmlFor="logo-upload-file">
+                    <Button variant="outlined" component="span" startIcon={uploading ? <CircularProgress size={20} /> : <CloudUpload />} disabled={uploading}>
+                      Upload
+                    </Button>
+                  </label>
+                </Box>
+              </Box>
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField fullWidth label="Nome (Usuário)" name="first_name" value={formData.first_name} onChange={handleChange} required margin="dense" />
