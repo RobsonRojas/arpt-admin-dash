@@ -15,7 +15,14 @@ export function EditDropshipperModal({ open, onClose, store, onUpdateSuccess }) 
     last_name: '',
     email: '',
     phone: '',
-    cpf: ''
+    cpf: '',
+    cep: '',
+    address_street: '',
+    address_number: '',
+    address_complement: '',
+    address_neighborhood: '',
+    address_city: '',
+    address_state: ''
   });
 
   useEffect(() => {
@@ -28,7 +35,14 @@ export function EditDropshipperModal({ open, onClose, store, onUpdateSuccess }) 
         last_name: store.last_name || '',
         email: store.email || '',
         phone: store.phone || '',
-        cpf: store.cpf || ''
+        cpf: store.cpf || '',
+        cep: store.cep || '',
+        address_street: store.address_street || '',
+        address_number: store.address_number || '',
+        address_complement: store.address_complement || '',
+        address_neighborhood: store.address_neighborhood || '',
+        address_city: store.address_city || '',
+        address_state: store.address_state || ''
       });
     }
   }, [store, open]);
@@ -81,6 +95,27 @@ export function EditDropshipperModal({ open, onClose, store, onUpdateSuccess }) 
             </Grid>
             <Grid item xs={12} sm={4}>
               <TextField fullWidth label="CPF" name="cpf" value={formData.cpf} onChange={handleChange} margin="dense" />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField fullWidth label="CEP" name="cep" value={formData.cep} onChange={handleChange} margin="dense" />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField fullWidth label="Logradouro (Rua)" name="address_street" value={formData.address_street} onChange={handleChange} margin="dense" />
+            </Grid>
+            <Grid item xs={12} sm={2}>
+              <TextField fullWidth label="Número" name="address_number" value={formData.address_number} onChange={handleChange} margin="dense" />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField fullWidth label="Complemento" name="address_complement" value={formData.address_complement} onChange={handleChange} margin="dense" />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField fullWidth label="Bairro" name="address_neighborhood" value={formData.address_neighborhood} onChange={handleChange} margin="dense" />
+            </Grid>
+            <Grid item xs={12} sm={8}>
+              <TextField fullWidth label="Cidade" name="address_city" value={formData.address_city} onChange={handleChange} margin="dense" />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField fullWidth label="Estado" name="address_state" value={formData.address_state} onChange={handleChange} margin="dense" />
             </Grid>
           </Grid>
         </DialogContent>
