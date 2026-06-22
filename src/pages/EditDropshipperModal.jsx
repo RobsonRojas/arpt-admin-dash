@@ -27,7 +27,9 @@ export function EditDropshipperModal({ open, onClose, store, onUpdateSuccess }) 
     address_neighborhood: '',
     address_city: '',
     address_state: '',
-    logoFilename: ''
+    logoFilename: '',
+    seoKeywords: '',
+    headScripts: ''
   });
 
   useEffect(() => {
@@ -48,13 +50,20 @@ export function EditDropshipperModal({ open, onClose, store, onUpdateSuccess }) 
         address_neighborhood: store.address_neighborhood || '',
         address_city: store.address_city || '',
         address_state: store.address_state || '',
-        logoFilename: ''
+        logoFilename: '',
+        seoKeywords: '',
+        headScripts: ''
       });
       
       if (store.config) {
         try {
            const parsed = typeof store.config === 'string' ? JSON.parse(store.config) : store.config;
-           setFormData(prev => ({ ...prev, logoFilename: parsed.logoFilename || '' }));
+           setFormData(prev => ({ 
+             ...prev, 
+             logoFilename: parsed.logoFilename || '',
+             seoKeywords: parsed.seoKeywords || '',
+             headScripts: parsed.headScripts || ''
+           }));
         } catch(e) {}
       }
     }
@@ -208,6 +217,12 @@ export function EditDropshipperModal({ open, onClose, store, onUpdateSuccess }) 
             </Grid>
             <Grid item xs={12} sm={4}>
               <TextField fullWidth label="Estado" name="address_state" value={formData.address_state} onChange={handleChange} margin="dense" />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField fullWidth label="Palavras-Chave (SEO)" name="seoKeywords" value={formData.seoKeywords} onChange={handleChange} margin="dense" helperText="Ex: móveis rústicos, madeira de lei, decoração" />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField fullWidth multiline rows={4} label="Scripts do Cabeçalho (<head>)" name="headScripts" value={formData.headScripts} onChange={handleChange} margin="dense" helperText="Ex: Scripts de rastreamento do Facebook Pixel, GTM, etc. Inclua as tags <script> completas." />
             </Grid>
           </Grid>
         </DialogContent>

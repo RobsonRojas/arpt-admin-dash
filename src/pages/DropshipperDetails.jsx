@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box, Typography, Paper, Grid, Card, CardContent, Button, CircularProgress,
   Divider, IconButton, List, ListItem, ListItemText, ListItemSecondaryAction,
-  FormControl, InputLabel, Select, MenuItem
+  FormControl, InputLabel, Select, MenuItem, Avatar
 } from '@mui/material';
 import { ArrowBack, Store, Person, ContactMail, VpnKey, Public, Event, Edit, LocationOn, Delete, AddBox, Inventory } from '@mui/icons-material';
 import { api } from '../services/api';
@@ -104,6 +104,18 @@ export function DropshipperDetails() {
     );
   }
 
+  let logoFilename = '';
+  let seoKeywords = '';
+  let headScripts = '';
+  if (store.config) {
+    try {
+      const parsed = typeof store.config === 'string' ? JSON.parse(store.config) : store.config;
+      logoFilename = parsed.logoFilename || '';
+      seoKeywords = parsed.seoKeywords || '';
+      headScripts = parsed.headScripts || '';
+    } catch(e) {}
+  }
+
   return (
     <Box sx={{ p: { xs: 2, md: 3 } }}>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
@@ -168,13 +180,28 @@ export function DropshipperDetails() {
               <Divider sx={{ mb: 2 }} />
 
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                <Typography variant="body1">
-                  <strong>Nome da Loja:</strong> {store.store_name}
-                </Typography>
-                <Typography variant="body1" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Public fontSize="small" color="action" />
-                  <strong>Slug:</strong> <span style={{ fontFamily: 'monospace' }}>{store.slug}</span>
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                  {logoFilename ? (
+                    <Avatar
+                      src={import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL.replace('/api', '')}/midias/files/${logoFilename}` : `https://arpt.site/midias/files/${logoFilename}`}
+                      variant="rounded"
+                      sx={{ width: 64, height: 64, border: '1px solid #e0e0e0' }}
+                    />
+                  ) : (
+                    <Avatar variant="rounded" sx={{ width: 64, height: 64, bgcolor: 'grey.200', color: 'grey.500' }}>
+                      {store.store_name?.charAt(0)?.toUpperCase()}
+                    </Avatar>
+                  )}
+                  <Box>
+                    <Typography variant="body1">
+                      <strong>Nome da Loja:</strong> {store.store_name}
+                    </Typography>
+                    <Typography variant="body1" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Public fontSize="small" color="action" />
+                      <strong>Slug:</strong> <span style={{ fontFamily: 'monospace' }}>{store.slug}</span>
+                    </Typography>
+                  </Box>
+                </Box>
                 <Typography variant="body1">
                   <strong>Domínio Customizado:</strong> {store.custom_domain ? store.custom_domain : <em>Nenhum</em>} 
                   {store.domain_status && ` (${store.domain_status})`}
@@ -193,6 +220,33 @@ export function DropshipperDetails() {
                     ? `${store.address_street || ''}${store.address_number ? `, ${store.address_number}` : ''}${store.address_complement ? ` - ${store.address_complement}` : ''}${store.address_neighborhood ? ` - ${store.address_neighborhood}` : ''}${store.address_city ? ` - ${store.address_city}` : ''}${store.address_state ? `/${store.address_state}` : ''}${store.cep ? ` - CEP: ${store.cep}` : ''}`.replace(/^[\s,-]+/, '') 
                     : 'Endereço não informado'}
                 </Typography>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Marketing & SEO Card */}
+        <Grid item xs={12}>
+          <Card variant="outlined" sx={{ borderRadius: 3 }}>
+            <CardContent>
+              <Typography variant="h6" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                <Public color="primary" /> Marketing & SEO
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+              
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary">Palavras-Chave (SEO)</Typography>
+                  <Typography variant="body2" sx={{ bgcolor: 'grey.50', p: 1.5, borderRadius: 1, border: '1px solid #eee' }}>
+                    {seoKeywords || <em>Nenhuma configurada</em>}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary">Scripts do Cabeçalho (&lt;head&gt;)</Typography>
+                  <Box sx={{ bgcolor: 'grey.900', color: '#4caf50', p: 1.5, borderRadius: 1, fontFamily: 'monospace', fontSize: '0.8rem', whiteSpace: 'pre-wrap', maxHeight: 200, overflow: 'auto' }}>
+                    {headScripts || <em>Nenhum script configurado</em>}
+                  </Box>
+                </Box>
               </Box>
             </CardContent>
           </Card>
