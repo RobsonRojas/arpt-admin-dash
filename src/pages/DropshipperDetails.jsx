@@ -8,6 +8,7 @@ import {
 import { ArrowBack, Store, Person, ContactMail, VpnKey, Public, Event, Edit, LocationOn, Delete, AddBox, Inventory } from '@mui/icons-material';
 import { api } from '../services/api';
 import { EditDropshipperModal } from './EditDropshipperModal';
+import { EditAllocatedProductModal } from './EditAllocatedProductModal';
 
 export function DropshipperDetails() {
   const { id } = useParams();
@@ -20,6 +21,7 @@ export function DropshipperDetails() {
   const [availableProducts, setAvailableProducts] = useState([]);
   const [selectedProductId, setSelectedProductId] = useState('');
   const [loadingProducts, setLoadingProducts] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
 
   const fetchDetails = async () => {
     try {
@@ -135,6 +137,14 @@ export function DropshipperDetails() {
         onClose={() => setEditModalOpen(false)} 
         store={store} 
         onUpdateSuccess={fetchDetails} 
+      />
+
+      <EditAllocatedProductModal
+        open={Boolean(editingProduct)}
+        onClose={() => setEditingProduct(null)}
+        storeId={store?.store_id}
+        product={editingProduct}
+        onUpdateSuccess={() => fetchProducts(store.store_id)}
       />
 
       <Grid container spacing={3}>
@@ -300,6 +310,9 @@ export function DropshipperDetails() {
                           secondary={`Preço: R$ ${Number(product.preco).toFixed(2).replace('.', ',')} | Status: ${product.is_public ? 'Público' : 'Oculto'}`}
                         />
                         <ListItemSecondaryAction>
+                          <IconButton edge="end" color="primary" onClick={() => setEditingProduct(product)} sx={{ mr: 1 }}>
+                            <Edit />
+                          </IconButton>
                           <IconButton edge="end" color="error" onClick={() => handleRemoveProduct(product.id)}>
                             <Delete />
                           </IconButton>

@@ -6,7 +6,7 @@ import {
   Chip, IconButton, Tooltip, Alert, InputAdornment
 } from '@mui/material';
 import {
-  Search, Edit, Inventory2, TrendingUp, Store, People, SwapHoriz, MailOutline, Visibility
+  Search, Edit, Inventory2, TrendingUp, Store, People, SwapHoriz, MailOutline, Visibility, OpenInNew
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
@@ -18,6 +18,17 @@ import { api } from '../services/api';
 
 const fmt = (val) =>
   Number(val || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+const getStoreUrl = (store) => {
+  const isLocal = window.location.hostname.includes('localhost') || window.location.hostname.includes('127.0.0.1');
+  if (isLocal) {
+    return `http://localhost:3000/store/${store.slug}`;
+  }
+  if (store.custom_domain) {
+    return `https://${store.custom_domain}`;
+  }
+  return `https://${store.slug}.arpt.site`;
+};
 
 // ─── Transfer Owner Modal ───────────────────────────────────────────────────
 function TransferOwnerModal({ store, onClose, onSuccess }) {
@@ -585,6 +596,18 @@ export function DropshippingAdmin() {
                             }}
                           >
                             <MailOutline fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Abrir Loja">
+                          <IconButton
+                            size="small"
+                            color="secondary"
+                            component="a"
+                            href={getStoreUrl(store)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <OpenInNew fontSize="small" />
                           </IconButton>
                         </Tooltip>
                       </TableCell>
