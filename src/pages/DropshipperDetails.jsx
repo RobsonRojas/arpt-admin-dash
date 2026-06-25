@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box, Typography, Paper, Grid, Card, CardContent, Button, CircularProgress,
   Divider, IconButton, List, ListItem, ListItemText, ListItemSecondaryAction,
-  FormControl, InputLabel, Select, MenuItem, Avatar
+  FormControl, InputLabel, Select, MenuItem, Avatar, Switch, FormControlLabel
 } from '@mui/material';
 import { ArrowBack, Store, Person, ContactMail, VpnKey, Public, Event, Edit, LocationOn, Delete, AddBox, Inventory } from '@mui/icons-material';
 import { api } from '../services/api';
@@ -80,6 +80,18 @@ export function DropshipperDetails() {
       alert('Erro ao remover produto: ' + (err.response?.data?.error || err.message));
     } finally {
       setLoadingProducts(false);
+    }
+  };
+
+  const handleTogglePublic = async (event) => {
+    const newValue = event.target.checked;
+    try {
+      await api.put(`/api/v1/admin/dropshipping/dropshippers/${id}`, {
+        is_public: newValue
+      });
+      fetchDetails();
+    } catch (err) {
+      alert('Erro ao atualizar visibilidade da loja: ' + (err.response?.data?.error || err.message));
     }
   };
 
@@ -220,6 +232,19 @@ export function DropshipperDetails() {
                   <Event fontSize="small" color="action" />
                   <strong>Criado em:</strong> {store.store_created_at ? new Date(store.store_created_at).toLocaleString('pt-BR') : 'N/A'}
                 </Typography>
+
+                <Box sx={{ mt: 1, display: 'flex', alignItems: 'center' }}>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={!!store.is_public}
+                        onChange={handleTogglePublic}
+                        color="primary"
+                      />
+                    }
+                    label={store.is_public ? 'Loja Pública (Ativa)' : 'Loja Privada (Oculta)'}
+                  />
+                </Box>
                 
                 <Divider sx={{ my: 1 }} />
                 <Typography variant="subtitle2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
