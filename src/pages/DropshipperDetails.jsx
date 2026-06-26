@@ -22,6 +22,7 @@ export function DropshipperDetails() {
   const [selectedProductId, setSelectedProductId] = useState('');
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [userStores, setUserStores] = useState([]);
 
   const fetchDetails = async () => {
     try {
@@ -30,6 +31,10 @@ export function DropshipperDetails() {
       setStore(response.data);
       if (response.data?.store_id) {
         fetchProducts(response.data.store_id);
+      }
+      if (response.data?.user_id) {
+        const storesRes = await api.get(`/api/v1/admin/dropshipping/stores?user_id=${response.data.user_id}`);
+        setUserStores(storesRes.data.stores || []);
       }
     } catch (err) {
       setError('Failed to load dropshipper details. ' + (err.response?.data?.error || err.message));
@@ -256,6 +261,35 @@ export function DropshipperDetails() {
                     : 'Endereço não informado'}
                 </Typography>
               </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* User's Stores List Card */}
+        <Grid item xs={12}>
+          <Card variant="outlined" sx={{ borderRadius: 3 }}>
+            <CardContent>
+              <Typography variant="h6" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                <Store color="primary" /> Todas Lojas do Dropshipper
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+              {userStores.length === 0 ? (
+                <Typography color="text.secondary">Nenhuma loja encontrada.</Typography>
+              ) : (
+                <List sx={{ width: '100%', bgcolor: 'background.paper', border: '1px solid #e0e0e0', borderRadius: 1 }}>
+                  {userStores.map((s, index) => (
+                    <React.Fragment key={s.id}>
+                      <ListItem button onClick={() => navigate(`/dropshipping-admin/${s.id}`)}>
+                        <ListItemText 
+                          primary={s.name} 
+                          secondary={`Slug: ${s.slug} | Domínio: ${s.custom_domain || 'Nenhum'} | Produtos: ${s.product_count}`}
+                        />
+                      </ListItem>
+                      {index < userStores.length - 1 && <Divider />}
+                    </React.Fragment>
+                  ))}
+                </List>
+              )}
             </CardContent>
           </Card>
         </Grid>
