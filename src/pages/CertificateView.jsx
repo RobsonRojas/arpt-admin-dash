@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Button, Paper, Container, useMediaQuery, useTheme } from '@mui/material';
-import { Share, Download } from '@mui/icons-material';
+import { Share, Download, PictureAsPdf, Image } from '@mui/icons-material';
 import { useSearchParams } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
+import { exportToImage, exportToPdf } from '../utils/exportCertificate';
 
 export const CertificateView = () => {
     const [searchParams] = useSearchParams();
@@ -23,6 +24,20 @@ export const CertificateView = () => {
         }
     }, [searchParams]);
 
+    useEffect(() => {
+        const dl = searchParams.get('dl');
+        if (dl && data) {
+            const timer = setTimeout(() => {
+                if (dl === 'pdf') {
+                    handleDownloadPdf();
+                } else if (dl === 'img') {
+                    handleDownloadImage();
+                }
+            }, 1000); // Allow fonts and images to load
+            return () => clearTimeout(timer);
+        }
+    }, [data, searchParams]);
+
     const handleShare = async () => {
         if (navigator.share) {
             try {
@@ -38,6 +53,14 @@ export const CertificateView = () => {
             navigator.clipboard.writeText(window.location.href);
             alert("Link copiado para a área de transferência!");
         }
+    };
+
+    const handleDownloadPdf = async () => {
+        await exportToPdf('certificate-content', `Certificado_ARPT_${data.sponsorName.replace(/ /g, '_')}.pdf`);
+    };
+
+    const handleDownloadImage = async () => {
+        await exportToImage('certificate-content', `Certificado_ARPT_${data.sponsorName.replace(/ /g, '_')}.png`);
     };
 
     if (!data) {
@@ -80,6 +103,7 @@ export const CertificateView = () => {
             </style>
 
             <Paper
+                id="certificate-content"
                 elevation={12}
                 sx={{
                     position: 'relative',
@@ -250,7 +274,7 @@ export const CertificateView = () => {
                 </Box>
             </Paper>
 
-            <Box mt={4} display="flex" gap={2}>
+            <Box mt={4} display="flex" gap={2} flexWrap="wrap" justifyContent="center">
                 <Button
                     variant="contained"
                     startIcon={<Share />}
@@ -259,11 +283,39 @@ export const CertificateView = () => {
                         bgcolor: '#1b5e20',
                         color: 'white',
                         fontFamily: "'Cinzel', serif",
-                        px: 4,
+                        px: 3,
                         '&:hover': { bgcolor: '#003300' }
                     }}
                 >
                     Compartilhar
+                </Button>
+                <Button
+                    variant="outlined"
+                    startIcon={<PictureAsPdf />}
+                    onClick={handleDownloadPdf}
+                    sx={{
+                        color: '#1b5e20',
+                        borderColor: '#1b5e20',
+                        fontFamily: "'Cinzel', serif",
+                        px: 3,
+                        '&:hover': { bgcolor: '#e8f5e9', borderColor: '#003300' }
+                    }}
+                >
+                    PDF
+                </Button>
+                <Button
+                    variant="outlined"
+                    startIcon={<Image />}
+                    onClick={handleDownloadImage}
+                    sx={{
+                        color: '#1b5e20',
+                        borderColor: '#1b5e20',
+                        fontFamily: "'Cinzel', serif",
+                        px: 3,
+                        '&:hover': { bgcolor: '#e8f5e9', borderColor: '#003300' }
+                    }}
+                >
+                    Imagem
                 </Button>
             </Box>
         </Box>
