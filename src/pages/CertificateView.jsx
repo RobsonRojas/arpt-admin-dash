@@ -108,8 +108,12 @@ export const CertificateView = () => {
                 sx={{
                     position: 'relative',
                     p: { xs: 3, md: 8 },
-                    maxWidth: 1000,
+                    maxWidth: 1123,
                     width: '100%',
+                    aspectRatio: '1123 / 794', // Proporção A4 Paisagem
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
                     textAlign: 'center',
                     bgcolor: '#fffcf5', // Cream paper color
                     color: '#2c3e50',

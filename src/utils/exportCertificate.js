@@ -35,10 +35,12 @@ export const exportToPdf = async (elementId, filename = 'certificado.pdf') => {
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF({
             orientation: 'landscape',
-            unit: 'px',
-            format: [canvas.width, canvas.height]
+            unit: 'mm',
+            format: 'a4'
         });
-        pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+        
+        // A4 landscape dimensions: 297mm x 210mm
+        pdf.addImage(imgData, 'PNG', 0, 0, 297, 210);
         pdf.save(filename);
     } catch (error) {
         console.error('Error generating PDF:', error);
