@@ -107,32 +107,43 @@ export const CertificateView = () => {
                 elevation={12}
                 sx={{
                     position: 'relative',
-                    p: { xs: 3, md: 8 },
                     maxWidth: 1123,
                     width: '100%',
                     aspectRatio: '1123 / 794', // Proporção A4 Paisagem
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    textAlign: 'center',
                     bgcolor: '#fffcf5', // Cream paper color
                     color: '#2c3e50',
                     backgroundImage: `
                         linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)),
                         url("https://www.transparenttextures.com/patterns/cream-paper.png")
                     `,
-                    border: `double 6px #1b5e20`, // Keeping green as base
-                    outline: `4px solid ${primaryColor}`, // Type color outline
-                    outlineOffset: '-12px',
                     boxShadow: '0 20px 50px rgba(0,0,0,0.1)',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    p: '5mm', // Margem de 5mm para a borda
+                    boxSizing: 'border-box'
                 }}
             >
-                {/* Decorative corners */}
-                <Box sx={{ position: 'absolute', top: 18, left: 18, width: 40, height: 40, borderTop: `4px solid ${primaryColor}`, borderLeft: `4px solid ${primaryColor}` }} />
-                <Box sx={{ position: 'absolute', top: 18, right: 18, width: 40, height: 40, borderTop: `4px solid ${primaryColor}`, borderRight: `4px solid ${primaryColor}` }} />
-                <Box sx={{ position: 'absolute', bottom: 18, left: 18, width: 40, height: 40, borderBottom: `4px solid ${primaryColor}`, borderLeft: `4px solid ${primaryColor}` }} />
-                <Box sx={{ position: 'absolute', bottom: 18, right: 18, width: 40, height: 40, borderBottom: `4px solid ${primaryColor}`, borderRight: `4px solid ${primaryColor}` }} />
+                <Box
+                    sx={{
+                        width: '100%',
+                        height: '100%',
+                        position: 'relative',
+                        border: `double 6px #1b5e20`, // Keeping green as base
+                        outline: `4px solid ${primaryColor}`, // Type color outline
+                        outlineOffset: '-12px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        textAlign: 'center',
+                        p: { xs: 3, md: 6 },
+                        boxSizing: 'border-box'
+                    }}
+                >
+                    {/* Decorative corners */}
+                    <Box sx={{ position: 'absolute', top: 18, left: 18, width: 40, height: 40, borderTop: `4px solid ${primaryColor}`, borderLeft: `4px solid ${primaryColor}` }} />
+                    <Box sx={{ position: 'absolute', top: 18, right: 18, width: 40, height: 40, borderTop: `4px solid ${primaryColor}`, borderRight: `4px solid ${primaryColor}` }} />
+                    <Box sx={{ position: 'absolute', bottom: 18, left: 18, width: 40, height: 40, borderBottom: `4px solid ${primaryColor}`, borderLeft: `4px solid ${primaryColor}` }} />
+                    <Box sx={{ position: 'absolute', bottom: 18, right: 18, width: 40, height: 40, borderBottom: `4px solid ${primaryColor}`, borderRight: `4px solid ${primaryColor}` }} />
 
                 <Box mb={4}>
                     <img src="/arpt-logo-new.png" alt="ARPT Logo" style={{ height: isMobile ? 60 : 100, opacity: 0.9 }} />
@@ -275,6 +286,7 @@ export const CertificateView = () => {
                     <Typography variant="caption" sx={{ color: '#888', fontStyle: 'italic' }}>
                         "Preservando a Amazônia para as futuras gerações."
                     </Typography>
+                </Box>
                 </Box>
             </Paper>
 
