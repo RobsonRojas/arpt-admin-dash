@@ -145,7 +145,7 @@ export const CertificateView = () => {
                     <Box sx={{ position: 'absolute', bottom: 18, left: 18, width: 40, height: 40, borderBottom: `4px solid ${primaryColor}`, borderLeft: `4px solid ${primaryColor}` }} />
                     <Box sx={{ position: 'absolute', bottom: 18, right: 18, width: 40, height: 40, borderBottom: `4px solid ${primaryColor}`, borderRight: `4px solid ${primaryColor}` }} />
 
-                <Box mb={4}>
+                <Box mb={2}>
                     <img src="/arpt-logo-new.png" alt="ARPT Logo" style={{ height: isMobile ? 60 : 100, opacity: 0.9 }} />
                 </Box>
 
@@ -158,7 +158,7 @@ export const CertificateView = () => {
                         fontFamily: "'Cinzel', serif",
                         letterSpacing: '0.1em',
                         fontSize: { xs: '1.5rem', md: '3rem' },
-                        mb: 4,
+                        mb: 2,
                         textTransform: 'uppercase',
                         textShadow: '1px 1px 2px rgba(0,0,0,0.1)'
                     }}
@@ -183,7 +183,7 @@ export const CertificateView = () => {
                     variant="h2"
                     component="div"
                     sx={{
-                        my: 3,
+                        my: 2,
                         color: '#2e7d32',
                         fontFamily: "'Great Vibes', cursive",
                         fontSize: { xs: '2.5rem', md: '4.5rem' },
@@ -207,7 +207,7 @@ export const CertificateView = () => {
                     em reconhecimento ao seu inestimável patrocínio e apoio ao projeto de manejo sustentável e preservação
                 </Typography>
 
-                <Box sx={{ my: 4, borderTop: '1px solid #ddd', borderBottom: '1px solid #ddd', py: 2, width: '80%', mx: 'auto' }}>
+                <Box sx={{ my: 2, borderTop: '1px solid #ddd', borderBottom: '1px solid #ddd', py: 2, width: '80%', mx: 'auto' }}>
                     <Typography
                         variant="h4"
                         sx={{
@@ -226,7 +226,7 @@ export const CertificateView = () => {
                     flexDirection={{ xs: 'column-reverse', md: 'row' }}
                     justifyContent="space-between"
                     alignItems="center"
-                    mt={8}
+                    mt={4}
                     px={{ xs: 2, md: 8 }}
                     gap={4}
                 >
@@ -261,7 +261,7 @@ export const CertificateView = () => {
                 </Box>
 
                 {data.blockchainLink && (
-                    <Box mt={4}>
+                    <Box mt={2}>
                         <Button
                             variant="outlined"
                             href={data.blockchainLink}
@@ -282,7 +282,7 @@ export const CertificateView = () => {
                     </Box>
                 )}
 
-                <Box mt={6}>
+                <Box mt={3}>
                     <Typography variant="caption" sx={{ color: '#888', fontStyle: 'italic' }}>
                         "Preservando a Amazônia para as futuras gerações."
                     </Typography>
