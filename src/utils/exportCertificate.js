@@ -39,8 +39,19 @@ export const exportToPdf = async (elementId, filename = 'certificado.pdf') => {
             format: 'a4'
         });
         
-        // A4 landscape dimensions: 297mm x 210mm
-        pdf.addImage(imgData, 'PNG', 0, 0, 297, 210);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        
+        const imgProps = pdf.getImageProperties(imgData);
+        const ratio = Math.min(pdfWidth / imgProps.width, pdfHeight / imgProps.height);
+        
+        const imgWidth = imgProps.width * ratio;
+        const imgHeight = imgProps.height * ratio;
+        
+        const x = (pdfWidth - imgWidth) / 2;
+        const y = (pdfHeight - imgHeight) / 2;
+        
+        pdf.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight);
         pdf.save(filename);
     } catch (error) {
         console.error('Error generating PDF:', error);
