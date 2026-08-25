@@ -145,8 +145,8 @@ export const CertificateView = () => {
                     <Box sx={{ position: 'absolute', bottom: 18, left: 18, width: 40, height: 40, borderBottom: `4px solid ${primaryColor}`, borderLeft: `4px solid ${primaryColor}` }} />
                     <Box sx={{ position: 'absolute', bottom: 18, right: 18, width: 40, height: 40, borderBottom: `4px solid ${primaryColor}`, borderRight: `4px solid ${primaryColor}` }} />
 
-                <Box mb={2}>
-                    <img src="/arpt-logo-new.png" alt="ARPT Logo" style={{ height: isMobile ? 60 : 100, opacity: 0.9 }} />
+                <Box mb={1}>
+                    <img src={`${window.location.origin}/arpt-logo-new.png`} alt="ARPT Logo" style={{ height: isMobile ? 50 : 80, opacity: 0.9 }} crossOrigin="anonymous" />
                 </Box>
 
                 <Typography
@@ -157,8 +157,8 @@ export const CertificateView = () => {
                         fontWeight: 700,
                         fontFamily: "'Cinzel', serif",
                         letterSpacing: '0.1em',
-                        fontSize: { xs: '1.5rem', md: '3rem' },
-                        mb: 2,
+                        fontSize: { xs: '1.5rem', md: '2.5rem' },
+                        mb: 1,
                         textTransform: 'uppercase',
                         textShadow: '1px 1px 2px rgba(0,0,0,0.1)'
                     }}
@@ -169,7 +169,7 @@ export const CertificateView = () => {
                 <Typography
                     variant="h6"
                     sx={{
-                        my: 2,
+                        my: 1,
                         color: '#546e7a',
                         fontFamily: "'Playfair Display', serif",
                         fontStyle: 'italic',
@@ -183,10 +183,10 @@ export const CertificateView = () => {
                     variant="h2"
                     component="div"
                     sx={{
-                        my: 2,
+                        my: 1,
                         color: '#2e7d32',
                         fontFamily: "'Great Vibes', cursive",
-                        fontSize: { xs: '2.5rem', md: '4.5rem' },
+                        fontSize: { xs: '2.5rem', md: '4rem' },
                         lineHeight: 1.2
                     }}
                 >
@@ -196,7 +196,7 @@ export const CertificateView = () => {
                 <Typography
                     variant="h6"
                     sx={{
-                        my: 2,
+                        my: 1,
                         color: '#546e7a',
                         fontFamily: "'Playfair Display', serif",
                         fontSize: { xs: '1rem', md: '1.25rem' },
@@ -207,14 +207,14 @@ export const CertificateView = () => {
                     em reconhecimento ao seu inestimável patrocínio e apoio ao projeto de manejo sustentável e preservação
                 </Typography>
 
-                <Box sx={{ my: 2, borderTop: '1px solid #ddd', borderBottom: '1px solid #ddd', py: 2, width: '80%', mx: 'auto' }}>
+                <Box sx={{ my: 1, borderTop: '1px solid #ddd', borderBottom: '1px solid #ddd', py: 1, width: '80%', mx: 'auto' }}>
                     <Typography
                         variant="h4"
                         sx={{
                             fontFamily: "'Cinzel', serif",
                             color: '#1b5e20',
                             fontWeight: 600,
-                            fontSize: { xs: '1.2rem', md: '2rem' }
+                            fontSize: { xs: '1.2rem', md: '1.8rem' }
                         }}
                     >
                         {data.projectName}
@@ -226,9 +226,9 @@ export const CertificateView = () => {
                     flexDirection={{ xs: 'column-reverse', md: 'row' }}
                     justifyContent="space-between"
                     alignItems="center"
-                    mt={4}
+                    mt={2}
                     px={{ xs: 2, md: 8 }}
-                    gap={4}
+                    gap={2}
                 >
                     <Box textAlign="center" flex={1}>
                         <Typography
@@ -249,7 +249,7 @@ export const CertificateView = () => {
 
                     <Box display="flex" flexDirection="column" alignItems="center" flex={1}>
                         <Box sx={{ p: 1, bgcolor: '#fff', border: '1px solid #ddd' }}>
-                            <QRCodeSVG value={window.location.href} size={isMobile ? 80 : 100} fgColor="#1b5e20" />
+                            <QRCodeSVG value={window.location.href} size={isMobile ? 70 : 80} fgColor="#1b5e20" />
                         </Box>
                         <Typography variant="caption" sx={{ mt: 1, color: '#1b5e20', fontWeight: 'bold', fontFamily: "'Cinzel', serif" }}>
                             VERIFICAR AUTENTICIDADE
@@ -261,7 +261,7 @@ export const CertificateView = () => {
                 </Box>
 
                 {data.blockchainLink && (
-                    <Box mt={2}>
+                    <Box mt={1}>
                         <Button
                             variant="outlined"
                             href={data.blockchainLink}
@@ -282,7 +282,7 @@ export const CertificateView = () => {
                     </Box>
                 )}
 
-                <Box mt={3}>
+                <Box mt={1}>
                     <Typography variant="caption" sx={{ color: '#888', fontStyle: 'italic' }}>
                         "Preservando a Amazônia para as futuras gerações."
                     </Typography>
