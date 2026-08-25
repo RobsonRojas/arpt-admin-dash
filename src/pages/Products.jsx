@@ -40,6 +40,8 @@ export const Products = () => {
         preco: 0,
         prazo_entrega_meses: 0,
         is_ativo: true,
+        is_physical_reward: false,
+        carbon_stored_kg: 0,
         foto_url: '',
         translations: {}
     });
@@ -103,6 +105,8 @@ export const Products = () => {
                 preco: product.preco,
                 prazo_entrega_meses: product.prazo_entrega_meses,
                 is_ativo: product.is_ativo,
+                is_physical_reward: product.is_physical_reward || false,
+                carbon_stored_kg: product.carbon_stored_kg || 0,
                 foto_url: product.fotos?.[0]?.url || '',
                 translations: product.translations || {}
             };
@@ -122,6 +126,8 @@ export const Products = () => {
                 preco: 0,
                 prazo_entrega_meses: 0,
                 is_ativo: true,
+                is_physical_reward: false,
+                carbon_stored_kg: 0,
                 foto_url: '',
                 translations: {}
             };
@@ -165,6 +171,8 @@ export const Products = () => {
                 preco: Number(formData.preco),
                 prazo_entrega_meses: Number(formData.prazo_entrega_meses),
                 is_ativo: formData.is_ativo,
+                is_physical_reward: formData.is_physical_reward,
+                carbon_stored_kg: Number(formData.carbon_stored_kg),
                 translations: {
                     ...(formData.translations || {}),
                     en: {
@@ -188,6 +196,11 @@ export const Products = () => {
                     after: { ...payload, id: editingProduct.id },
                     user
                 });
+                if (payload.is_physical_reward) {
+                    setSnackbar({ open: true, message: 'Produto atualizado e geração de recompensa física ativada com sucesso!', severity: 'success' });
+                } else {
+                    setSnackbar({ open: true, message: 'Produto atualizado com sucesso!', severity: 'success' });
+                }
             } else {
                 const response = await api.post('/produtos', payload, config);
                 await recordAudit({
@@ -198,6 +211,11 @@ export const Products = () => {
                     after: payload,
                     user
                 });
+                if (payload.is_physical_reward) {
+                    setSnackbar({ open: true, message: 'Produto criado e geração de recompensa física ativada com sucesso!', severity: 'success' });
+                } else {
+                    setSnackbar({ open: true, message: 'Produto criado com sucesso!', severity: 'success' });
+                }
             }
 
             await clearDraft(); // Clear draft on success
@@ -439,6 +457,14 @@ export const Products = () => {
                                 value={formData.prazo_entrega_meses}
                                 onChange={(e) => setFormData({ ...formData, prazo_entrega_meses: e.target.value })}
                             />
+                            <TextField
+                                label="Carbono Estocado (kg)"
+                                type="number"
+                                fullWidth
+                                value={formData.carbon_stored_kg}
+                                onChange={(e) => setFormData({ ...formData, carbon_stored_kg: e.target.value })}
+                                helperText="Estimativa de carbono para este produto"
+                            />
                         </Box>
                         <TextField
                             label="URL da Foto"
@@ -491,6 +517,15 @@ export const Products = () => {
                                 />
                             }
                             label="Produto Ativo"
+                        />
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={formData.is_physical_reward}
+                                    onChange={(e) => setFormData({ ...formData, is_physical_reward: e.target.checked })}
+                                />
+                            }
+                            label="Gera Recompensa Física (Placa Metálica)"
                         />
                     </Box>
                 </DialogContent>
@@ -573,6 +608,10 @@ export const Products = () => {
                                             color={viewingProduct.is_ativo ? "success" : "default"}
                                             size="small"
                                         />
+                                    </Box>
+                                    <Box>
+                                        <Typography variant="subtitle2" color="textSecondary">Carbono</Typography>
+                                        <Typography variant="body1">{viewingProduct.carbon_stored_kg || 0} kg</Typography>
                                     </Box>
                                 </Box>
                             </Grid>

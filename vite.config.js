@@ -1,9 +1,22 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import basicSsl from '@vitejs/plugin-basic-ssl';
 
 export default defineConfig({
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks(id) {
+                    if (id.includes('node_modules')) {
+                        return 'vendor';
+                    }
+                }
+            }
+        }
+    },
     plugins: [
+        basicSsl(),
         react(),
         VitePWA({
             registerType: 'autoUpdate',
@@ -30,7 +43,7 @@ export default defineConfig({
                 ]
             },
             workbox: {
-                maximumFileSizeToCacheInBytes: 3000000
+                maximumFileSizeToCacheInBytes: 5242880
             }
         })
     ]

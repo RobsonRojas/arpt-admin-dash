@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Button, Paper, Container, useMediaQuery, useTheme } from '@mui/material';
-import { Share, Download } from '@mui/icons-material';
+import { Share, Download, PictureAsPdf, Image } from '@mui/icons-material';
 import { useSearchParams } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
+import { exportToImage, exportToPdf } from '../utils/exportCertificate';
 
 export const CertificateView = () => {
     const [searchParams] = useSearchParams();
@@ -23,6 +24,20 @@ export const CertificateView = () => {
         }
     }, [searchParams]);
 
+    useEffect(() => {
+        const dl = searchParams.get('dl');
+        if (dl && data) {
+            const timer = setTimeout(() => {
+                if (dl === 'pdf') {
+                    handleDownloadPdf();
+                } else if (dl === 'img') {
+                    handleDownloadImage();
+                }
+            }, 1000); // Allow fonts and images to load
+            return () => clearTimeout(timer);
+        }
+    }, [data, searchParams]);
+
     const handleShare = async () => {
         if (navigator.share) {
             try {
@@ -38,6 +53,14 @@ export const CertificateView = () => {
             navigator.clipboard.writeText(window.location.href);
             alert("Link copiado para a área de transferência!");
         }
+    };
+
+    const handleDownloadPdf = async () => {
+        await exportToPdf('certificate-content', `Certificado_ARPT_${data.sponsorName.replace(/ /g, '_')}.pdf`);
+    };
+
+    const handleDownloadImage = async () => {
+        await exportToImage('certificate-content', `Certificado_ARPT_${data.sponsorName.replace(/ /g, '_')}.png`);
     };
 
     if (!data) {
@@ -80,34 +103,50 @@ export const CertificateView = () => {
             </style>
 
             <Paper
+                id="certificate-content"
                 elevation={12}
                 sx={{
                     position: 'relative',
-                    p: { xs: 3, md: 8 },
-                    maxWidth: 1000,
+                    maxWidth: 1123,
                     width: '100%',
-                    textAlign: 'center',
+                    aspectRatio: '1123 / 794', // Proporção A4 Paisagem
                     bgcolor: '#fffcf5', // Cream paper color
                     color: '#2c3e50',
                     backgroundImage: `
                         linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)),
                         url("https://www.transparenttextures.com/patterns/cream-paper.png")
                     `,
-                    border: `double 6px #1b5e20`, // Keeping green as base
-                    outline: `4px solid ${primaryColor}`, // Type color outline
-                    outlineOffset: '-12px',
                     boxShadow: '0 20px 50px rgba(0,0,0,0.1)',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    p: '5mm', // Margem de 5mm para a borda
+                    boxSizing: 'border-box'
                 }}
             >
-                {/* Decorative corners */}
-                <Box sx={{ position: 'absolute', top: 18, left: 18, width: 40, height: 40, borderTop: `4px solid ${primaryColor}`, borderLeft: `4px solid ${primaryColor}` }} />
-                <Box sx={{ position: 'absolute', top: 18, right: 18, width: 40, height: 40, borderTop: `4px solid ${primaryColor}`, borderRight: `4px solid ${primaryColor}` }} />
-                <Box sx={{ position: 'absolute', bottom: 18, left: 18, width: 40, height: 40, borderBottom: `4px solid ${primaryColor}`, borderLeft: `4px solid ${primaryColor}` }} />
-                <Box sx={{ position: 'absolute', bottom: 18, right: 18, width: 40, height: 40, borderBottom: `4px solid ${primaryColor}`, borderRight: `4px solid ${primaryColor}` }} />
+                <Box
+                    sx={{
+                        width: '100%',
+                        height: '100%',
+                        position: 'relative',
+                        border: `double 6px #1b5e20`, // Keeping green as base
+                        outline: `4px solid ${primaryColor}`, // Type color outline
+                        outlineOffset: '-12px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        textAlign: 'center',
+                        p: { xs: 3, md: 6 },
+                        boxSizing: 'border-box'
+                    }}
+                >
+                    {/* Decorative corners */}
+                    <Box sx={{ position: 'absolute', top: 18, left: 18, width: 40, height: 40, borderTop: `4px solid ${primaryColor}`, borderLeft: `4px solid ${primaryColor}` }} />
+                    <Box sx={{ position: 'absolute', top: 18, right: 18, width: 40, height: 40, borderTop: `4px solid ${primaryColor}`, borderRight: `4px solid ${primaryColor}` }} />
+                    <Box sx={{ position: 'absolute', bottom: 18, left: 18, width: 40, height: 40, borderBottom: `4px solid ${primaryColor}`, borderLeft: `4px solid ${primaryColor}` }} />
+                    <Box sx={{ position: 'absolute', bottom: 18, right: 18, width: 40, height: 40, borderBottom: `4px solid ${primaryColor}`, borderRight: `4px solid ${primaryColor}` }} />
 
-                <Box mb={4}>
-                    <img src="/arpt-logo-new.png" alt="ARPT Logo" style={{ height: isMobile ? 60 : 100, opacity: 0.9 }} />
+                <Box mb={1}>
+                    <img src={`${window.location.origin}/arpt-logo-new.png`} alt="ARPT Logo" style={{ height: isMobile ? 50 : 80, opacity: 0.9 }} crossOrigin="anonymous" />
                 </Box>
 
                 <Typography
@@ -118,8 +157,8 @@ export const CertificateView = () => {
                         fontWeight: 700,
                         fontFamily: "'Cinzel', serif",
                         letterSpacing: '0.1em',
-                        fontSize: { xs: '1.5rem', md: '3rem' },
-                        mb: 4,
+                        fontSize: { xs: '1.5rem', md: '2.5rem' },
+                        mb: 1,
                         textTransform: 'uppercase',
                         textShadow: '1px 1px 2px rgba(0,0,0,0.1)'
                     }}
@@ -130,7 +169,7 @@ export const CertificateView = () => {
                 <Typography
                     variant="h6"
                     sx={{
-                        my: 2,
+                        my: 1,
                         color: '#546e7a',
                         fontFamily: "'Playfair Display', serif",
                         fontStyle: 'italic',
@@ -144,10 +183,10 @@ export const CertificateView = () => {
                     variant="h2"
                     component="div"
                     sx={{
-                        my: 3,
+                        my: 1,
                         color: '#2e7d32',
                         fontFamily: "'Great Vibes', cursive",
-                        fontSize: { xs: '2.5rem', md: '4.5rem' },
+                        fontSize: { xs: '2.5rem', md: '4rem' },
                         lineHeight: 1.2
                     }}
                 >
@@ -157,7 +196,7 @@ export const CertificateView = () => {
                 <Typography
                     variant="h6"
                     sx={{
-                        my: 2,
+                        my: 1,
                         color: '#546e7a',
                         fontFamily: "'Playfair Display', serif",
                         fontSize: { xs: '1rem', md: '1.25rem' },
@@ -168,14 +207,14 @@ export const CertificateView = () => {
                     em reconhecimento ao seu inestimável patrocínio e apoio ao projeto de manejo sustentável e preservação
                 </Typography>
 
-                <Box sx={{ my: 4, borderTop: '1px solid #ddd', borderBottom: '1px solid #ddd', py: 2, width: '80%', mx: 'auto' }}>
+                <Box sx={{ my: 1, borderTop: '1px solid #ddd', borderBottom: '1px solid #ddd', py: 1, width: '80%', mx: 'auto' }}>
                     <Typography
                         variant="h4"
                         sx={{
                             fontFamily: "'Cinzel', serif",
                             color: '#1b5e20',
                             fontWeight: 600,
-                            fontSize: { xs: '1.2rem', md: '2rem' }
+                            fontSize: { xs: '1.2rem', md: '1.8rem' }
                         }}
                     >
                         {data.projectName}
@@ -187,9 +226,9 @@ export const CertificateView = () => {
                     flexDirection={{ xs: 'column-reverse', md: 'row' }}
                     justifyContent="space-between"
                     alignItems="center"
-                    mt={8}
+                    mt={2}
                     px={{ xs: 2, md: 8 }}
-                    gap={4}
+                    gap={2}
                 >
                     <Box textAlign="center" flex={1}>
                         <Typography
@@ -210,7 +249,7 @@ export const CertificateView = () => {
 
                     <Box display="flex" flexDirection="column" alignItems="center" flex={1}>
                         <Box sx={{ p: 1, bgcolor: '#fff', border: '1px solid #ddd' }}>
-                            <QRCodeSVG value={window.location.href} size={isMobile ? 80 : 100} fgColor="#1b5e20" />
+                            <QRCodeSVG value={window.location.href} size={isMobile ? 70 : 80} fgColor="#1b5e20" />
                         </Box>
                         <Typography variant="caption" sx={{ mt: 1, color: '#1b5e20', fontWeight: 'bold', fontFamily: "'Cinzel', serif" }}>
                             VERIFICAR AUTENTICIDADE
@@ -222,7 +261,7 @@ export const CertificateView = () => {
                 </Box>
 
                 {data.blockchainLink && (
-                    <Box mt={4}>
+                    <Box mt={1}>
                         <Button
                             variant="outlined"
                             href={data.blockchainLink}
@@ -243,14 +282,15 @@ export const CertificateView = () => {
                     </Box>
                 )}
 
-                <Box mt={6}>
+                <Box mt={1}>
                     <Typography variant="caption" sx={{ color: '#888', fontStyle: 'italic' }}>
                         "Preservando a Amazônia para as futuras gerações."
                     </Typography>
                 </Box>
+                </Box>
             </Paper>
 
-            <Box mt={4} display="flex" gap={2}>
+            <Box mt={4} display="flex" gap={2} flexWrap="wrap" justifyContent="center">
                 <Button
                     variant="contained"
                     startIcon={<Share />}
@@ -259,11 +299,39 @@ export const CertificateView = () => {
                         bgcolor: '#1b5e20',
                         color: 'white',
                         fontFamily: "'Cinzel', serif",
-                        px: 4,
+                        px: 3,
                         '&:hover': { bgcolor: '#003300' }
                     }}
                 >
                     Compartilhar
+                </Button>
+                <Button
+                    variant="outlined"
+                    startIcon={<PictureAsPdf />}
+                    onClick={handleDownloadPdf}
+                    sx={{
+                        color: '#1b5e20',
+                        borderColor: '#1b5e20',
+                        fontFamily: "'Cinzel', serif",
+                        px: 3,
+                        '&:hover': { bgcolor: '#e8f5e9', borderColor: '#003300' }
+                    }}
+                >
+                    PDF
+                </Button>
+                <Button
+                    variant="outlined"
+                    startIcon={<Image />}
+                    onClick={handleDownloadImage}
+                    sx={{
+                        color: '#1b5e20',
+                        borderColor: '#1b5e20',
+                        fontFamily: "'Cinzel', serif",
+                        px: 3,
+                        '&:hover': { bgcolor: '#e8f5e9', borderColor: '#003300' }
+                    }}
+                >
+                    Imagem
                 </Button>
             </Box>
         </Box>

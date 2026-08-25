@@ -1,9 +1,17 @@
 import axios from 'axios';
 import { auth } from './firebase';
 
+const getBaseURL = () => {
+    if (typeof window !== 'undefined') {
+        const savedURL = localStorage.getItem('arpt_api_url');
+        if (savedURL) return savedURL;
+    }
+    if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+    return "https://arpt.site/api";
+};
+
 export const api = axios.create({
-    baseURL: "https://arpt.site/api",
-    // baseURL: "http://localhost:4001",
+    baseURL: getBaseURL(),
     timeout: 8 * 1000,
 });
 console.log('>>> [API.js] Module loaded and api instance created');
@@ -11,6 +19,12 @@ console.log('>>> [API.js] Module loaded and api instance created');
 api.interceptors.request.use(
     async (config) => {
         const currentUser = auth?.currentUser;
+
+        if (import.meta.env.VITE_SKIP_AUTH === 'true') {
+            config.headers = config.headers || {};
+            config.headers['Authorization'] = `Bearer test-admin-token`;
+            return config;
+        }
 
         if (currentUser) {
             try {
@@ -41,7 +55,13 @@ export const setupInterceptors = (logError) => {
     api.interceptors.response.use(
         (response) => response,
         (error) => {
-            logError(error, 'API');
+            if (error.response && error.response.status === 451) {
+                if (typeof window !== 'undefined' && !window.location.pathname.includes('/privacy-settings')) {
+                    window.location.href = '/privacy-settings';
+                }
+            } else {
+                logError(error, 'API');
+            }
             return Promise.reject(error);
         }
     );

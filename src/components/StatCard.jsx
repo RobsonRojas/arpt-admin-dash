@@ -1,8 +1,9 @@
 import React from 'react';
 import { Paper, Box, Typography } from '@mui/material';
 
-export const StatCard = ({ title, value, subtext, icon, color }) => (
+export const StatCard = ({ title, value, subtext, icon, color, testId }) => (
   <Paper 
+    data-testid={testId}
     sx={{ 
       p: 3, 
       display: 'flex', 

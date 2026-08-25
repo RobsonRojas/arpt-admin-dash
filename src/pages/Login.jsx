@@ -37,9 +37,9 @@ export const Login = () => {
         )}
         {error && <Alert severity="error">{error}</Alert>}
         <form onSubmit={handleLogin}>
-          <TextField fullWidth margin="normal" label="Email" value={email} onChange={e => setEmail(e.target.value)} />
-          <TextField fullWidth margin="normal" label="Senha" type="password" value={pass} onChange={e => setPass(e.target.value)} />
-          <Button fullWidth variant="contained" type="submit" sx={{ mt: 2 }}>Entrar</Button>
+          <TextField data-testid="login-email" fullWidth margin="normal" label="Email" value={email} onChange={e => setEmail(e.target.value)} />
+          <TextField data-testid="login-password" fullWidth margin="normal" label="Senha" type="password" value={pass} onChange={e => setPass(e.target.value)} />
+          <Button data-testid="login-submit" fullWidth variant="contained" type="submit" sx={{ mt: 2 }}>Entrar</Button>
         </form>
       </Paper>
     </Container>

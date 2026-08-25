@@ -6,3 +6,4 @@ export { Layout } from './Layout';
 export { FieldAppEmbedded } from './FieldAppEmbedded';
 export { TreeForm } from './modules/TreeForm';
 export { InventoryManager } from './modules/InventoryManager';
+export { ErrorBoundary } from './ErrorBoundary';

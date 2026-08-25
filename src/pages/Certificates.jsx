@@ -5,7 +5,7 @@ import {
     DialogTitle, DialogContent, DialogActions, TextField,
     CircularProgress, Chip, MenuItem, Snackbar, Alert
 } from '@mui/material';
-import { Add, Visibility, Delete, CardMembership, Edit } from '@mui/icons-material';
+import { Add, Visibility, Delete, CardMembership, Edit, PictureAsPdf, Image } from '@mui/icons-material';
 import { db } from '../services/firebase';
 import { collection, addDoc, getDocs, deleteDoc, updateDoc, doc, query, orderBy, Timestamp } from 'firebase/firestore';
 import { useAdmin } from '../contexts/AdminContext';
@@ -151,6 +151,18 @@ export const Certificates = () => {
     };
 
     const handleView = (cert) => {
+        handleAction(cert, null);
+    };
+
+    const handleDownloadPdf = (cert) => {
+        handleAction(cert, 'pdf');
+    };
+
+    const handleDownloadImage = (cert) => {
+        handleAction(cert, 'img');
+    };
+
+    const handleAction = (cert, dlAction) => {
         // Prepare data for view
         const viewData = {
             sponsorName: cert.sponsorName,
@@ -164,7 +176,11 @@ export const Certificates = () => {
         // Encode to base64 (Unicode safe)
         const json = JSON.stringify(viewData);
         const encoded = btoa(unescape(encodeURIComponent(json)));
-        window.open(`https://arpt.site/certificate/view?d=${encoded}`, '_blank');
+        let url = `https://arpt.site/certificate/view?d=${encoded}`;
+        if (dlAction) {
+            url += `&dl=${dlAction}`;
+        }
+        window.open(url, '_blank');
     };
 
     const getTypeColor = (type) => {
@@ -249,6 +265,20 @@ export const Certificates = () => {
                                             title="Visualizar"
                                         >
                                             <Visibility />
+                                        </IconButton>
+                                        <IconButton
+                                            color="secondary"
+                                            onClick={() => handleDownloadPdf(cert)}
+                                            title="Baixar PDF"
+                                        >
+                                            <PictureAsPdf />
+                                        </IconButton>
+                                        <IconButton
+                                            color="secondary"
+                                            onClick={() => handleDownloadImage(cert)}
+                                            title="Baixar Imagem"
+                                        >
+                                            <Image />
                                         </IconButton>
                                         <IconButton
                                             color="info"

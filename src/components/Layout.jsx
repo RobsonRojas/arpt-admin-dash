@@ -12,7 +12,13 @@ import {
   PermMedia,
   BugReport,
   Replay,
-  Psychology
+  Psychology,
+  Notifications,
+  Code,
+  QrCode,
+  TrendingUp,
+  Storefront,
+  Security
 } from '@mui/icons-material';
 import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -51,18 +57,25 @@ export const Layout = ({ children }) => {
     { id: 'projects', label: 'Gestão Projetos', icon: <FolderOpen />, path: '/projects' },
     { id: 'adoptions', label: 'Gestão de Adoções', icon: <Forest />, path: '/adoptions' },
     { id: 'rewards', label: 'Recompensas', icon: <CardGiftcard />, path: '/rewards' },
+    { id: 'physical-pieces', label: 'Peças Físicas', icon: <QrCode />, path: '/physical-pieces' },
     { id: 'products', label: 'Produtos', icon: <CardGiftcard />, path: '/products' },
+    { id: 'product-simulation', label: 'Simulação de Produto', icon: <TrendingUp />, path: '/product-simulation' },
     { id: 'certificates', label: 'Certificados', icon: <CardMembership />, path: '/certificates' },
     { id: 'properties', label: 'Propriedades', icon: <HomeWork />, path: '/properties' },
     { id: 'sponsors', label: 'Patrocinadores', icon: <People />, path: '/sponsors' },
     { id: 'refunds', label: 'Reembolsos', icon: <Replay />, path: '/refunds' },
+    { id: 'notifications', label: 'Central de Notificações', icon: <Notifications />, path: '/notifications' },
     { id: 'users', label: 'Gestão de Usuários', icon: <ManageAccounts />, path: '/users' },
     { id: 'audit', label: 'Log de Modificações', icon: <History />, path: '/audit' },
+    { id: 'manejo-logs', label: 'Log de Manejo', icon: <History />, path: '/manejo-logs' },
     { id: 'payment-config', label: 'Configurações de Pagamento', icon: <Payment />, path: '/payment-config' },
     { id: 'media-manager', label: 'Gerenciador de Arquivos', icon: <PermMedia />, path: '/media-manager' },
     { id: 'forest-intelligence', label: 'Inteligência Florestal', icon: <Psychology />, path: '/forest-intelligence' },
     { id: 'gemini-settings', label: 'Configuração IA', icon: <SettingsSuggest />, path: '/gemini-settings' },
+    { id: 'developer-settings', label: 'Configurações Dev', icon: <Code />, path: '/developer-settings' },
     { id: 'error-logs', label: 'Log de Erros', icon: <BugReport />, path: '/error-logs' },
+    { id: 'dropshipping-admin', label: 'Admin Dropshipping', icon: <Storefront />, path: '/dropshipping-admin' },
+    { id: 'privacy-settings', label: 'Privacidade (LGPD)', icon: <Security />, path: '/privacy-settings' },
   ];
 
   const getPageTitle = () => {

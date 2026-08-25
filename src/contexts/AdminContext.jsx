@@ -157,12 +157,12 @@ export const AdminProvider = ({ children }) => {
         try {
             const before = projects.find(p => p.id === newProject.id);
             const payload = normalizeProjectForApi(newProject);
-            
+
             // Manual token handling with forced refresh for reliability
             const token = await user?.getIdToken(true);
             const config = { headers: { Authorization: `Bearer ${token}` } };
             console.log(`[AdminContext] Updating project ${newProject.id} with forced token refresh.`);
-            
+
             const response = await api.put(`/manejos/${newProject.id}`, payload, config);
             if (response.status === 200) {
                 console.log('Projeto atualizado com sucesso na API.');
@@ -329,6 +329,21 @@ export const AdminProvider = ({ children }) => {
             return null;
         } catch (error) {
             console.error("Error creating inventory:", error);
+            return null;
+        }
+    }
+    
+    const updateInventoryVisibility = async (inventoryId, isPublic) => {
+        try {
+            const token = await user?.getIdToken(true);
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await api.patch(`/inventarios/${inventoryId}`, { is_public: isPublic }, config);
+            if (response.status === 200) {
+                return response.data;
+            }
+            return null;
+        } catch (error) {
+            console.error("Error updating inventory visibility:", error);
             return null;
         }
     }
@@ -612,6 +627,133 @@ export const AdminProvider = ({ children }) => {
         }
     }
 
+    // ==================== PHYSICAL PIECES MANAGEMENT ====================
+
+    const getPhysicalPieces = async () => {
+        try {
+            const response = await api.get('/admin/pecas');
+            if (response.status === 200) {
+                return response.data;
+            }
+            return [];
+        } catch (error) {
+            console.error("Error fetching physical pieces:", error);
+            return [];
+        }
+    }
+
+    const createPhysicalPiece = async (payload) => {
+        try {
+            const response = await api.post('/admin/pecas', payload);
+            if (response.status === 201) {
+                await recordAudit({
+                    action: 'CREATE',
+                    entity: 'PHYSICAL_PIECE',
+                    entityId: String(response.data.id),
+                    before: null,
+                    after: response.data,
+                    user
+                });
+                return response.data;
+            }
+            return null;
+        } catch (error) {
+            console.error("Error creating physical piece:", error);
+            return null;
+        }
+    }
+
+    const attributePhysicalPiece = async (pieceId, userId) => {
+        try {
+            const response = await api.post(`/admin/pecas/${pieceId}/atribuir`, { id_usuario: userId });
+            if (response.status === 200) {
+                await recordAudit({
+                    action: 'UPDATE',
+                    entity: 'PHYSICAL_PIECE',
+                    entityId: String(pieceId),
+                    before: null,
+                    after: { pieceId, userId, action: 'atribuir' },
+                    user
+                });
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error("Error attributing physical piece:", error);
+            return false;
+        }
+    }
+
+    const associateTagToPhysicalPiece = async (pieceId, tagValue, sourceTreeId) => {
+        try {
+            const token = await user?.getIdToken();
+            const response = await api.post(`/admin/pecas/${pieceId}/labels`, {
+                tag_value: tagValue,
+                source_tree_id: sourceTreeId
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.status === 201 || response.status === 200) {
+                await recordAudit({
+                    action: 'UPDATE',
+                    entity: 'PHYSICAL_PIECE',
+                    entityId: String(pieceId),
+                    before: null,
+                    after: { pieceId, tagValue, sourceTreeId, action: 'associate_tag' },
+                    user
+                });
+                return response.data;
+            }
+            return null;
+        } catch (error) {
+            console.error("Error associating tag to physical piece:", error);
+            throw error;
+        }
+    }
+
+    const disassociateTagFromPhysicalPiece = async (pieceId, labelId) => {
+        try {
+            const token = await user?.getIdToken();
+            const response = await api.delete(`/admin/pecas/${pieceId}/labels/${labelId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.status === 200) {
+                await recordAudit({
+                    action: 'UPDATE',
+                    entity: 'PHYSICAL_PIECE',
+                    entityId: String(pieceId),
+                    before: null,
+                    after: { pieceId, labelId, action: 'disassociate_tag' },
+                    user
+                });
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error("Error disassociating tag from physical piece:", error);
+            return false;
+        }
+    }
+
+    const getUsers = async (limit = 1000) => {
+        try {
+            const token = await user?.getIdToken();
+            const config = {
+                headers: { Authorization: `Bearer ${token}` },
+                params: { page: 1, limit }
+            };
+            const response = await api.get('/admin/users', config);
+            if (response.status === 200) {
+                return response.data;
+            }
+            return { users: [], total: 0 };
+        } catch (error) {
+            console.error("Error fetching users:", error);
+            return { users: [], total: 0 };
+        }
+    }
+
+
     // ==================== DOCS MANAGEMENT ====================
 
     const getDocsByManejoId = async (manejoId) => {
@@ -637,7 +779,7 @@ export const AdminProvider = ({ children }) => {
             const token = await user?.getIdToken();
             if (payload instanceof FormData) {
                 data = payload;
-                headers = { 
+                headers = {
                     'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${token}`
                 };
@@ -1096,10 +1238,12 @@ export const AdminProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        getProjects();
-        getProperties();
-        getStatuses();
-    }, []);
+        if (user) {
+            getProjects();
+            getProperties();
+            getStatuses();
+        }
+    }, [user]);
 
     // ==================== VALOR DO CONTEXTO ====================
     const value = {
@@ -1150,6 +1294,7 @@ export const AdminProvider = ({ children }) => {
         getDashboardStats,
         getAllInventoryByPropertyId,
         getInventoriesByPropertyId,
+        updateInventoryVisibility,
         getTreesByInventoryId,
         createInventory,
         createTree,
@@ -1184,6 +1329,14 @@ export const AdminProvider = ({ children }) => {
         // Regras de Negócio - Pagamentos
         registerManualPurchase,
         updatePurchase,
+
+        // Regras de Negócio - Peças Físicas (Recompensas)
+        getPhysicalPieces,
+        createPhysicalPiece,
+        attributePhysicalPiece,
+        associateTagToPhysicalPiece,
+        disassociateTagFromPhysicalPiece,
+        getUsers,
     };
 
     return (
