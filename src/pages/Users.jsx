@@ -78,7 +78,9 @@ export const Users = () => {
         descricao: '',
         media_url: '',
         media_type: 'image',
-        ordem: 0
+        ordem: 0,
+        titulo_en: '',
+        descricao_en: ''
     });
     const [savingHistory, setSavingHistory] = useState(false);
     const [inventories, setInventories] = useState([]);
@@ -279,7 +281,7 @@ export const Users = () => {
     const handleOpenHistory = (reward) => {
         setCurrentReward(reward);
         fetchHistory(reward.id);
-        setHistoryFormData({ id: null, titulo: '', descricao: '', media_url: '', media_type: 'image', ordem: (historyParts?.length || 0) + 1 });
+        setHistoryFormData({ id: null, titulo: '', titulo_en: '', descricao: '', descricao_en: '', media_url: '', media_type: 'image', ordem: (historyParts?.length || 0) + 1 });
         setOpenHistoryDialog(true);
     };
 
@@ -319,7 +321,7 @@ export const Users = () => {
                 setSnackbar({ open: true, message: 'Parte adicionada com sucesso', severity: 'success' });
             }
             // Reset form
-            setHistoryFormData({ id: null, titulo: '', descricao: '', media_url: '', media_type: 'image', ordem: historyParts.length + 1 });
+            setHistoryFormData({ id: null, titulo: '', titulo_en: '', descricao: '', descricao_en: '', media_url: '', media_type: 'image', ordem: historyParts.length + 1 });
         } catch (error) {
             console.error('Erro ao salvar parte da história:', error);
             setSnackbar({ open: true, message: 'Erro ao salvar história', severity: 'error' });
@@ -1103,18 +1105,32 @@ export const Users = () => {
                             <Typography variant="subtitle1" gutterBottom>Adicionar/Editar Parte</Typography>
                             <Box display="flex" flexDirection="column" gap={2}>
                                 <TextField
-                                    label="Título"
+                                    label="Título (PT)"
                                     fullWidth
                                     value={historyFormData.titulo}
                                     onChange={e => setHistoryFormData({ ...historyFormData, titulo: e.target.value })}
                                 />
                                 <TextField
-                                    label="Descrição"
+                                    label="Título (EN)"
+                                    fullWidth
+                                    value={historyFormData.titulo_en || ''}
+                                    onChange={e => setHistoryFormData({ ...historyFormData, titulo_en: e.target.value })}
+                                />
+                                <TextField
+                                    label="Descrição (PT)"
                                     fullWidth
                                     multiline
                                     rows={4}
                                     value={historyFormData.descricao}
                                     onChange={e => setHistoryFormData({ ...historyFormData, descricao: e.target.value })}
+                                />
+                                <TextField
+                                    label="Descrição (EN)"
+                                    fullWidth
+                                    multiline
+                                    rows={4}
+                                    value={historyFormData.descricao_en || ''}
+                                    onChange={e => setHistoryFormData({ ...historyFormData, descricao_en: e.target.value })}
                                 />
                                 <TextField
                                     label="URL da Mídia (opcional)"
@@ -1147,7 +1163,7 @@ export const Users = () => {
                                     {historyFormData.id ? 'Atualizar Parte' : 'Adicionar Parte'}
                                 </Button>
                                 {historyFormData.id && (
-                                    <Button color="inherit" onClick={() => setHistoryFormData({ id: null, titulo: '', descricao: '', media_url: '', media_type: 'image', ordem: 0 })}>
+                                    <Button color="inherit" onClick={() => setHistoryFormData({ id: null, titulo: '', titulo_en: '', descricao: '', descricao_en: '', media_url: '', media_type: 'image', ordem: 0 })}>
                                         Cancelar Edição
                                     </Button>
                                 )}
