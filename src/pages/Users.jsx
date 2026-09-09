@@ -468,6 +468,22 @@ export const Users = () => {
         }
     };
 
+    const handleTogglePaymentSplit = async (user) => {
+        try {
+            const token = await authUser.getIdToken();
+            const newStatus = !user.payment_split_unlocked;
+            await api.put(`/admin/users/${user.id}/unlock-payment-split`, 
+                { payment_split_unlocked: newStatus },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setUsers(users.map(u => u.id === user.id ? { ...u, payment_split_unlocked: newStatus } : u));
+            setSnackbar({ open: true, message: `Split Financeiro ${newStatus ? 'liberado' : 'bloqueado'} com sucesso`, severity: 'success' });
+        } catch (error) {
+            console.error('Erro ao atualizar status do split financeiro:', error);
+            setSnackbar({ open: true, message: 'Erro ao atualizar status do split financeiro', severity: 'error' });
+        }
+    };
+
     const getStatusColor = (status) => {
         return status === 'Ativo' ? 'success' : 'default';
     };
@@ -506,6 +522,7 @@ export const Users = () => {
                             <TableCell>Email</TableCell>
                             <TableCell>Função</TableCell>
                             <TableCell>Status</TableCell>
+                            <TableCell>Split Financeiro</TableCell>
                             <TableCell>Cadastrado em</TableCell>
                             <TableCell align="right">Ações</TableCell>
                         </TableRow>
@@ -541,6 +558,15 @@ export const Users = () => {
                                         label={user.status || 'Ativo'}
                                         color={getStatusColor(user.status || 'Ativo')}
                                         size="small"
+                                    />
+                                </TableCell>
+                                <TableCell>
+                                    <Chip
+                                        label={user.payment_split_unlocked ? 'Liberado' : 'Bloqueado'}
+                                        color={user.payment_split_unlocked ? 'success' : 'default'}
+                                        size="small"
+                                        onClick={() => handleTogglePaymentSplit(user)}
+                                        sx={{ cursor: 'pointer' }}
                                     />
                                 </TableCell>
                                 <TableCell>{user.created_at ? new Date(user.created_at).toLocaleDateString() : user.createdAt}</TableCell>
