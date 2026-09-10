@@ -6,12 +6,13 @@ import {
     TextField, MenuItem, Avatar, TablePagination, CircularProgress,
     Snackbar, Alert
 } from '@mui/material';
-import { Add, Edit, Delete, ManageAccounts, CardMembership, Visibility, History, QrCode, Public, PublicOff, Inventory, Sync } from '@mui/icons-material';
+import { Add, Edit, Delete, ManageAccounts, CardMembership, Visibility, History, QrCode, Public, PublicOff, Inventory, Sync, HomeWork } from '@mui/icons-material';
 import { QRCodeSVG } from 'qrcode.react';
 import { useAuth } from '../contexts/AuthContext';
 import { useAdmin } from '../contexts/AdminContext';
 import { api } from '../services/api';
 import { usePersistence } from '../hooks/usePersistence';
+import { AssignPropertyModal } from '../components/modules/AssignPropertyModal';
 
 const ROLES = ['Administrador', 'Gestor', 'Operador', 'Visualizador'];
 const STATUS = ['Ativo', 'Inativo'];
@@ -92,6 +93,7 @@ export const Users = () => {
     const [initializingFromTree, setInitializingFromTree] = useState(false);
 
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+    const [assignPropUser, setAssignPropUser] = useState(null);
 
     const fetchUsers = useCallback(async () => {
         if (!authUser) return;
@@ -578,6 +580,14 @@ export const Users = () => {
                                         title="Ver Detalhes do Usuário"
                                     >
                                         <Visibility />
+                                    </IconButton>
+                                    <IconButton
+                                        size="small"
+                                        color="success"
+                                        onClick={() => setAssignPropUser(user)}
+                                        title="Vincular Propriedade"
+                                    >
+                                        <HomeWork />
                                     </IconButton>
                                     <IconButton
                                         size="small"
@@ -1364,6 +1374,19 @@ export const Users = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            {assignPropUser && (
+                <AssignPropertyModal
+                    open={!!assignPropUser}
+                    onClose={() => setAssignPropUser(null)}
+                    userId={assignPropUser.id}
+                    userName={assignPropUser.first_name ? `${assignPropUser.first_name} ${assignPropUser.last_name}` : assignPropUser.name}
+                    onAssigned={() => {
+                        fetchUsers();
+                        setSnackbar({ open: true, message: 'Propriedade vinculada com sucesso', severity: 'success' });
+                    }}
+                />
+            )}
         </Box>
     );
 };
