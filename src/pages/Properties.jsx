@@ -5,9 +5,10 @@ import {
   Dialog, DialogTitle, DialogContent, DialogActions, Grid,
   TextField, MenuItem, Drawer, Divider, CircularProgress,
 } from '@mui/material';
-import { Add, Visibility, Edit, CloudUpload, HomeWork, Park, Image as ImageIcon } from '@mui/icons-material';
+import { Add, Visibility, Edit, CloudUpload, HomeWork, Park, Image as ImageIcon, PersonAdd } from '@mui/icons-material';
 import { AIAssistant } from '../components/AIAssistant';
 import { MapEmbed, InventoryManager } from '../components';
+import { AssignUserModal } from '../components/modules/AssignUserModal';
 import { STATUS_PROPRIEDADE } from '../constants';
 import { useAdmin } from '../contexts/AdminContext';
 
@@ -26,6 +27,11 @@ export const Properties = () => {
   const [selectedProp, setSelectedProp] = useState(null);
   const [openInventory, setOpenInventory] = useState(false);
   const [uploading, setUploading] = useState(false);
+  
+  const [assignUserProp, setAssignUserProp] = useState(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0); // If needed to refresh properties list
+  // Note: Since properties come from context, ideally we should call a fetchProperties function from context.
+  // Assuming the page reloads or we just wait for the context to sync. Let's just force a reload or do nothing for now since context might not have a fetch method exposed explicitly.
 
   const [formData, setFormData] = useState({
     id: '',
@@ -247,6 +253,15 @@ export const Properties = () => {
                     </IconButton>
                     <IconButton
                       size="small"
+                      color="primary"
+                      onClick={() => setAssignUserProp(row)}
+                      title="Vincular Proprietário"
+                      aria-label="Vincular Proprietário"
+                    >
+                      <PersonAdd />
+                    </IconButton>
+                    <IconButton
+                      size="small"
                       color="default"
                       onClick={() => handleOpenEdit(row)}
                       title="Editar"
@@ -295,6 +310,9 @@ export const Properties = () => {
                 </Button>
                 <Button size="small" startIcon={<Edit />} onClick={() => handleOpenEdit(row)}>
                   Editar
+                </Button>
+                <Button size="small" startIcon={<PersonAdd />} onClick={() => setAssignUserProp(row)}>
+                  Vincular Usuário
                 </Button>
               </Box>
             </Paper>
@@ -515,6 +533,19 @@ export const Properties = () => {
           />
         )}
       </Dialog>
+      
+      {assignUserProp && (
+        <AssignUserModal
+          open={!!assignUserProp}
+          onClose={() => setAssignUserProp(null)}
+          propertyId={assignUserProp.id}
+          propertyName={assignUserProp.name}
+          onAssigned={() => {
+            // Ideally trigger a refresh in the AdminContext
+            window.location.reload();
+          }}
+        />
+      )}
     </Box>
   );
 };

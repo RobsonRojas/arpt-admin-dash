@@ -6,12 +6,13 @@ import {
     TextField, MenuItem, Avatar, TablePagination, CircularProgress,
     Snackbar, Alert
 } from '@mui/material';
-import { Add, Edit, Delete, ManageAccounts, CardMembership, Visibility, History, QrCode, Public, PublicOff, Inventory, Sync } from '@mui/icons-material';
+import { Add, Edit, Delete, ManageAccounts, CardMembership, Visibility, History, QrCode, Public, PublicOff, Inventory, Sync, HomeWork } from '@mui/icons-material';
 import { QRCodeSVG } from 'qrcode.react';
 import { useAuth } from '../contexts/AuthContext';
 import { useAdmin } from '../contexts/AdminContext';
 import { api } from '../services/api';
 import { usePersistence } from '../hooks/usePersistence';
+import { AssignPropertyModal } from '../components/modules/AssignPropertyModal';
 
 const ROLES = ['Administrador', 'Gestor', 'Operador', 'Visualizador'];
 const STATUS = ['Ativo', 'Inativo'];
@@ -78,7 +79,9 @@ export const Users = () => {
         descricao: '',
         media_url: '',
         media_type: 'image',
-        ordem: 0
+        ordem: 0,
+        titulo_en: '',
+        descricao_en: ''
     });
     const [savingHistory, setSavingHistory] = useState(false);
     const [inventories, setInventories] = useState([]);
@@ -90,6 +93,7 @@ export const Users = () => {
     const [initializingFromTree, setInitializingFromTree] = useState(false);
 
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+    const [assignPropUser, setAssignPropUser] = useState(null);
 
     const fetchUsers = useCallback(async () => {
         if (!authUser) return;
@@ -279,7 +283,7 @@ export const Users = () => {
     const handleOpenHistory = (reward) => {
         setCurrentReward(reward);
         fetchHistory(reward.id);
-        setHistoryFormData({ id: null, titulo: '', descricao: '', media_url: '', media_type: 'image', ordem: (historyParts?.length || 0) + 1 });
+        setHistoryFormData({ id: null, titulo: '', titulo_en: '', descricao: '', descricao_en: '', media_url: '', media_type: 'image', ordem: (historyParts?.length || 0) + 1 });
         setOpenHistoryDialog(true);
     };
 
@@ -319,7 +323,7 @@ export const Users = () => {
                 setSnackbar({ open: true, message: 'Parte adicionada com sucesso', severity: 'success' });
             }
             // Reset form
-            setHistoryFormData({ id: null, titulo: '', descricao: '', media_url: '', media_type: 'image', ordem: historyParts.length + 1 });
+            setHistoryFormData({ id: null, titulo: '', titulo_en: '', descricao: '', descricao_en: '', media_url: '', media_type: 'image', ordem: historyParts.length + 1 });
         } catch (error) {
             console.error('Erro ao salvar parte da história:', error);
             setSnackbar({ open: true, message: 'Erro ao salvar história', severity: 'error' });
@@ -466,6 +470,22 @@ export const Users = () => {
         }
     };
 
+    const handleTogglePaymentSplit = async (user) => {
+        try {
+            const token = await authUser.getIdToken();
+            const newStatus = !user.payment_split_unlocked;
+            await api.put(`/admin/users/${user.id}/unlock-payment-split`, 
+                { payment_split_unlocked: newStatus },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setUsers(users.map(u => u.id === user.id ? { ...u, payment_split_unlocked: newStatus } : u));
+            setSnackbar({ open: true, message: `Split Financeiro ${newStatus ? 'liberado' : 'bloqueado'} com sucesso`, severity: 'success' });
+        } catch (error) {
+            console.error('Erro ao atualizar status do split financeiro:', error);
+            setSnackbar({ open: true, message: 'Erro ao atualizar status do split financeiro', severity: 'error' });
+        }
+    };
+
     const getStatusColor = (status) => {
         return status === 'Ativo' ? 'success' : 'default';
     };
@@ -504,6 +524,7 @@ export const Users = () => {
                             <TableCell>Email</TableCell>
                             <TableCell>Função</TableCell>
                             <TableCell>Status</TableCell>
+                            <TableCell>Split Financeiro</TableCell>
                             <TableCell>Cadastrado em</TableCell>
                             <TableCell align="right">Ações</TableCell>
                         </TableRow>
@@ -541,6 +562,15 @@ export const Users = () => {
                                         size="small"
                                     />
                                 </TableCell>
+                                <TableCell>
+                                    <Chip
+                                        label={user.payment_split_unlocked ? 'Liberado' : 'Bloqueado'}
+                                        color={user.payment_split_unlocked ? 'success' : 'default'}
+                                        size="small"
+                                        onClick={() => handleTogglePaymentSplit(user)}
+                                        sx={{ cursor: 'pointer' }}
+                                    />
+                                </TableCell>
                                 <TableCell>{user.created_at ? new Date(user.created_at).toLocaleDateString() : user.createdAt}</TableCell>
                                 <TableCell align="right">
                                     <IconButton
@@ -550,6 +580,14 @@ export const Users = () => {
                                         title="Ver Detalhes do Usuário"
                                     >
                                         <Visibility />
+                                    </IconButton>
+                                    <IconButton
+                                        size="small"
+                                        color="success"
+                                        onClick={() => setAssignPropUser(user)}
+                                        title="Vincular Propriedade"
+                                    >
+                                        <HomeWork />
                                     </IconButton>
                                     <IconButton
                                         size="small"
@@ -1103,18 +1141,32 @@ export const Users = () => {
                             <Typography variant="subtitle1" gutterBottom>Adicionar/Editar Parte</Typography>
                             <Box display="flex" flexDirection="column" gap={2}>
                                 <TextField
-                                    label="Título"
+                                    label="Título (PT)"
                                     fullWidth
                                     value={historyFormData.titulo}
                                     onChange={e => setHistoryFormData({ ...historyFormData, titulo: e.target.value })}
                                 />
                                 <TextField
-                                    label="Descrição"
+                                    label="Título (EN)"
+                                    fullWidth
+                                    value={historyFormData.titulo_en || ''}
+                                    onChange={e => setHistoryFormData({ ...historyFormData, titulo_en: e.target.value })}
+                                />
+                                <TextField
+                                    label="Descrição (PT)"
                                     fullWidth
                                     multiline
                                     rows={4}
                                     value={historyFormData.descricao}
                                     onChange={e => setHistoryFormData({ ...historyFormData, descricao: e.target.value })}
+                                />
+                                <TextField
+                                    label="Descrição (EN)"
+                                    fullWidth
+                                    multiline
+                                    rows={4}
+                                    value={historyFormData.descricao_en || ''}
+                                    onChange={e => setHistoryFormData({ ...historyFormData, descricao_en: e.target.value })}
                                 />
                                 <TextField
                                     label="URL da Mídia (opcional)"
@@ -1147,7 +1199,7 @@ export const Users = () => {
                                     {historyFormData.id ? 'Atualizar Parte' : 'Adicionar Parte'}
                                 </Button>
                                 {historyFormData.id && (
-                                    <Button color="inherit" onClick={() => setHistoryFormData({ id: null, titulo: '', descricao: '', media_url: '', media_type: 'image', ordem: 0 })}>
+                                    <Button color="inherit" onClick={() => setHistoryFormData({ id: null, titulo: '', titulo_en: '', descricao: '', descricao_en: '', media_url: '', media_type: 'image', ordem: 0 })}>
                                         Cancelar Edição
                                     </Button>
                                 )}
@@ -1322,6 +1374,19 @@ export const Users = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            {assignPropUser && (
+                <AssignPropertyModal
+                    open={!!assignPropUser}
+                    onClose={() => setAssignPropUser(null)}
+                    userId={assignPropUser.id}
+                    userName={assignPropUser.first_name ? `${assignPropUser.first_name} ${assignPropUser.last_name}` : assignPropUser.name}
+                    onAssigned={() => {
+                        fetchUsers();
+                        setSnackbar({ open: true, message: 'Propriedade vinculada com sucesso', severity: 'success' });
+                    }}
+                />
+            )}
         </Box>
     );
 };

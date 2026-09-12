@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
     Box, Typography, Paper, Tabs, Tab, TextField, Button, Switch, FormControlLabel,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination,
-    IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert, Grid, Chip
+    IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert, Grid, Chip, Select, MenuItem, InputLabel, FormControl
 } from '@mui/material';
 import { Edit, Delete, Add, ContentCopy } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
@@ -11,6 +11,7 @@ import { api } from '../services/api';
 const PaymentConfig = () => {
     const [tabValue, setTabValue] = useState(0);
     const [config, setConfig] = useState({ enabled: true, fee_percentage: 10, description: '' });
+    const [gateway, setGateway] = useState('mock');
     const [sellers, setSellers] = useState([]);
     const [loading, setLoading] = useState(false);
     const [sellerDialogOpen, setSellerDialogOpen] = useState(false);
@@ -32,18 +33,28 @@ const PaymentConfig = () => {
         }
     };
 
+    const fetchGateway = async () => {
+        try {
+            const res = await api.get('/pagamentos/gateway');
+            if (res.data && res.data.gateway) setGateway(res.data.gateway);
+        } catch (error) {
+            console.error('Error fetching gateway:', error);
+        }
+    };
+
     const fetchSellers = async () => {
         try {
             const res = await api.get('/pagamentos/admin/sellers');
             if (res.data) setSellers(res.data);
         } catch (error) {
             console.error('Error fetching sellers:', error);
-            setSnackbar({ open: true, message: 'Erro ao carregar vendedores', severity: 'error' });
+            setSnackbar({ open: true, message: 'Erro ao carregar produtores', severity: 'error' });
         }
     };
 
     useEffect(() => {
         fetchConfig();
+        fetchGateway();
         if (tabValue === 1) {
             fetchSellers();
         }
@@ -61,6 +72,7 @@ const PaymentConfig = () => {
                 fee_percentage: Number(config.fee_percentage),
                 description: config.description
             });
+            await api.put('/pagamentos/gateway', { gateway });
             setSnackbar({ open: true, message: 'Configurações salvas', severity: 'success' });
         } catch (error) {
             setSnackbar({ open: true, message: 'Erro ao salvar configurações', severity: 'error' });
@@ -73,26 +85,26 @@ const PaymentConfig = () => {
         try {
             if (currentSeller) {
                 await api.put(`/pagamentos/admin/sellers/${currentSeller.seller_id}`, sellerData);
-                setSnackbar({ open: true, message: 'Vendedor atualizado', severity: 'success' });
+                setSnackbar({ open: true, message: 'Produtor atualizado', severity: 'success' });
             } else {
                 await api.post('/pagamentos/admin/sellers', sellerData);
-                setSnackbar({ open: true, message: 'Vendedor criado', severity: 'success' });
+                setSnackbar({ open: true, message: 'Produtor criado', severity: 'success' });
             }
             setSellerDialogOpen(false);
             fetchSellers();
         } catch (error) {
-            setSnackbar({ open: true, message: 'Erro ao salvar vendedor', severity: 'error' });
+            setSnackbar({ open: true, message: 'Erro ao salvar produtor', severity: 'error' });
         }
     };
 
     const handleSellerDelete = async (sellerId) => {
-        if (!window.confirm('Tem certeza que deseja desativar este vendedor?')) return;
+        if (!window.confirm('Tem certeza que deseja desativar este produtor?')) return;
         try {
             await api.delete(`/pagamentos/admin/sellers/${sellerId}`);
-            setSnackbar({ open: true, message: 'Vendedor desativado', severity: 'success' });
+            setSnackbar({ open: true, message: 'Produtor desativado', severity: 'success' });
             fetchSellers();
         } catch (error) {
-            setSnackbar({ open: true, message: 'Erro ao desativar vendedor', severity: 'error' });
+            setSnackbar({ open: true, message: 'Erro ao desativar produtor', severity: 'error' });
         }
     };
 
@@ -113,12 +125,29 @@ const PaymentConfig = () => {
             <Paper sx={{ width: '100%', mb: 2 }}>
                 <Tabs value={tabValue} onChange={handleTabChange} indicatorColor="primary" textColor="primary">
                     <Tab label="Geral" />
-                    <Tab label="Vendedores (Split)" />
+                    <Tab label="Produtores (Split)" />
                 </Tabs>
             </Paper>
 
             {tabValue === 0 && (
                 <Paper sx={{ p: 3, maxWidth: 600 }}>
+                    <Typography variant="h6" gutterBottom>Configuração do Gateway</Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 4 }}>
+                        <FormControl fullWidth>
+                            <InputLabel id="gateway-select-label">Gateway Principal de Pagamento</InputLabel>
+                            <Select
+                                labelId="gateway-select-label"
+                                value={gateway}
+                                label="Gateway Principal de Pagamento"
+                                onChange={(e) => setGateway(e.target.value)}
+                            >
+                                <MenuItem value="stripe">Stripe</MenuItem>
+                                <MenuItem value="mercadopago">Mercado Pago</MenuItem>
+                                <MenuItem value="mock">Mock (Ambiente de Teste)</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Box>
+
                     <Typography variant="h6" gutterBottom>Taxa de Marketplace</Typography>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                         <FormControlLabel
@@ -150,16 +179,16 @@ const PaymentConfig = () => {
             {tabValue === 1 && (
                 <Paper sx={{ p: 3 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                        <Typography variant="h6">Vendedores Cadastrados</Typography>
+                        <Typography variant="h6">Produtores Cadastrados</Typography>
                         <Button variant="contained" startIcon={<Add />} onClick={() => { setCurrentSeller(null); setSellerDialogOpen(true); }}>
-                            Novo Vendedor
+                            Novo Produtor
                         </Button>
                     </Box>
                     <TableContainer>
                         <Table>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>ID Vendedor</TableCell>
+                                    <TableCell>ID Produtor</TableCell>
                                     <TableCell>Nome</TableCell>
                                     <TableCell>Email</TableCell>
                                     <TableCell>Collector ID (MP)</TableCell>
@@ -247,11 +276,11 @@ const SellerDialog = ({ open, onClose, seller, onSave }) => {
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-            <DialogTitle>{seller ? 'Editar Vendedor' : 'Novo Vendedor'}</DialogTitle>
+            <DialogTitle>{seller ? 'Editar Produtor' : 'Novo Produtor'}</DialogTitle>
             <DialogContent>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
                     <TextField
-                        name="seller_id" label="ID Vendedor (Único)" value={formData.seller_id} onChange={handleChange} fullWidth required disabled={!!seller}
+                        name="seller_id" label="ID Produtor (Único)" value={formData.seller_id} onChange={handleChange} fullWidth required disabled={!!seller}
                     />
                     <TextField
                         name="seller_name" label="Nome" value={formData.seller_name} onChange={handleChange} fullWidth required

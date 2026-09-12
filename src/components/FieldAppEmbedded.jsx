@@ -31,6 +31,7 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
     latitude: 0,
     longitude: 0,
     potencial: "Manejo de Madeira",
+    potencial_en: "",
     data_submissao: new Date().toISOString().split('T')[0],
     data_inicio: "",
     data_termino: "",
@@ -71,12 +72,11 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
       if (!baseData.id_status && baseData.status) {
         baseData.id_status = baseData.status;
       }
- 
-      // Map translations to local fields
       if (baseData.translations && baseData.translations.en) {
         baseData.descricao_en = baseData.translations.en.descricao || baseData.descricao_en;
         baseData.resumo_en = baseData.translations.en.resumo || baseData.resumo_en;
         baseData.detalhes_en = baseData.translations.en.detalhes || baseData.detalhes_en;
+        baseData.potencial_en = baseData.translations.en.potencial || baseData.potencial_en;
       }
 
       if (savedDraft) {
@@ -185,7 +185,8 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
         en: {
           descricao: formData.descricao_en,
           resumo: formData.resumo_en,
-          detalhes: formData.detalhes_en
+          detalhes: formData.detalhes_en,
+          potencial: formData.potencial_en
         }
       }
     };
@@ -394,7 +395,7 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
                 ))}
               </TextField>
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={6}>
               <TextField
                 select
                 fullWidth
@@ -407,6 +408,15 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
                   <MenuItem key={p} value={p}>{p}</MenuItem>
                 ))}
               </TextField>
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                fullWidth
+                label="Potencial (EN)"
+                name="potencial_en"
+                value={formData.potencial_en || ""}
+                onChange={handleChange}
+              />
             </Grid>
             <Grid item xs={12}>
               <TextField
