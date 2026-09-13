@@ -7,7 +7,7 @@ import {
 import { AutoFixHigh, MoreVert, Check, Close, ContentCopy } from '@mui/icons-material';
 import { improveText } from '../services/gemini';
 
-export const AIAssistant = ({ initialText, onApply, context = "", label = "Assistente IA" }) => {
+export const AIAssistant = ({ initialText, sourceText, onApply, context = "", label = "Assistente IA" }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [loading, setLoading] = useState(false);
     const [openPreview, setOpenPreview] = useState(false);
@@ -24,15 +24,19 @@ export const AIAssistant = ({ initialText, onApply, context = "", label = "Assis
 
     const handleAction = async (type) => {
         handleMenuClose();
-        if (!initialText || initialText.length < 5) {
-            alert("Insira um texto um pouco maior para a IA trabalhar.");
+        const textToUse = (type === 'translate_en' && sourceText) 
+            ? sourceText 
+            : ((!initialText || initialText.length < 5) && sourceText ? sourceText : initialText);
+
+        if (!textToUse || textToUse.length < 5) {
+            alert("Insira ou preencha o texto em Português para a IA trabalhar.");
             return;
         }
 
         setLoading(true);
         setLastAction(type);
         try {
-            const result = await improveText(initialText, context, type);
+            const result = await improveText(textToUse, context, type);
             setResultText(result);
             setOpenPreview(true);
         } catch (error) {
@@ -72,6 +76,7 @@ export const AIAssistant = ({ initialText, onApply, context = "", label = "Assis
                     open={Boolean(anchorEl)}
                     onClose={handleMenuClose}
                 >
+                    <MenuItem onClick={() => handleAction('translate_en')}>🌐 Traduzir para Inglês (EN)</MenuItem>
                     <MenuItem onClick={() => handleAction('improve')}>✨ Melhorar Escrita (Profissional)</MenuItem>
                     <MenuItem onClick={() => handleAction('campaign_appeal')}>🎯 Otimizar para Campanha (Persuasivo)</MenuItem>
                     <MenuItem onClick={() => handleAction('fix')}>abc Corrigir Gramática</MenuItem>

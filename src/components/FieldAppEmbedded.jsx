@@ -465,6 +465,7 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
                 </Box>
                 <AIAssistant
                   initialText={formData.resumo_en}
+                  sourceText={formData.resumo}
                   context={`Project: ${formData.descricao_en || formData.descricao}`}
                   onApply={(text) => setFormData(prev => ({ ...prev, resumo_en: text }))}
                   label="Translate/Improve EN"
@@ -510,6 +511,7 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
                 </Box>
                 <AIAssistant
                   initialText={formData.detalhes_en}
+                  sourceText={formData.detalhes}
                   context={`Project: ${formData.descricao_en || formData.descricao}`}
                   onApply={(text) => setFormData(prev => ({ ...prev, detalhes_en: text }))}
                   label="Translate/Improve EN"

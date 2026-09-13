@@ -206,6 +206,9 @@ export const improveText = async (text, context = "", type = "improve") => {
             case "fix":
                 specificInstruction = "Corrija apenas erros gramaticais e de pontuação do texto abaixo, mantendo o estilo original.";
                 break;
+            case "translate_en":
+                specificInstruction = "Traduza o texto abaixo do Português para o Inglês de forma fluida, clara e profissional. Mantenha toda a formatação Markdown, listas, negritos e parágrafos do texto original.";
+                break;
             case "campaign_appeal":
                 specificInstruction = "Reescreva o texto abaixo para torná-lo PERSUASIVO e EMOCIONANTE para uma campanha de doação/venda. Foque no impacto social/ambiental e no valor gerado para quem apoia. Use gatilhos mentais de propósito e urgência.";
                 break;
