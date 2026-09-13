@@ -230,3 +230,45 @@ export const generateBusinessModel = async (project) => {
         throw err;
     }
 };
+
+/**
+ * Consulta status do serviço arpt-ai (se está habilitado)
+ */
+export const getAiStatus = async () => {
+    const targetUrl = `${AI_SERVICE_URL.replace(/\/$/, '')}/status`;
+    try {
+        const response = await axios.get(targetUrl, {
+            headers: {
+                'Authorization': `Bearer ${ARPT_AI_SECRET}`,
+                'x-arpt-ai-secret': ARPT_AI_SECRET,
+            },
+            timeout: 10000,
+        });
+        return response.data;
+    } catch (error) {
+        console.warn("[arpt-ai] Failed to get AI status:", error.message);
+        return { enabled: true, error: error.message };
+    }
+};
+
+/**
+ * Habilita ou desabilita o serviço arpt-ai via API
+ */
+export const setAiStatus = async (enabled) => {
+    const targetUrl = `${AI_SERVICE_URL.replace(/\/$/, '')}/status`;
+    try {
+        const response = await axios.post(targetUrl, { enabled }, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${ARPT_AI_SECRET}`,
+                'x-arpt-ai-secret': ARPT_AI_SECRET,
+            },
+            timeout: 10000,
+        });
+        return response.data;
+    } catch (error) {
+        console.error("[arpt-ai] Failed to set AI status:", error.message);
+        throw error;
+    }
+};
+

@@ -10,7 +10,7 @@ import {
 } from '@mui/icons-material';
 import { db } from '../services/firebase';
 import { doc, getDoc } from 'firebase/firestore';
-import { saveModelConfig } from '../services/gemini';
+import { saveModelConfig, getAiStatus, setAiStatus } from '../services/gemini';
 
 const ALL_POSSIBLE_MODELS = [
     { id: "gemini-1.5-flash", name: "Gemini 1.5 Flash", description: "Rápido e eficiente para a maioria das tarefas." },
@@ -20,8 +20,10 @@ const ALL_POSSIBLE_MODELS = [
 
 export const GeminiSettings = () => {
     const [models, setModels] = useState([]);
+    const [aiEnabled, setAiEnabledState] = useState(true);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [togglingAi, setTogglingAi] = useState(false);
     const [notification, setNotification] = useState({ open: false, message: "", severity: "success" });
 
     useEffect(() => {
@@ -31,6 +33,11 @@ export const GeminiSettings = () => {
     const loadSettings = async () => {
         setLoading(true);
         try {
+            const statusRes = await getAiStatus();
+            if (statusRes && typeof statusRes.enabled === 'boolean') {
+                setAiEnabledState(statusRes.enabled);
+            }
+
             const docRef = doc(db, 'settings', 'gemini');
             const docSnap = await getDoc(docRef);
 
@@ -85,6 +92,29 @@ export const GeminiSettings = () => {
         setModels(newModels.map((m, idx) => ({ ...m, priority: idx + 1 })));
     };
 
+    const handleGlobalAiToggle = async () => {
+        const nextState = !aiEnabled;
+        setTogglingAi(true);
+        try {
+            await setAiStatus(nextState);
+            setAiEnabledState(nextState);
+            setNotification({
+                open: true,
+                message: `Serviço arpt-ai ${nextState ? 'HABILITADO' : 'DESABILITADO'} com sucesso!`,
+                severity: nextState ? "success" : "warning"
+            });
+        } catch (error) {
+            console.error("Error toggling global AI status:", error);
+            setNotification({
+                open: true,
+                message: "Falha ao alterar o status do serviço arpt-ai.",
+                severity: "error"
+            });
+        } finally {
+            setTogglingAi(false);
+        }
+    };
+
     const handleSave = async () => {
         const enabledCount = models.filter(m => m.enabled).length;
         if (enabledCount === 0) {
@@ -116,12 +146,40 @@ export const GeminiSettings = () => {
             <Box display="flex" alignItems="center" gap={2} mb={3}>
                 <SettingsSuggest color="primary" fontSize="large" />
                 <Box>
-                    <Typography variant="h5">Configuração dos Modelos IA</Typography>
+                    <Typography variant="h5">Configuração dos Modelos IA e Microsserviço arpt-ai</Typography>
                     <Typography variant="body2" color="textSecondary">
-                        Gerencie quais modelos do Google Gemini são usados e defina a ordem de prioridade para fallback.
+                        Gerencie a disponibilidade geral da Inteligência Artificial e a prioridade dos modelos Gemini.
                     </Typography>
                 </Box>
             </Box>
+
+            <Card elevation={0} sx={{ mb: 3, border: '1px solid #e0e0e0', bgcolor: aiEnabled ? '#f4fbf7' : '#fff5f5' }}>
+                <CardContent sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Box display="flex" alignItems="center" gap={2}>
+                        <SmartToy color={aiEnabled ? "success" : "disabled"} fontSize="large" />
+                        <Box>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                                Status Global do Serviço arpt-ai
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary">
+                                {aiEnabled
+                                    ? "O microsserviço de IA está HABILITADO e processando requisições."
+                                    : "O microsserviço de IA está DESABILITADO pelo administrador (retornando 503)."
+                                }
+                            </Typography>
+                        </Box>
+                    </Box>
+                    <Box display="flex" alignItems="center" gap={1}>
+                        {togglingAi && <CircularProgress size={24} />}
+                        <Switch
+                            checked={aiEnabled}
+                            onChange={handleGlobalAiToggle}
+                            disabled={togglingAi}
+                            color="success"
+                        />
+                    </Box>
+                </CardContent>
+            </Card>
 
             <Alert severity="info" sx={{ mb: 3 }} icon={<InfoOutlined />}>
                 O sistema tentará usar o primeiro modelo ativado da lista. Se a cota expirar, ele passará automaticamente para o próximo.
