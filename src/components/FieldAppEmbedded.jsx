@@ -4,20 +4,43 @@ import {
   Stepper, Step, StepLabel, Alert, Avatar, Divider, Card, CardMedia, CardContent, CardActions
 } from '@mui/material';
 import {
-  Map, ArrowForward, CheckCircle, Save, ContentCopy, Delete, Add, Image as ImageIcon
+  Map, ArrowForward, CheckCircle, Save, ContentCopy, Delete, Add, Image as ImageIcon, AutoAwesome, Translate
 } from '@mui/icons-material';
 import MDEditor from '@uiw/react-md-editor';
 import '@uiw/react-md-editor/markdown-editor.css';
 import '@uiw/react-markdown-preview/markdown.css';
 import { ESTADOS, UNIDADES, POTENCIAIS } from '../constants';
 import { improveText } from '../services/gemini';
-import { CircularProgress, IconButton, Snackbar } from '@mui/material';
+import { CircularProgress, IconButton, Snackbar, Tooltip, InputAdornment } from '@mui/material';
 import { AIAssistant } from './AIAssistant';
 
 export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = [], statuses = [] }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [loadingAI, setLoadingAI] = useState({ resumo: false, detalhes: false });
+  const [translatingNameEn, setTranslatingNameEn] = useState(false);
+  const [toast, setToast] = useState({ open: false, message: '', severity: 'info' });
   const [errorLog, setErrorLog] = useState(null);
+
+  const handleTranslateNameEn = async () => {
+    if (!formData.descricao || formData.descricao.trim().length < 5) {
+      setToast({ open: true, message: "Preencha o Nome do Projeto (PT) com pelo menos 5 caracteres primeiro.", severity: "warning" });
+      return;
+    }
+
+    setTranslatingNameEn(true);
+    try {
+      const translated = await improveText(formData.descricao, "", "translate_en", formData.descricao);
+      if (translated) {
+        setFormData(prev => ({ ...prev, descricao_en: translated }));
+        setToast({ open: true, message: "Nome do projeto traduzido para o Inglês com sucesso!", severity: "success" });
+      }
+    } catch (err) {
+      console.error("Erro ao traduzir nome do projeto:", err);
+      setToast({ open: true, message: "Erro ao traduzir nome do projeto com IA.", severity: "error" });
+    } finally {
+      setTranslatingNameEn(false);
+    }
+  };
 
   const defaultState = {
     id: null,
@@ -248,6 +271,24 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
                 name="descricao_en"
                 value={formData.descricao_en || ""}
                 onChange={handleChange}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Tooltip title="Traduzir nome para Inglês usando IA">
+                        <span>
+                          <IconButton
+                            onClick={handleTranslateNameEn}
+                            disabled={translatingNameEn}
+                            color="primary"
+                            edge="end"
+                          >
+                            {translatingNameEn ? <CircularProgress size={20} /> : <AutoAwesome />}
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+                    </InputAdornment>
+                  )
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -792,6 +833,17 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
           </Box>
         </Paper>
       )}
+
+      <Snackbar
+        open={toast.open}
+        autoHideDuration={4000}
+        onClose={() => setToast(prev => ({ ...prev, open: false }))}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity={toast.severity} variant="filled" onClose={() => setToast(prev => ({ ...prev, open: false }))}>
+          {toast.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
