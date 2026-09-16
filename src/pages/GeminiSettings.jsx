@@ -1,29 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Box, Typography, Paper, List, ListItem, ListItemText,
-    ListItemSecondaryAction, Switch, IconButton, Button,
-    Divider, CircularProgress, Alert, Snackbar, Card, CardContent
+    Box, Typography, Paper, Switch, Button,
+    CircularProgress, Alert, Snackbar, Card, CardContent,
+    FormControl, InputLabel, Select, MenuItem
 } from '@mui/material';
 import {
-    ArrowUpward, ArrowDownward, Save, SmartToy,
-    SettingsSuggest, InfoOutlined
+    Save, SmartToy, SettingsSuggest, InfoOutlined
 } from '@mui/icons-material';
-import { db } from '../services/firebase';
-import { doc, getDoc } from 'firebase/firestore';
-import { saveModelConfig, getAiStatus, setAiStatus } from '../services/gemini';
-
-const ALL_POSSIBLE_MODELS = [
-    { id: "gemini-1.5-flash", name: "Gemini 1.5 Flash", description: "Rápido e eficiente para a maioria das tarefas." },
-    { id: "gemini-1.5-pro-latest", name: "Gemini 1.5 Pro", description: "Mais inteligente, ideal para textos complexos." },
-    { id: "gemini-pro", name: "Gemini Pro (Legacy)", description: "Versão legada do modelo Pro." }
-];
+import { getAiStatus, setAiStatus } from '../services/gemini';
 
 export const GeminiSettings = () => {
-    const [models, setModels] = useState([]);
+    const [availableModels, setAvailableModels] = useState([]);
+    const [defaultModel, setDefaultModel] = useState('');
     const [aiEnabled, setAiEnabledState] = useState(true);
     const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
     const [togglingAi, setTogglingAi] = useState(false);
+    const [saving, setSaving] = useState(false);
     const [notification, setNotification] = useState({ open: false, message: "", severity: "success" });
 
     useEffect(() => {
@@ -34,32 +26,16 @@ export const GeminiSettings = () => {
         setLoading(true);
         try {
             const statusRes = await getAiStatus();
-            if (statusRes && typeof statusRes.enabled === 'boolean') {
-                setAiEnabledState(statusRes.enabled);
-            }
-
-            const docRef = doc(db, 'settings', 'gemini');
-            const docSnap = await getDoc(docRef);
-
-            if (docSnap.exists()) {
-                const savedModels = docSnap.data().models || [];
-                // Merge with ALL_POSSIBLE_MODELS to ensure we have all available options
-                const merged = ALL_POSSIBLE_MODELS.map(pModel => {
-                    let saved = savedModels.find(s => s.id === pModel.id);
-
-                    // Migration: Check for legacy ID for Pro model
-                    if (!saved && pModel.id === 'gemini-1.5-pro-latest') {
-                        saved = savedModels.find(s => s.id === 'gemini-1.5-pro');
-                    }
-
-                    // Use saved settings (enabled/priority) but ensure we use the NEW ID and Name from pModel
-                    return saved ? { ...pModel, enabled: saved.enabled, priority: saved.priority } : { ...pModel, enabled: false, priority: 99 };
-                }).sort((a, b) => a.priority - b.priority);
-
-                setModels(merged);
-            } else {
-                // Use defaults with sorted priorities
-                setModels(ALL_POSSIBLE_MODELS.map((m, idx) => ({ ...m, enabled: true, priority: idx + 1 })));
+            if (statusRes) {
+                if (typeof statusRes.enabled === 'boolean') {
+                    setAiEnabledState(statusRes.enabled);
+                }
+                if (statusRes.defaultModel) {
+                    setDefaultModel(statusRes.defaultModel);
+                }
+                if (statusRes.availableModels) {
+                    setAvailableModels(statusRes.availableModels);
+                }
             }
         } catch (error) {
             console.error("Error loading settings:", error);
@@ -67,29 +43,6 @@ export const GeminiSettings = () => {
         } finally {
             setLoading(false);
         }
-    };
-
-    const handleToggle = (id) => {
-        setModels(prev => prev.map(m =>
-            m.id === id ? { ...m, enabled: !m.enabled } : m
-        ));
-    };
-
-    const moveUp = (index) => {
-        if (index === 0) return;
-        const newModels = [...models];
-        const item = newModels.splice(index, 1)[0];
-        newModels.splice(index - 1, 0, item);
-        // Resave priorities
-        setModels(newModels.map((m, idx) => ({ ...m, priority: idx + 1 })));
-    };
-
-    const moveDown = (index) => {
-        if (index === models.length - 1) return;
-        const newModels = [...models];
-        const item = newModels.splice(index, 1)[0];
-        newModels.splice(index + 1, 0, item);
-        setModels(newModels.map((m, idx) => ({ ...m, priority: idx + 1 })));
     };
 
     const handleGlobalAiToggle = async () => {
@@ -115,21 +68,25 @@ export const GeminiSettings = () => {
         }
     };
 
+    const handleModelChange = (event) => {
+        setDefaultModel(event.target.value);
+    };
+
     const handleSave = async () => {
-        const enabledCount = models.filter(m => m.enabled).length;
-        if (enabledCount === 0) {
-            setNotification({ open: true, message: "Pelo menos um modelo deve estar ativado.", severity: "warning" });
+        if (!defaultModel) {
+            setNotification({ open: true, message: "Selecione um modelo padrão.", severity: "warning" });
             return;
         }
 
         setSaving(true);
-        const success = await saveModelConfig(models);
-        setSaving(false);
-
-        if (success) {
-            setNotification({ open: true, message: "Configurações salvas com sucesso!", severity: "success" });
-        } else {
-            setNotification({ open: true, message: "Erro ao salvar configurações.", severity: "error" });
+        try {
+            await setAiStatus(aiEnabled, defaultModel);
+            setNotification({ open: true, message: "Modelo padrão salvo com sucesso!", severity: "success" });
+        } catch (error) {
+            console.error("Error saving default model:", error);
+            setNotification({ open: true, message: "Erro ao salvar modelo.", severity: "error" });
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -148,7 +105,7 @@ export const GeminiSettings = () => {
                 <Box>
                     <Typography variant="h5">Configuração dos Modelos IA e Microsserviço arpt-ai</Typography>
                     <Typography variant="body2" color="textSecondary">
-                        Gerencie a disponibilidade geral da Inteligência Artificial e a prioridade dos modelos Gemini.
+                        Gerencie a disponibilidade geral da Inteligência Artificial e o modelo padrão.
                     </Typography>
                 </Box>
             </Box>
@@ -182,55 +139,41 @@ export const GeminiSettings = () => {
             </Card>
 
             <Alert severity="info" sx={{ mb: 3 }} icon={<InfoOutlined />}>
-                O sistema tentará usar o primeiro modelo ativado da lista. Se a cota expirar, ele passará automaticamente para o próximo.
+                O sistema tentará usar o modelo padrão. Se o modelo falhar (alta demanda), ele passará automaticamente para os próximos modelos disponíveis na lista de fallback do microsserviço.
             </Alert>
 
-            <Paper elevation={0} sx={{ border: '1px solid #e0e0e0', overflow: 'hidden' }}>
-                <List sx={{ p: 0 }}>
-                    {models.map((model, index) => (
-                        <React.Fragment key={model.id}>
-                            <ListItem sx={{ py: 2, bgcolor: model.enabled ? 'inherit' : 'action.hover' }}>
-                                <Box sx={{ mr: 2, display: 'flex', flexDirection: 'column' }}>
-                                    <IconButton size="small" onClick={() => moveUp(index)} disabled={index === 0}>
-                                        <ArrowUpward fontSize="small" />
-                                    </IconButton>
-                                    <IconButton size="small" onClick={() => moveDown(index)} disabled={index === models.length - 1}>
-                                        <ArrowDownward fontSize="small" />
-                                    </IconButton>
-                                </Box>
-                                <ListItemText
-                                    primary={
-                                        <Box display="flex" alignItems="center" gap={1}>
-                                            <SmartToy color={model.enabled ? "primary" : "disabled"} />
-                                            <Typography variant="subtitle1" sx={{ fontWeight: 600, opacity: model.enabled ? 1 : 0.6 }}>
-                                                {model.name}
-                                            </Typography>
-                                            <Typography variant="caption" sx={{ bgcolor: 'primary.light', color: 'primary.contrastText', px: 1, borderRadius: 1 }}>
-                                                P{model.priority}
-                                            </Typography>
-                                        </Box>
-                                    }
-                                    secondary={model.description}
-                                />
-                                <ListItemSecondaryAction>
-                                    <Switch
-                                        edge="end"
-                                        onChange={() => handleToggle(model.id)}
-                                        checked={model.enabled}
-                                        color="primary"
-                                    />
-                                </ListItemSecondaryAction>
-                            </ListItem>
-                            {index < models.length - 1 && <Divider />}
-                        </React.Fragment>
-                    ))}
-                </List>
-                <Box sx={{ p: 3, bgcolor: '#f9fafb', display: 'flex', justifyContent: 'flex-end' }}>
+            <Paper elevation={0} sx={{ border: '1px solid #e0e0e0', p: 3, mb: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                    Modelo de Inteligência Artificial Padrão
+                </Typography>
+                <Typography variant="body2" color="textSecondary" mb={3}>
+                    Selecione o modelo do Gemini que será priorizado em todas as chamadas de IA.
+                </Typography>
+                
+                <FormControl fullWidth sx={{ mb: 3 }}>
+                    <InputLabel id="default-model-label">Modelo Padrão</InputLabel>
+                    <Select
+                        labelId="default-model-label"
+                        id="default-model-select"
+                        value={defaultModel}
+                        label="Modelo Padrão"
+                        onChange={handleModelChange}
+                        disabled={!aiEnabled || availableModels.length === 0}
+                    >
+                        {availableModels.map((modelId) => (
+                            <MenuItem key={modelId} value={modelId}>
+                                {modelId}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <Button
                         variant="contained"
                         startIcon={saving ? <CircularProgress size={20} color="inherit" /> : <Save />}
                         onClick={handleSave}
-                        disabled={saving}
+                        disabled={saving || !aiEnabled}
                     >
                         Salvar Configurações
                     </Button>

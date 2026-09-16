@@ -130,8 +130,18 @@ const callArptAiService = async (endpoint, payload) => {
         }
         throw new Error("Resposta inválida do serviço arpt-ai");
     } catch (error) {
-        console.warn(`[arpt-ai service] Call to ${targetUrl} failed:`, error.message);
-        throw error;
+        let errorMsg = error.message;
+        if (error.response && error.response.data && error.response.data.error) {
+            errorMsg = error.response.data.error;
+        }
+        
+        console.warn(`[arpt-ai service] Call to ${targetUrl} failed:`, errorMsg);
+
+        if (errorMsg.includes('high demand') || errorMsg.includes('quota') || error.response?.status === 503) {
+            throw new Error('O modelo de IA está sobrecarregado (alta demanda) ou a cota esgotou. Tente novamente mais tarde.');
+        }
+
+        throw new Error(errorMsg);
     }
 };
 
@@ -252,12 +262,15 @@ export const getAiStatus = async () => {
 };
 
 /**
- * Habilita ou desabilita o serviço arpt-ai via API
+ * Habilita ou desabilita o serviço arpt-ai via API e define o defaultModel
  */
-export const setAiStatus = async (enabled) => {
+export const setAiStatus = async (enabled, defaultModel = undefined) => {
     const targetUrl = `${AI_SERVICE_URL.replace(/\/$/, '')}/status`;
     try {
-        const response = await axios.post(targetUrl, { enabled }, {
+        const payload = { enabled };
+        if (defaultModel) payload.defaultModel = defaultModel;
+        
+        const response = await axios.post(targetUrl, payload, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${ARPT_AI_SECRET}`,
