@@ -176,7 +176,7 @@ export const generateCampaignStrategy = async (project, products = [], rewards =
  */
 export const improveText = async (text, context = "", type = "improve", sourceText = "") => {
     const targetText = text || sourceText;
-    if (!targetText || targetText.length < 5) return targetText;
+    if (!targetText || targetText.length < 2) return targetText;
 
     try {
         return await callArptAiService('/ai/improve-text', {

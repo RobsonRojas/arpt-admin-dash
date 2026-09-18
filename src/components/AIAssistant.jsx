@@ -26,9 +26,9 @@ export const AIAssistant = ({ initialText, sourceText, onApply, context = "", la
         handleMenuClose();
         const textToUse = (type === 'translate_en' && sourceText) 
             ? sourceText 
-            : ((!initialText || initialText.length < 5) && sourceText ? sourceText : initialText);
+            : ((!initialText || initialText.length < 2) && sourceText ? sourceText : initialText);
 
-        if (!textToUse || textToUse.length < 5) {
+        if (!textToUse || textToUse.length < 2) {
             alert("Insira ou preencha o texto em Português para a IA trabalhar.");
             return;
         }

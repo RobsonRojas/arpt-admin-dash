@@ -398,12 +398,23 @@ export const Products = () => {
                             value={formData.nome}
                             onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
                         />
-                        <TextField
-                            label="Nome do Produto (EN)"
-                            fullWidth
-                            value={formData.nome_en}
-                            onChange={(e) => setFormData({ ...formData, nome_en: e.target.value })}
-                        />
+                        <Grid item xs={12}>
+                            <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                                <Typography variant="caption">Nome do Produto (EN)</Typography>
+                                <AIAssistant
+                                    initialText={formData.nome_en}
+                                    sourceText={formData.nome}
+                                    context={`Product: ${formData.nome}`}
+                                    onApply={(text) => setFormData({ ...formData, nome_en: text })}
+                                    label="Traduzir Nome EN"
+                                />
+                            </Box>
+                            <TextField
+                                fullWidth
+                                value={formData.nome_en}
+                                onChange={(e) => setFormData({ ...formData, nome_en: e.target.value })}
+                            />
+                        </Grid>
                         <Grid item xs={12}>
                             <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
                                 <Typography variant="caption">Descrição / Informações (PT)</Typography>
@@ -428,6 +439,7 @@ export const Products = () => {
                                 <Typography variant="caption">Descrição / Informações (EN)</Typography>
                                 <AIAssistant
                                     initialText={formData.info_en}
+                                    sourceText={formData.info}
                                     context={`Product: ${formData.nome_en || formData.nome}`}
                                     onApply={(text) => setFormData({ ...formData, info_en: text })}
                                     label="Improve Description EN"
