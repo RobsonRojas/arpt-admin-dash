@@ -957,21 +957,21 @@ export const AdminProvider = ({ children }) => {
         try {
             // Normalizar dados para envio à API
             const payload = {
-                name: property.name || property.descricao || '',
-                address: property.address || '',
+                name: property.name || property.descricao || 'Sem Nome',
+                address: property.address || 'Endereço não informado',
                 area_he: Number(property.area || property.area_he || 0),
                 longitude: Number(property.longitude || property.lng || -60.0),
                 latitude: Number(property.latitude || property.lat || -3.0),
                 id_municipality: Number(property.id_municipality || 1),
                 aquisition_year: Number(property.aquisition_year || new Date().getFullYear()),
-                info: property.info || property.descricao || '',
+                info: property.info || property.descricao || 'Sem informações adicionais',
                 image_internal_path: property.image_internal_path || '/default/property.jpg',
-                user_id: user?.uid || ''
+                user_id: user?.uid || property.user_id || 'unknown'
             };
 
             const token = await user?.getIdToken();
             const config = { headers: { Authorization: `Bearer ${token}` } };
-            const response = await api.post('/propriedades/sync', payload, config);
+            const response = await api.post('/propriedades', payload, config);
 
             if (response.status === 200 || response.status === 201) {
                 const newProperty = {
@@ -1010,14 +1010,14 @@ export const AdminProvider = ({ children }) => {
 
             // Normalizar dados para envio à API
             const payload = {
-                name: property.name || property.descricao || '',
-                address: property.address || '',
+                name: property.name || property.descricao || 'Sem Nome',
+                address: property.address || 'Endereço não informado',
                 area_he: Number(property.area || property.area_he || 0),
                 longitude: Number(property.longitude || property.lng || -60.0),
                 latitude: Number(property.latitude || property.lat || -3.0),
                 id_municipality: Number(property.id_municipality || 1),
                 aquisition_year: Number(property.aquisition_year || new Date().getFullYear()),
-                info: property.info || property.descricao || '',
+                info: property.info || property.descricao || 'Sem informações adicionais',
                 image_internal_path: property.image_internal_path || '/default/property.jpg'
             };
 
@@ -1059,7 +1059,7 @@ export const AdminProvider = ({ children }) => {
 
                 const token = await user?.getIdToken();
                 const config = { headers: { Authorization: `Bearer ${token}` } };
-                const response = await api.delete(`/propriedades/sync/${propertyId}`, config);
+                const response = await api.delete(`/propriedades/${propertyId}`, config);
 
                 if (response.status === 200) {
                     await recordAudit({
