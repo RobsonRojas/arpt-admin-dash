@@ -8,11 +8,13 @@ import {
 } from '@mui/material';
 import {
     Search, AccountTree, Inventory2, Calculate,
-    Park, TrendingUp, CheckCircle, InfoOutlined
+    Park, TrendingUp, CheckCircle, InfoOutlined, History
 } from '@mui/icons-material';
 import { api } from '../services/api';
+import TokenHistoryModal from '../components/TokenHistoryModal';
 
 export const ProductSimulation = () => {
+    const [historyModalOpen, setHistoryModalOpen] = useState(false);
     // Stepper
     const [activeStep, setActiveStep] = useState(0);
     const steps = ['Selecionar Projeto', 'Selecionar Árvore', 'Simular Receita'];
@@ -440,6 +442,13 @@ export const ProductSimulation = () => {
                                     {' · '}Volume: {Number(selectedTree.volume || 0).toFixed(3)} m³
                                 </Typography>
                             </Box>
+                            <Box>
+                                <Tooltip title="Histórico da Blockchain (Árvore)">
+                                    <IconButton onClick={() => setHistoryModalOpen(true)} color="primary">
+                                        <History />
+                                    </IconButton>
+                                </Tooltip>
+                            </Box>
                         </Box>
                     </Paper>
 
@@ -624,6 +633,15 @@ export const ProductSimulation = () => {
                     {snackbar.message}
                 </Alert>
             </Snackbar>
+
+            {selectedTree && (
+                <TokenHistoryModal
+                    open={historyModalOpen}
+                    onClose={() => setHistoryModalOpen(false)}
+                    tokenType="tree"
+                    tokenId={selectedTree.id}
+                />
+            )}
         </Box>
     );
 };

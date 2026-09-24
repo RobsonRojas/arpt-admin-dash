@@ -11,6 +11,7 @@ import { useAdmin } from '../../contexts/AdminContext';
 import { generateDocument } from '../../services/gemini';
 import MDEditor from '@uiw/react-md-editor';
 import TreeRow from './TreeRow'; // Import TreeRow
+import TokenHistoryModal from '../TokenHistoryModal';
 import { api } from '../../services/api';
 
 export const InventoryManager = ({ property, onClose }) => {
@@ -29,9 +30,9 @@ export const InventoryManager = ({ property, onClose }) => {
   const [uploadResults, setUploadResults] = useState(null);
 
   // Blockchain History State
-  const [openHistoryDialog, setOpenHistoryDialog] = useState(false);
-  const [historyData, setHistoryData] = useState([]);
-  const [loadingHistory, setLoadingHistory] = useState(false);
+  const [openHistoryDialog, setOpenHistoryDialog] = useState(false); // Deprecated
+  const [historyData, setHistoryData] = useState([]); // Deprecated
+  const [loadingHistory, setLoadingHistory] = useState(false); // Deprecated
 
 
   // Paginação
@@ -258,19 +259,10 @@ export const InventoryManager = ({ property, onClose }) => {
     setUploadResults(null);
   };
 
+  const [historyTreeId, setHistoryTreeId] = useState(null);
+
   const handleViewHistory = async (tree) => {
-    setLoadingHistory(true);
-    setOpenHistoryDialog(true);
-    setHistoryData([]);
-    try {
-      const history = await getTreeHistory(tree.id);
-      setHistoryData(history || []);
-    } catch (error) {
-      console.error("Erro ao buscar histórico:", error);
-      setHistoryData([]);
-    } finally {
-      setLoadingHistory(false);
-    }
+    setHistoryTreeId(tree.id);
   };
 
   const handleCreateInventory = async () => {
@@ -1004,164 +996,14 @@ export const InventoryManager = ({ property, onClose }) => {
         </DialogActions>
       </Dialog>
 
-      {/* DIALOG DE HISTÓRICO BLOCKCHAIN */}
-      <Dialog open={openHistoryDialog} onClose={() => setOpenHistoryDialog(false)} maxWidth="md" fullWidth>
-        <DialogTitle>Histórico Blockchain</DialogTitle>
-        <DialogContent dividers>
-          {loadingHistory ? (
-            <Box display="flex" justifyContent="center" my={4}>
-              <CircularProgress />
-            </Box>
-          ) : historyData.length === 0 ? (
-            <Typography variant="body2" color="textSecondary" align="center">
-              Nenhum registro encontrado na blockchain para esta árvore.
-            </Typography>
-          ) : (
-            <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: 400 }}>
-              <Table size="small" stickyHeader>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Data</TableCell>
-                    <TableCell>Tipo</TableCell>
-                    <TableCell>TXID</TableCell>
-                    <TableCell>Link</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {historyData.map((item, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{new Date(item.created_at).toLocaleString()}</TableCell>
-                      <TableCell>{item.type === 0 ? 'Criação' : 'Atualização'}</TableCell>
-                      <TableCell sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {item.txid}
-                      </TableCell>
-                      <TableCell>
-                        <a
-                          href={`https://whatsonchain.com/tx/${item.txid}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{ color: '#1976d2', textDecoration: 'none' }}
-                        >
-                          Ver na Blockchain
-                        </a>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenHistoryDialog(false)}>Fechar</Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* DIALOG DE HISTÓRICO BLOCKCHAIN */}
-      <Dialog open={openHistoryDialog} onClose={() => setOpenHistoryDialog(false)} maxWidth="md" fullWidth>
-        <DialogTitle>Histórico Blockchain</DialogTitle>
-        <DialogContent dividers>
-          {loadingHistory ? (
-            <Box display="flex" justifyContent="center" my={4}>
-              <CircularProgress />
-            </Box>
-          ) : historyData.length === 0 ? (
-            <Typography variant="body2" color="textSecondary" align="center">
-              Nenhum registro encontrado na blockchain para esta árvore.
-            </Typography>
-          ) : (
-            <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: 400 }}>
-              <Table size="small" stickyHeader>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Data</TableCell>
-                    <TableCell>Tipo</TableCell>
-                    <TableCell>TXID</TableCell>
-                    <TableCell>Link</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {historyData.map((item, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{new Date(item.created_at).toLocaleString()}</TableCell>
-                      <TableCell>{item.type === 0 ? 'Criação' : 'Atualização'}</TableCell>
-                      <TableCell sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {item.txid}
-                      </TableCell>
-                      <TableCell>
-                        <a
-                          href={`https://whatsonchain.com/tx/${item.txid}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{ color: '#1976d2', textDecoration: 'none' }}
-                        >
-                          Ver na Blockchain
-                        </a>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenHistoryDialog(false)}>Fechar</Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* DIALOG DE HISTÓRICO BLOCKCHAIN */}
-      <Dialog open={openHistoryDialog} onClose={() => setOpenHistoryDialog(false)} maxWidth="md" fullWidth>
-        <DialogTitle>Histórico Blockchain</DialogTitle>
-        <DialogContent dividers>
-          {loadingHistory ? (
-            <Box display="flex" justifyContent="center" my={4}>
-              <CircularProgress />
-            </Box>
-          ) : historyData.length === 0 ? (
-            <Typography variant="body2" color="textSecondary" align="center">
-              Nenhum registro encontrado na blockchain para esta árvore.
-            </Typography>
-          ) : (
-            <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: 400 }}>
-              <Table size="small" stickyHeader>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Data</TableCell>
-                    <TableCell>Tipo</TableCell>
-                    <TableCell>TXID</TableCell>
-                    <TableCell>Link</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {historyData.map((item, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{new Date(item.created_at).toLocaleString()}</TableCell>
-                      <TableCell>{item.type === 0 ? 'Criação' : 'Atualização'}</TableCell>
-                      <TableCell sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {item.txid}
-                      </TableCell>
-                      <TableCell>
-                        <a
-                          href={`https://whatsonchain.com/tx/${item.txid}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{ color: '#1976d2', textDecoration: 'none' }}
-                        >
-                          Ver na Blockchain
-                        </a>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenHistoryDialog(false)}>Fechar</Button>
-        </DialogActions>
-      </Dialog>
+      {historyTreeId && (
+        <TokenHistoryModal
+          open={Boolean(historyTreeId)}
+          onClose={() => setHistoryTreeId(null)}
+          tokenType="tree"
+          tokenId={historyTreeId}
+        />
+      )}
 
       <Dialog open={openCreateInventory} onClose={() => setOpenCreateInventory(false)} fullWidth maxWidth="sm">
         <DialogTitle>Criar Inventário</DialogTitle>

@@ -5,10 +5,11 @@ import {
   Dialog, DialogTitle, DialogContent, DialogActions, Grid,
   TextField, MenuItem, Drawer, Divider, CircularProgress,
 } from '@mui/material';
-import { Add, Visibility, Edit, CloudUpload, HomeWork, Park, Image as ImageIcon, PersonAdd } from '@mui/icons-material';
+import { Add, Visibility, Edit, CloudUpload, HomeWork, Park, Image as ImageIcon, PersonAdd, History } from '@mui/icons-material';
 import { AIAssistant } from '../components/AIAssistant';
 import { MapEmbed, InventoryManager } from '../components';
 import { AssignUserModal } from '../components/modules/AssignUserModal';
+import TokenHistoryModal from '../components/TokenHistoryModal';
 import { STATUS_PROPRIEDADE } from '../constants';
 import { useAdmin } from '../contexts/AdminContext';
 
@@ -27,6 +28,8 @@ export const Properties = () => {
   const [selectedProp, setSelectedProp] = useState(null);
   const [openInventory, setOpenInventory] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
+  const [historyPropId, setHistoryPropId] = useState(null);
   
   const [assignUserProp, setAssignUserProp] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0); // If needed to refresh properties list
@@ -262,6 +265,17 @@ export const Properties = () => {
                     </IconButton>
                     <IconButton
                       size="small"
+                      color="secondary"
+                      onClick={() => {
+                        setHistoryPropId(row.id);
+                        setHistoryModalOpen(true);
+                      }}
+                      title="Histórico na Blockchain"
+                    >
+                      <History />
+                    </IconButton>
+                    <IconButton
+                      size="small"
                       color="default"
                       onClick={() => handleOpenEdit(row)}
                       title="Editar"
@@ -313,6 +327,12 @@ export const Properties = () => {
                 </Button>
                 <Button size="small" startIcon={<PersonAdd />} onClick={() => setAssignUserProp(row)}>
                   Vincular Usuário
+                </Button>
+                <Button size="small" startIcon={<History />} onClick={() => {
+                  setHistoryPropId(row.id);
+                  setHistoryModalOpen(true);
+                }}>
+                  Histórico
                 </Button>
               </Box>
             </Paper>
@@ -463,10 +483,16 @@ export const Properties = () => {
       >
         {selectedProp && (
           <Box p={3} display="flex" flexDirection="column" gap={2}>
-            <Box>
-              <Typography variant="h6" gutterBottom>Detalhes</Typography>
-              <Divider sx={{ mb: 2 }} />
+            <Box display="flex" justifyContent="space-between" alignItems="center">
+              <Typography variant="h6" gutterBottom mb={0}>Detalhes</Typography>
+              <IconButton onClick={() => {
+                setHistoryPropId(selectedProp.id);
+                setHistoryModalOpen(true);
+              }} color="secondary" title="Histórico da Propriedade">
+                <History />
+              </IconButton>
             </Box>
+            <Divider sx={{ mb: 2 }} />
 
             {getPropertyImage(selectedProp) && (
               <Box
@@ -544,6 +570,15 @@ export const Properties = () => {
             // Ideally trigger a refresh in the AdminContext
             window.location.reload();
           }}
+        />
+      )}
+
+      {historyModalOpen && (
+        <TokenHistoryModal
+          open={historyModalOpen}
+          onClose={() => setHistoryModalOpen(false)}
+          tokenType="propriedade"
+          tokenId={historyPropId}
         />
       )}
     </Box>

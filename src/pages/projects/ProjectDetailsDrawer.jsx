@@ -1,6 +1,6 @@
-import React from 'react';
-import { Box, Typography, Drawer, IconButton, Tabs, Tab, List, ListItem, ListItemText, Divider, Button } from '@mui/material';
-import { Close, Description } from '@mui/icons-material';
+import React, { useState } from 'react';
+import { Box, Typography, Drawer, IconButton, Tabs, Tab, List, ListItem, ListItemText, Divider, Button, Tooltip } from '@mui/material';
+import { Close, Description, History } from '@mui/icons-material';
 import { MapEmbed } from '../../components/MapEmbed';
 import { StatusChip } from '../../components/StatusChip';
 import { ProjectProducts } from '../../components/modules/project_tabs/ProjectProducts';
@@ -9,6 +9,7 @@ import { ProjectIncidents } from '../../components/modules/project_tabs/ProjectI
 import { ProjectTeam } from '../../components/modules/project_tabs/ProjectTeam';
 import { CampaignAssistant } from '../../components/CampaignAssistant';
 import { ProjectSpends } from '../../components/modules/project_tabs/ProjectSpends';
+import TokenHistoryModal from '../../components/TokenHistoryModal';
 
 export const ProjectDetailsDrawer = ({ 
   selectedProject, 
@@ -18,7 +19,10 @@ export const ProjectDetailsDrawer = ({
   getProjectImage,
   onGenerateLicensingDoc 
 }) => {
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
+
   return (
+    <>
     <Drawer
       anchor="right"
       open={Boolean(selectedProject)}
@@ -29,9 +33,16 @@ export const ProjectDetailsDrawer = ({
         <Box height="100%" display="flex" flexDirection="column">
           <Box p={2} bgcolor="primary.main" color="white" display="flex" justifyContent="space-between" alignItems="center">
             <Typography variant="h6">{selectedProject.descricao}</Typography>
-            <IconButton onClick={onClose} sx={{ color: 'white' }}>
-              <Close />
-            </IconButton>
+            <Box>
+              <Tooltip title="Histórico da Blockchain (Manejo)">
+                <IconButton onClick={() => setHistoryModalOpen(true)} sx={{ color: 'white' }}>
+                  <History />
+                </IconButton>
+              </Tooltip>
+              <IconButton onClick={onClose} sx={{ color: 'white' }}>
+                <Close />
+              </IconButton>
+            </Box>
           </Box>
 
           {/* Project Image Header */}
@@ -146,5 +157,15 @@ export const ProjectDetailsDrawer = ({
         </Box>
       )}
     </Drawer>
+
+    {selectedProject && (
+      <TokenHistoryModal
+        open={historyModalOpen}
+        onClose={() => setHistoryModalOpen(false)}
+        tokenType="manejo"
+        tokenId={selectedProject.id}
+      />
+    )}
+    </>
   );
 };
