@@ -454,7 +454,7 @@ export const Products = () => {
                                 onChange={(e) => setFormData({ ...formData, info_en: e.target.value })}
                             />
                         </Grid>
-                        <Box display="flex" gap={2}>
+                        <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} gap={2}>
                             <TextField
                                 label="Preço"
                                 type="number"
@@ -541,9 +541,9 @@ export const Products = () => {
                         />
                     </Box>
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseDialog}>Cancelar</Button>
-                    <Button variant="contained" onClick={handleSave}>Salvar</Button>
+                <DialogActions sx={{ p: 2, flexWrap: 'wrap', gap: 1 }}>
+                    <Button onClick={handleCloseDialog} fullWidth={{ xs: true, sm: false }}>Cancelar</Button>
+                    <Button variant="contained" onClick={handleSave} fullWidth={{ xs: true, sm: false }}>Salvar</Button>
                 </DialogActions>
             </Dialog>
 
