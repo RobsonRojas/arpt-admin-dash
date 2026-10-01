@@ -442,26 +442,36 @@ export const Users = () => {
         setOpenForm(true);
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!formData.name || !formData.email) {
             alert('Preencha os campos obrigatórios');
             return;
         }
 
-        if (isEditing) {
-            setUsers(users.map(u => u.id === formData.id ? formData : u));
-        } else {
-            const newUser = {
-                ...formData,
-                id: Math.max(...users.map(u => u.id), 0) + 1,
-                createdAt: new Date().toISOString().split('T')[0],
-            };
-            setUsers([...users, newUser]);
-            clearDraft(); // Clear draft after save
-        }
+        try {
+            if (isEditing) {
+                const token = await authUser.getIdToken();
+                await api.put(`/admin/users/${formData.id}`, formData, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setUsers(users.map(u => u.id === formData.id ? { ...u, ...formData } : u));
+                setSnackbar({ open: true, message: 'Usuário atualizado com sucesso', severity: 'success' });
+            } else {
+                // Creation is typically handled differently, leaving local mock or maybe a post endpoint
+                const newUser = {
+                    ...formData,
+                    id: Math.max(...users.map(u => u.id), 0) + 1,
+                    createdAt: new Date().toISOString().split('T')[0],
+                };
+                setUsers([...users, newUser]);
+            }
 
-        setOpenForm(false);
-        if (isEditing) clearDraft(); // Also clear on edit save
+            setOpenForm(false);
+            if (isEditing) clearDraft();
+        } catch (error) {
+            console.error('Erro ao salvar usuário:', error);
+            setSnackbar({ open: true, message: 'Erro ao salvar usuário', severity: 'error' });
+        }
     };
 
     const handleDelete = (userId) => {
@@ -515,7 +525,40 @@ export const Users = () => {
                 </Button>
             </Box>
 
-            <TableContainer component={Paper}>
+            <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+                {users.map((user) => (
+                    <Paper key={user.id} sx={{ p: 2, mb: 2 }}>
+                        <Box display="flex" alignItems="center" gap={2} mb={2}>
+                            <Avatar sx={{ bgcolor: 'primary.main' }}>
+                                {(user.first_name || user.name || 'U').charAt(0)}
+                            </Avatar>
+                            <Box>
+                                <Typography variant="subtitle1" fontWeight="bold">
+                                    {user.first_name ? `${user.first_name} ${user.last_name}` : user.name}
+                                </Typography>
+                                <Typography variant="body2" color="textSecondary">{user.email}</Typography>
+                            </Box>
+                        </Box>
+                        <Box display="flex" flexWrap="wrap" gap={1} mb={2}>
+                            <Chip label={user.role || 'Operador'} color={getRoleColor(user.role || 'Operador')} size="small" />
+                            <Chip label={user.status || 'Ativo'} color={getStatusColor(user.status || 'Ativo')} size="small" />
+                            <Chip 
+                                label={user.payment_split_unlocked ? 'Split: Liberado' : 'Split: Bloqueado'} 
+                                color={user.payment_split_unlocked ? 'success' : 'default'} 
+                                size="small" 
+                                onClick={() => handleTogglePaymentSplit(user)} 
+                            />
+                        </Box>
+                        <Box display="flex" justifyContent="flex-end" gap={1}>
+                            <IconButton size="small" color="primary" onClick={() => handleOpenEdit(user)} title="Editar"><Edit /></IconButton>
+                            <IconButton size="small" color="warning" onClick={() => handleOpenRewardList(user)} title="Recompensas"><Inventory /></IconButton>
+                            <IconButton size="small" color="info" onClick={() => handleOpenCertList(user)} title="Certificados"><CardMembership /></IconButton>
+                        </Box>
+                    </Paper>
+                ))}
+            </Box>
+
+            <TableContainer component={Paper} sx={{ display: { xs: 'none', md: 'block' } }}>
                 <Table data-testid="users-table">
                     <TableHead sx={{ bgcolor: '#f9fafb' }}>
                         <TableRow>
