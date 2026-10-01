@@ -12,7 +12,8 @@ export const RewardFormDialog = ({
     setFormData,
     products,
     handleSave,
-    loading
+    loading,
+    validationErrors = {}
 }) => {
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -35,7 +36,8 @@ export const RewardFormDialog = ({
                                     qtd_products: prod?.qtd_disponivel || 0
                                 });
                             }}
-                            helperText={isEditing ? "Selecione um novo produto se desejar alterar a associação desta recompensa" : "Escolha o produto base para esta recompensa"}
+                            error={!!validationErrors.id_produto}
+                            helperText={validationErrors.id_produto || (isEditing ? "Selecione um novo produto se desejar alterar a associação desta recompensa" : "Escolha o produto base para esta recompensa")}
                         >
                             {products.map((product) => (
                                 <MenuItem key={product.id} value={product.id}>
@@ -59,10 +61,11 @@ export const RewardFormDialog = ({
                                 <TextField
                                     fullWidth
                                     type="number"
-                                    label="Preço Recompensa *"
+                                    label="Preço Recompensa"
                                     value={formData.reward_price}
                                     onChange={e => setFormData({ ...formData, reward_price: e.target.value })}
                                     inputProps={{ step: '0.01', min: '0' }}
+                                    helperText="Deixe em branco para configurar como 'Apoio sem recompensa'"
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6}>
@@ -73,13 +76,15 @@ export const RewardFormDialog = ({
                                     value={formData.reward_qtd}
                                     onChange={e => setFormData({ ...formData, reward_qtd: e.target.value })}
                                     inputProps={{ min: '0' }}
+                                    error={!!validationErrors.reward_qtd}
+                                    helperText={validationErrors.reward_qtd}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     fullWidth
                                     type="number"
-                                    label="Unidades de Produto *"
+                                    label="Unidades de Produto"
                                     value={formData.qtd_products}
                                     onChange={e => setFormData({ ...formData, qtd_products: e.target.value })}
                                     inputProps={{ min: '1' }}
@@ -90,7 +95,7 @@ export const RewardFormDialog = ({
                                 <TextField
                                     fullWidth
                                     type="date"
-                                    label="Data de Entrega *"
+                                    label="Data de Entrega"
                                     value={formData.delivery ? (typeof formData.delivery === 'string' ? formData.delivery.split('T')[0] : new Date(formData.delivery).toISOString().split('T')[0]) : ''}
                                     onChange={e => setFormData({ ...formData, delivery: e.target.value })}
                                     InputLabelProps={{ shrink: true }}

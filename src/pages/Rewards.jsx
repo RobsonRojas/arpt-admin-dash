@@ -44,6 +44,7 @@ export const Rewards = () => {
     const [openView, setOpenView] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [selectedReward, setSelectedReward] = useState(null);
+    const [validationErrors, setValidationErrors] = useState({});
 
     // Form state with Persistence
     const [persistenceKey, setPersistenceKey] = useState('reward_draft_new');
@@ -107,6 +108,7 @@ export const Rewards = () => {
         setImgError(false);
         const key = 'reward_draft_new';
         setPersistenceKey(key);
+        setValidationErrors({});
         setFormData({
             id: '',
             id_manejo: selectedManejoId,
@@ -124,6 +126,7 @@ export const Rewards = () => {
         setImgError(false);
         const key = `reward_draft_${reward.id}`;
         setPersistenceKey(key);
+        setValidationErrors({});
         setFormData({
             id: reward.id || '',
             id_manejo: selectedManejoId,
@@ -144,8 +147,13 @@ export const Rewards = () => {
     };
 
     const handleSave = async () => {
-        if (!formData.id_produto) {
-            alert('A seleção de um produto é obrigatória');
+        const errors = {};
+        if (!formData.id_produto) errors.id_produto = 'A seleção de um produto é obrigatória';
+        if (!formData.reward_qtd && formData.reward_qtd !== 0 && formData.reward_qtd !== '0') errors.reward_qtd = 'Unidades de Recompensa são obrigatórias';
+        
+        setValidationErrors(errors);
+
+        if (Object.keys(errors).length > 0) {
             return;
         }
 
@@ -160,7 +168,7 @@ export const Rewards = () => {
                 id_produto: Number(formData.id_produto),
                 reward_price: Number(formData.reward_price) || 0,
                 reward_qtd: Number(formData.reward_qtd) || 0,
-                delivery: formData.delivery,
+                delivery: formData.delivery ? formData.delivery : null,
                 qtd_products: Number(formData.qtd_products) || 0
             };
 
@@ -296,6 +304,7 @@ export const Rewards = () => {
                     products={products}
                     handleSave={handleSave}
                     loading={loading}
+                    validationErrors={validationErrors}
                 />
 
                 <RewardViewDialog 
