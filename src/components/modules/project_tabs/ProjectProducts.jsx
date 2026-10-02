@@ -7,6 +7,7 @@ import {
 } from '@mui/material';
 import { Add, Edit, Delete, ShoppingBag } from '@mui/icons-material';
 import { useAdmin } from '../../../contexts/AdminContext';
+import { AIAssistant } from '../../AIAssistant';
 
 export const ProjectProducts = ({ projectId }) => {
     const { getRewardsByManejoId, createReward, updateReward, deleteReward } = useAdmin();
@@ -16,7 +17,9 @@ export const ProjectProducts = ({ projectId }) => {
     const [editingProduct, setEditingProduct] = useState(null);
     const [formData, setFormData] = useState({
         nome: '',
+        nome_en: '',
         descricao: '',
+        descricao_en: '',
         valor_pontos: '',
         quantidade_disponivel: ''
     });
@@ -41,7 +44,9 @@ export const ProjectProducts = ({ projectId }) => {
             setEditingProduct(product);
             setFormData({
                 nome: product.nome || '',
+                nome_en: product.nome_en || product.translations?.en?.nome || '',
                 descricao: product.descricao || '',
+                descricao_en: product.descricao_en || product.translations?.en?.descricao || '',
                 valor_pontos: product.valor_pontos || '',
                 quantidade_disponivel: product.quantidade_disponivel || ''
             });
@@ -49,7 +54,9 @@ export const ProjectProducts = ({ projectId }) => {
             setEditingProduct(null);
             setFormData({
                 nome: '',
+                nome_en: '',
                 descricao: '',
+                descricao_en: '',
                 valor_pontos: '',
                 quantidade_disponivel: ''
             });
@@ -66,7 +73,13 @@ export const ProjectProducts = ({ projectId }) => {
         const payload = {
             ...formData,
             valor_pontos: Number(formData.valor_pontos),
-            quantidade_disponivel: Number(formData.quantidade_disponivel || 0)
+            quantidade_disponivel: Number(formData.quantidade_disponivel || 0),
+            translations: {
+                en: {
+                    nome: formData.nome_en,
+                    descricao: formData.descricao_en
+                }
+            }
         };
 
         let success;
@@ -173,16 +186,61 @@ export const ProjectProducts = ({ projectId }) => {
                 <DialogContent>
                     <Box display="flex" flexDirection="column" gap={2} pt={1}>
                         <TextField
-                            label="Nome"
+                            label="Nome (PT)"
                             value={formData.nome}
                             onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
                             fullWidth
                             required
                         />
+                        <Box display="flex" justifyContent="space-between" alignItems="center" mb={-1}>
+                            <Typography variant="caption">Nome (EN)</Typography>
+                            <AIAssistant
+                                initialText={formData.nome_en}
+                                sourceText={formData.nome}
+                                context={`Reward Title: ${formData.nome}`}
+                                onApply={(text) => setFormData({ ...formData, nome_en: text })}
+                                label="Traduzir Nome EN"
+                            />
+                        </Box>
                         <TextField
-                            label="Descrição"
+                            label="Nome (EN)"
+                            value={formData.nome_en}
+                            onChange={(e) => setFormData({ ...formData, nome_en: e.target.value })}
+                            fullWidth
+                        />
+                        
+                        <Box display="flex" justifyContent="space-between" alignItems="center" mb={-1}>
+                            <Typography variant="caption">Descrição (PT)</Typography>
+                            <AIAssistant
+                                initialText={formData.descricao}
+                                context={`Melhorar descrição da recompensa: ${formData.nome}`}
+                                onApply={(text) => setFormData({ ...formData, descricao: text })}
+                                label="Melhorar Descrição PT"
+                            />
+                        </Box>
+                        <TextField
+                            label="Descrição (PT)"
                             value={formData.descricao}
                             onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
+                            fullWidth
+                            multiline
+                            rows={2}
+                        />
+
+                        <Box display="flex" justifyContent="space-between" alignItems="center" mb={-1}>
+                            <Typography variant="caption">Descrição (EN)</Typography>
+                            <AIAssistant
+                                initialText={formData.descricao_en}
+                                sourceText={formData.descricao}
+                                context={`Reward Description: ${formData.nome}`}
+                                onApply={(text) => setFormData({ ...formData, descricao_en: text })}
+                                label="Traduzir Descrição EN"
+                            />
+                        </Box>
+                        <TextField
+                            label="Descrição (EN)"
+                            value={formData.descricao_en}
+                            onChange={(e) => setFormData({ ...formData, descricao_en: e.target.value })}
                             fullWidth
                             multiline
                             rows={2}

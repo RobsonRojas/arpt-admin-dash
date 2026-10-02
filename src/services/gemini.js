@@ -179,12 +179,18 @@ export const improveText = async (text, context = "", type = "improve", sourceTe
     if (!targetText || targetText.length < 2) return targetText;
 
     try {
-        return await callArptAiService('/ai/improve-text', {
+        const token = await import('../contexts/AuthContext').then(m => {
+            // Need to get token or we can just use the standard api instance which adds the interceptor
+            return null;
+        });
+        const { api } = await import('./api');
+        const response = await api.post('/admin/ai/translate', {
             text,
             sourceText,
             context,
             type,
         });
+        return response.data?.text || response.data?.result || response.data;
     } catch (err) {
         if (genAI) {
             return runWithFallbackClientSide(async (model) => {
