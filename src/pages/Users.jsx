@@ -13,6 +13,7 @@ import { useAdmin } from '../contexts/AdminContext';
 import { api } from '../services/api';
 import { usePersistence } from '../hooks/usePersistence';
 import { AssignPropertyModal } from '../components/modules/AssignPropertyModal';
+import { StripeConnectModal } from '../components/modules/StripeConnectModal';
 
 const ROLES = ['Administrador', 'Gestor', 'Operador', 'Visualizador'];
 const STATUS = ['Ativo', 'Inativo'];
@@ -94,6 +95,7 @@ export const Users = () => {
 
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
     const [assignPropUser, setAssignPropUser] = useState(null);
+    const [stripeModalUser, setStripeModalUser] = useState(null);
 
     const fetchUsers = useCallback(async () => {
         if (!authUser) return;
@@ -510,6 +512,11 @@ export const Users = () => {
         return colors[role] || 'default';
     };
 
+    const getStripeStatusChip = (user) => {
+        if (!user.stripe_account_id) return <Chip label="Não conectado" color="error" size="small" onClick={() => setStripeModalUser(user)} sx={{ cursor: 'pointer' }} />;
+        return <Chip label="Pendente" color="warning" size="small" onClick={() => setStripeModalUser(user)} sx={{ cursor: 'pointer' }} />;
+    };
+
     return (
         <Box sx={{ animation: 'fadeIn 0.5s' }}>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
@@ -568,6 +575,7 @@ export const Users = () => {
                             <TableCell>Função</TableCell>
                             <TableCell>Status</TableCell>
                             <TableCell>Split Financeiro</TableCell>
+                            <TableCell>Stripe</TableCell>
                             <TableCell>Cadastrado em</TableCell>
                             <TableCell align="right">Ações</TableCell>
                         </TableRow>
@@ -613,6 +621,9 @@ export const Users = () => {
                                         onClick={() => handleTogglePaymentSplit(user)}
                                         sx={{ cursor: 'pointer' }}
                                     />
+                                </TableCell>
+                                <TableCell>
+                                    {getStripeStatusChip(user)}
                                 </TableCell>
                                 <TableCell>{user.created_at ? new Date(user.created_at).toLocaleDateString() : user.createdAt}</TableCell>
                                 <TableCell align="right">
@@ -1431,6 +1442,17 @@ export const Users = () => {
                     }}
                 />
             )}
+
+            <StripeConnectModal
+                open={!!stripeModalUser}
+                onClose={() => setStripeModalUser(null)}
+                user={stripeModalUser}
+                onStatusUpdate={(userId, data) => {
+                    setUsers(prev => prev.map(u => u.id === userId ? { ...u, stripe_account_id: data.stripe_account_id } : u));
+                    setSnackbar({ open: true, message: 'Conta Stripe criada. E-mail enviado ao usuário.', severity: 'success' });
+                }}
+            />
         </Box>
     );
 };
+
