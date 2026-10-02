@@ -1337,6 +1337,7 @@ export const AdminProvider = ({ children }) => {
         associateTagToPhysicalPiece,
         disassociateTagFromPhysicalPiece,
         getUsers,
+        getProperties,
     };
 
     return (

@@ -23,6 +23,7 @@ export const RevenueReportDialog = ({ open, onClose, project }) => {
     const [loading, setLoading] = useState(false);
     const [openPreCadForm, setOpenPreCadForm] = useState(false);
     const [selectedPreCad, setSelectedPreCad] = useState(null);
+    const [emailFeedback, setEmailFeedback] = useState({ open: false, link: '', success: false, message: '' });
 
     const { user } = useAuth();
 
@@ -57,11 +58,21 @@ export const RevenueReportDialog = ({ open, onClose, project }) => {
             const config = {
                 headers: { Authorization: `Bearer ${token}` }
             };
-            await api.post(`/admin/pagamentos/${saleId}/resend-email`, {}, config);
-            alert("E-mail de reenvio solicitado com sucesso!");
+            const response = await api.post(`/admin/pagamentos/${saleId}/resend-email`, {}, config);
+            setEmailFeedback({
+                open: true,
+                success: true,
+                link: response.data.link || '',
+                message: "E-mail de reenvio solicitado com sucesso!"
+            });
         } catch (err) {
             console.error(">>> [RevenueReportDialog] Error resending email:", err);
-            alert("Erro ao reenviar e-mail. Verifique os logs.");
+            setEmailFeedback({
+                open: true,
+                success: false,
+                link: '',
+                message: "Erro ao reenviar e-mail. Verifique os logs."
+            });
         }
     };
 
@@ -322,6 +333,38 @@ ${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number
             purchase={selectedPreCad}
             onSave={fetchReport}
         />
+
+        <Dialog open={emailFeedback.open} onClose={() => setEmailFeedback({ ...emailFeedback, open: false })} maxWidth="sm" fullWidth>
+            <DialogTitle>{emailFeedback.success ? "Sucesso" : "Erro"}</DialogTitle>
+            <DialogContent dividers>
+                <Typography gutterBottom>{emailFeedback.message}</Typography>
+                {emailFeedback.link && (
+                    <Box mt={2}>
+                        <Typography variant="body2" color="textSecondary" gutterBottom>
+                            Link gerado (enviado ao usuário):
+                        </Typography>
+                        <Paper variant="outlined" sx={{ p: 1, wordBreak: 'break-all', bgcolor: '#f5f5f5' }}>
+                            <Typography variant="body2">{emailFeedback.link}</Typography>
+                        </Paper>
+                        <Button 
+                            variant="outlined" 
+                            size="small" 
+                            startIcon={<ContentCopy />} 
+                            onClick={() => {
+                                navigator.clipboard.writeText(emailFeedback.link);
+                                alert("Link copiado!");
+                            }}
+                            sx={{ mt: 1 }}
+                        >
+                            Copiar Link
+                        </Button>
+                    </Box>
+                )}
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={() => setEmailFeedback({ ...emailFeedback, open: false })}>Fechar</Button>
+            </DialogActions>
+        </Dialog>
         </>
     );
 };

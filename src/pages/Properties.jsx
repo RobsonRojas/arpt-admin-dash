@@ -20,7 +20,8 @@ export const Properties = () => {
     handleUpdateProperty,
     uploadPropertyPhoto,
     createPropertyPhoto,
-    urlMidiasFiles
+    urlMidiasFiles,
+    getProperties
   } = useAdmin();
 
   const [openForm, setOpenForm] = useState(false);
@@ -567,8 +568,7 @@ export const Properties = () => {
           propertyId={assignUserProp.id}
           propertyName={assignUserProp.name}
           onAssigned={() => {
-            // Ideally trigger a refresh in the AdminContext
-            window.location.reload();
+            getProperties();
           }}
         />
       )}

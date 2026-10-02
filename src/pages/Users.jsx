@@ -39,7 +39,7 @@ export const Users = () => {
         status: 'Ativo',
     });
 
-    const { projects } = useAdmin();
+    const { projects, getProperties } = useAdmin();
     const [openCertForm, setOpenCertForm] = useState(false);
     const [openCertList, setOpenCertList] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
@@ -1426,6 +1426,7 @@ export const Users = () => {
                     userName={assignPropUser.first_name ? `${assignPropUser.first_name} ${assignPropUser.last_name}` : assignPropUser.name}
                     onAssigned={() => {
                         fetchUsers();
+                        getProperties();
                         setSnackbar({ open: true, message: 'Propriedade vinculada com sucesso', severity: 'success' });
                     }}
                 />
