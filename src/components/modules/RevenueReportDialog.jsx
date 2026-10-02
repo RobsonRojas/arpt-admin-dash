@@ -249,6 +249,7 @@ ${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number
                                     <TableRow>
                                         <TableCell sx={{ minWidth: 100 }}>Data</TableCell>
                                         <TableCell>Produto</TableCell>
+                                        <TableCell sx={{ display: { print: 'none' } }}>Email</TableCell>
                                         <TableCell align="center">Qtd</TableCell>
                                         <TableCell align="center" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>Total Itens</TableCell>
                                         <TableCell align="right">Valor Est.</TableCell>
@@ -268,6 +269,9 @@ ${reportData.sales.map(s => `${new Date(s.date).toLocaleDateString()} - ${Number
                                                 }}>
                                                     {Number(sale.rewardPrice) === 0 ? "Doação" : sale.product}
                                                 </Typography>
+                                            </TableCell>
+                                            <TableCell sx={{ display: { print: 'none' } }}>
+                                                {sale.user_email}
                                             </TableCell>
                                             <TableCell align="center">{sale.quantity}</TableCell>
                                             <TableCell align="center" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
