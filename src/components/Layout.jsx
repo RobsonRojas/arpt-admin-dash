@@ -18,7 +18,8 @@ import {
   QrCode,
   TrendingUp,
   Storefront,
-  Security
+  Security,
+  AutoGraph
 } from '@mui/icons-material';
 import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -53,6 +54,7 @@ export const Layout = ({ children }) => {
 
   const menuItems = [
     { id: 'dashboard', label: 'Sala de Situação', icon: <Dashboard />, path: '/dashboard' },
+    { id: 'analytics', label: 'Analytics e IA', icon: <AutoGraph />, path: '/analytics' },
     { id: 'necromassa', label: 'Necromassa', icon: <Forest />, path: '/necromassa' },
     { id: 'projects', label: 'Gestão Projetos', icon: <FolderOpen />, path: '/projects' },
     { id: 'adoptions', label: 'Gestão de Adoções', icon: <Forest />, path: '/adoptions' },

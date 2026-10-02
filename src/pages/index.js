@@ -25,3 +25,4 @@ export * from './ManejoLogs';
 export { DropshippingAdmin } from './DropshippingAdmin';
 export { DropshipperDetails } from './DropshipperDetails';
 export * from './PrivacySettings';
+export * from './AnalyticsDashboard';

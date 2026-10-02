@@ -42,6 +42,10 @@ export const Products = () => {
         is_ativo: true,
         is_physical_reward: false,
         carbon_stored_kg: 0,
+        weight_grams: 0,
+        width_cm: 0,
+        height_cm: 0,
+        length_cm: 0,
         foto_url: '',
         translations: {}
     });
@@ -107,6 +111,10 @@ export const Products = () => {
                 is_ativo: product.is_ativo,
                 is_physical_reward: product.is_physical_reward || false,
                 carbon_stored_kg: product.carbon_stored_kg || 0,
+                weight_grams: product.weight_grams || 0,
+                width_cm: product.width_cm || 0,
+                height_cm: product.height_cm || 0,
+                length_cm: product.length_cm || 0,
                 foto_url: product.fotos?.[0]?.url || '',
                 translations: product.translations || {}
             };
@@ -128,6 +136,10 @@ export const Products = () => {
                 is_ativo: true,
                 is_physical_reward: false,
                 carbon_stored_kg: 0,
+                weight_grams: 0,
+                width_cm: 0,
+                height_cm: 0,
+                length_cm: 0,
                 foto_url: '',
                 translations: {}
             };
@@ -173,6 +185,10 @@ export const Products = () => {
                 is_ativo: formData.is_ativo,
                 is_physical_reward: formData.is_physical_reward,
                 carbon_stored_kg: Number(formData.carbon_stored_kg),
+                weight_grams: Number(formData.weight_grams),
+                width_cm: Number(formData.width_cm),
+                height_cm: Number(formData.height_cm),
+                length_cm: Number(formData.length_cm),
                 translations: {
                     ...(formData.translations || {}),
                     en: {
@@ -478,6 +494,41 @@ export const Products = () => {
                                 helperText="Estimativa de carbono para este produto"
                             />
                         </Box>
+                        {formData.is_physical_reward && (
+                            <>
+                                <Typography variant="subtitle2" sx={{ mt: 2, mb: 1, color: 'text.secondary' }}>Dimensões e Peso (para cálculo de frete)</Typography>
+                                <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} gap={2}>
+                                    <TextField
+                                        label="Peso (g)"
+                                        type="number"
+                                        fullWidth
+                                        value={formData.weight_grams}
+                                        onChange={(e) => setFormData({ ...formData, weight_grams: e.target.value })}
+                                    />
+                                    <TextField
+                                        label="Largura (cm)"
+                                        type="number"
+                                        fullWidth
+                                        value={formData.width_cm}
+                                        onChange={(e) => setFormData({ ...formData, width_cm: e.target.value })}
+                                    />
+                                    <TextField
+                                        label="Altura (cm)"
+                                        type="number"
+                                        fullWidth
+                                        value={formData.height_cm}
+                                        onChange={(e) => setFormData({ ...formData, height_cm: e.target.value })}
+                                    />
+                                    <TextField
+                                        label="Profundidade (cm)"
+                                        type="number"
+                                        fullWidth
+                                        value={formData.length_cm}
+                                        onChange={(e) => setFormData({ ...formData, length_cm: e.target.value })}
+                                    />
+                                </Box>
+                            </>
+                        )}
                         <TextField
                             label="URL da Foto"
                             fullWidth
