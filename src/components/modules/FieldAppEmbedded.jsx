@@ -5,7 +5,7 @@ import { CONSTANTS } from '../../utils/constants';
 
 const FieldAppEmbedded = ({ onClose, onSave }) => {
   const [activeStep, setActiveStep] = useState(0);
-  const [formData, setFormData] = useState({ descricao: "", municipio: "Tefé", tamanho: "", custo: "" });
+  const [formData, setFormData] = useState({ descricao: "", municipio: "Tefé", tamanho: "", custo: "", commission_rate: "" });
   const steps = ['Dados', 'Revisão'];
 
   return (
@@ -17,7 +17,8 @@ const FieldAppEmbedded = ({ onClose, onSave }) => {
                   <Grid item xs={12}><TextField fullWidth label="Nome do Projeto" value={formData.descricao} onChange={e=>setFormData({...formData, descricao: e.target.value})} /></Grid>
                   <Grid item xs={6}><TextField fullWidth label="Município" value={formData.municipio} onChange={e=>setFormData({...formData, municipio: e.target.value})} /></Grid>
                   <Grid item xs={6}><TextField fullWidth label="Tamanho (ha)" type="number" value={formData.tamanho} onChange={e=>setFormData({...formData, tamanho: e.target.value})} /></Grid>
-                  <Grid item xs={12}><TextField fullWidth label="Custo Operacional (R$)" type="number" value={formData.custo} onChange={e=>setFormData({...formData, custo: e.target.value})} /></Grid>
+                  <Grid item xs={12} sm={6}><TextField fullWidth label="Custo Operacional (R$)" type="number" value={formData.custo} onChange={e=>setFormData({...formData, custo: e.target.value})} /></Grid>
+                  <Grid item xs={12} sm={6}><TextField fullWidth label="Taxa de Comissão (%)" type="number" value={formData.commission_rate} onChange={e=>setFormData({...formData, commission_rate: e.target.value})} /></Grid>
               </Grid>
           ) : (
               <Alert severity="info">Confirme os dados: {formData.descricao} em {formData.municipio}, {formData.tamanho} ha.</Alert>

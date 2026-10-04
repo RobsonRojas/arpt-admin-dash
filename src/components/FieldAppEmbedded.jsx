@@ -61,6 +61,7 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
     id_propriedade: "",
     id_status: "",
     custo_operacional: "",
+    commission_rate: "",
     ranking: 5,
     resumo: "",
     resumo_en: "",
@@ -202,6 +203,7 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
       ...formData,
       id: formData.id || `PROJ-${Math.floor(Math.random() * 1000)}`,
       custo_operacional: Number(formData.custo_operacional),
+      commission_rate: Number(formData.commission_rate || 0),
       tamanho: Number(formData.tamanho),
       translations: {
         ...(formData.translations || {}),
@@ -459,7 +461,7 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
                 onChange={handleChange}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
                 type="number"
@@ -467,6 +469,17 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
                 name="custo_operacional"
                 value={formData.custo_operacional}
                 onChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                type="number"
+                label="Taxa de Comissão (%)"
+                name="commission_rate"
+                value={formData.commission_rate}
+                onChange={handleChange}
+                helperText="Ex: 10 para 10%"
               />
             </Grid>
           </Grid>
@@ -686,6 +699,9 @@ export const FieldAppEmbedded = ({ onClose, onSave, initialData, properties = []
               </Typography>
               <Typography variant="body2">
                 <strong>Valor:</strong> R$ {formData.custo_operacional}
+              </Typography>
+              <Typography variant="body2">
+                <strong>Comissão:</strong> {formData.commission_rate}%
               </Typography>
             </Alert>
 
