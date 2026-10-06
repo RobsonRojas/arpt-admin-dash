@@ -3,7 +3,7 @@ import {
     Box, Typography, Button, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Paper, IconButton,
     Dialog, DialogTitle, DialogContent, DialogActions, TextField,
-    CircularProgress
+    CircularProgress, useMediaQuery, useTheme
 } from '@mui/material';
 import { Add, Edit, Delete, ShoppingBag } from '@mui/icons-material';
 import { useAdmin } from '../../../contexts/AdminContext';
@@ -11,6 +11,8 @@ import { AIAssistant } from '../../AIAssistant';
 
 export const ProjectProducts = ({ projectId }) => {
     const { getRewardsByManejoId, createReward, updateReward, deleteReward } = useAdmin();
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [openDialog, setOpenDialog] = useState(false);
@@ -21,7 +23,11 @@ export const ProjectProducts = ({ projectId }) => {
         descricao: '',
         descricao_en: '',
         valor_pontos: '',
-        quantidade_disponivel: ''
+        quantidade_disponivel: '',
+        weight_grams: '',
+        width_cm: '',
+        height_cm: '',
+        length_cm: ''
     });
 
     useEffect(() => {
@@ -43,12 +49,16 @@ export const ProjectProducts = ({ projectId }) => {
         if (product) {
             setEditingProduct(product);
             setFormData({
-                nome: product.nome || '',
+                nome: product.nome || product.name || '',
                 nome_en: product.nome_en || product.translations?.en?.nome || '',
-                descricao: product.descricao || '',
-                descricao_en: product.descricao_en || product.translations?.en?.descricao || '',
-                valor_pontos: product.valor_pontos || '',
-                quantidade_disponivel: product.quantidade_disponivel || ''
+                descricao: product.descricao || product.info || '',
+                descricao_en: product.descricao_en || product.info_en || product.translations?.en?.descricao || '',
+                valor_pontos: product.valor_pontos ?? product.reward_price ?? '',
+                quantidade_disponivel: product.quantidade_disponivel ?? product.diferenca ?? '',
+                weight_grams: product.weight_grams ?? '',
+                width_cm: product.width_cm ?? '',
+                height_cm: product.height_cm ?? '',
+                length_cm: product.length_cm ?? ''
             });
         } else {
             setEditingProduct(null);
@@ -58,7 +68,11 @@ export const ProjectProducts = ({ projectId }) => {
                 descricao: '',
                 descricao_en: '',
                 valor_pontos: '',
-                quantidade_disponivel: ''
+                quantidade_disponivel: '',
+                weight_grams: '',
+                width_cm: '',
+                height_cm: '',
+                length_cm: ''
             });
         }
         setOpenDialog(true);
@@ -74,6 +88,10 @@ export const ProjectProducts = ({ projectId }) => {
             ...formData,
             valor_pontos: Number(formData.valor_pontos),
             quantidade_disponivel: Number(formData.quantidade_disponivel || 0),
+            weight_grams: formData.weight_grams === '' ? undefined : Number(formData.weight_grams),
+            width_cm: formData.width_cm === '' ? undefined : Number(formData.width_cm),
+            height_cm: formData.height_cm === '' ? undefined : Number(formData.height_cm),
+            length_cm: formData.length_cm === '' ? undefined : Number(formData.length_cm),
             translations: {
                 en: {
                     nome: formData.nome_en,
@@ -139,10 +157,10 @@ export const ProjectProducts = ({ projectId }) => {
                             <TableBody>
                                 {products.map((p) => (
                                     <TableRow key={p.id}>
-                                        <TableCell>{p.nome}</TableCell>
-                                        <TableCell>{p.descricao}</TableCell>
-                                        <TableCell>{p.valor_pontos}</TableCell>
-                                        <TableCell>{p.quantidade_disponivel}</TableCell>
+                                        <TableCell>{p.nome || p.name}</TableCell>
+                                        <TableCell>{p.descricao || p.info}</TableCell>
+                                        <TableCell>{p.valor_pontos ?? p.reward_price}</TableCell>
+                                        <TableCell>{p.quantidade_disponivel ?? p.diferenca}</TableCell>
                                         <TableCell align="right">
                                             <IconButton size="small" onClick={() => handleOpenDialog(p)}>
                                                 <Edit fontSize="small" />
@@ -161,11 +179,11 @@ export const ProjectProducts = ({ projectId }) => {
                     <Box sx={{ display: { xs: 'flex', md: 'none' }, flexDirection: 'column', gap: 2 }}>
                         {products.map((p) => (
                             <Paper key={p.id} sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
-                                <Typography fontWeight="bold" variant="subtitle1">{p.nome}</Typography>
-                                <Typography variant="body2" color="textSecondary">{p.descricao}</Typography>
+                                <Typography fontWeight="bold" variant="subtitle1">{p.nome || p.name}</Typography>
+                                <Typography variant="body2" color="textSecondary">{p.descricao || p.info}</Typography>
                                 <Box display="flex" justifyContent="space-between" mt={1}>
-                                    <Typography variant="body2"><strong>Pontos:</strong> {p.valor_pontos}</Typography>
-                                    <Typography variant="body2"><strong>Qtd:</strong> {p.quantidade_disponivel}</Typography>
+                                    <Typography variant="body2"><strong>Pontos:</strong> {p.valor_pontos ?? p.reward_price}</Typography>
+                                    <Typography variant="body2"><strong>Qtd:</strong> {p.quantidade_disponivel ?? p.diferenca}</Typography>
                                 </Box>
                                 <Box display="flex" justifyContent="flex-end" gap={1} mt={1}>
                                     <Button size="small" startIcon={<Edit />} onClick={() => handleOpenDialog(p)}>
@@ -181,7 +199,7 @@ export const ProjectProducts = ({ projectId }) => {
                 </>
             )}
 
-            <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="xs" fullWidth>
+            <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="xs" fullWidth fullScreen={isMobile}>
                 <DialogTitle>{editingProduct ? 'Editar Produto' : 'Novo Produto'}</DialogTitle>
                 <DialogContent>
                     <Box display="flex" flexDirection="column" gap={2} pt={1}>
@@ -260,6 +278,36 @@ export const ProjectProducts = ({ projectId }) => {
                             onChange={(e) => setFormData({ ...formData, quantidade_disponivel: e.target.value })}
                             fullWidth
                         />
+                        <Box display="flex" gap={2} flexWrap="wrap">
+                            <TextField
+                                label="Peso (g)"
+                                type="number"
+                                value={formData.weight_grams}
+                                onChange={(e) => setFormData({ ...formData, weight_grams: e.target.value })}
+                                sx={{ flex: 1, minWidth: 120 }}
+                            />
+                            <TextField
+                                label="Largura (cm)"
+                                type="number"
+                                value={formData.width_cm}
+                                onChange={(e) => setFormData({ ...formData, width_cm: e.target.value })}
+                                sx={{ flex: 1, minWidth: 120 }}
+                            />
+                            <TextField
+                                label="Altura (cm)"
+                                type="number"
+                                value={formData.height_cm}
+                                onChange={(e) => setFormData({ ...formData, height_cm: e.target.value })}
+                                sx={{ flex: 1, minWidth: 120 }}
+                            />
+                            <TextField
+                                label="Comprimento (cm)"
+                                type="number"
+                                value={formData.length_cm}
+                                onChange={(e) => setFormData({ ...formData, length_cm: e.target.value })}
+                                sx={{ flex: 1, minWidth: 120 }}
+                            />
+                        </Box>
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ p: 2, flexWrap: 'wrap', gap: 1 }}>

@@ -4,7 +4,7 @@ import {
     TableRow, TableCell, TableBody, Paper, IconButton, Chip,
     Dialog, DialogTitle, DialogContent, DialogActions, TextField,
     FormControlLabel, Switch, CircularProgress, Alert, Snackbar,
-    Avatar, Grid
+    Avatar, Grid, useMediaQuery, useTheme
 } from '@mui/material';
 import { Add, Edit, Delete, Visibility, Close, Image as ImageIcon, Search, Refresh, BrokenImage } from '@mui/icons-material';
 import { AIAssistant } from '../components/AIAssistant';
@@ -16,6 +16,8 @@ import { usePersistence } from '../hooks/usePersistence';
 
 export const Products = () => {
     const { user } = useAuth();
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -404,7 +406,7 @@ export const Products = () => {
             )}
 
             {/* Create/Edit Dialog */}
-            <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+            <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth fullScreen={isMobile}>
                 <DialogTitle>{editingProduct ? 'Editar Produto' : 'Novo Produto'}</DialogTitle>
                 <DialogContent dividers>
                     <Box display="flex" flexDirection="column" gap={2}>
@@ -599,7 +601,7 @@ export const Products = () => {
             </Dialog>
 
             {/* View Dialog */}
-            <Dialog open={openViewDialog} onClose={handleCloseView} maxWidth="sm" fullWidth>
+            <Dialog open={openViewDialog} onClose={handleCloseView} maxWidth="sm" fullWidth fullScreen={isMobile}>
                 <DialogTitle>
                     {viewingProduct?.nome}
                 </DialogTitle>

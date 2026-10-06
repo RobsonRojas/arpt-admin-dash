@@ -525,7 +525,7 @@ export const AdminProvider = ({ children }) => {
 
     const getRewardsByManejoId = async (manejoId) => {
         try {
-            const response = await api.get(`/manejos/${manejoId}/produtos`);
+            const response = await api.get(`/manejos/${manejoId}/produtos?lang=pt`);
             if (response.status === 200) {
                 return response.data;
             } else {
@@ -540,7 +540,7 @@ export const AdminProvider = ({ children }) => {
 
     const getRewardById = async (manejoId, productId) => {
         try {
-            const response = await api.get(`/manejos/${manejoId}/produtos/${productId}`);
+            const response = await api.get(`/manejos/${manejoId}/produtos/${productId}?lang=pt`);
             if (response.status === 200) {
                 return response.data;
             } else {
