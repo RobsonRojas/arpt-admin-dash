@@ -514,6 +514,7 @@ export const Users = () => {
 
     const getStripeStatusChip = (user) => {
         if (!user.stripe_account_id) return <Chip label="Não conectado" color="error" size="small" onClick={() => setStripeModalUser(user)} sx={{ cursor: 'pointer' }} />;
+        if (user.charges_enabled) return <Chip label="Ativa" color="success" size="small" onClick={() => setStripeModalUser(user)} sx={{ cursor: 'pointer' }} />;
         return <Chip label="Pendente" color="warning" size="small" onClick={() => setStripeModalUser(user)} sx={{ cursor: 'pointer' }} />;
     };
 
