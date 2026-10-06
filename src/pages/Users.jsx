@@ -96,6 +96,14 @@ export const Users = () => {
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
     const [assignPropUser, setAssignPropUser] = useState(null);
     const [stripeModalUser, setStripeModalUser] = useState(null);
+    const [searchTerm, setSearchTerm] = useState(() => {
+        try { return localStorage.getItem("admin_users_filters_search") || ""; } catch (e) { return ""; }
+    });
+    const [sortBy, setSortBy] = useState("name");
+    const [sortDir, setSortDir] = useState(() => {
+        try { const v = localStorage.getItem("admin_users_filters_sortDir"); return v === "desc" ? "desc" : "asc"; } catch (e) { return "asc"; }
+    });
+    const [filterApplied, setFilterApplied] = useState(false);
 
     const fetchUsers = useCallback(async () => {
         if (!authUser) return;
@@ -119,6 +127,28 @@ export const Users = () => {
     useEffect(() => {
         fetchUsers();
     }, [fetchUsers]);
+    useEffect(() => {
+        try {
+            const search = localStorage.getItem("admin_users_filters_search") || "";
+            const sortDir = localStorage.getItem("admin_users_filters_sortDir") || "asc";
+            if (search || sortDir !== "asc") {
+                setFilterApplied(true);
+            }
+        } catch (e) {}
+    }, []);
+
+    useEffect(() => {
+        try {
+            localStorage.setItem("admin_users_filters_search", searchTerm);
+            localStorage.setItem("admin_users_filters_sortDir", sortDir);
+            if (searchTerm || sortDir !== "asc") {
+                setFilterApplied(true);
+            } else {
+                setFilterApplied(false);
+            }
+        } catch (e) {}
+    }, [searchTerm, sortDir]);
+
 
     const fetchUserCertificates = async (userId) => {
         setLoadingCerts(true);
@@ -534,7 +564,7 @@ export const Users = () => {
             </Box>
 
             <Box sx={{ display: { xs: 'block', md: 'none' } }}>
-                {users.map((user) => (
+                {filteredUsers.map((user) => (
                     <Paper key={user.id} sx={{ p: 2, mb: 2 }}>
                         <Box display="flex" alignItems="center" gap={2} mb={2}>
                             <Avatar sx={{ bgcolor: 'primary.main' }}>
@@ -571,7 +601,7 @@ export const Users = () => {
                     <TableHead sx={{ bgcolor: '#f9fafb' }}>
                         <TableRow>
                             <TableCell>ID</TableCell>
-                            <TableCell>Usuário</TableCell>
+                            <TableCell onClick={() => setSortDir(d => d === "asc" ? "desc" : "asc")} sx={{ cursor: "pointer" }}>Usuário {sortDir === "asc" ? "▲" : "▼"}</TableCell>
                             <TableCell>Email</TableCell>
                             <TableCell>Função</TableCell>
                             <TableCell>Status</TableCell>
@@ -582,7 +612,7 @@ export const Users = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {users.map((user) => (
+                        {filteredUsers.map((user) => (
                             <TableRow key={user.id} hover data-testid="user-row">
                                 <TableCell>
                                     <Typography variant="body2" fontWeight="medium">
