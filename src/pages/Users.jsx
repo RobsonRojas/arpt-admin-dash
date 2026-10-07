@@ -6,7 +6,7 @@ import {
     TextField, MenuItem, Avatar, TablePagination, CircularProgress,
     Snackbar, Alert
 } from '@mui/material';
-import { Add, Edit, Delete, ManageAccounts, CardMembership, Visibility, History, QrCode, Public, PublicOff, Inventory, Sync, HomeWork } from '@mui/icons-material';
+import { Add, Edit, Delete, ManageAccounts, CardMembership, Visibility, History, QrCode, Public, PublicOff, Inventory, Sync, HomeWork, Warning } from '@mui/icons-material';
 import { QRCodeSVG } from 'qrcode.react';
 import { useAuth } from '../contexts/AuthContext';
 import { useAdmin } from '../contexts/AdminContext';
@@ -29,6 +29,10 @@ export const Users = () => {
 
     const [openForm, setOpenForm] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+
+    // Sync ID states
+    const [syncIdValue, setSyncIdValue] = useState('');
+    const [isSyncingId, setIsSyncingId] = useState(false);
 
     // Form Persistence
     const [persistenceKey, setPersistenceKey] = useState('user_draft_new');
@@ -481,6 +485,7 @@ export const Users = () => {
     const handleOpenEdit = (user) => {
         setPersistenceKey(`user_draft_${user.id}`);
         setFormData(user);
+        setSyncIdValue('');
         setIsEditing(true);
         setOpenForm(true);
     };
@@ -514,6 +519,36 @@ export const Users = () => {
         } catch (error) {
             console.error('Erro ao salvar usuário:', error);
             setSnackbar({ open: true, message: 'Erro ao salvar usuário', severity: 'error' });
+        }
+    };
+
+    const handleSyncId = async () => {
+        if (!syncIdValue || syncIdValue.trim() === '') {
+            setSnackbar({ open: true, message: 'Digite o novo UUID do Keycloak.', severity: 'warning' });
+            return;
+        }
+        if (!window.confirm(`ATENÇÃO: Deseja forçar o update do ID do usuário de ${formData.id} para ${syncIdValue}? Isso requer que as tabelas relacionadas aceitem CASCADE UPDATE. Continuar?`)) {
+            return;
+        }
+
+        setIsSyncingId(true);
+        try {
+            const token = await authUser.getIdToken();
+            await api.patch(`/admin/users/${formData.id}/uuid`, { newId: syncIdValue.trim() }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            
+            // Update local state
+            setUsers(users.map(u => u.id === formData.id ? { ...u, id: syncIdValue.trim() } : u));
+            setFormData({ ...formData, id: syncIdValue.trim() });
+            setSnackbar({ open: true, message: 'ID atualizado com sucesso.', severity: 'success' });
+            setSyncIdValue('');
+        } catch (error) {
+            console.error('Erro ao atualizar ID do usuário:', error);
+            const msg = error.response?.data?.message || 'Erro ao sincronizar ID. (Problema de Foreign Key?)';
+            setSnackbar({ open: true, message: msg, severity: 'error' });
+        } finally {
+            setIsSyncingId(false);
         }
     };
 
@@ -794,6 +829,38 @@ export const Users = () => {
                                 ))}
                             </TextField>
                         </Grid>
+                        {isEditing && (
+                            <Grid item xs={12}>
+                                <Box border="1px solid #ffcc00" borderRadius={1} p={2} bgcolor="#fffbea">
+                                    <Typography variant="subtitle2" color="warning.dark" gutterBottom>
+                                        <Warning fontSize="small" style={{ verticalAlign: 'middle', marginRight: 4 }} /> 
+                                        Sincronização de ID (Avançado)
+                                    </Typography>
+                                    <Typography variant="body2" color="textSecondary" mb={2}>
+                                        Utilize esta opção caso o usuário receba "User not found" ou "404" e exista uma dessincronização entre o ID do Keycloak e o banco de dados.
+                                        <br/>ID Atual no BD: <strong>{formData.id}</strong>
+                                    </Typography>
+                                    <Box display="flex" gap={1}>
+                                        <TextField
+                                            size="small"
+                                            fullWidth
+                                            placeholder="Insira o UUID correto do Keycloak"
+                                            value={syncIdValue}
+                                            onChange={(e) => setSyncIdValue(e.target.value)}
+                                        />
+                                        <Button 
+                                            variant="contained" 
+                                            color="warning" 
+                                            onClick={handleSyncId}
+                                            disabled={isSyncingId || !syncIdValue}
+                                            sx={{ whiteSpace: 'nowrap' }}
+                                        >
+                                            {isSyncingId ? 'Sincronizando...' : 'Atualizar ID'}
+                                        </Button>
+                                    </Box>
+                                </Box>
+                            </Grid>
+                        )}
                     </Grid>
                 </DialogContent>
                 <DialogActions>
