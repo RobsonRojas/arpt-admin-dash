@@ -150,6 +150,17 @@ export const Users = () => {
     }, [searchTerm, sortDir]);
 
 
+    const filteredUsers = users.filter(u => {
+        const term = searchTerm.toLowerCase();
+        const name = (u.first_name ? `${u.first_name} ${u.last_name}` : u.name || "").toLowerCase();
+        const email = (u.email || "").toLowerCase();
+        return !term || name.includes(term) || email.includes(term);
+    }).sort((a, b) => {
+        const nameA = (a.first_name ? `${a.first_name} ${a.last_name}` : a.name || "").toLowerCase();
+        const nameB = (b.first_name ? `${b.first_name} ${b.last_name}` : b.name || "").toLowerCase();
+        return sortDir === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+    });
+
     const fetchUserCertificates = async (userId) => {
         setLoadingCerts(true);
         try {
