@@ -496,41 +496,37 @@ export const Products = () => {
                                 helperText="Estimativa de carbono para este produto"
                             />
                         </Box>
-                        {formData.is_physical_reward && (
-                            <>
-                                <Typography variant="subtitle2" sx={{ mt: 2, mb: 1, color: 'text.secondary' }}>Dimensões e Peso (para cálculo de frete)</Typography>
-                                <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} gap={2}>
-                                    <TextField
-                                        label="Peso (g)"
-                                        type="number"
-                                        fullWidth
-                                        value={formData.weight_grams}
-                                        onChange={(e) => setFormData({ ...formData, weight_grams: e.target.value })}
-                                    />
-                                    <TextField
-                                        label="Largura (cm)"
-                                        type="number"
-                                        fullWidth
-                                        value={formData.width_cm}
-                                        onChange={(e) => setFormData({ ...formData, width_cm: e.target.value })}
-                                    />
-                                    <TextField
-                                        label="Altura (cm)"
-                                        type="number"
-                                        fullWidth
-                                        value={formData.height_cm}
-                                        onChange={(e) => setFormData({ ...formData, height_cm: e.target.value })}
-                                    />
-                                    <TextField
-                                        label="Profundidade (cm)"
-                                        type="number"
-                                        fullWidth
-                                        value={formData.length_cm}
-                                        onChange={(e) => setFormData({ ...formData, length_cm: e.target.value })}
-                                    />
-                                </Box>
-                            </>
-                        )}
+                        <Typography variant="subtitle2" sx={{ mt: 2, mb: 1, color: 'text.secondary' }}>Dimensões e Peso (Opcional - usado para frete)</Typography>
+                        <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} gap={2}>
+                            <TextField
+                                label="Peso (g)"
+                                type="number"
+                                fullWidth
+                                value={formData.weight_grams}
+                                onChange={(e) => setFormData({ ...formData, weight_grams: e.target.value })}
+                            />
+                            <TextField
+                                label="Largura (cm)"
+                                type="number"
+                                fullWidth
+                                value={formData.width_cm}
+                                onChange={(e) => setFormData({ ...formData, width_cm: e.target.value })}
+                            />
+                            <TextField
+                                label="Altura (cm)"
+                                type="number"
+                                fullWidth
+                                value={formData.height_cm}
+                                onChange={(e) => setFormData({ ...formData, height_cm: e.target.value })}
+                            />
+                            <TextField
+                                label="Profundidade (cm)"
+                                type="number"
+                                fullWidth
+                                value={formData.length_cm}
+                                onChange={(e) => setFormData({ ...formData, length_cm: e.target.value })}
+                            />
+                        </Box>
                         <TextField
                             label="URL da Foto"
                             fullWidth
