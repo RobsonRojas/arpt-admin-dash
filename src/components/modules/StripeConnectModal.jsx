@@ -47,7 +47,11 @@ export const StripeConnectModal = ({ open, onClose, user, onStatusUpdate }) => {
             });
             if (onStatusUpdate) onStatusUpdate(user.id, response.data);
         } catch (err) {
-            setError(err.response?.data?.message || 'Erro ao conectar com a Stripe');
+            if (err.response?.status === 400) {
+                setError('Erro ao conectar Stripe: dados da conta inválidos ou incompletos. Contate o suporte ou verifique os dados no perfil.');
+            } else {
+                setError(err.response?.data?.message || 'Erro ao conectar com a Stripe');
+            }
         } finally {
             setLoading(false);
         }
