@@ -1116,8 +1116,14 @@ export const Users = () => {
             <Dialog open={openUserDetails} onClose={() => setOpenUserDetails(false)} maxWidth="lg" fullWidth>
                 <DialogTitle>Detalhes do Usuário</DialogTitle>
                 <DialogContent dividers>
-                    {selectedUser && (
-                        <Grid container spacing={3} mb={4}>
+                    {selectedUser && (() => {
+                        const userProps = properties.filter(p => String(p.user_id) === String(selectedUser.id) || String(p.id_usuario) === String(selectedUser.id));
+                        const propIds = userProps.map(p => p.id);
+                        const userProjs = projects.filter(proj => propIds.includes(proj.id_propriedade) || String(proj.user_id) === String(selectedUser.id) || String(proj.id_usuario) === String(selectedUser.id));
+
+                        return (
+                        <>
+                            <Grid container spacing={3} mb={4}>
                             <Grid item xs={12} md={6}>
                                 <Typography variant="subtitle2" color="textSecondary">Nome Completo</Typography>
                                 <Typography variant="h6">{selectedUser.first_name ? `${selectedUser.first_name} ${selectedUser.last_name}` : selectedUser.name}</Typography>
@@ -1136,14 +1142,14 @@ export const Users = () => {
                             </Grid>
                             <Grid item xs={6} md={3}>
                                 <Typography variant="subtitle2" color="textSecondary">Função</Typography>
-                                <Chip label={selectedUser.role} color={getRoleColor(selectedUser.role)} size="small" />
+                                <Chip label={selectedUser.role || 'Operador'} color={getRoleColor(selectedUser.role || 'Operador')} size="small" />
                             </Grid>
                             <Grid item xs={6} md={3}>
                                 <Typography variant="subtitle2" color="textSecondary">Status</Typography>
-                                <Chip label={selectedUser.status} color={getStatusColor(selectedUser.status)} size="small" />
+                                <Chip label={selectedUser.status || 'Ativo'} color={getStatusColor(selectedUser.status || 'Ativo')} size="small" />
                             </Grid>
                         </Grid>
-                    )}
+
 
                     <Box mt={3} mb={4} p={2} sx={{ border: '1px solid #e0e0e0', borderRadius: 1 }}>
                         <Typography variant="h6" gutterBottom display="flex" alignItems="center" gap={1} sx={{ fontWeight: 'bold' }}>
@@ -1289,9 +1295,81 @@ export const Users = () => {
                             </Table>
                         </TableContainer>
                     )}
+
+                    {/* Projetos e Propriedades */}
+                    <Box mt={3} mb={4} p={2} sx={{ border: '1px solid #e0e0e0', borderRadius: 1 }}>
+                        <Typography variant="h6" gutterBottom display="flex" alignItems="center" gap={1} sx={{ fontWeight: 'bold' }}>
+                            Projetos e Propriedades
+                        </Typography>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} md={6}>
+                                <Typography variant="subtitle2" color="textSecondary" gutterBottom>
+                                    Propriedades ({userProps.length})
+                                </Typography>
+                                {userProps.length === 0 ? (
+                                    <Typography variant="body2" color="textSecondary">Nenhuma propriedade associada.</Typography>
+                                ) : (
+                                    <List dense>
+                                        {userProps.map(p => (
+                                            <ListItem key={p.id}>
+                                                <ListItemText primary={p.name || p.nome || 'Propriedade Sem Nome'} secondary={p.cidade || p.estado || 'Localização não informada'} />
+                                                <Box display="flex" gap={1}>
+                                                    <Button size="small" variant="outlined" onClick={() => {
+                                                        setOpenUserDetails(false);
+                                                        window.location.href = `/properties`; // No specific route for a property ID exists in admin
+                                                    }}>Ver no Admin</Button>
+                                                    <Button size="small" variant="outlined" component="a" target="_blank" href={`https://arpt.site/propriedades/${p.id}`}>
+                                                        Site Público
+                                                    </Button>
+                                                </Box>
+                                            </ListItem>
+                                        ))}
+                                    </List>
+                                )}
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <Typography variant="subtitle2" color="textSecondary" gutterBottom>
+                                    Projetos ({userProjs.length})
+                                </Typography>
+                                {userProjs.length === 0 ? (
+                                    <Typography variant="body2" color="textSecondary">Nenhum projeto associado.</Typography>
+                                ) : (
+                                    <List dense>
+                                        {userProjs.map(p => (
+                                            <ListItem key={p.id}>
+                                                <ListItemText primary={p.nome || p.descricao || 'Projeto Sem Nome'} secondary={p.estado || 'Localização não informada'} />
+                                                <Box display="flex" gap={1}>
+                                                    <Button size="small" variant="outlined" onClick={() => {
+                                                        setOpenUserDetails(false);
+                                                        window.location.href = `/projects`; // No specific route for a project ID exists in admin
+                                                    }}>Ver no Admin</Button>
+                                                    <Button size="small" variant="outlined" component="a" target="_blank" href={`https://arpt.site/projetos/${p.id}`}>
+                                                        Site Público
+                                                    </Button>
+                                                </Box>
+                                            </ListItem>
+                                        ))}
+                                    </List>
+                                )}
+                            </Grid>
+                        </Grid>
+                    </Box>
+                        </>
+                    )})()}
+
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpenUserDetails(false)}>Fechar</Button>
+                    <Button 
+                        color="primary" 
+                        variant="contained"
+                        onClick={() => {
+                            setOpenUserDetails(false);
+                            openForm(selectedUser);
+                        }}
+                    >
+                        Editar Usuário
+                    </Button>
                 </DialogActions>
             </Dialog>
 
