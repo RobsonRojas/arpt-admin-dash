@@ -27,3 +27,4 @@ export { DropshipperDetails } from './DropshipperDetails';
 export * from './PrivacySettings';
 export * from './AnalyticsDashboard';
 export * from './TermsOfUse';
+export * from './AnalyticsPixels';
