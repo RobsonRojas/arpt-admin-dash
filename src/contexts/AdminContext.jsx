@@ -633,12 +633,48 @@ export const AdminProvider = ({ children }) => {
         try {
             const response = await api.get('/admin/pecas');
             if (response.status === 200) {
-                return response.data;
+                // Endpoint is paginated: { total, page, pageSize, items }
+                if (Array.isArray(response.data)) return response.data;
+                return response.data?.items || [];
             }
             return [];
         } catch (error) {
             console.error("Error fetching physical pieces:", error);
             return [];
+        }
+    }
+
+    const getPhysicalPiece = async (pieceId) => {
+        try {
+            const response = await api.get(`/admin/pecas/${pieceId}`);
+            if (response.status === 200) {
+                return response.data;
+            }
+            return null;
+        } catch (error) {
+            console.error("Error fetching physical piece:", error);
+            return null;
+        }
+    }
+
+    const updatePhysicalPiece = async (pieceId, patch) => {
+        try {
+            const response = await api.patch(`/admin/pecas/${pieceId}`, patch);
+            if (response.status === 200) {
+                await recordAudit({
+                    action: 'UPDATE',
+                    entity: 'PHYSICAL_PIECE',
+                    entityId: String(pieceId),
+                    before: null,
+                    after: { pieceId, ...patch },
+                    user
+                });
+                return response.data;
+            }
+            return null;
+        } catch (error) {
+            console.error("Error updating physical piece:", error);
+            return null;
         }
     }
 
@@ -663,16 +699,16 @@ export const AdminProvider = ({ children }) => {
         }
     }
 
-    const attributePhysicalPiece = async (pieceId, userId) => {
+    const attributePhysicalPiece = async (pieceId, idCompra) => {
         try {
-            const response = await api.post(`/admin/pecas/${pieceId}/atribuir`, { id_usuario: userId });
+            const response = await api.post(`/admin/pecas/${pieceId}/atribuir`, { id_compra: idCompra });
             if (response.status === 200) {
                 await recordAudit({
                     action: 'UPDATE',
                     entity: 'PHYSICAL_PIECE',
                     entityId: String(pieceId),
                     before: null,
-                    after: { pieceId, userId, action: 'atribuir' },
+                    after: { pieceId, idCompra, action: 'atribuir' },
                     user
                 });
                 return true;
@@ -684,54 +720,19 @@ export const AdminProvider = ({ children }) => {
         }
     }
 
-    const associateTagToPhysicalPiece = async (pieceId, tagValue, sourceTreeId) => {
+    /** Lists reward purchases of a user for the attribution modal. */
+    const getUserPurchases = async (userId, email) => {
         try {
-            const token = await user?.getIdToken();
-            const response = await api.post(`/admin/pecas/${pieceId}/labels`, {
-                tag_value: tagValue,
-                source_tree_id: sourceTreeId
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
+            const response = await api.get(`/admin/users/${userId}/purchases`, {
+                params: email ? { email } : {}
             });
-            if (response.status === 201 || response.status === 200) {
-                await recordAudit({
-                    action: 'UPDATE',
-                    entity: 'PHYSICAL_PIECE',
-                    entityId: String(pieceId),
-                    before: null,
-                    after: { pieceId, tagValue, sourceTreeId, action: 'associate_tag' },
-                    user
-                });
+            if (response.status === 200 && Array.isArray(response.data)) {
                 return response.data;
             }
-            return null;
+            return [];
         } catch (error) {
-            console.error("Error associating tag to physical piece:", error);
-            throw error;
-        }
-    }
-
-    const disassociateTagFromPhysicalPiece = async (pieceId, labelId) => {
-        try {
-            const token = await user?.getIdToken();
-            const response = await api.delete(`/admin/pecas/${pieceId}/labels/${labelId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (response.status === 200) {
-                await recordAudit({
-                    action: 'UPDATE',
-                    entity: 'PHYSICAL_PIECE',
-                    entityId: String(pieceId),
-                    before: null,
-                    after: { pieceId, labelId, action: 'disassociate_tag' },
-                    user
-                });
-                return true;
-            }
-            return false;
-        } catch (error) {
-            console.error("Error disassociating tag from physical piece:", error);
-            return false;
+            console.error("Error fetching user purchases:", error);
+            return [];
         }
     }
 
@@ -1332,10 +1333,11 @@ export const AdminProvider = ({ children }) => {
 
         // Regras de Negócio - Peças Físicas (Recompensas)
         getPhysicalPieces,
+        getPhysicalPiece,
         createPhysicalPiece,
+        updatePhysicalPiece,
         attributePhysicalPiece,
-        associateTagToPhysicalPiece,
-        disassociateTagFromPhysicalPiece,
+        getUserPurchases,
         getUsers,
         getProperties,
     };
