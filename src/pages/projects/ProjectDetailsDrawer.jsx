@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Box, Typography, Drawer, IconButton, Tabs, Tab, List, ListItem, ListItemText, Divider, Button, Tooltip } from '@mui/material';
-import { Close, Description, History } from '@mui/icons-material';
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, Drawer, IconButton, Tabs, Tab, List, ListItem, ListItemText, Divider, Button, Tooltip, Chip, CircularProgress, Snackbar, Alert } from '@mui/material';
+import { Close, Description, History, VerifiedUser, Token } from '@mui/icons-material';
 import { MapEmbed } from '../../components/MapEmbed';
 import { StatusChip } from '../../components/StatusChip';
 import { ProjectProducts } from '../../components/modules/project_tabs/ProjectProducts';
@@ -10,6 +10,7 @@ import { ProjectTeam } from '../../components/modules/project_tabs/ProjectTeam';
 import { CampaignAssistant } from '../../components/CampaignAssistant';
 import { ProjectSpends } from '../../components/modules/project_tabs/ProjectSpends';
 import TokenHistoryModal from '../../components/TokenHistoryModal';
+import { api } from '../../services/api';
 
 export const ProjectDetailsDrawer = ({ 
   selectedProject, 
@@ -20,6 +21,60 @@ export const ProjectDetailsDrawer = ({
   onGenerateLicensingDoc 
 }) => {
   const [historyModalOpen, setHistoryModalOpen] = useState(false);
+
+  // Blockchain token status
+  const [hasBlockchainToken, setHasBlockchainToken] = useState(null);
+  const [loadingTokenStatus, setLoadingTokenStatus] = useState(false);
+  const [tokenQueued, setTokenQueued] = useState(false);
+  const [triggeringToken, setTriggeringToken] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+
+  const handleCloseSnackbar = () => setSnackbar(prev => ({ ...prev, open: false }));
+
+  useEffect(() => {
+    if (!selectedProject?.id) {
+      setHasBlockchainToken(null);
+      setTokenQueued(false);
+      return;
+    }
+
+    let active = true;
+    setTokenQueued(false);
+    setLoadingTokenStatus(true);
+
+    api.get(`/admin/manejo/${selectedProject.id}`)
+      .then((response) => {
+        if (!active) return;
+        const data = response.data;
+        const projectStatus = Array.isArray(data) ? data[0] : data;
+        setHasBlockchainToken(Boolean(projectStatus?.hasBlockchainToken));
+      })
+      .catch(() => {
+        if (!active) return;
+        // Em caso de erro tratamos como desconhecido para não exibir o botão indevidamente.
+        setHasBlockchainToken(null);
+      })
+      .finally(() => {
+        if (active) setLoadingTokenStatus(false);
+      });
+
+    return () => { active = false; };
+  }, [selectedProject?.id]);
+
+  const handleTriggerToken = async () => {
+    if (!selectedProject?.id) return;
+    setTriggeringToken(true);
+    try {
+      await api.post(`/admin/manejo/${selectedProject.id}/trigger-blockchain-token`);
+      setTokenQueued(true);
+      setSnackbar({ open: true, message: 'Criação do token na blockchain enfileirada com sucesso.', severity: 'success' });
+    } catch (error) {
+      const message = error?.response?.data?.error || 'Erro ao enfileirar a criação do token na blockchain.';
+      setSnackbar({ open: true, message, severity: 'error' });
+    } finally {
+      setTriggeringToken(false);
+    }
+  };
 
   return (
     <>
@@ -109,7 +164,53 @@ export const ProjectDetailsDrawer = ({
                       }
                     />
                   </ListItem>
+                  <Divider />
+                  <ListItem disableGutters>
+                    <ListItemText
+                      primary="Token na Blockchain"
+                      secondary={
+                        loadingTokenStatus ? (
+                          <CircularProgress size={16} />
+                        ) : hasBlockchainToken ? (
+                          <Chip
+                            size="small"
+                            color="success"
+                            icon={<VerifiedUser />}
+                            label="Registrado"
+                          />
+                        ) : tokenQueued ? (
+                          <Chip
+                            size="small"
+                            color="info"
+                            icon={<Token />}
+                            label="Criação enfileirada"
+                          />
+                        ) : (
+                          <Chip
+                            size="small"
+                            color="warning"
+                            icon={<Token />}
+                            label="Não registrado"
+                          />
+                        )
+                      }
+                    />
+                  </ListItem>
                 </List>
+
+                {hasBlockchainToken === false && !tokenQueued && (
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    fullWidth
+                    sx={{ mt: 2 }}
+                    startIcon={triggeringToken ? <CircularProgress size={16} color="inherit" /> : <Token />}
+                    disabled={triggeringToken}
+                    onClick={handleTriggerToken}
+                  >
+                    {triggeringToken ? 'Enfileirando...' : 'Disparar Criação de Token'}
+                  </Button>
+                )}
 
                 <Divider sx={{ my: 2 }} />
                 <Typography variant="subtitle2" gutterBottom>Documentação (IA)</Typography>
@@ -166,6 +267,16 @@ export const ProjectDetailsDrawer = ({
         tokenId={selectedProject.id}
       />
     )}
+
+    <Snackbar
+      open={snackbar.open}
+      autoHideDuration={6000}
+      onClose={handleCloseSnackbar}
+    >
+      <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+        {snackbar.message}
+      </Alert>
+    </Snackbar>
     </>
   );
 };
