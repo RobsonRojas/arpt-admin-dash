@@ -386,13 +386,15 @@ export function DropshippingAdmin() {
     setLoading(true);
     try {
       const [storesRes, analyticsRes, prodRes] = await Promise.all([
-        api.get('/api/v1/admin/dropshipping/stores', { params: { page, pageSize: 20, search } }),
-        api.get('/api/v1/admin/dropshipping/analytics'),
+        api.get('/api/v1/admin/dropshipping/stores', { params: { page, pageSize: 20, q: search } }),
+        // Métricas de vendas: indisponíveis não devem impedir a listagem de lojas.
+        api.get('/api/v1/admin/dropshipping/analytics/performance').catch(() => ({ data: null })),
         api.get('/produtos/all'),
       ]);
-      setStores(storesRes.data.stores || []);
+      // A API devolve nome/owner_user_id; a tela usa name/user_id.
+      setStores((storesRes.data.data || []).map(s => ({ ...s, name: s.nome, user_id: s.owner_user_id })));
       setTotalStores(storesRes.data.total || 0);
-      setAnalytics(analyticsRes.data || { totals: null, trend: [] });
+      setAnalytics({ totals: analyticsRes.data?.totais || null, trend: [] });
       if (prodRes.data?.success) {
         setAllProducts(prodRes.data.data.filter(p => p.is_ativo));
       }
@@ -439,9 +441,9 @@ export function DropshippingAdmin() {
           <Grid container spacing={2} sx={{ mb: 3 }}>
             {[
               { label: 'Total de Lojas', value: totalStores, color: '#1e293b', icon: <Store sx={{ color: '#4ade80' }} />, accent: 'rgba(74,222,128,0.15)' },
-              { label: 'Receita Plataforma', value: fmt(totals.total_platform), color: '#1e293b', icon: <TrendingUp sx={{ color: '#fbbf24' }} />, accent: 'rgba(251,191,36,0.15)' },
-              { label: 'Receita Dropshippers', value: fmt(totals.total_dropshipper), color: '#1e293b', icon: <People sx={{ color: '#38bdf8' }} />, accent: 'rgba(56,189,248,0.15)' },
-              { label: 'Receita Produtores', value: fmt(totals.total_producer), color: '#1e293b', icon: <Inventory2 sx={{ color: '#a78bfa' }} />, accent: 'rgba(167,139,250,0.15)' },
+              { label: 'Receita das Lojas', value: fmt(totals.receita), color: '#1e293b', icon: <TrendingUp sx={{ color: '#fbbf24' }} />, accent: 'rgba(251,191,36,0.15)' },
+              { label: 'Pedidos', value: Number(totals.pedidos || 0).toLocaleString('pt-BR'), color: '#1e293b', icon: <Inventory2 sx={{ color: '#a78bfa' }} />, accent: 'rgba(167,139,250,0.15)' },
+              { label: 'Ticket Médio', value: fmt(totals.ticket_medio), color: '#1e293b', icon: <People sx={{ color: '#38bdf8' }} />, accent: 'rgba(56,189,248,0.15)' },
             ].map((kpi, i) => (
               <Grid item xs={12} sm={6} md={3} key={i}>
                 <Card variant="outlined" sx={{ bgcolor: kpi.color, color: '#fff', borderRadius: 3, border: '1px solid rgba(255,255,255,0.08)', transition: 'all 0.2s', '&:hover': { transform: 'scale(1.02)' } }}>

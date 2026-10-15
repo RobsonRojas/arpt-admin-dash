@@ -31,6 +31,43 @@ import {
   CartesianGrid, Tooltip, Legend, BarChart, Cell
 } from 'recharts';
 
+// Papéis da equipe (API: dono | editor | financeiro) e ações do log que o dono pode desfazer.
+const ROLE_LABELS = { dono: 'Dono', editor: 'Editor', financeiro: 'Financeiro' };
+const REVERSIBLE_ACTIONS = ['PRECO_ALTERADO', 'PRODUTO_ALOCADO', 'PRODUTO_REMOVIDO', 'MEMBRO_PAPEL'];
+const ACTION_TEXT = {
+  PRECO_ALTERADO: 'Alterou o preço de venda de um produto',
+  PRODUTO_ALOCADO: 'Adicionou um produto à loja',
+  PRODUTO_REMOVIDO: 'Removeu um produto da loja',
+  MEMBRO_PAPEL: 'Alterou o papel de um membro da equipe',
+  MEMBRO_REMOVIDO: 'Removeu um membro da equipe',
+  LOJA_ATUALIZADA: 'Atualizou os dados da loja',
+  LOJA_SUSPENSA: 'Loja suspensa pela administração',
+  LOJA_REATIVADA: 'Loja reativada pela administração',
+  DONO_TRANSFERIDO: 'Propriedade da loja transferida',
+  REVERSAO: 'Reversão de uma ação anterior',
+};
+
+// Converte a resposta de /members ({ members, invites }) na lista única exibida na equipe.
+const normalizeTeam = ({ members = [], invites = [] }) => [
+  ...members.map(m => ({
+    key: `m-${m.id}`, id: m.id, kind: 'member', email: m.email || m.user_id,
+    status: 'Ativo', role: m.papel,
+  })),
+  ...invites.map(i => ({
+    key: `i-${i.id}`, id: i.id, kind: 'invite', email: i.email,
+    status: 'Pendente', role: i.papel,
+  })),
+];
+
+// Converte uma linha de /actions-log para o formato exibido na trilha de auditoria.
+const normalizeLogEntry = (l) => ({
+  ...l,
+  acao: l.tipo,
+  user_email: l.ator_user_id,
+  reversivel: REVERSIBLE_ACTIONS.includes(l.tipo) && !l.revertida_por,
+});
+
+
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
   return (
@@ -92,7 +129,7 @@ export default function Dropshipping() {
   const [actionsLog, setActionsLog] = useState([]);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteRole, setInviteRole] = useState('Vendedor');
+  const [inviteRole, setInviteRole] = useState('editor');
   const [inviting, setInviting] = useState(false);
   const [startDate, setStartDate] = useState(() => {
     const d = new Date();
@@ -284,8 +321,8 @@ export default function Dropshipping() {
         api.get(`/api/v1/dropshipping/stores/${storeId}/members`),
         api.get(`/api/v1/dropshipping/stores/${storeId}/actions-log`)
       ]);
-      setMembers(membersRes.data);
-      setActionsLog(logsRes.data);
+      setMembers(normalizeTeam(membersRes.data));
+      setActionsLog(logsRes.data.map(normalizeLogEntry));
     } catch (err) {
       console.error("Error fetching team/logs", err);
     }
@@ -297,12 +334,12 @@ export default function Dropshipping() {
     try {
       await api.post(`/api/v1/dropshipping/stores/${store.id}/members/invite`, {
         email: inviteEmail.trim(),
-        role: inviteRole
+        papel: inviteRole
       });
       alert("Convite enviado com sucesso!");
       setInviteOpen(false);
       setInviteEmail('');
-      setInviteRole('Vendedor');
+      setInviteRole('editor');
       fetchStoreTeam(store.id);
     } catch (err) {
       alert("Erro ao enviar convite: " + (err.response?.data?.error || err.message));
@@ -311,9 +348,9 @@ export default function Dropshipping() {
     }
   };
 
-  const handleResendInvite = async (memberId) => {
+  const handleResendInvite = async (inviteId) => {
     try {
-      await api.post(`/api/v1/dropshipping/stores/${store.id}/members/${memberId}/resend`);
+      await api.post(`/api/v1/dropshipping/stores/${store.id}/invites/${inviteId}/resend`);
       alert("Convite reenviado com sucesso!");
       fetchStoreTeam(store.id);
     } catch (err) {
@@ -324,7 +361,7 @@ export default function Dropshipping() {
   const handleUpdateRole = async (memberId, newRole) => {
     try {
       await api.put(`/api/v1/dropshipping/stores/${store.id}/members/${memberId}`, {
-        role: newRole
+        papel: newRole
       });
       alert("Cargo atualizado com sucesso!");
       fetchStoreTeam(store.id);
@@ -333,10 +370,11 @@ export default function Dropshipping() {
     }
   };
 
-  const handleRemoveMember = async (memberId) => {
-    if (!window.confirm("Deseja realmente remover este membro da equipe?")) return;
+  const handleRemoveMember = async (member) => {
+    const isInvite = member.kind === 'invite';
+    if (!window.confirm(isInvite ? "Deseja cancelar este convite?" : "Deseja realmente remover este membro da equipe?")) return;
     try {
-      await api.delete(`/api/v1/dropshipping/stores/${store.id}/members/${memberId}`);
+      await api.delete(`/api/v1/dropshipping/stores/${store.id}/${isInvite ? 'invites' : 'members'}/${member.id}`);
       alert("Membro removido com sucesso!");
       fetchStoreTeam(store.id);
     } catch (err) {
@@ -1505,7 +1543,7 @@ export default function Dropshipping() {
                   ) : (
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                       {members.map(m => (
-                        <Card key={m.id} variant="outlined" sx={{ borderRadius: 2.5, p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
+                        <Card key={m.key} variant="outlined" sx={{ borderRadius: 2.5, p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                             <Box 
                               sx={{ 
@@ -1532,11 +1570,6 @@ export default function Dropshipping() {
                                   {m.email}
                                 </Typography>
                               </Box>
-                              {m.status === 'Pendente' && m.token_convite && (
-                                <Typography variant="caption" sx={{ color: '#0284c7', display: 'block', mt: 0.5, fontFamily: 'monospace' }}>
-                                  Token: {m.token_convite.slice(0, 8)}...
-                                </Typography>
-                              )}
                             </Box>
                           </Box>
 
@@ -1548,29 +1581,23 @@ export default function Dropshipping() {
                               variant="outlined" 
                             />
                             
-                            <FormControl size="small" sx={{ minWidth: 110 }}>
-                              <Select
-                                value={m.role}
-                                onChange={(e) => handleUpdateRole(m.id, e.target.value)}
-                                sx={{ borderRadius: 1.5, height: 32, fontSize: '0.8rem' }}
-                              >
-                                <MenuItem value="Admin">Admin</MenuItem>
-                                <MenuItem value="Vendedor">Vendedor</MenuItem>
-                              </Select>
-                            </FormControl>
+                            {m.kind === 'member' && m.role !== 'dono' ? (
+                              <FormControl size="small" sx={{ minWidth: 110 }}>
+                                <Select
+                                  value={m.role}
+                                  onChange={(e) => handleUpdateRole(m.id, e.target.value)}
+                                  sx={{ borderRadius: 1.5, height: 32, fontSize: '0.8rem' }}
+                                >
+                                  <MenuItem value="editor">{ROLE_LABELS.editor}</MenuItem>
+                                  <MenuItem value="financeiro">{ROLE_LABELS.financeiro}</MenuItem>
+                                </Select>
+                              </FormControl>
+                            ) : (
+                              <Chip label={ROLE_LABELS[m.role] || m.role} size="small" />
+                            )}
 
                             {m.status === 'Pendente' && (
                               <>
-                                <Button
-                                  size="small"
-                                  variant="outlined"
-                                  color="primary"
-                                  startIcon={<ContentCopyIcon />}
-                                  onClick={() => handleCopyText(`${window.location.origin}/cadastro?token=${m.token_convite}`)}
-                                  sx={{ borderRadius: 1.5, height: 32, textTransform: 'none', fontSize: '0.75rem' }}
-                                >
-                                  Copiar
-                                </Button>
                                 <Button
                                   size="small"
                                   variant="outlined"
@@ -1583,15 +1610,17 @@ export default function Dropshipping() {
                               </>
                             )}
 
+                            {m.role !== 'dono' && (
                             <Button
                               size="small"
                               variant="outlined"
                               color="error"
-                              onClick={() => handleRemoveMember(m.id)}
+                              onClick={() => handleRemoveMember(m)}
                               sx={{ minWidth: 32, width: 32, height: 32, p: 0, borderRadius: 1.5 }}
                             >
                               <DeleteIcon sx={{ fontSize: 18 }} />
                             </Button>
+                            )}
                           </Box>
                         </Card>
                       ))}
@@ -1615,26 +1644,22 @@ export default function Dropshipping() {
                   ) : (
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxHeight: 600, overflowY: 'auto', pr: 0.5 }}>
                       {actionsLog.map(log => {
-                        const isReversible = log.acao === 'update_branding' || log.acao === 'curate_product';
+                        const isReversible = log.reversivel;
                         let actionText = log.acao;
                         let actionColor = 'inherit';
 
-                        if (log.acao === 'update_branding') {
-                          actionText = 'Atualizou a identidade visual e branding da vitrine';
-                          actionColor = '#2563eb';
-                        } else if (log.acao === 'curate_product') {
-                          actionText = 'Curu ou modificou o catálogo de produtos da loja';
-                          actionColor = '#16a34a';
-                        } else if (log.acao.startsWith('revert_')) {
-                          actionText = `Desfez/Reverteu a ação: ${log.acao.replace('revert_', '')}`;
+                        if (log.acao === 'REVERSAO') {
                           actionColor = '#dc2626';
+                        } else if (REVERSIBLE_ACTIONS.includes(log.acao)) {
+                          actionColor = '#2563eb';
                         }
+                        actionText = ACTION_TEXT[log.acao] || log.acao;
 
                         return (
-                          <Paper key={log.id} variant="outlined" sx={{ p: 2, borderRadius: 2.5, bgcolor: log.acao.startsWith('revert_') ? '#fef2f2' : 'white' }}>
+                          <Paper key={log.id} variant="outlined" sx={{ p: 2, borderRadius: 2.5, bgcolor: log.acao === 'REVERSAO' ? '#fef2f2' : 'white' }}>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                               <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: actionColor }}>
-                                {log.acao.startsWith('revert_') ? 'Reversão Efetuada' : 'Ação de Gerenciamento'}
+                                {log.acao === 'REVERSAO' ? 'Reversão Efetuada' : 'Ação de Gerenciamento'}
                               </Typography>
                               <Typography variant="caption" color="textSecondary">
                                 {new Date(log.created_at).toLocaleString('pt-BR')}
@@ -1706,8 +1731,8 @@ export default function Dropshipping() {
                       label="Papel na Equipe"
                       onChange={e => setInviteRole(e.target.value)}
                     >
-                      <MenuItem value="Vendedor">Vendedor (Catálogo, Vendas)</MenuItem>
-                      <MenuItem value="Admin">Administrador da Loja (Equipe, Configuração)</MenuItem>
+                      <MenuItem value="editor">Editor (Catálogo, Aparência, Marketing)</MenuItem>
+                      <MenuItem value="financeiro">Financeiro (Relatórios e Repasses)</MenuItem>
                     </Select>
                   </FormControl>
                 </Box>
