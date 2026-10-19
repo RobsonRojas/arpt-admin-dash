@@ -83,10 +83,6 @@ export default function Dropshipping() {
   const [store, setStore] = useState(null);
   
   // AI Wizard states
-  const [promptInput, setPromptInput] = useState('');
-  const [aiGenerating, setAiGenerating] = useState(false);
-  const [aiDialogOpen, setAiDialogOpen] = useState(false);
-  const [aiResult, setAiResult] = useState(null);
 
   // Store form state
   const [storeForm, setStoreForm] = useState({
@@ -107,24 +103,11 @@ export default function Dropshipping() {
     custom_domain: ''
   });
 
-  const [domainStatus, setDomainStatus] = useState('none');
-  const [verifyingDomain, setVerifyingDomain] = useState(false);
-  const [selectedProvider, setSelectedProvider] = useState('generic');
 
   const [catalog, setCatalog] = useState([]);
   const [availableProducts, setAvailableProducts] = useState([]);
-  const [sales, setSales] = useState([]);
-  const [analytics, setAnalytics] = useState(null);
 
-  // Marketing Hub states
-  const [selectedMarketingProduct, setSelectedMarketingProduct] = useState(null);
-  const [marketingAssets, setMarketingAssets] = useState(null);
 
-  // Pro Analytics States
-  const [perfData, setPerfData] = useState([]);
-  const [funnelData, setFunnelData] = useState({ visitors: 0, cartAdditions: 0, checkouts: 0, conversionRate: 0 });
-  const [opps, setOpps] = useState([]);
-  const [warnings, setWarnings] = useState([]);
   const [members, setMembers] = useState([]);
   const [actionsLog, setActionsLog] = useState([]);
   const [inviteOpen, setInviteOpen] = useState(false);
@@ -139,39 +122,7 @@ export default function Dropshipping() {
   const [endDate, setEndDate] = useState(() => {
     return new Date().toISOString().split('T')[0];
   });
-  const [scale, setScale] = useState('daily');
 
-  const fetchAnalyticsPro = async (storeId) => {
-    try {
-      const [perfRes, funnelRes, oppsRes, warningsRes] = await Promise.all([
-        api.get(`/api/v1/dropshipping/analytics/performance`, {
-          params: { lojaId: storeId, startDate, endDate, scale }
-        }),
-        api.get(`/api/v1/dropshipping/analytics/funnel`, {
-          params: { lojaId: storeId, startDate, endDate }
-        }),
-        api.get(`/api/v1/dropshipping/analytics/opportunities`, {
-          params: { lojaId: storeId }
-        }),
-        api.get(`/api/v1/dropshipping/analytics/capacity-warnings`, {
-          params: { lojaId: storeId }
-        })
-      ]);
-
-      setPerfData(perfRes.data);
-      setFunnelData(funnelRes.data);
-      setOpps(oppsRes.data);
-      setWarnings(warningsRes.data);
-    } catch (err) {
-      console.error("Error fetching pro analytics", err);
-    }
-  };
-
-  useEffect(() => {
-    if (store?.id) {
-      fetchAnalyticsPro(store.id);
-    }
-  }, [store?.id, startDate, endDate, scale]);
 
   useEffect(() => {
     if (store?.id && tabValue === 5) {
@@ -186,8 +137,8 @@ export default function Dropshipping() {
   const fetchStoreData = async () => {
     try {
       setLoading(true);
-      const res = await api.get('/manejos/dropshipping/stores');
-      const stores = res.data;
+      const res = await api.get('/api/v1/dropshipping/stores');
+      const stores = res.data.map((st) => ({ ...st, name: st.nome, config: {} }));
       
       if (stores.length > 0) {
         const myStore = stores[0];
@@ -215,23 +166,18 @@ export default function Dropshipping() {
         });
 
         if (myStore.custom_domain) {
-          checkDomainStatus(myStore.id);
         } else {
           setDomainStatus('none');
         }
 
-        // Fetch products, sales and analytics
+        // Fetch products and team
         fetchCatalog(myStore.id);
-        fetchSales(myStore.id);
-        fetchAnalytics(myStore.id);
         fetchStoreTeam(myStore.id);
       }
       
       // Fetch all available products to pick from
-      const prodRes = await api.get('/produtos/all');
-      if (prodRes.data && prodRes.data.success) {
-         setAvailableProducts(prodRes.data.data.filter(p => p.is_ativo));
-      }
+      const prodRes = await api.get('/produtos');
+      setAvailableProducts((prodRes.data || []).filter((p) => p.is_ativo));
     } catch (error) {
       console.error("Error fetching dropshipping data", error);
     } finally {
@@ -239,81 +185,15 @@ export default function Dropshipping() {
     }
   };
 
-  const checkDomainStatus = async (storeId) => {
-    try {
-      setVerifyingDomain(true);
-      const res = await api.get(`/manejos/dropshipping/stores/${storeId}/domain/status`);
-      if (res.data) {
-        setDomainStatus(res.data.status);
-      }
-    } catch (err) {
-      console.error("Error verifying domain", err);
-    } finally {
-      setVerifyingDomain(false);
-    }
-  };
-
-  const handleAttachDomain = async () => {
-    if (!store) return alert("Crie a loja primeiro");
-    if (!storeForm.custom_domain) return alert("Informe o domínio customizado (ex: minha-loja.com.br)");
-    
-    try {
-      setVerifyingDomain(true);
-      const res = await api.post(`/manejos/dropshipping/stores/${store.id}/domain`, { custom_domain: storeForm.custom_domain });
-      setDomainStatus(res.data.status);
-      alert("Domínio vinculado! Configure os registros DNS em seu provedor.");
-    } catch (err) {
-      alert("Erro ao vincular domínio: " + (err.response?.data?.error || err.message));
-    } finally {
-      setVerifyingDomain(false);
-    }
-  };
-
   const fetchCatalog = async (storeId) => {
     try {
-      const res = await api.get(`/manejos/dropshipping/stores/${storeId}/products`);
-      setCatalog(res.data);
-      if (res.data.length > 0 && !selectedMarketingProduct) {
-        setSelectedMarketingProduct(res.data[0]);
-      }
+      const res = await api.get(`/api/v1/dropshipping/stores/${storeId}/products`);
+      setCatalog(res.data.map((p) => ({ ...p, id: p.produto_id, name: p.nome, price: p.preco_venda })));
     } catch (err) {
       console.error("Error fetching catalog", err);
     }
   };
 
-  useEffect(() => {
-    if (selectedMarketingProduct) {
-      fetchMarketingAssets(selectedMarketingProduct.produto_id || selectedMarketingProduct.id);
-    }
-  }, [selectedMarketingProduct]);
-
-  const fetchMarketingAssets = async (productId) => {
-    try {
-      const res = await api.get(`/produtos/${productId}/assets`);
-      setMarketingAssets(res.data);
-    } catch (err) {
-      console.error("Error fetching marketing assets", err);
-      setMarketingAssets(null);
-    }
-  };
-
-  const fetchAnalytics = async (storeId) => {
-    try {
-      const res = await api.get(`/manejos/dropshipping/stores/${storeId}/analytics`);
-      setAnalytics(res.data);
-    } catch (err) {
-      console.error("Error fetching analytics", err);
-    }
-  };
-
-  const fetchSales = async (storeId) => {
-    try {
-      const res = await api.get(`/manejos/dropshipping/stores/${storeId}/sales`);
-      setSales(res.data);
-    } catch (err) {
-      console.error("Error fetching sales", err);
-    }
-  };
 
   const fetchStoreTeam = async (storeId) => {
     try {
@@ -399,88 +279,35 @@ export default function Dropshipping() {
 
   const handleSaveStore = async () => {
     try {
-      const payload = {
-        name: storeForm.name,
-        slug: storeForm.slug,
-        google_analytics_id: storeForm.google_analytics_id,
-        google_search_console_id: storeForm.google_search_console_id,
-        visual_preset: storeForm.visualPreset,
-        global_markup_percentage: Number(storeForm.globalMarkupPercentage),
-        ai_slogan: storeForm.aiSlogan,
-        config: {
-          logoUrl: storeForm.logoUrl,
-          primaryColor: storeForm.primaryColor,
-          seoTitle: storeForm.seoTitle,
-          seoDescription: storeForm.seoDescription,
-          splitPlatform: Number(storeForm.splitPlatform),
-          splitDropshipper: Number(storeForm.splitDropshipper),
-          splitProducer: Number(storeForm.splitProducer)
-        }
-      };
-      
+      // Contrato real: nome e slug na criação; nome na atualização. Aparência e SEO entram na change de vitrine.
       if (!store) {
-         const res = await api.post('/manejos/dropshipping/stores', payload);
-         setStore(res.data);
-         alert("Loja criada com sucesso!");
+        const res = await api.post('/api/v1/dropshipping/stores', { nome: storeForm.name, slug: storeForm.slug });
+        setStore({ ...res.data, name: res.data.nome });
+        alert("Loja criada com sucesso!");
       } else {
-         const res = await api.put(`/manejos/dropshipping/stores/${store.id}`, payload);
-         setStore(res.data);
-         alert("Loja atualizada com sucesso!");
+        const res = await api.put(`/api/v1/dropshipping/stores/${store.id}`, { nome: storeForm.name });
+        setStore({ ...res.data, name: res.data.nome });
+        alert("Loja atualizada com sucesso!");
       }
     } catch (error) {
       console.error("Error saving store", error);
-      alert("Erro ao salvar loja: " + (error.response?.data?.error || ""));
+      alert("Erro ao salvar loja: " + (error.response?.data?.error || error.message));
     }
   };
 
-  const handleAddProduct = async (productId) => {
+  const handleAddProduct = async (produto) => {
     if (!store) return alert("Crie a loja primeiro");
+    const sugerido = (Number(produto.preco) * 1.3).toFixed(2);
+    const entrada = window.prompt(`Preço de venda para "${produto.nome}" (R$):`, sugerido);
+    if (entrada === null) return;
+    const precoVenda = Number(entrada.replace(',', '.'));
+    if (!(precoVenda > 0)) return alert("Informe um preço de venda válido.");
     try {
-      await api.post(`/manejos/dropshipping/stores/${store.id}/products`, { productId });
+      await api.post(`/api/v1/dropshipping/stores/${store.id}/products`, { produto_id: produto.id, preco_venda: precoVenda });
       fetchCatalog(store.id);
     } catch (error) {
-      alert("Erro ao adicionar produto: " + (error.response?.data?.error || ""));
+      alert("Erro ao adicionar produto: " + (error.response?.data?.error || error.message));
     }
-  };
-
-  const handleGenerateAI = async () => {
-    if (!promptInput.trim()) return alert("Por favor, digite um prompt para a IA!");
-    setAiGenerating(true);
-    try {
-      const res = await api.post('/api/v1/dropshipping/ai-generator', { prompt: promptInput });
-      setAiResult(res.data);
-      setAiDialogOpen(true);
-    } catch (err) {
-      console.error("Error invoking AI generator", err);
-      alert("Erro ao gerar com IA: " + (err.response?.data?.error || err.message));
-    } finally {
-      setAiGenerating(false);
-    }
-  };
-
-  const handleApplyAISuggestion = async () => {
-    if (!aiResult) return;
-    
-    const slugified = aiResult.storeName
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)+/g, '');
-
-    // Update store configurations
-    setStoreForm(prev => ({
-      ...prev,
-      name: aiResult.storeName,
-      slug: slugified,
-      visualPreset: aiResult.visualPreset || 'classic_wood',
-      aiSlogan: aiResult.slogan || '',
-      seoTitle: `${aiResult.storeName} | Marketplace Ecológico`,
-      seoDescription: aiResult.slogan || `Móveis e produtos sustentáveis de manejo florestal na Amazônia.`
-    }));
-
-    setAiDialogOpen(false);
-    alert("Sugestões aplicadas no formulário! Clique em 'Salvar Loja' para persistir e criar a sua vitrine.");
   };
 
   const handleCopyText = (text) => {
@@ -519,53 +346,19 @@ export default function Dropshipping() {
           allowScrollButtonsMobile
           sx={{ '& .MuiTab-root': { minHeight: 48, py: 1.5, fontSize: { xs: '0.75rem', sm: '0.875rem' } } }}
         >
-          <Tab label="Configuração da Loja" />
-          <Tab label="Catálogo de Curação" />
-          <Tab label="Vendas & Comissões" />
-          <Tab label="Marketing Hub" />
-          <Tab label="Analytics Pro" />
-          <Tab label="Equipe & Auditoria" />
+          <Tab label="Configuração da Loja" value={0} />
+          <Tab label="Catálogo de Curação" value={1} />
+          <Tab label="Equipe & Auditoria" value={2} />
         </Tabs>
       </Box>
 
       {/* TAB 0: CONFIGURATION & LIVE VISUAL PREVIEWER */}
       <TabPanel value={tabValue} index={0}>
-        {/* AI Co-Pilot prompt wizard panel */}
-        <Paper variant="outlined" sx={{ p: 4, borderRadius: 3, mb: 4, bgcolor: '#f0fdf4', borderColor: '#bbf7d0' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-            <AutoAwesomeIcon sx={{ color: '#16a34a' }} />
-            <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#16a34a' }}>
-              Assistente de Criação AI (Co-Pilot Wizard)
-            </Typography>
-          </Box>
-          <Typography variant="body2" color="textSecondary" sx={{ mb: 3 }}>
-            Descreva que tipo de loja você deseja criar (público-alvo, nicho, estilo) e nossa IA criará uma marca personalizada, escolherá um slogan memorável, configurará o visual ideal e pré-selecionará os melhores produtos ecológicos.
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'stretch', sm: 'flex-start' } }}>
-            <TextField 
-              fullWidth 
-              variant="outlined" 
-              placeholder="Ex: Crie uma loja sofisticada de utensílios artesanais de sementes e marcenaria fina para um público engajado com design e natureza..."
-              value={promptInput}
-              onChange={e => setPromptInput(e.target.value)}
-              disabled={aiGenerating}
-              sx={{ bgcolor: 'white', borderRadius: 2 }}
-            />
-            <Button 
-              variant="contained" 
-              color="success" 
-              onClick={handleGenerateAI}
-              disabled={aiGenerating}
-              startIcon={aiGenerating ? <CircularProgress size={16} color="inherit" /> : <AutoAwesomeIcon />}
-              sx={{ px: 4, py: { xs: 1.5, sm: 1 }, borderRadius: 2, textTransform: 'none', fontWeight: 'bold', whiteSpace: 'nowrap', minHeight: 48 }}
-            >
-              {aiGenerating ? 'Gerando...' : 'Gerar com IA'}
-            </Button>
-          </Box>
-        </Paper>
-
+        <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
+          Nesta versão, o botão Salvar Loja grava nome e slug. Aparência, SEO e rastreio ficam disponíveis com a vitrine da loja.
+        </Alert>
         <Grid container spacing={4}>
-          {/* Form Configuration Inputs */}
+        {/* Form Configuration Inputs */}
           <Grid item xs={12} md={7}>
             <Paper variant="outlined" sx={{ p: 4, borderRadius: 3 }}>
               <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>Identidade, Branding & SEO</Typography>
@@ -611,146 +404,6 @@ export default function Dropshipping() {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField fullWidth label="Google Search Console ID" value={storeForm.google_search_console_id} onChange={e => setStoreForm({...storeForm, google_search_console_id: e.target.value})} margin="normal" />
-                </Grid>
-              </Grid>
-
-              <Divider sx={{ my: 4 }} />
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Domínio Customizado</Typography>
-                {verifyingDomain && <CircularProgress size={24} />}
-              </Box>
-              <Typography variant="caption" color="textSecondary" display="block" sx={{ mb: 2 }}>
-                Conecte seu próprio domínio (ex: www.minha-loja.com.br) para sua vitrine dropshipping.
-              </Typography>
-              
-              <Grid container spacing={3} alignItems="center">
-                <Grid item xs={12} sm={8}>
-                  <TextField 
-                    fullWidth 
-                    label="Seu Domínio (ex: minha-loja.com.br)" 
-                    value={storeForm.custom_domain} 
-                    onChange={e => setStoreForm({...storeForm, custom_domain: e.target.value})} 
-                  />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <Button 
-                    variant="outlined" 
-                    fullWidth 
-                    onClick={handleAttachDomain}
-                    disabled={verifyingDomain}
-                    sx={{ height: 56 }}
-                  >
-                    Vincular Domínio
-                  </Button>
-                </Grid>
-              </Grid>
-
-              {storeForm.custom_domain && (
-                <Box sx={{ mt: 3, p: 2, bgcolor: '#f5f5f5', borderRadius: 2, border: '1px solid #e0e0e0' }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
-                    Status do Domínio: 
-                    <Chip 
-                      label={domainStatus === 'verified' ? 'Verificado (Online)' : domainStatus === 'failed' ? 'Falha (Verifique DNS)' : 'Pendente / Verificando...'} 
-                      color={domainStatus === 'verified' ? 'success' : domainStatus === 'failed' ? 'error' : 'warning'} 
-                      size="small" 
-                      sx={{ ml: 1 }} 
-                    />
-                  </Typography>
-                  
-                  {domainStatus !== 'verified' && (
-                    <Box sx={{ mt: 2 }}>
-                      <Typography variant="body2" sx={{ mb: 2 }}>
-                        Para ativar seu domínio, selecione o seu provedor e siga as instruções abaixo:
-                      </Typography>
-                      
-                      <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-                        <InputLabel>Provedor de Domínio</InputLabel>
-                        <Select
-                          value={selectedProvider}
-                          label="Provedor de Domínio"
-                          onChange={(e) => setSelectedProvider(e.target.value)}
-                        >
-                          <MenuItem value="generic">Genérico (Outros)</MenuItem>
-                          <MenuItem value="registrobr">Registro.br</MenuItem>
-                          <MenuItem value="godaddy">GoDaddy</MenuItem>
-                          <MenuItem value="hostinger">Hostinger</MenuItem>
-                          <MenuItem value="locaweb">LocaWeb</MenuItem>
-                          <MenuItem value="hostgator">HostGator</MenuItem>
-                        </Select>
-                      </FormControl>
-
-                      {selectedProvider === 'registrobr' && (
-                        <Alert severity="info" sx={{ mb: 2, borderRadius: 2 }}>
-                          <strong>No Registro.br:</strong> Acesse "Zonas de DNS" {"->"} "Editar Zona" {"->"} "Nova Entrada". Crie a entrada WWW como CNAME e, para o domínio raiz (se suportado), deixe em branco com tipo A.
-                        </Alert>
-                      )}
-                      {selectedProvider === 'godaddy' && (
-                        <Alert severity="info" sx={{ mb: 2, borderRadius: 2 }}>
-                          <strong>No GoDaddy:</strong> Vá em "Gerenciamento de DNS". Clique em "Adicionar" um novo registro CNAME para "www" apontando para o valor abaixo, e um registro A para "@".
-                        </Alert>
-                      )}
-                      {selectedProvider === 'hostinger' && (
-                        <Alert severity="info" sx={{ mb: 2, borderRadius: 2 }}>
-                          <strong>Na Hostinger:</strong> Vá na seção "Editor de Zona DNS". Adicione ou edite o registro CNAME com o nome "www" apontando para o valor abaixo.
-                        </Alert>
-                      )}
-                      {selectedProvider === 'locaweb' && (
-                        <Alert severity="info" sx={{ mb: 2, borderRadius: 2 }}>
-                          <strong>Na LocaWeb:</strong> No Painel de Controle, vá em "Registro de Domínios" {"->"} "Gerenciar DNS". Adicione a entrada CNAME para "www".
-                        </Alert>
-                      )}
-                      {selectedProvider === 'hostgator' && (
-                        <Alert severity="info" sx={{ mb: 2, borderRadius: 2 }}>
-                          <strong>Na HostGator:</strong> No cPanel, abra "Zone Editor". Clique em "+ CNAME Record" e adicione a entrada "www".
-                        </Alert>
-                      )}
-
-                      <Paper variant="outlined" sx={{ p: 1.5, bgcolor: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Box>
-                          <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 'bold' }}>Tipo: CNAME</Typography>
-                          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                            <strong>Nome:</strong> www<br/>
-                            <strong>Valor:</strong> cname.vercel-dns.com.
-                          </Typography>
-                        </Box>
-                        <Button size="small" startIcon={<ContentCopyIcon />} onClick={() => handleCopyText('cname.vercel-dns.com.')}>
-                          Copiar Valor
-                        </Button>
-                      </Paper>
-                      <Paper variant="outlined" sx={{ p: 1.5, bgcolor: 'white', mt: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Box>
-                          <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 'bold' }}>Tipo: A (Opcional para domínio raiz sem www)</Typography>
-                          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                            <strong>Nome:</strong> @<br/>
-                            <strong>Valor:</strong> 76.76.21.21
-                          </Typography>
-                        </Box>
-                        <Button size="small" startIcon={<ContentCopyIcon />} onClick={() => handleCopyText('76.76.21.21')}>
-                          Copiar Valor
-                        </Button>
-                      </Paper>
-                      <Typography variant="caption" color="textSecondary" sx={{ mt: 1, display: 'block' }}>
-                        * A propagação do DNS pode levar algumas horas. Clique em Vincular Domínio novamente para forçar uma re-verificação.
-                      </Typography>
-                    </Box>
-                  )}
-                </Box>
-              )}
-
-              <Divider sx={{ my: 4 }} />
-              <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>Divisão Automática de Receita (Revenue Split)</Typography>
-              <Typography variant="caption" color="textSecondary" display="block" sx={{ mb: 2 }}>
-                Configure a proporção para cada venda (a soma exata deve ser 1.0, por exemplo, 0.20 = 20%).
-              </Typography>
-              <Grid container spacing={3}>
-                <Grid item xs={12} sm={4}>
-                  <TextField fullWidth label="Plataforma" value={storeForm.splitPlatform} onChange={e => setStoreForm({...storeForm, splitPlatform: e.target.value})} margin="normal" type="number" inputProps={{ step: 0.01 }} />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <TextField fullWidth label="Seu Lucro (Dropshipper)" value={storeForm.splitDropshipper} onChange={e => setStoreForm({...storeForm, splitDropshipper: e.target.value})} margin="normal" type="number" inputProps={{ step: 0.01 }} />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <TextField fullWidth label="Artesão / Produtor" value={storeForm.splitProducer} onChange={e => setStoreForm({...storeForm, splitProducer: e.target.value})} margin="normal" type="number" inputProps={{ step: 0.01 }} />
                 </Grid>
               </Grid>
 
@@ -949,7 +602,7 @@ export default function Dropshipping() {
                             variant="outlined"
                             fullWidth
                             disabled={inCatalog} 
-                            onClick={() => handleAddProduct(prod.id)}
+                            onClick={() => handleAddProduct(prod)}
                             sx={{ borderRadius: 1.5, textTransform: 'none', fontWeight: 'bold', minHeight: 40 }}
                           >
                             {inCatalog ? 'Já no Catálogo' : 'Adicionar'}
@@ -965,530 +618,11 @@ export default function Dropshipping() {
         </Grid>
       </TabPanel>
 
-      {/* TAB 2: SALES & COMMISSION RECORDS */}
+
+
+
+      {/* TAB 2: TEAM MANAGEMENT & AUDIT LOGS */}
       <TabPanel value={tabValue} index={2}>
-        <Paper variant="outlined" sx={{ p: 4, borderRadius: 3 }}>
-           <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>Vendas e Comissões Ecológicas</Typography>
-           <Grid container spacing={3} sx={{ mb: 4 }}>
-             <Grid item xs={12} sm={4}>
-               <Card variant="outlined" sx={{ bgcolor: 'rgba(88, 130, 15, 0.05)', borderColor: 'rgba(88, 130, 15, 0.2)' }}>
-                 <CardContent>
-                   <Typography variant="subtitle2" color="textSecondary">Total de Peças Vendidas</Typography>
-                   <Typography variant="h4" sx={{ fontWeight: 800, mt: 1 }}>{sales.length}</Typography>
-                 </CardContent>
-               </Card>
-             </Grid>
-             <Grid item xs={12} sm={4}>
-               <Card variant="outlined" sx={{ bgcolor: 'rgba(46, 125, 50, 0.05)', borderColor: 'rgba(46, 125, 50, 0.2)' }}>
-                 <CardContent>
-                   <Typography variant="subtitle2" color="textSecondary">Comissão Acumulada</Typography>
-                   <Typography variant="h4" sx={{ fontWeight: 800, mt: 1, color: '#2e7d32' }}>
-                     R$ {sales.reduce((sum, s) => sum + (Number(s.split_dropshipper) || 0), 0).toFixed(2)}
-                   </Typography>
-                 </CardContent>
-               </Card>
-             </Grid>
-           </Grid>
-           
-           <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2 }}>Histórico Recente de Transações</Typography>
-           {sales.length === 0 ? (
-             <Typography color="textSecondary" sx={{ fontStyle: 'italic' }}>
-               Ainda não há vendas registradas para a sua loja.
-             </Typography>
-           ) : (
-             <Box>
-               {sales.map(sale => (
-                 <Box key={sale.id} sx={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f0f0f0', py: 2, alignItems: 'center' }}>
-                   <Box>
-                     <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{sale.user_name || 'Comprador Anônimo'}</Typography>
-                     <Typography variant="caption" color="textSecondary">Qtd: {sale.qtd} • Pedido #{sale.id}</Typography>
-                   </Box>
-                   <Box sx={{ textAlign: 'right' }}>
-                     <Typography variant="body2" sx={{ color: '#2e7d32', fontWeight: 'bold' }}>
-                       + R$ {Number(sale.split_dropshipper).toFixed(2)}
-                     </Typography>
-                     <Typography variant="caption" color="textSecondary">
-                       {new Date(sale.created_at).toLocaleDateString()}
-                     </Typography>
-                   </Box>
-                 </Box>
-               ))}
-             </Box>
-           )}
-        </Paper>
-      </TabPanel>
-
-      {/* TAB 3: MARKETING HUB & COPYWRITING ASSETS */}
-      <TabPanel value={tabValue} index={3}>
-        <Grid container spacing={4}>
-          {/* Select Catalog Product for Marketing */}
-          <Grid item xs={12} md={4}>
-            <Paper variant="outlined" sx={{ p: 3, borderRadius: 3 }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2 }}>
-                Escolha um Produto
-              </Typography>
-              {catalog.length === 0 ? (
-                <Typography color="textSecondary" sx={{ fontStyle: 'italic' }}>
-                  Adicione produtos ao seu catálogo primeiro!
-                </Typography>
-              ) : (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                  {catalog.map(prod => (
-                    <Button 
-                      key={prod.id} 
-                      variant={selectedMarketingProduct?.id === prod.id ? "contained" : "outlined"}
-                      onClick={() => setSelectedMarketingProduct(prod)}
-                      fullWidth
-                      sx={{ 
-                        justifyContent: 'flex-start', 
-                        textTransform: 'none', 
-                        borderRadius: 2, 
-                        py: 1.5,
-                        fontWeight: 'bold' 
-                      }}
-                    >
-                      {prod.nome}
-                    </Button>
-                  ))}
-                </Box>
-              )}
-            </Paper>
-          </Grid>
-
-          {/* Social Copywriting & Media Downloads display */}
-          <Grid item xs={12} md={8}>
-            {selectedMarketingProduct ? (
-              <Paper variant="outlined" sx={{ p: 4, borderRadius: 3 }}>
-                <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
-                  Marketing Kit: {selectedMarketingProduct.nome}
-                </Typography>
-                <Typography variant="caption" color="textSecondary" display="block" sx={{ mb: 4 }}>
-                  Use estas cópias geradas por IA e imagens de alta definição para as suas redes sociais.
-                </Typography>
-
-                {/* AI Copywriting Widget Card */}
-                <Card variant="outlined" sx={{ mb: 4, borderRadius: 3, bgcolor: '#fafafa' }}>
-                  <CardHeader 
-                    title="Copywriting Sugerido para Redes Sociais" 
-                    titleTypographyProps={{ variant: 'subtitle2', sx: { fontWeight: 'bold' } }}
-                    action={
-                      <Button 
-                        size="small" 
-                        startIcon={<ContentCopyIcon />}
-                        onClick={() => handleCopyText(marketingAssets?.marketing_copy || `${selectedMarketingProduct.nome}: Um produto com design exclusivo e de origem certificada na floresta Amazônica.`)}
-                        sx={{ textTransform: 'none', fontWeight: 'bold' }}
-                      >
-                        Copiar
-                      </Button>
-                    }
-                  />
-                  <CardContent sx={{ pt: 0 }}>
-                    <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#444', lineHeight: 1.6 }}>
-                      {marketingAssets?.marketing_copy || 
-                        `🍃 Traga a beleza natural e a essência da Amazônia para a sua casa! O(A) ${selectedMarketingProduct.nome} é produzido com manejo florestal 100% regulado e design atemporal. Cada peça conta uma história de sustentabilidade e conservação florestal. Compre e ajude a manter a floresta em pé!`
-                      }
-                    </Typography>
-                  </CardContent>
-                </Card>
-
-                {/* High Resolution Media Download Assets */}
-                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 2 }}>
-                  Imagens e Banners Promocionais
-                </Typography>
-
-                {marketingAssets?.marketing_assets ? (
-                  <Grid container spacing={3}>
-                    {marketingAssets.marketing_assets.split(',').map((url, i) => (
-                      <Grid item xs={12} sm={6} key={i}>
-                        <Card variant="outlined" sx={{ borderRadius: 3, overflow: 'hidden' }}>
-                          <CardMedia 
-                            component="img"
-                            height="160"
-                            image={url.trim()}
-                            alt={`Banner ${i}`}
-                            sx={{ objectFit: 'cover' }}
-                          />
-                          <CardActions sx={{ display: 'flex', justifyContent: 'flex-end', p: 1.5 }}>
-                            <Button 
-                              size="small" 
-                              startIcon={<CloudDownloadIcon />}
-                              onClick={() => handleDownloadAsset(url.trim())}
-                              sx={{ textTransform: 'none', fontWeight: 'bold' }}
-                            >
-                              Download HD
-                            </Button>
-                          </CardActions>
-                        </Card>
-                      </Grid>
-                    ))}
-                  </Grid>
-                ) : (
-                  <Alert severity="info" sx={{ borderRadius: 2 }}>
-                    Ainda não há arquivos de imagem promocionais de alta definição para este produto. Você pode usar a foto principal do catálogo.
-                  </Alert>
-                )}
-              </Paper>
-            ) : (
-              <Paper variant="outlined" sx={{ p: 4, borderRadius: 3, textAlign: 'center' }}>
-                <Typography color="textSecondary" sx={{ fontStyle: 'italic' }}>
-                  Selecione um produto à esquerda para visualizar e baixar o kit de marketing.
-                </Typography>
-              </Paper>
-            )}
-          </Grid>
-        </Grid>
-      </TabPanel>
-
-      {/* TAB 4: ANALYTICS PRO DASHBOARD */}
-      <TabPanel value={tabValue} index={4}>
-        {!store ? (
-          <Paper variant="outlined" sx={{ p: 4, borderRadius: 3, textAlign: 'center' }}>
-            <Typography color="textSecondary" sx={{ fontStyle: 'italic' }}>
-              Por favor, crie ou configure a sua loja primeiro para habilitar o Analytics Pro.
-            </Typography>
-          </Paper>
-        ) : (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            
-            {/* Filter Bar with date pickers and granularity selection */}
-            <Paper variant="outlined" sx={{ p: 2, borderRadius: 3, bgcolor: '#fafafa' }}>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item xs={12} sm={3}>
-                  <TextField
-                    label="Data Inicial"
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    fullWidth
-                    InputLabelProps={{ shrink: true }}
-                    size="small"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={3}>
-                  <TextField
-                    label="Data Final"
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    fullWidth
-                    InputLabelProps={{ shrink: true }}
-                    size="small"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={3}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel>Agrupamento</InputLabel>
-                    <Select
-                      value={scale}
-                      label="Agrupamento"
-                      onChange={(e) => setScale(e.target.value)}
-                    >
-                      <MenuItem value="daily">Diário</MenuItem>
-                      <MenuItem value="weekly">Semanal</MenuItem>
-                      <MenuItem value="monthly">Mensal</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={3} sx={{ textAlign: 'right' }}>
-                  <Button 
-                    variant="contained" 
-                    color="success" 
-                    startIcon={<FilterAltIcon />} 
-                    onClick={() => fetchAnalyticsPro(store.id)}
-                    sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 'bold' }}
-                    fullWidth
-                  >
-                    Filtrar Resultados
-                  </Button>
-                </Grid>
-              </Grid>
-            </Paper>
-
-            {/* Top KPI Metrics Row with micro-animations */}
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6} md={3}>
-                <Card 
-                  variant="outlined" 
-                  sx={{ 
-                    bgcolor: '#1e293b', 
-                    color: '#fff', 
-                    borderRadius: 3, 
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                    transition: 'all 0.2s ease-in-out',
-                    '&:hover': { transform: 'scale(1.02)', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }
-                  }}
-                >
-                  <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Box sx={{ bgcolor: 'rgba(46, 125, 50, 0.2)', p: 1.5, borderRadius: 2 }}>
-                      <TrendingUpIcon sx={{ color: '#4ade80' }} />
-                    </Box>
-                    <Box>
-                      <Typography variant="caption" sx={{ color: '#94a3b8' }}>Faturamento Bruto</Typography>
-                      <Typography variant="h5" sx={{ fontWeight: 800 }}>
-                        R$ {perfData.reduce((sum, d) => sum + Number(d.gross_sales || 0), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                      </Typography>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={3}>
-                <Card 
-                  variant="outlined" 
-                  sx={{ 
-                    bgcolor: '#1e293b', 
-                    color: '#fff', 
-                    borderRadius: 3, 
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                    transition: 'all 0.2s ease-in-out',
-                    '&:hover': { transform: 'scale(1.02)', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }
-                  }}
-                >
-                  <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Box sx={{ bgcolor: 'rgba(212, 175, 55, 0.2)', p: 1.5, borderRadius: 2 }}>
-                      <ShowChartIcon sx={{ color: '#fbbf24' }} />
-                    </Box>
-                    <Box>
-                      <Typography variant="caption" sx={{ color: '#94a3b8' }}>Comissão Líquida (Margem)</Typography>
-                      <Typography variant="h5" sx={{ fontWeight: 800, color: '#fbbf24' }}>
-                        R$ {perfData.reduce((sum, d) => sum + Number(d.net_commissions || 0), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                      </Typography>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={3}>
-                <Card 
-                  variant="outlined" 
-                  sx={{ 
-                    bgcolor: '#1e293b', 
-                    color: '#fff', 
-                    borderRadius: 3, 
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                    transition: 'all 0.2s ease-in-out',
-                    '&:hover': { transform: 'scale(1.02)', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }
-                  }}
-                >
-                  <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Box sx={{ bgcolor: 'rgba(56, 189, 248, 0.2)', p: 1.5, borderRadius: 2 }}>
-                      <ShoppingBagIcon sx={{ color: '#38bdf8' }} />
-                    </Box>
-                    <Box>
-                      <Typography variant="caption" sx={{ color: '#94a3b8' }}>Ticket Médio (AOV)</Typography>
-                      <Typography variant="h5" sx={{ fontWeight: 800 }}>
-                        R$ {(perfData.length > 0 ? (perfData.reduce((sum, d) => sum + Number(d.aov || 0), 0) / perfData.length) : 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                      </Typography>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={3}>
-                <Card 
-                  variant="outlined" 
-                  sx={{ 
-                    bgcolor: '#1e293b', 
-                    color: '#fff', 
-                    borderRadius: 3, 
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                    transition: 'all 0.2s ease-in-out',
-                    '&:hover': { transform: 'scale(1.02)', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }
-                  }}
-                >
-                  <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Box sx={{ bgcolor: 'rgba(236, 72, 153, 0.2)', p: 1.5, borderRadius: 2 }}>
-                      <FilterAltIcon sx={{ color: '#f472b6' }} />
-                    </Box>
-                    <Box>
-                      <Typography variant="caption" sx={{ color: '#94a3b8' }}>Taxa de Conversão</Typography>
-                      <Typography variant="h5" sx={{ fontWeight: 800 }}>
-                        {funnelData?.conversionRate || 0}%
-                      </Typography>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
-
-            {/* Central Chart Area and Funnel */}
-            <Grid container spacing={3}>
-              
-              {/* Sales & Commission Trends Chart */}
-              <Grid item xs={12} md={8}>
-                <Paper variant="outlined" sx={{ p: 3, borderRadius: 3 }}>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2 }}>
-                    Tendência de Vendas e Margens de Comissão
-                  </Typography>
-                  <Box sx={{ width: '100%', height: { xs: 250, md: 350 } }}>
-                    {perfData.length === 0 ? (
-                      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                        <Typography color="textSecondary" sx={{ fontStyle: 'italic' }}>
-                          Nenhum dado registrado para o período selecionado.
-                        </Typography>
-                      </Box>
-                    ) : (
-                      <ResponsiveContainer width="100%" height="100%">
-                        <ComposedChart data={perfData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
-                          <CartesianGrid stroke="#f1f5f9" strokeDasharray="3 3" />
-                          <XAxis dataKey="time_bucket" stroke="#64748b" style={{ fontSize: '0.7rem' }} />
-                          <YAxis stroke="#64748b" style={{ fontSize: '0.7rem' }} />
-                          <Tooltip 
-                            contentStyle={{ borderRadius: 8, border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', fontSize: '0.75rem' }}
-                            formatter={(value, name) => [`R$ ${Number(value).toFixed(2)}`, name === 'gross_sales' ? 'Faturamento Bruto' : 'Comissão Dropshipper']}
-                          />
-                          <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: '0.75rem' }} />
-                          <Bar dataKey="gross_sales" fill="#2e7d32" radius={[4, 4, 0, 0]} maxBarSize={45} />
-                          <Line type="monotone" dataKey="net_commissions" stroke="#fbbf24" strokeWidth={3} dot={{ r: 4 }} />
-                        </ComposedChart>
-                      </ResponsiveContainer>
-                    )}
-                  </Box>
-                </Paper>
-              </Grid>
-
-              {/* Conversion Funnel Visualization */}
-              <Grid item xs={12} md={4}>
-                <Paper variant="outlined" sx={{ p: 3, borderRadius: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
-                    Funil de Conversão
-                  </Typography>
-                  <Typography variant="caption" color="textSecondary" sx={{ mb: 2 }}>
-                    Acompanhe as taxas de conversão de visitantes a apoios ecológicos realizados.
-                  </Typography>
-
-                  <Box sx={{ width: '100%', height: { xs: 200, md: 260 }, flexGrow: 1, display: 'flex', alignItems: 'center' }}>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        layout="vertical"
-                        data={[
-                          { stage: 'Visitas', count: funnelData?.visitors || 0, fill: '#64748b' },
-                          { stage: 'Carrinho', count: funnelData?.cartAdditions || 0, fill: '#fbbf24' },
-                          { stage: 'Apoios', count: funnelData?.checkouts || 0, fill: '#2e7d32' }
-                        ]}
-                        margin={{ top: 0, right: 30, left: 10, bottom: 0 }}
-                      >
-                        <XAxis type="number" hide />
-                        <YAxis dataKey="stage" type="category" stroke="#64748b" style={{ fontSize: '0.8rem', fontWeight: 'bold' }} width={65} />
-                        <Tooltip formatter={(value) => [value, 'Quantidade']} contentStyle={{ fontSize: '0.75rem' }} />
-                        <Bar dataKey="count" radius={[0, 4, 4, 0]} barSize={25}>
-                          <Cell fill="#64748b" />
-                          <Cell fill="#fbbf24" />
-                          <Cell fill="#2e7d32" />
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </Box>
-
-                  <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', pb: 1 }}>
-                      <Typography variant="caption" color="textSecondary">Conversão Visita/Carrinho</Typography>
-                      <Typography variant="caption" sx={{ fontWeight: 'bold' }}>
-                        {funnelData?.visitors > 0 ? ((funnelData.cartAdditions / funnelData.visitors) * 100).toFixed(1) : 0}%
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Typography variant="caption" color="textSecondary">Conversão Carrinho/Apoio</Typography>
-                      <Typography variant="caption" sx={{ fontWeight: 'bold', color: '#2e7d32' }}>
-                        {funnelData?.cartAdditions > 0 ? ((funnelData.checkouts / funnelData.cartAdditions) * 100).toFixed(1) : 0}%
-                      </Typography>
-                    </Box>
-                  </Box>
-                </Paper>
-              </Grid>
-            </Grid>
-
-            {/* Bottom Row: Catalog Opportunities and Low Capacity Warnings */}
-            <Grid container spacing={3}>
-              
-              {/* Opportunities list */}
-              <Grid item xs={12} md={6}>
-                <Paper variant="outlined" sx={{ p: 3, borderRadius: 3 }}>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <AutoAwesomeIcon sx={{ color: '#fbbf24' }} /> Oportunidades do Catálogo Amazônico
-                  </Typography>
-                  <Typography variant="caption" color="textSecondary" display="block" sx={{ mb: 3 }}>
-                    Produtos com alta demanda global que ainda não estão listados na sua vitrine.
-                  </Typography>
-
-                  {opps.length === 0 ? (
-                    <Typography color="textSecondary" sx={{ fontStyle: 'italic', py: 2 }}>
-                      Sua loja já possui todos os produtos recomendados do catálogo!
-                    </Typography>
-                  ) : (
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      {opps.map(op => (
-                        <Card key={op.id} variant="outlined" sx={{ borderRadius: 2, display: 'flex', justifyContent: 'space-between', p: 2, alignItems: 'center' }}>
-                          <Box sx={{ maxWidth: '70%' }}>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>{op.nome}</Typography>
-                            <Typography variant="caption" color="textSecondary" display="block" noWrap>
-                              {op.info}
-                            </Typography>
-                            <Box sx={{ display: 'flex', gap: 1, mt: 1, alignItems: 'center' }}>
-                              <Chip size="small" label={`Preço: R$ ${op.preco}`} variant="outlined" sx={{ height: 20 }} />
-                              <Chip size="small" label={`${op.sales_count} vendas globais`} color="success" variant="outlined" sx={{ height: 20 }} />
-                            </Box>
-                          </Box>
-                          <Button 
-                            variant="contained" 
-                            color="success" 
-                            size="small"
-                            onClick={() => handleAddProduct(op.id)}
-                            sx={{ borderRadius: 1.5, textTransform: 'none', fontWeight: 'bold' }}
-                          >
-                            Adicionar
-                          </Button>
-                        </Card>
-                      ))}
-                    </Box>
-                  )}
-                </Paper>
-              </Grid>
-
-              {/* Low capacity alarms */}
-              <Grid item xs={12} md={6}>
-                <Paper variant="outlined" sx={{ p: 3, borderRadius: 3 }}>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 0.5, display: 'flex', alignItems: 'center', gap: 1, color: warnings.length > 0 ? '#d32f2f' : 'inherit' }}>
-                    <WarningAmberIcon sx={{ color: warnings.length > 0 ? '#d32f2f' : '#64748b' }} /> Alertas de Limites de Produção & Capacidade
-                  </Typography>
-                  <Typography variant="caption" color="textSecondary" display="block" sx={{ mb: 3 }}>
-                    Produtos em sua loja operando próximos aos limites locais das comunidades extrativistas.
-                  </Typography>
-
-                  {warnings.length === 0 ? (
-                    <Alert severity="success" sx={{ borderRadius: 2 }}>
-                      Excelente! Todos os produtos da sua loja possuem capacidade de estoque e produção seguras.
-                    </Alert>
-                  ) : (
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      {warnings.map(w => (
-                        <Alert 
-                          key={w.id} 
-                          severity="warning" 
-                          icon={<WarningAmberIcon />}
-                          sx={{ borderRadius: 2, '& .MuiAlert-message': { width: '100%' } }}
-                        >
-                          <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>{w.nome}</Typography>
-                          <Typography variant="caption" display="block" color="textSecondary">
-                            Nível de Estoque Local: {w.stock_level || 0} unidades • Capacidade Mensal: {w.monthly_capacity || 0} unidades
-                          </Typography>
-                          <Typography variant="caption" sx={{ fontWeight: 'bold', color: '#d32f2f' }} display="block">
-                            Atenção: Risco iminente de atraso na produção sustentável local!
-                          </Typography>
-                        </Alert>
-                      ))}
-                    </Box>
-                  )}
-                </Paper>
-              </Grid>
-
-            </Grid>
-          </Box>
-        )}
-      </TabPanel>
-
-      {/* TAB 5: TEAM MANAGEMENT & AUDIT LOGS */}
-      <TabPanel value={tabValue} index={5}>
         {!store ? (
           <Alert severity="warning" sx={{ borderRadius: 2 }}>
             Você precisa criar e salvar uma loja antes de gerenciar a sua equipe de vendas.
@@ -1755,58 +889,6 @@ export default function Dropshipping() {
           </Box>
         )}
       </TabPanel>
-
-      {/* Dynamic AI Generator suggestions review dialog */}
-      <Dialog 
-        open={aiDialogOpen} 
-        onClose={() => setAiDialogOpen(false)}
-        PaperProps={{ sx: { borderRadius: 4, p: 2, maxWidth: 550 } }}
-      >
-        <DialogTitle sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
-          <AutoAwesomeIcon color="success" /> Sugestões Geradas pela IA
-        </DialogTitle>
-        <DialogContent>
-          <Typography variant="body2" color="textSecondary" sx={{ mb: 3 }}>
-            Revisamos a sua ideia e estruturamos as melhores configurações para o seu sucesso ecológico. Veja a sugestão:
-          </Typography>
-          
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-            <Box>
-              <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 'bold' }}>Nome Sugerido para a Loja</Typography>
-              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{aiResult?.storeName}</Typography>
-            </Box>
-            <Box>
-              <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 'bold' }}>Slogan da Marca</Typography>
-              <Typography variant="body2" sx={{ fontStyle: 'italic' }}>"{aiResult?.slogan}"</Typography>
-            </Box>
-            <Box>
-              <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 'bold' }}>Visual Preset Layout</Typography>
-              <Chip label={aiResult?.visualPreset === 'forest_light' ? 'Forest Light (Eco Clássico)' : aiResult?.visualPreset === 'modern_dark' ? 'Modern Dark (Luxo Noite)' : 'Classic Wood (Tons Quentes)'} color="primary" variant="outlined" size="small" />
-            </Box>
-            <Box>
-              <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 'bold' }}>Produtos Curados Recomendados</Typography>
-              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 0.5 }}>
-                {aiResult?.recommendedProducts && aiResult.recommendedProducts.map((p, i) => (
-                  <Chip key={i} label={p} size="small" />
-                ))}
-              </Box>
-            </Box>
-          </Box>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setAiDialogOpen(false)} color="inherit" sx={{ fontWeight: 'bold' }}>
-            Descartar
-          </Button>
-          <Button 
-            onClick={handleApplyAISuggestion} 
-            variant="contained" 
-            color="success"
-            sx={{ fontWeight: 'bold', borderRadius: 2 }}
-          >
-            Confirmar e Aplicar
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 }

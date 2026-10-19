@@ -3,12 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box, Typography, Paper, Grid, Card, CardContent, Button, CircularProgress,
   Divider, IconButton, List, ListItem, ListItemText, ListItemSecondaryAction,
-  FormControl, InputLabel, Select, MenuItem, Avatar, Switch, FormControlLabel
+  FormControl, InputLabel, Select, MenuItem, Avatar, Switch, FormControlLabel, Chip, TextField
 } from '@mui/material';
 import { ArrowBack, Store, Person, ContactMail, VpnKey, Public, Event, Edit, LocationOn, Delete, AddBox, Inventory } from '@mui/icons-material';
 import { api } from '../services/api';
-import { EditDropshipperModal } from './EditDropshipperModal';
-import { EditAllocatedProductModal } from './EditAllocatedProductModal';
 
 export function DropshipperDetails() {
   const { id } = useParams();
@@ -16,26 +14,29 @@ export function DropshipperDetails() {
   const [loading, setLoading] = useState(true);
   const [store, setStore] = useState(null);
   const [error, setError] = useState('');
-  const [editModalOpen, setEditModalOpen] = useState(false);
   const [products, setProducts] = useState([]);
   const [availableProducts, setAvailableProducts] = useState([]);
   const [selectedProductId, setSelectedProductId] = useState('');
   const [loadingProducts, setLoadingProducts] = useState(false);
-  const [editingProduct, setEditingProduct] = useState(null);
   const [userStores, setUserStores] = useState([]);
 
   const fetchDetails = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/api/v1/admin/dropshipping/dropshippers/${id}`);
-      setStore(response.data);
-      if (response.data?.store_id) {
-        fetchProducts(response.data.store_id);
-      }
-      if (response.data?.user_id) {
-        const storesRes = await api.get(`/api/v1/admin/dropshipping/stores?user_id=${response.data.user_id}`);
-        setUserStores(storesRes.data.stores || []);
-      }
+      const { data } = await api.get(`/api/v1/admin/dropshipping/dropshippers/${id}`);
+      const loja = data.lojas?.[0] ?? null;
+      setStore({
+        ...data.perfil,
+        user_id: data.perfil.user_id,
+        name: loja?.nome ?? data.perfil.nome_comercial,
+        store_id: loja?.id ?? null,
+        loja_status: loja?.status ?? null,
+        slug: loja?.slug ?? null,
+        commission_override: loja?.commission_override ?? null,
+        limite_lojas: data.limite_lojas,
+      });
+      setUserStores(data.lojas.map((l) => ({ ...l, name: l.nome })));
+      if (loja) fetchProducts(loja.id);
     } catch (err) {
       setError('Failed to load dropshipper details. ' + (err.response?.data?.error || err.message));
     } finally {
@@ -60,11 +61,17 @@ export function DropshipperDetails() {
   };
 
   const handleAddProduct = async () => {
-    if (!selectedProductId || !store?.store_id) return;
+    const produto = availableProducts.find((p) => String(p.id) === String(selectedProductId));
+    if (!produto || !store?.store_id) return;
+    const entrada = window.prompt(`Preço de venda para "${produto.nome}" (R$):`, (Number(produto.preco) * 1.3).toFixed(2));
+    if (entrada === null) return;
+    const precoVenda = Number(entrada.replace(',', '.'));
+    if (!(precoVenda > 0)) return alert('Informe um preço de venda válido.');
     try {
       setLoadingProducts(true);
       await api.post(`/api/v1/admin/dropshipping/stores/${store.store_id}/products`, {
-        product_ids: [selectedProductId]
+        produto_id: produto.id,
+        preco_venda: precoVenda,
       });
       setSelectedProductId('');
       await fetchProducts(store.store_id);
@@ -88,15 +95,23 @@ export function DropshipperDetails() {
     }
   };
 
-  const handleTogglePublic = async (event) => {
-    const newValue = event.target.checked;
+  const [overrideInput, setOverrideInput] = useState('');
+  const [savingOverride, setSavingOverride] = useState(false);
+
+  const handleSaveOverride = async () => {
+    if (!store?.store_id) return;
+    const valor = overrideInput.trim() === '' ? null : Number(overrideInput.replace(',', '.'));
+    if (valor !== null && !(valor >= 0 && valor <= 100)) return alert('A comissão deve estar entre 0 e 100.');
+    setSavingOverride(true);
     try {
-      await api.put(`/api/v1/admin/dropshipping/dropshippers/${id}`, {
-        is_public: newValue
-      });
-      fetchDetails();
+      await api.put(`/api/v1/admin/dropshipping/stores/${store.store_id}`, { commission_override: valor });
+      setOverrideInput('');
+      await fetchDetails();
+      alert(valor === null ? 'Comissão da loja voltou ao padrão do dropshipping.' : 'Comissão da loja atualizada.');
     } catch (err) {
-      alert('Erro ao atualizar visibilidade da loja: ' + (err.response?.data?.error || err.message));
+      alert('Erro ao salvar comissão: ' + (err.response?.data?.error || err.message));
+    } finally {
+      setSavingOverride(false);
     }
   };
 
@@ -144,25 +159,7 @@ export function DropshipperDetails() {
           </IconButton>
           <Typography variant="h4" fontWeight="bold">Detalhes do Dropshipper</Typography>
         </Box>
-        <Button variant="outlined" startIcon={<Edit />} onClick={() => setEditModalOpen(true)}>
-          Editar
-        </Button>
       </Box>
-
-      <EditDropshipperModal 
-        open={editModalOpen} 
-        onClose={() => setEditModalOpen(false)} 
-        store={store} 
-        onUpdateSuccess={fetchDetails} 
-      />
-
-      <EditAllocatedProductModal
-        open={Boolean(editingProduct)}
-        onClose={() => setEditingProduct(null)}
-        storeId={store?.store_id}
-        product={editingProduct}
-        onUpdateSuccess={() => fetchProducts(store.store_id)}
-      />
 
       <Grid container spacing={3}>
         {/* Profile Card */}
@@ -237,18 +234,19 @@ export function DropshipperDetails() {
                   <Event fontSize="small" color="action" />
                   <strong>Criado em:</strong> {store.store_created_at ? new Date(store.store_created_at).toLocaleString('pt-BR') : 'N/A'}
                 </Typography>
-
-                <Box sx={{ mt: 1, display: 'flex', alignItems: 'center' }}>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={!!store.is_public}
-                        onChange={handleTogglePublic}
-                        color="primary"
-                      />
-                    }
-                    label={store.is_public ? 'Loja Pública (Ativa)' : 'Loja Privada (Oculta)'}
+                <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+                  <Chip size="small" label={`Loja: ${store.loja_status ?? 'sem loja'}`} />
+                  <TextField
+                    size="small"
+                    label="Comissão desta loja (%)"
+                    placeholder={store.commission_override != null ? String(store.commission_override) : 'padrão do dropshipping'}
+                    value={overrideInput}
+                    onChange={(e) => setOverrideInput(e.target.value)}
+                    helperText="Vazio usa a comissão padrão. Taxa por manejo não se aplica."
                   />
+                  <Button variant="outlined" size="small" onClick={handleSaveOverride} disabled={savingOverride || !store.store_id}>
+                    Salvar comissão
+                  </Button>
                 </Box>
                 
                 <Divider sx={{ my: 1 }} />
@@ -362,17 +360,14 @@ export function DropshipperDetails() {
               ) : (
                 <List sx={{ width: '100%', bgcolor: 'background.paper', border: '1px solid #e0e0e0', borderRadius: 1 }}>
                   {products.map((product, index) => (
-                    <React.Fragment key={product.id}>
+                    <React.Fragment key={product.produto_id}>
                       <ListItem>
                         <ListItemText 
                           primary={product.nome} 
-                          secondary={`Preço: R$ ${Number(product.preco).toFixed(2).replace('.', ',')} | Status: ${product.is_public ? 'Público' : 'Oculto'}`}
+                          secondary={`Preço de venda: R$ ${Number(product.preco_venda).toFixed(2).replace('.', ',')} | ${product.ativo ? 'Ativo' : `Pausado (${product.pausado_motivo ?? 'motivo não informado'})`}`}
                         />
                         <ListItemSecondaryAction>
-                          <IconButton edge="end" color="primary" onClick={() => setEditingProduct(product)} sx={{ mr: 1 }}>
-                            <Edit />
-                          </IconButton>
-                          <IconButton edge="end" color="error" onClick={() => handleRemoveProduct(product.id)}>
+                          <IconButton edge="end" color="error" onClick={() => handleRemoveProduct(product.produto_id)}>
                             <Delete />
                           </IconButton>
                         </ListItemSecondaryAction>

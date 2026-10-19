@@ -87,6 +87,7 @@ function TransferOwnerModal({ store, onClose, onSuccess }) {
 // ─── Catalog Allocation Modal ───────────────────────────────────────────────
 function CatalogModal({ store, allProducts, onClose, onSuccess }) {
   const [selectedIds, setSelectedIds] = useState([]);
+  const [precoVenda, setPrecoVenda] = useState('');
   const [loading, setLoading] = useState(false);
   const [searchQ, setSearchQ] = useState('');
 
@@ -102,16 +103,19 @@ function CatalogModal({ store, allProducts, onClose, onSuccess }) {
 
   const handleSave = async () => {
     if (selectedIds.length === 0) return alert('Selecione pelo menos um produto.');
+    if (!precoVenda || Number(precoVenda) <= 0) return alert('Informe o preço de venda.');
     setLoading(true);
     try {
-      const res = await api.post(`/api/v1/admin/dropshipping/stores/${store.id}/products`, {
-        product_ids: selectedIds,
-      });
-      alert(`${res.data.added} produto(s) adicionado(s) ao catálogo.`);
-      onSuccess();
-      onClose();
-    } catch (err) {
-      alert('Erro: ' + (err.response?.data?.error || err.message));
+      const results = await Promise.allSettled(selectedIds.map((produtoId) =>
+        api.post(`/api/v1/admin/dropshipping/stores/${store.id}/products`, { produto_id: produtoId, preco_venda: Number(precoVenda) })
+      ));
+      const ok = results.filter((r) => r.status === 'fulfilled').length;
+      const falhas = results
+        .filter((r) => r.status === 'rejected')
+        .map((r) => r.reason.response?.data?.error || r.reason.message);
+      alert(`${ok} produto(s) adicionado(s) ao catálogo.` + (falhas.length ? `\nFalhas: ${falhas.join('; ')}` : ''));
+      if (ok > 0) onSuccess();
+      if (!falhas.length) onClose();
     } finally {
       setLoading(false);
     }
@@ -163,6 +167,15 @@ function CatalogModal({ store, allProducts, onClose, onSuccess }) {
           {selectedIds.length} produto(s) selecionado(s)
         </Typography>
       </DialogContent>
+      <TextField
+        fullWidth
+        size="small"
+        type="number"
+        label="Preço de venda para os produtos selecionados (R$)"
+        value={precoVenda}
+        onChange={(e) => setPrecoVenda(e.target.value)}
+        sx={{ mt: 2 }}
+      />
       <DialogActions sx={{ px: 3, pb: 3, gap: 1 }}>
         <Button onClick={onClose} color="inherit">Cancelar</Button>
         <Button variant="contained" color="success" onClick={handleSave} disabled={loading}>
@@ -173,194 +186,78 @@ function CatalogModal({ store, allProducts, onClose, onSuccess }) {
   );
 }
 
-// ─── Domain Admin Modal ───────────────────────────────────────────────────────
-function DomainAdminModal({ store, onClose, onSuccess }) {
-  const [customDomain, setCustomDomain] = useState(store.custom_domain || '');
-  const [loading, setLoading] = useState(false);
-
-  const handleSave = async () => {
-    setLoading(true);
-    try {
-      await api.put(`/api/v1/admin/dropshipping/stores/${store.id}/domain`, {
-        custom_domain: customDomain.trim(),
-      });
-      alert('Domínio atualizado com sucesso!');
-      onSuccess();
-      onClose();
-    } catch (err) {
-      alert('Erro: ' + (err.response?.data?.error || err.message));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <Dialog open onClose={onClose} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
-      <DialogTitle sx={{ fontWeight: 'bold' }}>
-        Gerenciar Domínio — {store.name}
-      </DialogTitle>
-      <DialogContent sx={{ pt: 2 }}>
-        <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
-          Substitua o domínio customizado desta loja. Deixe em branco para remover o domínio atual.
-        </Typography>
-        <TextField
-          label="Domínio Customizado"
-          value={customDomain}
-          onChange={e => setCustomDomain(e.target.value)}
-          fullWidth
-          variant="outlined"
-          placeholder="ex: www.minha-loja.com.br"
-        />
-      </DialogContent>
-      <DialogActions sx={{ px: 3, pb: 3, gap: 1 }}>
-        <Button onClick={onClose} color="inherit">Cancelar</Button>
-        <Button variant="contained" color="primary" onClick={handleSave} disabled={loading}>
-          {loading ? <CircularProgress size={18} color="inherit" /> : 'Salvar Domínio'}
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
-}
-
-// ─── Register Dropshipper Modal ─────────────────────────────────────────────
-function RegisterDropshipperModal({ onClose, onSuccess }) {
-  const [formData, setFormData] = useState({ name: '', email: '', subdomain: '' });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleSave = async (e) => {
-    e.preventDefault();
-    if (!formData.name.trim() || !formData.email.trim() || !formData.subdomain.trim()) {
-      return setError('Todos os campos são obrigatórios.');
-    }
-    if (!/^[a-z0-9-]+$/.test(formData.subdomain)) {
-      return setError('O subdomínio deve conter apenas letras minúsculas, números e hífens.');
-    }
-    setLoading(true);
-    setError('');
-    try {
-      await api.post('/api/v1/admin/dropshipping/dropshippers', {
-        name: formData.name.trim(),
-        email: formData.email.trim(),
-        subdomain: formData.subdomain.trim(),
-      });
-      alert('Dropshipper registrado com sucesso! O e-mail com as credenciais foi enviado.');
-      onSuccess();
-      onClose();
-    } catch (err) {
-      setError(err.response?.data?.error || err.response?.data?.message || err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <Dialog open onClose={onClose} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
-      <DialogTitle sx={{ fontWeight: 'bold' }}>
-        Registrar Novo Dropshipper
-      </DialogTitle>
-      <DialogContent sx={{ pt: 2 }}>
-        {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>{error}</Alert>}
-        
-        <Box component="form" onSubmit={handleSave} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, mt: 1 }}>
-          <TextField
-            label="Nome Completo"
-            value={formData.name}
-            onChange={e => setFormData({ ...formData, name: e.target.value })}
-            fullWidth
-            required
-            variant="outlined"
-            placeholder="Ex: João Silva"
-          />
-          <TextField
-            label="E-mail"
-            type="email"
-            value={formData.email}
-            onChange={e => setFormData({ ...formData, email: e.target.value })}
-            fullWidth
-            required
-            variant="outlined"
-            placeholder="Ex: joao@email.com"
-          />
-          <TextField
-            label="Subdomínio da Loja"
-            value={formData.subdomain}
-            onChange={e => setFormData({ ...formData, subdomain: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
-            fullWidth
-            required
-            variant="outlined"
-            placeholder="Ex: joaostore"
-            helperText="Este subdomínio será o endereço público da loja (ex: joaostore.arpt.site)"
-            InputProps={{
-              endAdornment: <InputAdornment position="end">.arpt.site</InputAdornment>,
-            }}
-          />
-        </Box>
-      </DialogContent>
-      <DialogActions sx={{ px: 3, pb: 3, gap: 1 }}>
-        <Button onClick={onClose} color="inherit" disabled={loading}>Cancelar</Button>
-        <Button variant="contained" color="success" onClick={handleSave} disabled={loading}>
-          {loading ? <CircularProgress size={18} color="inherit" /> : 'Registrar Dropshipper'}
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
-}
-
-// ─── Vercel Config Panel ────────────────────────────────────────────────────
-function VercelConfigPanel() {
-  const [config, setConfig] = useState({ VERCEL_API_TOKEN: '', VERCEL_PROJECT_ID: '' });
-  const [loading, setLoading] = useState(false);
+// ─── Fee Settings Card (taxas do dropshipping, 6.2a) ─────
+function FeeSettingsCard() {
+  const [form, setForm] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState(null);
 
   useEffect(() => {
-    api.get('/api/v1/admin/dropshipping/config').then(res => {
-      if (res.data) setConfig(res.data);
-    });
+    api.get('/api/v1/admin/dropshipping/settings')
+      .then((res) => setForm({
+        commissionPercent: String(res.data.commissionPercent),
+        gatewayPercent: String(res.data.gatewayPercent),
+        defaultMaxStores: String(res.data.defaultMaxStores),
+        termsVersion: res.data.termsVersion,
+      }))
+      .catch(() => setMessage({ severity: 'error', text: 'Não foi possível carregar as configurações.' }));
   }, []);
 
-  const handleSave = async () => {
-    setLoading(true);
+  const save = async () => {
+    setSaving(true);
+    setMessage(null);
     try {
-      await api.put('/api/v1/admin/dropshipping/config', config);
-      alert('Configurações salvas com sucesso!');
+      const res = await api.put('/api/v1/admin/dropshipping/settings', {
+        commissionPercent: Number(form.commissionPercent),
+        gatewayPercent: Number(form.gatewayPercent),
+        defaultMaxStores: Number(form.defaultMaxStores),
+        termsVersion: form.termsVersion,
+      });
+      setMessage({
+        severity: 'success',
+        text: res.data.pausa_agendada
+          ? 'Configurações salvas. As alocações abaixo do novo preço mínimo serão pausadas em instantes.'
+          : 'Configurações salvas.',
+      });
     } catch (err) {
-      alert('Erro ao salvar: ' + (err.response?.data?.error || err.message));
+      setMessage({ severity: 'error', text: err.response?.data?.error || err.message });
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
+
+  if (!form) return null;
+
+  const fields = [
+    ['commissionPercent', 'Comissão padrão (%)'],
+    ['gatewayPercent', 'Taxa do gateway (%)'],
+    ['defaultMaxStores', 'Lojas por dropshipper (padrão)'],
+    ['termsVersion', 'Versão dos termos (nova versão exige novo aceite)'],
+  ];
 
   return (
     <Paper variant="outlined" sx={{ p: 3, borderRadius: 3, mb: 3 }}>
-      <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 2 }}>
-        Integração Vercel (Configuração de Domínios)
+      <Typography variant="subtitle1" fontWeight="bold">Taxas e limites do dropshipping</Typography>
+      <Typography variant="caption" color="textSecondary" display="block" sx={{ mb: 2 }}>
+        Independente da taxa por manejo, que pertence ao financiamento coletivo. Override por loja fica na tela do dropshipper.
       </Typography>
-      <Grid container spacing={2} alignItems="center">
-        <Grid item xs={12} sm={5}>
-          <TextField
-            size="small"
-            label="Vercel API Token"
-            type="password"
-            value={config.VERCEL_API_TOKEN}
-            onChange={e => setConfig({...config, VERCEL_API_TOKEN: e.target.value})}
-            fullWidth
-          />
-        </Grid>
-        <Grid item xs={12} sm={5}>
-          <TextField
-            size="small"
-            label="Vercel Project ID"
-            value={config.VERCEL_PROJECT_ID}
-            onChange={e => setConfig({...config, VERCEL_PROJECT_ID: e.target.value})}
-            fullWidth
-          />
-        </Grid>
-        <Grid item xs={12} sm={2}>
-          <Button variant="contained" fullWidth onClick={handleSave} disabled={loading}>
-            Salvar
-          </Button>
-        </Grid>
+      <Grid container spacing={2}>
+        {fields.map(([key, label]) => (
+          <Grid item xs={12} sm={6} md={3} key={key}>
+            <TextField
+              fullWidth
+              size="small"
+              label={label}
+              value={form[key]}
+              onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+            />
+          </Grid>
+        ))}
       </Grid>
+      {message && <Alert severity={message.severity} sx={{ mt: 2, borderRadius: 2 }}>{message.text}</Alert>}
+      <Button variant="contained" sx={{ mt: 2, borderRadius: 2 }} onClick={save} disabled={saving}>
+        {saving ? 'Salvando...' : 'Salvar taxas'}
+      </Button>
     </Paper>
   );
 }
@@ -378,8 +275,6 @@ export function DropshippingAdmin() {
 
   const [transferStore, setTransferStore] = useState(null);
   const [catalogStore, setCatalogStore] = useState(null);
-  const [domainStore, setDomainStore] = useState(null);
-  const [registerModalOpen, setRegisterModalOpen] = useState(false);
 
 
   const fetchAll = async () => {
@@ -389,15 +284,13 @@ export function DropshippingAdmin() {
         api.get('/api/v1/admin/dropshipping/stores', { params: { page, pageSize: 20, q: search } }),
         // Métricas de vendas: indisponíveis não devem impedir a listagem de lojas.
         api.get('/api/v1/admin/dropshipping/analytics/performance').catch(() => ({ data: null })),
-        api.get('/produtos/all'),
+        api.get('/produtos'),
       ]);
       // A API devolve nome/owner_user_id; a tela usa name/user_id.
       setStores((storesRes.data.data || []).map(s => ({ ...s, name: s.nome, user_id: s.owner_user_id })));
       setTotalStores(storesRes.data.total || 0);
       setAnalytics({ totals: analyticsRes.data?.totais || null, trend: [] });
-      if (prodRes.data?.success) {
-        setAllProducts(prodRes.data.data.filter(p => p.is_ativo));
-      }
+      setAllProducts((prodRes.data || []).filter(p => p.is_ativo));
     } catch (err) {
       console.error('Erro ao carregar dados admin dropshipping', err);
     } finally {
@@ -419,15 +312,6 @@ export function DropshippingAdmin() {
             Gerencie lojas, transfira propriedades, aloque catálogos e monitore receitas da plataforma.
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          color="success"
-          startIcon={<Store />}
-          onClick={() => setRegisterModalOpen(true)}
-          sx={{ borderRadius: 2, px: 3, py: 1, fontWeight: 'bold' }}
-        >
-          Registrar Dropshipper
-        </Button>
       </Box>
 
 
@@ -435,7 +319,7 @@ export function DropshippingAdmin() {
         <Box display="flex" justifyContent="center" py={8}><CircularProgress /></Box>
       ) : (
         <>
-          <VercelConfigPanel />
+          <FeeSettingsCard />
 
           {/* KPI Row */}
           <Grid container spacing={2} sx={{ mb: 3 }}>
@@ -568,11 +452,6 @@ export function DropshippingAdmin() {
                             <Visibility fontSize="small" />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title="Gerenciar Domínio">
-                          <IconButton size="small" color="primary" onClick={() => setDomainStore(store)}>
-                            <Store fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
                         <Tooltip title="Transferir Proprietário">
                           <IconButton size="small" color="warning" onClick={() => setTransferStore(store)}>
                             <SwapHoriz fontSize="small" />
@@ -642,19 +521,6 @@ export function DropshippingAdmin() {
           store={catalogStore}
           allProducts={allProducts}
           onClose={() => setCatalogStore(null)}
-          onSuccess={fetchAll}
-        />
-      )}
-      {domainStore && (
-        <DomainAdminModal
-          store={domainStore}
-          onClose={() => setDomainStore(null)}
-          onSuccess={fetchAll}
-        />
-      )}
-      {registerModalOpen && (
-        <RegisterDropshipperModal
-          onClose={() => setRegisterModalOpen(false)}
           onSuccess={fetchAll}
         />
       )}
