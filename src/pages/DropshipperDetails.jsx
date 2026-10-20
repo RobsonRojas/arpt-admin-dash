@@ -7,6 +7,7 @@ import {
 } from '@mui/material';
 import { ArrowBack, Store, Person, ContactMail, VpnKey, Public, Event, Edit, LocationOn, Delete, AddBox, Inventory } from '@mui/icons-material';
 import { api } from '../services/api';
+import { leadTimeLabel, modoLabel } from '../utils/offer';
 
 export function DropshipperDetails() {
   const { id } = useParams();
@@ -364,7 +365,7 @@ export function DropshipperDetails() {
                       <ListItem>
                         <ListItemText 
                           primary={product.nome} 
-                          secondary={`Preço de venda: R$ ${Number(product.preco_venda).toFixed(2).replace('.', ',')} | ${product.ativo ? 'Ativo' : `Pausado (${product.pausado_motivo ?? 'motivo não informado'})`}`}
+                          secondary={`Preço de venda: R$ ${Number(product.preco_venda).toFixed(2).replace('.', ',')} | ${product.ativo ? 'Ativo' : `Pausado (${product.pausado_motivo ?? 'motivo não informado'})`} | ${modoLabel(product.modo_oferta)}: ${leadTimeLabel(product)}`}
                         />
                         <ListItemSecondaryAction>
                           <IconButton edge="end" color="error" onClick={() => handleRemoveProduct(product.produto_id)}>

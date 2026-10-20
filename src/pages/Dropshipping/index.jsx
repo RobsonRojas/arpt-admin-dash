@@ -26,6 +26,7 @@ import HistoryIcon from '@mui/icons-material/History';
 import UndoIcon from '@mui/icons-material/Undo';
 import EmailIcon from '@mui/icons-material/Email';
 import ShieldIcon from '@mui/icons-material/Shield';
+import { leadTimeLabel, modoLabel } from '../../utils/offer';
 import { 
   ResponsiveContainer, ComposedChart, Bar, Line, XAxis, YAxis, 
   CartesianGrid, Tooltip, Legend, BarChart, Cell
@@ -543,11 +544,12 @@ export default function Dropshipping() {
                           {/* Availability badge */}
                           <Box sx={{ mt: 0.5, display: 'flex', gap: 1, alignItems: 'center' }}>
                             <Typography variant="caption" color="textSecondary">Preço Original: R$ {prod.preco}</Typography>
-                            {prod.availability_type === 'sob_encomenda' ? (
-                              <Chip size="small" label={`Sob Encomenda (${prod.production_time_days} dias)`} color="warning" sx={{ height: 20 }} />
-                            ) : (
-                              <Chip size="small" label="Em Estoque" color="success" sx={{ height: 20 }} />
-                            )}
+                            <Chip
+                              size="small"
+                              label={`${modoLabel(prod.modo_oferta)} · ${leadTimeLabel(prod)}`}
+                              color={prod.modo_oferta === 'PRONTA_ENTREGA' ? 'success' : 'warning'}
+                              sx={{ height: 20 }}
+                            />
                           </Box>
                         </CardContent>
                       </Card>
@@ -589,11 +591,12 @@ export default function Dropshipping() {
                           
                           {/* Availability badge */}
                           <Box sx={{ mt: 1 }}>
-                            {prod.availability_type === 'sob_encomenda' ? (
-                              <Chip size="small" label={`Sob Encomenda (${prod.production_time_days}d)`} color="warning" sx={{ height: 18 }} />
-                            ) : (
-                              <Chip size="small" label="Em Estoque" color="success" sx={{ height: 18 }} />
-                            )}
+                            <Chip
+                              size="small"
+                              label={`${modoLabel(prod.modo_oferta)} · ${leadTimeLabel(prod)}`}
+                              color={prod.modo_oferta === 'PRONTA_ENTREGA' ? 'success' : 'warning'}
+                              sx={{ height: 18 }}
+                            />
                           </Box>
                         </CardContent>
                         <CardActions sx={{ p: 2, pt: 0 }}>
