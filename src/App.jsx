@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { ThemeProvider, CssBaseline, CircularProgress, Box } from '@mui/material';
 import { theme } from './theme';
 import { Layout, ErrorBoundary } from './components';
-import { Dashboard, Projects, Properties, Necromassa, Sponsors, Login, Users, Rewards, Certificates, Products, AuditLogs, GeminiSettings, PaymentConfig, MediaManager, ErrorLogs, Refunds, ForestIntelligence, Adoptions, PhysicalPieces, Notifications, DeveloperSettings, ProductSimulation, Dropshipping, ManejoLogs, DropshippingAdmin, DropshipperDetails, PrivacySettings, AnalyticsDashboard, TermsOfUse, AnalyticsPixels, ExitSurvey } from './pages';
+import { Dashboard, Projects, Properties, Necromassa, Sponsors, Login, Users, Rewards, Certificates, Products, AuditLogs, GeminiSettings, PaymentConfig, MediaManager, ErrorLogs, Refunds, ForestIntelligence, Adoptions, PhysicalPieces, Notifications, DeveloperSettings, ProductSimulation, Dropshipping, ManejoLogs, DropshippingAdmin, DropshipperDetails, AdminOrders, PrivacySettings, AnalyticsDashboard, TermsOfUse, AnalyticsPixels, ExitSurvey } from './pages';
 import { CertificateView } from './pages/CertificateView';
 import { useAdmin } from './contexts/AdminContext';
 import { useAuth } from './contexts/AuthContext.jsx';
@@ -85,6 +85,7 @@ export default function App() {
                   <Route path="dropshipping" element={<Dropshipping />} />
                   <Route path="dropshipping-admin" element={<DropshippingAdmin />} />
                   <Route path="dropshipping-admin/:id" element={<DropshipperDetails />} />
+                  <Route path="orders-admin" element={<AdminOrders />} />
                   <Route path="privacy-settings" element={<PrivacySettings />} />
                   <Route path="terms-of-use" element={<TermsOfUse />} />
                   <Route path="*" element={<Navigate to="/dashboard" replace />} />

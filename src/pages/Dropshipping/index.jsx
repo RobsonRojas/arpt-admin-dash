@@ -27,6 +27,7 @@ import UndoIcon from '@mui/icons-material/Undo';
 import EmailIcon from '@mui/icons-material/Email';
 import ShieldIcon from '@mui/icons-material/Shield';
 import { leadTimeLabel, modoLabel } from '../../utils/offer';
+import StoreOrdersTab from '../../components/orders/StoreOrdersTab';
 import { 
   ResponsiveContainer, ComposedChart, Bar, Line, XAxis, YAxis, 
   CartesianGrid, Tooltip, Legend, BarChart, Cell
@@ -350,6 +351,7 @@ export default function Dropshipping() {
           <Tab label="Configuração da Loja" value={0} />
           <Tab label="Catálogo de Curação" value={1} />
           <Tab label="Equipe & Auditoria" value={2} />
+          <Tab label="Pedidos e Repasses" value={3} />
         </Tabs>
       </Box>
 
@@ -623,6 +625,15 @@ export default function Dropshipping() {
 
 
 
+
+      {/* TAB 3: PEDIDOS E REPASSES */}
+      <TabPanel value={tabValue} index={3}>
+        {!store ? (
+          <Alert severity="warning" sx={{ borderRadius: 2 }}>Crie e salve uma loja para acompanhar pedidos e repasses.</Alert>
+        ) : (
+          <StoreOrdersTab storeId={store.id} />
+        )}
+      </TabPanel>
 
       {/* TAB 2: TEAM MANAGEMENT & AUDIT LOGS */}
       <TabPanel value={tabValue} index={2}>
