@@ -4,7 +4,7 @@ import {
     TableRow, TableCell, TableBody, Paper, IconButton, Chip,
     Dialog, DialogTitle, DialogContent, DialogActions, TextField,
     FormControlLabel, Switch, CircularProgress, Alert, Snackbar,
-    Avatar, Grid, useMediaQuery, useTheme
+    Avatar, Grid, useMediaQuery, useTheme, MenuItem
 } from '@mui/material';
 import { Add, Edit, Delete, Visibility, Close, Image as ImageIcon, Search, Refresh, BrokenImage } from '@mui/icons-material';
 import { AIAssistant } from '../components/AIAssistant';
@@ -13,6 +13,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { recordAudit } from '../services/auditLog';
 import { api } from '../services/api';
 import { usePersistence } from '../hooks/usePersistence';
+import { MODOS, OFFER_DEFAULTS, buildOfferPayload, leadTimeLabel, modoLabel, offerFormFromProduct } from '../utils/offer';
 
 export const Products = () => {
     const { user } = useAuth();
@@ -40,7 +41,7 @@ export const Products = () => {
         info: '',
         info_en: '',
         preco: 0,
-        prazo_entrega_meses: 0,
+        ...OFFER_DEFAULTS,
         is_ativo: true,
         is_physical_reward: false,
         carbon_stored_kg: 0,
@@ -109,7 +110,7 @@ export const Products = () => {
                 info: product.info,
                 info_en: product.info_en || '',
                 preco: product.preco,
-                prazo_entrega_meses: product.prazo_entrega_meses,
+                ...offerFormFromProduct(product),
                 is_ativo: product.is_ativo,
                 is_physical_reward: product.is_physical_reward || false,
                 carbon_stored_kg: product.carbon_stored_kg || 0,
@@ -134,7 +135,7 @@ export const Products = () => {
                 info: '',
                 info_en: '',
                 preco: 0,
-                prazo_entrega_meses: 0,
+                ...OFFER_DEFAULTS,
                 is_ativo: true,
                 is_physical_reward: false,
                 carbon_stored_kg: 0,
@@ -176,6 +177,13 @@ export const Products = () => {
             return;
         }
 
+        // Prazos e estoque são validados aqui como no servidor (o servidor continua sendo a fonte da verdade).
+        const offer = buildOfferPayload(formData);
+        if (offer.error) {
+            setSnackbar({ open: true, message: offer.error, severity: 'warning' });
+            return;
+        }
+
         try {
             const payload = {
                 nome: formData.nome,
@@ -183,7 +191,7 @@ export const Products = () => {
                 info: formData.info,
                 info_en: formData.info_en,
                 preco: Number(formData.preco),
-                prazo_entrega_meses: Number(formData.prazo_entrega_meses),
+                ...offer.payload,
                 is_ativo: formData.is_ativo,
                 is_physical_reward: formData.is_physical_reward,
                 carbon_stored_kg: Number(formData.carbon_stored_kg),
@@ -299,7 +307,7 @@ export const Products = () => {
                                 <TableRow>
                                     <TableCell>Produto</TableCell>
                                     <TableCell>Preço</TableCell>
-                                    <TableCell>Prazo (meses)</TableCell>
+                                    <TableCell>Oferta e prazo</TableCell>
                                     <TableCell>Status</TableCell>
                                     <TableCell align="right">Ações</TableCell>
                                 </TableRow>
@@ -323,7 +331,10 @@ export const Products = () => {
                                             </Box>
                                         </TableCell>
                                         <TableCell>R$ {row.preco}</TableCell>
-                                        <TableCell>{row.prazo_entrega_meses}</TableCell>
+                                        <TableCell>
+                                            <Chip size="small" label={modoLabel(row.modo_oferta)} color={row.modo_oferta === 'PRONTA_ENTREGA' ? 'success' : 'default'} />
+                                            <Typography variant="body2" color="textSecondary">{leadTimeLabel(row)}</Typography>
+                                        </TableCell>
                                         <TableCell>
                                             <Chip
                                                 label={row.is_ativo ? "Ativo" : "Inativo"}
@@ -481,12 +492,80 @@ export const Products = () => {
                                 onChange={(e) => setFormData({ ...formData, preco: e.target.value })}
                             />
                             <TextField
-                                label="Prazo de Entrega (meses)"
+                                select
+                                label="Modo de oferta"
+                                fullWidth
+                                value={formData.modo_oferta || 'ENCOMENDA'}
+                                onChange={(e) => setFormData({ ...formData, modo_oferta: e.target.value })}
+                                helperText="Pronta entrega tem estoque; encomenda é produzida sob pedido."
+                            >
+                                {Object.entries(MODOS).map(([value, label]) => (
+                                    <MenuItem key={value} value={value}>{label}</MenuItem>
+                                ))}
+                            </TextField>
+                            {(formData.modo_oferta || 'ENCOMENDA') === 'PRONTA_ENTREGA' ? (
+                                <TextField
+                                    label="Estoque (unidades)"
+                                    type="number"
+                                    fullWidth
+                                    required
+                                    inputProps={{ min: 0, step: 1 }}
+                                    value={formData.estoque ?? ''}
+                                    onChange={(e) => setFormData({ ...formData, estoque: e.target.value })}
+                                />
+                            ) : (
+                                <Box display="flex" gap={2}>
+                                    <TextField
+                                        label="Produção mínima (dias)"
+                                        type="number"
+                                        fullWidth
+                                        required
+                                        inputProps={{ min: 0, step: 1 }}
+                                        value={formData.prazo_producao_dias_min ?? ''}
+                                        onChange={(e) => setFormData({ ...formData, prazo_producao_dias_min: e.target.value })}
+                                    />
+                                    <TextField
+                                        label="Produção máxima (dias)"
+                                        type="number"
+                                        fullWidth
+                                        required
+                                        inputProps={{ min: 0, step: 1 }}
+                                        value={formData.prazo_producao_dias_max ?? ''}
+                                        onChange={(e) => setFormData({ ...formData, prazo_producao_dias_max: e.target.value })}
+                                    />
+                                </Box>
+                            )}
+                            <TextField
+                                label="Prazo de despacho (dias)"
                                 type="number"
                                 fullWidth
-                                value={formData.prazo_entrega_meses}
-                                onChange={(e) => setFormData({ ...formData, prazo_entrega_meses: e.target.value })}
+                                required={(formData.modo_oferta || 'ENCOMENDA') === 'PRONTA_ENTREGA'}
+                                inputProps={{ min: 0, step: 1 }}
+                                value={formData.prazo_despacho_dias ?? ''}
+                                onChange={(e) => setFormData({ ...formData, prazo_despacho_dias: e.target.value })}
+                                helperText="O frete é somado pelo servidor na cotação."
                             />
+                            <Box display="flex" gap={2}>
+                                <TextField
+                                    label="Capacidade semanal (opcional)"
+                                    type="number"
+                                    fullWidth
+                                    inputProps={{ min: 0, step: 1 }}
+                                    value={formData.capacidade_semanal ?? ''}
+                                    onChange={(e) => setFormData({ ...formData, capacidade_semanal: e.target.value })}
+                                />
+                                {(formData.modo_oferta || 'ENCOMENDA') === 'ENCOMENDA' && (
+                                    <TextField
+                                        label="Limite da fila (opcional)"
+                                        type="number"
+                                        fullWidth
+                                        inputProps={{ min: 0, step: 1 }}
+                                        value={formData.limite_fila ?? ''}
+                                        onChange={(e) => setFormData({ ...formData, limite_fila: e.target.value })}
+                                        helperText="Sem limite, a fila nunca enche."
+                                    />
+                                )}
+                            </Box>
                             <TextField
                                 label="Carbono Estocado (kg)"
                                 type="number"
@@ -659,8 +738,11 @@ export const Products = () => {
                                         <Typography variant="h6" color="primary">R$ {viewingProduct.preco}</Typography>
                                     </Box>
                                     <Box>
-                                        <Typography variant="subtitle2" color="textSecondary">Prazo</Typography>
-                                        <Typography variant="body1">{viewingProduct.prazo_entrega_meses} meses</Typography>
+                                        <Typography variant="subtitle2" color="textSecondary">Oferta e prazo</Typography>
+                                        <Typography variant="body1">{modoLabel(viewingProduct.modo_oferta)} · {leadTimeLabel(viewingProduct)}</Typography>
+                                        {viewingProduct.modo_oferta === 'PRONTA_ENTREGA' && (
+                                            <Typography variant="body2" color="textSecondary">Estoque: {viewingProduct.estoque ?? 0}</Typography>
+                                        )}
                                     </Box>
                                     <Box>
                                         <Typography variant="subtitle2" color="textSecondary">Status</Typography>
