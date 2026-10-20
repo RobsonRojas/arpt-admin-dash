@@ -113,11 +113,11 @@ export default function StoreOrdersTab({ storeId }) {
           <TableHead>
             <TableRow>
               <TableCell>Pedido</TableCell><TableCell>Status</TableCell><TableCell>Prazo</TableCell><TableCell>Rastreio</TableCell>
-              <TableCell align="right">Total</TableCell><TableCell align="right">Sua margem</TableCell><TableCell align="right">Ações</TableCell>
+              <TableCell align="right">Total</TableCell><TableCell align="right">Frete <Typography component="span" variant="caption" color="textSecondary">(informativo)</Typography></TableCell><TableCell align="right">Sua margem</TableCell><TableCell align="right">Ações</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {orders.length === 0 && <TableRow><TableCell colSpan={7} align="center">Nenhum pedido</TableCell></TableRow>}
+            {orders.length === 0 && <TableRow><TableCell colSpan={8} align="center">Nenhum pedido</TableCell></TableRow>}
             {orders.map((o) => {
               const hint = cancelHint(o.status);
               return (
@@ -130,6 +130,7 @@ export default function StoreOrdersTab({ storeId }) {
                   <TableCell>{o.prazo_prometido_em ? deadlineText(o.prazo_prometido_em) : '—'}</TableCell>
                   <TableCell>{o.rastreio_codigo ? `${o.transportadora ?? ''} ${o.rastreio_codigo}`.trim() : '—'}</TableCell>
                   <TableCell align="right">{money(o.valor_total)}</TableCell>
+                  <TableCell align="right">{Number(o.frete) > 0 ? money(o.frete) : '—'}</TableCell>
                   <TableCell align="right">{money(o.margem)}</TableCell>
                   <TableCell align="right">
                     {hint.allowed && (

@@ -7,7 +7,7 @@
     "dev": "vite --host",
     "build": "vite build",
     "preview": "vite preview",
-    "check:utils": "node scripts/check-offer-utils.mjs && node scripts/check-orders-utils.mjs"
+    "check:utils": "node scripts/check-offer-utils.mjs && node scripts/check-orders-utils.mjs && node scripts/check-terms-utils.mjs"
   },
   "dependencies": {
     "@emotion/react": "^11.11.0",

@@ -46,3 +46,27 @@ assert.equal(u.beneficiaryLabel('ARPT'), 'ARPT');
 assert.equal(u.apiError({ response: { data: { error: 'Prazo vencido' } } }), 'Prazo vencido');
 assert.equal(u.apiError({}, 'padrão'), 'padrão');
 console.log('orders.js: todas as verificações passaram');
+// frete: o frete é do produtor; sem frete não há linha
+assert.equal(u.freightBreakdown({ valor_frete: 0 }), null); assert.equal(u.freightBreakdown({}), null); assert.equal(u.freightBreakdown(null), null);
+assert.deepEqual(u.freightBreakdown({ valor_frete: '30.00', valor_taxa_frete: '1.50' }), { bruto: 30, taxa: 1.5, liquido: 28.5 });
+assert.deepEqual(u.freightBreakdown({ valor_frete: 0.3, valor_taxa_frete: 0.1 }), { bruto: 0.3, taxa: 0.1, liquido: 0.2 }); // sem erro de ponto flutuante
+assert.match(u.freightText({ valor_frete: 30, valor_taxa_frete: 1.5 }), /30,00.*produtor recebe.*28,50/);
+assert.equal(u.freightText({ valor_frete: 0 }), '—');
+// débitos em aberto
+assert.equal(u.debitTypeLabel('LOGISTICA_REVERSA'), 'Logística reversa'); assert.match(u.debitTypeLabel('DEVOLUCAO'), /frete/); assert.equal(u.debitTypeLabel('X'), 'X');
+const deb = [{ beneficiario_user_id: 'a', valor: 0.1 }, { beneficiario_user_id: 'a', valor: 0.2 }, { beneficiario_user_id: 'b', valor: 5 }];
+assert.equal(u.openDebitTotal(deb, 'a'), 0.3); assert.equal(u.openDebitTotal(deb), 5.3); assert.equal(u.openDebitTotal(null), 0);
+// logística reversa 50/50, centavo ímpar para a ARPT
+assert.deepEqual(u.reverseLogisticsSplit(40), { produtor: 20, dropshipper: 20, arpt: 0 });
+assert.deepEqual(u.reverseLogisticsSplit(0.05), { produtor: 0.02, dropshipper: 0.02, arpt: 0.01 });
+assert.equal(u.reverseLogisticsSplit(0), null); assert.equal(u.reverseLogisticsSplit(-3), null); assert.equal(u.reverseLogisticsSplit('x'), null);
+// custo digitado: vírgula, vazio, zero, acima do teto (produtos + frete)
+const sub = { valor_total: 300, valor_frete: 30 };
+assert.deepEqual(u.parseReverseCost('45,90', sub), { ok: true, value: 45.9 });
+assert.deepEqual(u.parseReverseCost('330', sub), { ok: true, value: 330 });
+assert.equal(u.parseReverseCost('330,01', sub).ok, false); assert.match(u.parseReverseCost('400', sub).error, /330,00/);
+for (const bad of ['', '  ', '0', '-1', 'abc', null, undefined]) assert.equal(u.parseReverseCost(bad, sub).ok, false);
+assert.equal(u.needsReverseCost({ status: 'DEVOLVIDO', custo_logistica_reversa: null }), true);
+assert.equal(u.needsReverseCost({ status: 'DEVOLVIDO' }), true);
+assert.equal(u.needsReverseCost({ status: 'DEVOLVIDO', custo_logistica_reversa: 0.01 }), false);
+assert.equal(u.needsReverseCost({ status: 'ENTREGUE', custo_logistica_reversa: null }), false);

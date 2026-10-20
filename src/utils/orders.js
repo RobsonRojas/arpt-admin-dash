@@ -103,3 +103,54 @@ export function slaDelay(window) {
 export function apiError(err, fallback = 'Algo deu errado. Tente de novo.') {
     return err?.response?.data?.error || err?.response?.data?.message || fallback;
 }
+
+// ───────── frete (route-shipping-fee-to-producer) ─────────
+// O frete é do produtor: não entra na margem da loja nem na comissão. Aqui só se formata o que a API devolve.
+
+export const DEBIT_TYPE_LABEL = { DEVOLUCAO: 'Devolução (produto e frete)', LOGISTICA_REVERSA: 'Logística reversa' };
+export const debitTypeLabel = (t) => DEBIT_TYPE_LABEL[t] ?? t ?? '—';
+
+const cents = (v) => Math.round(Number(v ?? 0) * 100);
+
+/** Frete bruto, taxa do gateway e frete líquido (o que o produtor recebe), em reais; sem frete devolve `null`. */
+export function freightBreakdown(order) {
+    const bruto = cents(order?.valor_frete);
+    if (!(bruto > 0)) return null;
+    const taxa = cents(order?.valor_taxa_frete);
+    return { bruto: bruto / 100, taxa: taxa / 100, liquido: (bruto - taxa) / 100 };
+}
+
+/** Texto curto para a coluna "Frete": "R$ 30,00 (produtor recebe R$ 28,50)" ou "—" quando não há frete. */
+export function freightText(order) {
+    const f = freightBreakdown(order);
+    return f ? `${money(f.bruto)} (produtor recebe ${money(f.liquido)})` : '—';
+}
+
+/** Soma dos débitos em aberto de um beneficiário (centavos exatos). */
+export function openDebitTotal(debits, userId) {
+    const c = (debits ?? []).filter((d) => !userId || d.beneficiario_user_id === userId).reduce((s, d) => s + cents(d.valor), 0);
+    return c / 100;
+}
+
+/** Mesma divisão do servidor: 50% para o produtor, 50% para o dropshipper, centavo ímpar para a ARPT (só pré-visualização). */
+export function reverseLogisticsSplit(custo) {
+    const total = cents(custo);
+    if (!(total > 0)) return null;
+    const metade = Math.floor(total / 2);
+    return { produtor: metade / 100, dropshipper: metade / 100, arpt: (total - 2 * metade) / 100 };
+}
+
+/**
+ * Valida o custo digitado (aceita vírgula). Teto: total pago pelo sub-pedido (produtos mais frete), igual ao servidor.
+ * Devolve `{ ok, value }` ou `{ ok: false, error }`.
+ */
+export function parseReverseCost(raw, order) {
+    const n = Number(String(raw ?? '').trim().replace(/\./g, '').replace(',', '.'));
+    if (String(raw ?? '').trim() === '' || !Number.isFinite(n) || n <= 0) return { ok: false, error: 'Informe um custo maior que zero.' };
+    const teto = cents(order?.valor_total) + cents(order?.valor_frete);
+    if (Math.round(n * 100) > teto) return { ok: false, error: `O custo não pode passar do total pago pelo sub-pedido (${money(teto / 100)}).` };
+    return { ok: true, value: Math.round(n * 100) / 100 };
+}
+
+/** Pedido devolvido que ainda aguarda o registro do custo da logística reversa. */
+export const needsReverseCost = (order) => order?.status === 'DEVOLVIDO' && (order.custo_logistica_reversa === null || order.custo_logistica_reversa === undefined);
