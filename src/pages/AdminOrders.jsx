@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  Alert, Box, Button, Chip, CircularProgress, Grid, MenuItem, Paper, Tab, Table, TableBody, TableCell, TableContainer, TableHead,
-  TableRow, Tabs, TextField, Typography,
+  Alert, Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, MenuItem, Paper,
+  Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, TextField, Typography,
 } from '@mui/material';
 import { api } from '../services/api';
 import {
-  apiError, beneficiaryLabel, dateTime, deadlineText, holdReasonLabel, money, payoutStatusLabel, slaDelay, slaRate, statusColor,
-  statusLabel, STATUS_LABEL,
+  apiError, beneficiaryLabel, dateTime, deadlineText, debitTypeLabel, freightBreakdown, freightText, holdReasonLabel, money, needsReverseCost,
+  openDebitTotal, parseReverseCost, payoutStatusLabel, reverseLogisticsSplit, slaDelay, slaRate, statusColor, statusLabel, STATUS_LABEL,
 } from '../utils/orders';
 
 const A = '/api/v1/admin';
@@ -22,6 +22,10 @@ export const AdminOrders = () => {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(null);
+  // Devolução / logística reversa: o custo do envio de volta é dividido 50% produtor, 50% dropshipper.
+  const [reverse, setReverse] = useState(null); // { order, registerReturn: boolean }
+  const [reverseCost, setReverseCost] = useState('');
+  const [reverseError, setReverseError] = useState('');
 
   const load = useCallback(async () => {
     setError('');
@@ -55,8 +59,24 @@ export const AdminOrders = () => {
   };
   const deliver = (o) => window.confirm(`Confirmar a entrega do pedido #${o.id}? O prazo de arrependimento começa agora.`)
     && act(`del-${o.id}`, () => api.post(`${A}/orders/${o.id}/deliver`), 'Entrega confirmada.');
-  const registerReturn = (o) => window.confirm(`Registrar a DEVOLUÇÃO do pedido #${o.id}? O cliente será reembolsado e repasses já liberados viram débito.`)
-    && act(`ret-${o.id}`, () => api.post(`${A}/orders/${o.id}/return`), 'Devolução registrada.');
+  const registerReturn = (o) => { setReverse({ order: o, registerReturn: true }); setReverseCost(''); setReverseError(''); };
+  const registerReverseCost = (o) => { setReverse({ order: o, registerReturn: false }); setReverseCost(''); setReverseError(''); };
+  const confirmReverse = () => {
+    const { order, registerReturn: isReturn } = reverse;
+    const typed = String(reverseCost).trim();
+    // Na devolução o custo é opcional (pode ser registrado depois); na logística reversa avulsa é obrigatório.
+    if (isReturn && typed === '') {
+      setReverse(null);
+      return act(`ret-${order.id}`, () => api.post(`${A}/orders/${order.id}/return`), 'Devolução registrada. Falta registrar o custo da logística reversa.');
+    }
+    const parsed = parseReverseCost(reverseCost, order);
+    if (!parsed.ok) { setReverseError(parsed.error); return; }
+    setReverse(null);
+    return isReturn
+      ? act(`ret-${order.id}`, () => api.post(`${A}/orders/${order.id}/return`, { custo_logistica_reversa: parsed.value }), 'Devolução e logística reversa registradas.')
+      : act(`rev-${order.id}`, () => api.post(`${A}/orders/${order.id}/reverse-logistics`, { custo: parsed.value }), 'Custo da logística reversa registrado.');
+  };
+  const split = reverseLogisticsSplit(parseReverseCost(reverseCost, reverse?.order ?? {}).value);
 
   if (orders === null) return <Box sx={{ display: 'flex', justifyContent: 'center', p: 6 }}><CircularProgress /></Box>;
 
@@ -83,10 +103,10 @@ export const AdminOrders = () => {
             <Table size="small">
               <TableHead><TableRow>
                 <TableCell>Pedido</TableCell><TableCell>Loja</TableCell><TableCell>Status</TableCell><TableCell>Prazo</TableCell>
-                <TableCell align="right">Total</TableCell><TableCell align="right">Produtor</TableCell><TableCell align="right">Comissão</TableCell><TableCell align="right">Margem loja</TableCell><TableCell align="right">Ações</TableCell>
+                <TableCell align="right">Total</TableCell><TableCell align="right">Frete (do produtor)</TableCell><TableCell align="right">Produtor</TableCell><TableCell align="right">Comissão</TableCell><TableCell align="right">Margem loja</TableCell><TableCell align="right">Ações</TableCell>
               </TableRow></TableHead>
               <TableBody>
-                {orders.length === 0 && <TableRow><TableCell colSpan={9} align="center">Nenhum pedido</TableCell></TableRow>}
+                {orders.length === 0 && <TableRow><TableCell colSpan={10} align="center">Nenhum pedido</TableCell></TableRow>}
                 {orders.map((o) => (
                   <TableRow key={o.id} hover>
                     <TableCell>#{o.id}<Typography variant="caption" display="block" color="textSecondary">{dateTime(o.created_at)}</Typography></TableCell>
@@ -98,12 +118,14 @@ export const AdminOrders = () => {
                     </TableCell>
                     <TableCell>{o.prazo_prometido_em ? deadlineText(o.prazo_prometido_em) : '—'}</TableCell>
                     <TableCell align="right">{money(o.valor_total)}</TableCell>
+                    <TableCell align="right">{freightText(o)}{freightBreakdown(o) && freightBreakdown(o).taxa > 0 && <Typography variant="caption" display="block" color="textSecondary">taxa do gateway: {money(freightBreakdown(o).taxa)}</Typography>}{Number(o.custo_logistica_reversa) > 0 && <Typography variant="caption" display="block" color="error">logística reversa: {money(o.custo_logistica_reversa)}</Typography>}</TableCell>
                     <TableCell align="right">{money(o.valor_produtor)}</TableCell>
                     <TableCell align="right">{money(o.valor_comissao)}</TableCell>
                     <TableCell align="right">{money(o.valor_margem)}</TableCell>
                     <TableCell align="right">
                       {o.status === 'ENVIADO' && <Button size="small" disabled={busy === `del-${o.id}`} onClick={() => deliver(o)}>Confirmar entrega</Button>}
                       {o.status === 'ENTREGUE' && <Button size="small" color="error" disabled={busy === `ret-${o.id}`} onClick={() => registerReturn(o)}>Devolução</Button>}
+                      {needsReverseCost(o) && <Button size="small" disabled={busy === `rev-${o.id}`} onClick={() => registerReverseCost(o)}>Registrar logística reversa</Button>}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -192,7 +214,7 @@ export const AdminOrders = () => {
                       {payoutStatusLabel(r.status)}
                       {r.motivo_retencao && <Typography variant="caption" display="block" color="warning.main">{holdReasonLabel(r.motivo_retencao)}</Typography>}
                     </TableCell>
-                    <TableCell align="right">{money(r.valor)}{Number(r.valor_compensado) > 0 && <Typography variant="caption" display="block" color="textSecondary">compensado: {money(r.valor_compensado)}</Typography>}</TableCell>
+                    <TableCell align="right">{money(r.valor)}{Number(r.valor_frete_incluido) > 0 && <Typography variant="caption" display="block" color="textSecondary">inclui frete líquido: {money(r.valor_frete_incluido)}</Typography>}{Number(r.valor_compensado) > 0 && <Typography variant="caption" display="block" color="textSecondary">compensado: {money(r.valor_compensado)}</Typography>}</TableCell>
                     <TableCell>{r.liberado_em ? dateTime(r.liberado_em) : r.liberar_apos ? `a partir de ${dateTime(r.liberar_apos)}` : '—'}</TableCell>
                     <TableCell sx={{ fontFamily: 'monospace', fontSize: 12 }}>{r.gateway_ref || '—'}</TableCell>
                   </TableRow>
@@ -200,8 +222,61 @@ export const AdminOrders = () => {
               </TableBody>
             </Table>
           </TableContainer>
+
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mt: 4, mb: 0.5 }}>
+            Débitos em aberto{payouts.total_debitos > 0 ? ` (${money(payouts.total_debitos)})` : ''}
+          </Typography>
+          <Typography variant="caption" color="textSecondary" display="block" sx={{ mb: 1 }}>
+            Abatidos dos próximos repasses do beneficiário. Sem repasse futuro, ficam em aberto: não há cobrança automática.
+          </Typography>
+          <TableContainer component={Paper} variant="outlined">
+            <Table size="small">
+              <TableHead><TableRow>
+                <TableCell>Pedido</TableCell><TableCell>Beneficiário</TableCell><TableCell>Tipo</TableCell><TableCell align="right">Valor</TableCell>
+              </TableRow></TableHead>
+              <TableBody>
+                {(payouts.debitos_abertos ?? []).length === 0 && <TableRow><TableCell colSpan={4} align="center">Nenhum débito em aberto</TableCell></TableRow>}
+                {(payouts.debitos_abertos ?? []).map((d) => (
+                  <TableRow key={d.id}>
+                    <TableCell>#{d.subpedido_id}</TableCell>
+                    <TableCell sx={{ fontFamily: 'monospace', fontSize: 12 }}>{d.beneficiario_user_id}<Typography variant="caption" display="block" color="textSecondary">total do beneficiário: {money(openDebitTotal(payouts.debitos_abertos, d.beneficiario_user_id))}</Typography></TableCell>
+                    <TableCell>{debitTypeLabel(d.tipo)}</TableCell>
+                    <TableCell align="right">{money(d.valor)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Box>
       )}
+
+      <Dialog open={!!reverse} onClose={() => setReverse(null)} fullWidth maxWidth="xs">
+        <DialogTitle>{reverse?.registerReturn ? `Registrar devolução do pedido #${reverse?.order?.id}` : `Logística reversa do pedido #${reverse?.order?.id}`}</DialogTitle>
+        <DialogContent>
+          {reverse?.registerReturn && (
+            <DialogContentText sx={{ mb: 2 }}>
+              O cliente será reembolsado (produtos e frete) e repasses já liberados viram débito do produtor.
+            </DialogContentText>
+          )}
+          <DialogContentText sx={{ mb: 2 }}>
+            Custo do envio de volta, dividido 50% pelo produtor e 50% pelo dropshipper (centavo ímpar fica com a ARPT). Não é cobrado do cliente.
+            {reverse?.registerReturn && ' Pode ficar em branco agora e ser registrado depois.'}
+          </DialogContentText>
+          <TextField autoFocus fullWidth label="Custo da logística reversa (R$)" value={reverseCost} error={!!reverseError} helperText={reverseError || ' '}
+            onChange={(e) => { setReverseCost(e.target.value); setReverseError(''); }} inputProps={{ inputMode: 'decimal' }} />
+          {split && (
+            <Typography variant="body2" color="textSecondary">
+              Produtor {money(split.produtor)} · Dropshipper {money(split.dropshipper)}{split.arpt > 0 ? ` · ARPT ${money(split.arpt)}` : ''}
+            </Typography>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setReverse(null)}>Cancelar</Button>
+          <Button variant="contained" color={reverse?.registerReturn ? 'error' : 'primary'} onClick={confirmReverse}>
+            {reverse?.registerReturn ? 'Registrar devolução' : 'Registrar custo'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
