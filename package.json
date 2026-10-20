@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check:utils": "node scripts/check-offer-utils.mjs && node scripts/check-orders-utils.mjs"
   },
   "dependencies": {
     "@emotion/react": "^11.11.0",

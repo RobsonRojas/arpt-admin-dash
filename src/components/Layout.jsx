@@ -79,6 +79,7 @@ export const Layout = ({ children }) => {
     { id: 'developer-settings', label: 'Configurações Dev', icon: <Code />, path: '/developer-settings' },
     { id: 'error-logs', label: 'Log de Erros', icon: <BugReport />, path: '/error-logs' },
     { id: 'dropshipping-admin', label: 'Admin Dropshipping', icon: <Storefront />, path: '/dropshipping-admin' },
+    { id: 'orders-admin', label: 'Pedidos Dropshipping', icon: <Storefront />, path: '/orders-admin' },
     { id: 'privacy-settings', label: 'Privacidade (LGPD)', icon: <Security />, path: '/privacy-settings' },
     { id: 'terms-of-use', label: 'Termos de Uso', icon: <Policy />, path: '/terms-of-use' },
   ];
