@@ -11,7 +11,7 @@ import { AIAssistant } from '../components/AIAssistant';
 import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
 import { recordAudit } from '../services/auditLog';
-import { buildShippingPayload } from '../utils/shipping';
+import { buildShippingPayload, countPending, filterProducts, hasPendingShipping, pendingLabels, reminderSummaryText } from '../utils/shipping';
 import { api } from '../services/api';
 import { usePersistence } from '../hooks/usePersistence';
 import { MODOS, OFFER_DEFAULTS, buildOfferPayload, leadTimeLabel, modoLabel, offerFormFromProduct } from '../utils/offer';
@@ -26,6 +26,22 @@ export const Products = () => {
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
     const handleCloseSnackbar = () => setSnackbar(prev => ({ ...prev, open: false }));
+
+    // Acompanhamento do frete (a pendência vem calculada do servidor; aqui só filtra e avisa)
+    const [onlyPending, setOnlyPending] = useState(false);
+    const [reminder, setReminder] = useState({ open: false, busy: false, result: null, error: '' });
+    const pendingCount = countPending(products);
+    const visibleProducts = filterProducts(products, { onlyPending });
+    const runReminder = async (simular) => {
+        setReminder((r) => ({ ...r, busy: true, error: '' }));
+        try {
+            const res = await api.post('/api/v1/admin/producers/shipping-data-reminders', { simular });
+            setReminder({ open: true, busy: false, result: res.data, error: '' });
+        } catch (err) {
+            const msg = err?.response?.status === 429 ? 'Muitos disparos seguidos. Aguarde um minuto.' : (err?.response?.data?.error || 'Não foi possível disparar o aviso.');
+            setReminder((r) => ({ ...r, open: true, busy: false, error: msg }));
+        }
+    };
 
     // Dialog state
     const [openDialog, setOpenDialog] = useState(false);
@@ -290,6 +306,9 @@ export const Products = () => {
                     Gestão de Produtos
                 </Typography>
                 <Box display="flex" gap={2}>
+                    <Button onClick={() => setReminder({ open: true, busy: false, result: null, error: '' })} disabled={pendingCount === 0} data-testid="open-reminder">
+                        Avisar produtores
+                    </Button>
                     <Button onClick={fetchProducts} startIcon={<Refresh />}>
                         Atualizar
                     </Button>
@@ -300,6 +319,13 @@ export const Products = () => {
             </Box>
 
             {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+
+            {pendingCount > 0 && (
+                <Alert severity="warning" sx={{ mb: 2 }} data-testid="pending-banner"
+                    action={<FormControlLabel control={<Switch size="small" checked={onlyPending} onChange={(e) => setOnlyPending(e.target.checked)} inputProps={{ 'aria-label': 'Mostrar só produtos sem dados de frete' }} />} label="Só sem dados de frete" />}>
+                    {pendingCount} produto(s) ativo(s) sem dados de frete: não são vendidos com frete até o produtor informar peso, medidas e CEP de origem.
+                </Alert>
+            )}
 
             {loading ? (
                 <Box display="flex" justifyContent="center" p={4}>
@@ -315,12 +341,13 @@ export const Products = () => {
                                     <TableCell>Produto</TableCell>
                                     <TableCell>Preço</TableCell>
                                     <TableCell>Oferta e prazo</TableCell>
+                                    <TableCell>Dados de frete</TableCell>
                                     <TableCell>Status</TableCell>
                                     <TableCell align="right">Ações</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {products.map((row) => (
+                                {visibleProducts.map((row) => (
                                     <TableRow key={row.id} hover>
                                         <TableCell>
                                             <Box display="flex" alignItems="center" gap={2}>
@@ -341,6 +368,15 @@ export const Products = () => {
                                         <TableCell>
                                             <Chip size="small" label={modoLabel(row.modo_oferta)} color={row.modo_oferta === 'PRONTA_ENTREGA' ? 'success' : 'default'} />
                                             <Typography variant="body2" color="textSecondary">{leadTimeLabel(row)}</Typography>
+                                        </TableCell>
+                                        <TableCell data-testid={`frete-${row.id}`}>
+                                            {pendingLabels(row.dados_de_frete_pendentes).length === 0
+                                                ? <Chip size="small" color="success" variant="outlined" label="Completo" />
+                                                : (<>
+                                                    <Chip size="small" color={hasPendingShipping(row) ? 'warning' : 'default'} label={hasPendingShipping(row) ? 'Não vende com frete' : 'Incompleto (inativo)'} />
+                                                    <Typography variant="caption" display="block" color="textSecondary">Falta: {pendingLabels(row.dados_de_frete_pendentes).join(', ')}</Typography>
+                                                    {row.produtor_user_id && <Typography variant="caption" display="block" color="textSecondary">Produtor: {row.produtor_user_id}</Typography>}
+                                                </>)}
                                         </TableCell>
                                         <TableCell>
                                             <Chip
@@ -364,7 +400,7 @@ export const Products = () => {
                                 ))}
                                 {products.length === 0 && (
                                     <TableRow>
-                                        <TableCell colSpan={6} align="center">Nenhum produto encontrado</TableCell>
+                                        <TableCell colSpan={7} align="center">Nenhum produto encontrado</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
@@ -373,7 +409,7 @@ export const Products = () => {
 
                     {/* Mobile Card View */}
                     <Box sx={{ display: { xs: 'flex', md: 'none' }, flexDirection: 'column', gap: 2 }}>
-                        {products.map((row) => (
+                        {visibleProducts.map((row) => (
                             <Paper key={row.id} sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
                                 <Box display="flex" gap={2} alignItems="center">
                                     <Avatar
@@ -402,6 +438,8 @@ export const Products = () => {
                                         size="small"
                                     />
                                 </Box>
+
+                                {hasPendingShipping(row) && <Alert severity="warning" sx={{ py: 0 }}>Sem dados de frete: {pendingLabels(row.dados_de_frete_pendentes).join(', ')}</Alert>}
 
                                 <Box display="flex" justifyContent="flex-end" gap={1} mt={1}>
                                     <Button size="small" startIcon={<Visibility />} onClick={() => handleOpenView(row)}>
@@ -788,6 +826,24 @@ export const Products = () => {
                     >
                         Editar
                     </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={reminder.open} onClose={() => !reminder.busy && setReminder((r) => ({ ...r, open: false }))} maxWidth="sm" fullWidth>
+                <DialogTitle>Avisar produtores</DialogTitle>
+                <DialogContent>
+                    <Typography variant="body2" sx={{ mb: 2 }}>
+                        Envia e-mail e push aos produtores que têm produto ativo sem dados de frete, com a contagem e a orientação de abrir o app Manejar.
+                        Cada produtor recebe no máximo um aviso por intervalo. Use <strong>Simular</strong> para ver quantos seriam avisados, sem enviar nada.
+                    </Typography>
+                    {reminder.error && <Alert severity="error" data-testid="reminder-error">{reminder.error}</Alert>}
+                    {reminder.result && <Alert severity={reminder.result.simulado ? 'info' : 'success'} data-testid="reminder-result">{reminderSummaryText(reminder.result)}</Alert>}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setReminder((r) => ({ ...r, open: false }))} disabled={reminder.busy}>Fechar</Button>
+                    <Button onClick={() => runReminder(true)} disabled={reminder.busy} data-testid="reminder-simulate">Simular</Button>
+                    <Button variant="contained" color="warning" disabled={reminder.busy} data-testid="reminder-send"
+                        onClick={() => { if (window.confirm('Enviar o aviso por e-mail e push aos produtores com pendência?')) runReminder(false); }}>Enviar aviso</Button>
                 </DialogActions>
             </Dialog>
 

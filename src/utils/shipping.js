@@ -50,3 +50,38 @@ export function missingShippingLabels(product, hasEnvFallback = false) {
     if (!normalizeCep(String(product?.cep_origem ?? '')) && !hasEnvFallback) out.push('CEP de origem');
     return out;
 }
+
+// ───────── acompanhamento da pendência pelo administrador (add-producer-shipping-data-screen, 4.1) ─────────
+// O servidor calcula `dados_de_frete_pendentes` (lista de chaves) com a regra do CEP padrão do ambiente; o painel só formata e filtra.
+
+const PENDING_LABELS = { weight_grams: 'Peso', width_cm: 'Largura', height_cm: 'Altura', length_cm: 'Profundidade', cep_origem: 'CEP de origem' };
+
+/** Rótulos legíveis das chaves pendentes que o servidor devolveu (chave desconhecida é ignorada; nunca lança). */
+export function pendingLabels(keys) {
+    if (!Array.isArray(keys)) return [];
+    return keys.filter((k) => typeof k === 'string' && Object.prototype.hasOwnProperty.call(PENDING_LABELS, k)).map((k) => PENDING_LABELS[k]);
+}
+
+/** Produto ATIVO com algum dado pendente (inativo não entra: ninguém o vende). */
+export const hasPendingShipping = (p) => !!p && p.is_ativo !== false && pendingLabels(p.dados_de_frete_pendentes).length > 0;
+
+/** Lista para a tela: com `onlyPending`, só os ativos com pendência. Não altera a lista original. */
+export const filterProducts = (products, { onlyPending = false } = {}) => (Array.isArray(products) ? products : []).filter((p) => !onlyPending || hasPendingShipping(p));
+
+/** Quantos produtos ativos estão pendentes. */
+export const countPending = (products) => (Array.isArray(products) ? products : []).filter(hasPendingShipping).length;
+
+/** Resumo do disparo do aviso, em português. Aceita o corpo que a API devolve; campo ausente conta como 0. */
+export function reminderSummaryText(r) {
+    const n = (v) => (Number.isFinite(Number(v)) ? Number(v) : 0);
+    if (!r || typeof r !== 'object') return 'Resposta inesperada do servidor.';
+    const com = n(r.produtores_com_pendencia);
+    if (com === 0) return 'Nenhum produtor com produto ativo sem dados de frete.';
+    const partes = [];
+    if (r.simulado) partes.push(`Simulação: ${n(r.avisados)} de ${com} produtor(es) seriam avisados`);
+    else partes.push(`${n(r.avisados)} de ${com} produtor(es) avisados`);
+    partes.push(`e-mails: ${n(r.emails)}`, `push: ${n(r.pushes)}`);
+    if (n(r.ignorados_ja_avisados)) partes.push(`${n(r.ignorados_ja_avisados)} já avisado(s) recentemente`);
+    if (n(r.sem_canal)) partes.push(`${n(r.sem_canal)} sem e-mail nem dispositivo`);
+    return `${partes.join(' · ')}.`;
+}
