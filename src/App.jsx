@@ -2,8 +2,9 @@ import React, { useEffect } from 'react';
 import { ThemeProvider, CssBaseline, CircularProgress, Box } from '@mui/material';
 import { theme } from './theme';
 import { Layout, ErrorBoundary } from './components';
-import { Dashboard, Projects, Properties, Necromassa, Sponsors, Login, Users, Rewards, Certificates, Products, AuditLogs, GeminiSettings, PaymentConfig, MediaManager, ErrorLogs, Refunds, ForestIntelligence, Adoptions, PhysicalPieces, Notifications, DeveloperSettings, ProductSimulation, Dropshipping, ManejoLogs, DropshippingAdmin, DropshipperDetails, AdminOrders, PrivacySettings, AnalyticsDashboard, TermsOfUse } from './pages';
+import { Dashboard, Projects, Properties, Necromassa, Sponsors, Login, Users, Rewards, Certificates, Products, AuditLogs, GeminiSettings, PaymentConfig, MediaManager, ErrorLogs, Refunds, ForestIntelligence, Adoptions, PhysicalPieces, Notifications, DeveloperSettings, ProductSimulation, Dropshipping, ManejoLogs, DropshippingAdmin, DropshipperDetails, AdminOrders, PrivacySettings, AnalyticsDashboard, AnalyticsPixels, TermsOfUse } from './pages';
 import { CertificateView } from './pages/CertificateView';
+import StorePanel from './modules/store-panel/StorePanel';
 import { useAdmin } from './contexts/AdminContext';
 import { useAuth } from './contexts/AuthContext.jsx';
 import { ErrorProvider, useError } from './contexts/ErrorContext';
@@ -82,6 +83,7 @@ export default function App() {
                   <Route path="error-logs" element={<ErrorLogs />} />
                   <Route path="product-simulation" element={<ProductSimulation />} />
                   <Route path="dropshipping" element={<Dropshipping />} />
+                  <Route path="loja/*" element={<StorePanel />} />
                   <Route path="dropshipping-admin" element={<DropshippingAdmin />} />
                   <Route path="dropshipping-admin/:id" element={<DropshipperDetails />} />
                   <Route path="orders-admin" element={<AdminOrders />} />

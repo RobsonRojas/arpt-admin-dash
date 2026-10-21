@@ -11,6 +11,7 @@ import { AIAssistant } from '../components/AIAssistant';
 import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
 import { recordAudit } from '../services/auditLog';
+import { buildShippingPayload } from '../utils/shipping';
 import { api } from '../services/api';
 import { usePersistence } from '../hooks/usePersistence';
 import { MODOS, OFFER_DEFAULTS, buildOfferPayload, leadTimeLabel, modoLabel, offerFormFromProduct } from '../utils/offer';
@@ -49,6 +50,7 @@ export const Products = () => {
         width_cm: 0,
         height_cm: 0,
         length_cm: 0,
+        cep_origem: '',
         foto_url: '',
         translations: {}
     });
@@ -118,6 +120,7 @@ export const Products = () => {
                 width_cm: product.width_cm || 0,
                 height_cm: product.height_cm || 0,
                 length_cm: product.length_cm || 0,
+                cep_origem: product.cep_origem || '',
                 foto_url: product.fotos?.[0]?.url || '',
                 translations: product.translations || {}
             };
@@ -143,6 +146,7 @@ export const Products = () => {
                 width_cm: 0,
                 height_cm: 0,
                 length_cm: 0,
+                cep_origem: '',
                 foto_url: '',
                 translations: {}
             };
@@ -183,6 +187,12 @@ export const Products = () => {
             setSnackbar({ open: true, message: offer.error, severity: 'warning' });
             return;
         }
+        // Peso, medidas e CEP de origem: validados aqui como no servidor (inteiros, com teto; CEP de 8 dígitos).
+        const shipping = buildShippingPayload(formData);
+        if (shipping.error) {
+            setSnackbar({ open: true, message: shipping.error, severity: 'warning' });
+            return;
+        }
 
         try {
             const payload = {
@@ -195,10 +205,7 @@ export const Products = () => {
                 is_ativo: formData.is_ativo,
                 is_physical_reward: formData.is_physical_reward,
                 carbon_stored_kg: Number(formData.carbon_stored_kg),
-                weight_grams: Number(formData.weight_grams),
-                width_cm: Number(formData.width_cm),
-                height_cm: Number(formData.height_cm),
-                length_cm: Number(formData.length_cm),
+                ...shipping.payload,
                 translations: {
                     ...(formData.translations || {}),
                     en: {
@@ -606,6 +613,15 @@ export const Products = () => {
                                 onChange={(e) => setFormData({ ...formData, length_cm: e.target.value })}
                             />
                         </Box>
+                        <TextField
+                            label="CEP de origem do envio"
+                            fullWidth
+                            placeholder="69000-000"
+                            helperText="De onde este produto é despachado. Sem peso, medidas e CEP de origem o produto não é vendido com frete."
+                            value={formData.cep_origem ?? ''}
+                            onChange={(e) => setFormData({ ...formData, cep_origem: e.target.value })}
+                            inputProps={{ inputMode: 'numeric' }}
+                        />
                         <TextField
                             label="URL da Foto"
                             fullWidth

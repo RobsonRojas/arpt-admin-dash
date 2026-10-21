@@ -14,7 +14,7 @@ import {
  * (nunca o valor do produtor nem a comissão, que a API não envia). Pedido e repasse de outra loja não aparecem:
  * a API responde 404 para loja alheia.
  */
-export default function StoreOrdersTab({ storeId }) {
+export default function StoreOrdersTab({ storeId, readOnly = false }) {
   const [orders, setOrders] = useState(null);
   const [payouts, setPayouts] = useState(null);
   const [sla, setSla] = useState(null);
@@ -133,7 +133,7 @@ export default function StoreOrdersTab({ storeId }) {
                   <TableCell align="right">{Number(o.frete) > 0 ? money(o.frete) : '—'}</TableCell>
                   <TableCell align="right">{money(o.margem)}</TableCell>
                   <TableCell align="right">
-                    {hint.allowed && (
+                    {hint.allowed && !readOnly && (
                       <Tooltip title={hint.text}>
                         <span><Button size="small" color="error" disabled={busyId === o.id} onClick={() => cancel(o)}>Cancelar</Button></span>
                       </Tooltip>

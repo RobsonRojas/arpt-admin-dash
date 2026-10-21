@@ -4,6 +4,10 @@ import { VitePWA } from 'vite-plugin-pwa';
 import basicSsl from '@vitejs/plugin-basic-ssl';
 
 export default defineConfig({
+    // O E2E local roda o dev server com o código montado só para leitura do cache: o cache vai para outro lugar.
+    // E2E local: o painel é acessado pelo nome do serviço do Docker (`panel`), que o Vite recusa por padrão.
+    ...(process.env.VITE_ALLOWED_HOSTS ? { server: { allowedHosts: process.env.VITE_ALLOWED_HOSTS.split(',') } } : {}),
+    ...(process.env.VITE_CACHE_DIR ? { cacheDir: process.env.VITE_CACHE_DIR } : {}),
     build: {
         rollupOptions: {
             output: {
@@ -16,7 +20,8 @@ export default defineConfig({
         }
     },
     plugins: [
-        basicSsl(),
+        // O dev server é https por padrão; o E2E local (http, em Docker) desliga com VITE_NO_SSL=1.
+        ...(process.env.VITE_NO_SSL ? [] : [basicSsl()]),
         react(),
         VitePWA({
             registerType: 'autoUpdate',
