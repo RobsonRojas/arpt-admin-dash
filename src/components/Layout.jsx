@@ -79,6 +79,7 @@ export const Layout = ({ children }) => {
     { id: 'gemini-settings', label: 'Configuração IA', icon: <SettingsSuggest />, path: '/gemini-settings' },
     { id: 'developer-settings', label: 'Configurações Dev', icon: <Code />, path: '/developer-settings' },
     { id: 'error-logs', label: 'Log de Erros', icon: <BugReport />, path: '/error-logs' },
+    { id: 'store-panel', label: 'Minha loja', icon: <Storefront />, path: '/loja' },
     { id: 'dropshipping-admin', label: 'Admin Dropshipping', icon: <Storefront />, path: '/dropshipping-admin' },
     { id: 'orders-admin', label: 'Pedidos Dropshipping', icon: <Storefront />, path: '/orders-admin' },
     { id: 'privacy-settings', label: 'Privacidade (LGPD)', icon: <Security />, path: '/privacy-settings' },
@@ -86,7 +87,7 @@ export const Layout = ({ children }) => {
   ];
 
   const getPageTitle = () => {
-    const currentItem = menuItems.find(item => item.path === location.pathname);
+    const currentItem = menuItems.find(item => item.path === location.pathname || (item.path === '/loja' && location.pathname.startsWith('/loja')));
     if (currentItem) return currentItem.label;
 
     // Fallbacks or special cases

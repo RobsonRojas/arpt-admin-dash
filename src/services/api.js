@@ -22,7 +22,10 @@ api.interceptors.request.use(
 
         if (import.meta.env.VITE_SKIP_AUTH === 'true') {
             config.headers = config.headers || {};
-            config.headers['Authorization'] = `Bearer test-admin-token`;
+            // Só em teste local: o E2E guarda um token real da API (Keycloak falso) para falar com o backend de verdade.
+            let token = 'test-admin-token';
+            try { token = window.localStorage.getItem('arpt_e2e_token') || token; } catch { /* sem armazenamento */ }
+            config.headers['Authorization'] = `Bearer ${token}`;
             return config;
         }
 
