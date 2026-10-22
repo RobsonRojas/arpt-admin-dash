@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint src",
     "preview": "vite preview",
-    "check:utils": "node scripts/check-offer-utils.mjs && node scripts/check-orders-utils.mjs && node scripts/check-terms-utils.mjs && node scripts/check-shipping-utils.mjs && node scripts/check-store-panel.mjs"
+    "check:utils": "node scripts/check-offer-utils.mjs && node scripts/check-orders-utils.mjs && node scripts/check-terms-utils.mjs && node scripts/check-shipping-utils.mjs && node scripts/check-store-panel.mjs && node scripts/check-product-form.mjs"
   },
   "dependencies": {
     "@emotion/react": "^11.11.0",

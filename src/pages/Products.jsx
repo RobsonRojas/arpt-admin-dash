@@ -11,9 +11,10 @@ import { AIAssistant } from '../components/AIAssistant';
 import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
 import { recordAudit } from '../services/auditLog';
-import { buildShippingPayload, countPending, filterProducts, hasPendingShipping, pendingLabels, reminderSummaryText } from '../utils/shipping';
+import { countPending, filterProducts, hasPendingShipping, pendingLabels, reminderSummaryText } from '../utils/shipping';
 import { api } from '../services/api';
 import { usePersistence } from '../hooks/usePersistence';
+import { NEW_PRODUCT_LANGUAGES, buildProductTextAndShipping, draftKey, formFromProduct, languageWarning } from '../utils/productForm';
 import { MODOS, OFFER_DEFAULTS, buildOfferPayload, leadTimeLabel, modoLabel, offerFormFromProduct } from '../utils/offer';
 
 export const Products = () => {
@@ -51,7 +52,7 @@ export const Products = () => {
 
     // Form state
     // Form state with Persistence
-    const [persistenceKey, setPersistenceKey] = useState('product_draft_new');
+    const [persistenceKey, setPersistenceKey] = useState(draftKey(null));
     const [formData, setFormData, clearDraft] = usePersistence(persistenceKey, {
         nome: '',
         nome_en: '',
@@ -68,7 +69,7 @@ export const Products = () => {
         length_cm: 0,
         cep_origem: '',
         foto_url: '',
-        translations: {}
+        loaded: NEW_PRODUCT_LANGUAGES
     });
 
     // Image Error State for View and Preview
@@ -121,33 +122,20 @@ export const Products = () => {
 
         if (product) {
             setEditingProduct(product);
-            key = `product_draft_${product.id}`;
-            initialData = {
-                nome: product.nome,
-                nome_en: product.nome_en || '',
-                info: product.info,
-                info_en: product.info_en || '',
+            key = draftKey(product.id);
+            // Os textos vêm dos campos explícitos de cada idioma (nome_pt, info_pt, nome_en, info_en): `nome` e `info` chegam traduzidos
+            // conforme o idioma do navegador e gravariam o inglês no campo em português.
+            initialData = formFromProduct(product, {
                 preco: product.preco,
                 ...offerFormFromProduct(product),
                 is_ativo: product.is_ativo,
                 is_physical_reward: product.is_physical_reward || false,
                 carbon_stored_kg: product.carbon_stored_kg || 0,
-                weight_grams: product.weight_grams || 0,
-                width_cm: product.width_cm || 0,
-                height_cm: product.height_cm || 0,
-                length_cm: product.length_cm || 0,
-                cep_origem: product.cep_origem || '',
                 foto_url: product.fotos?.[0]?.url || '',
-                translations: product.translations || {}
-            };
-            // Map translations to local fields
-            if (product.translations && product.translations.en) {
-                initialData.nome_en = product.translations.en.nome || '';
-                initialData.info_en = product.translations.en.info || '';
-            }
+            });
         } else {
             setEditingProduct(null);
-            key = 'product_draft_new';
+            key = draftKey(null);
             initialData = {
                 nome: '',
                 nome_en: '',
@@ -164,7 +152,7 @@ export const Products = () => {
                 length_cm: 0,
                 cep_origem: '',
                 foto_url: '',
-                translations: {}
+                loaded: NEW_PRODUCT_LANGUAGES
             };
         }
 
@@ -192,44 +180,30 @@ export const Products = () => {
     };
 
     const handleSave = async () => {
-        if (!formData.nome || formData.nome.length < 10) {
-            setSnackbar({ open: true, message: 'O nome do produto deve ter pelo menos 10 caracteres', severity: 'warning' });
+        // Textos por idioma (só o que foi carregado) e frete (peso, medidas e CEP): validados aqui como no servidor, que continua sendo a fonte da verdade.
+        const loaded = formData.loaded || NEW_PRODUCT_LANGUAGES;
+        const textAndShipping = buildProductTextAndShipping(formData, loaded);
+        if (textAndShipping.error) {
+            setSnackbar({ open: true, message: textAndShipping.error, severity: 'warning' });
             return;
         }
 
-        // Prazos e estoque são validados aqui como no servidor (o servidor continua sendo a fonte da verdade).
+        // Prazos e estoque são validados aqui como no servidor.
         const offer = buildOfferPayload(formData);
         if (offer.error) {
             setSnackbar({ open: true, message: offer.error, severity: 'warning' });
             return;
         }
-        // Peso, medidas e CEP de origem: validados aqui como no servidor (inteiros, com teto; CEP de 8 dígitos).
-        const shipping = buildShippingPayload(formData);
-        if (shipping.error) {
-            setSnackbar({ open: true, message: shipping.error, severity: 'warning' });
-            return;
-        }
 
         try {
             const payload = {
-                nome: formData.nome,
-                nome_en: formData.nome_en,
-                info: formData.info,
-                info_en: formData.info_en,
+                ...textAndShipping.payload,
                 preco: Number(formData.preco),
                 ...offer.payload,
                 is_ativo: formData.is_ativo,
                 is_physical_reward: formData.is_physical_reward,
                 carbon_stored_kg: Number(formData.carbon_stored_kg),
-                ...shipping.payload,
-                translations: {
-                    ...(formData.translations || {}),
-                    en: {
-                        nome: formData.nome_en,
-                        info: formData.info_en
-                    }
-                },
-                fotos: formData.foto_url ? [{ src: formData.foto_url, alt: formData.nome.padEnd(10, '_'), type: 'principal' }] : []
+                fotos: formData.foto_url ? [{ src: formData.foto_url, alt: (formData.nome || 'produto').padEnd(10, '_'), type: 'principal' }] : []
             };
 
             const token = await user.getIdToken();
@@ -466,9 +440,13 @@ export const Products = () => {
                 <DialogTitle>{editingProduct ? 'Editar Produto' : 'Novo Produto'}</DialogTitle>
                 <DialogContent dividers>
                     <Box display="flex" flexDirection="column" gap={2}>
+                        {languageWarning(formData.loaded || NEW_PRODUCT_LANGUAGES) && (
+                            <Alert severity="warning">{languageWarning(formData.loaded || NEW_PRODUCT_LANGUAGES)}</Alert>
+                        )}
                         <TextField
                             label="Nome do Produto (PT)"
                             fullWidth
+                            disabled={!(formData.loaded || NEW_PRODUCT_LANGUAGES).pt}
                             value={formData.nome}
                             onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
                         />
@@ -485,6 +463,7 @@ export const Products = () => {
                             </Box>
                             <TextField
                                 fullWidth
+                                disabled={!(formData.loaded || NEW_PRODUCT_LANGUAGES).en}
                                 value={formData.nome_en}
                                 onChange={(e) => setFormData({ ...formData, nome_en: e.target.value })}
                             />
@@ -502,6 +481,7 @@ export const Products = () => {
                             <TextField
                                 fullWidth
                                 label="Informações Adicionais (PT)"
+                                disabled={!(formData.loaded || NEW_PRODUCT_LANGUAGES).pt}
                                 multiline
                                 rows={3}
                                 value={formData.info}
@@ -522,6 +502,7 @@ export const Products = () => {
                             <TextField
                                 fullWidth
                                 label="Additional Info (EN)"
+                                disabled={!(formData.loaded || NEW_PRODUCT_LANGUAGES).en}
                                 multiline
                                 rows={3}
                                 value={formData.info_en}
