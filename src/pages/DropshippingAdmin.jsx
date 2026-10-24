@@ -18,6 +18,7 @@ import { api } from '../services/api';
 import { parseBrNumber } from '../utils/numbers';
 import { rotaDetalheDropshipper } from '../utils/dropshipper';
 import AnalyticsSection from '../components/dropshipping/AnalyticsSection';
+import CandidaturaEmNomeCard from '../components/dropshipping/CandidaturaEmNomeCard';
 
 const fmt = (val) =>
   Number(val || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -319,6 +320,8 @@ export function DropshippingAdmin() {
       </Box>
 
       <AnalyticsSection />
+
+      <CandidaturaEmNomeCard />
 
       {loading ? (
         <Box display="flex" justifyContent="center" py={8}><CircularProgress /></Box>

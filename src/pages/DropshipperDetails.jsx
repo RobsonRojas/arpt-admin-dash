@@ -10,6 +10,8 @@ import { api } from '../services/api';
 import { leadTimeLabel, modoLabel } from '../utils/offer';
 import { parseBrNumber } from '../utils/numbers';
 import LifecycleCard from '../components/dropshipping/LifecycleCard';
+import LgpdAdminCard from '../components/dropshipping/LgpdAdminCard';
+import TermosEmNomeCard from '../components/dropshipping/TermosEmNomeCard';
 import MotivoDialog from '../components/dropshipping/MotivoDialog';
 
 export function DropshipperDetails() {
@@ -194,6 +196,16 @@ export function DropshipperDetails() {
         {/* Ciclo de vida do dropshipper: aprovar, recusar, suspender, reativar e histórico */}
         <Grid item xs={12}>
           <LifecycleCard userId={id} status={store?.status} onChanged={fetchDetails} />
+        </Grid>
+
+        {/* LGPD: exportar os dados do perfil e anonimizá-lo (dois passos) */}
+        <Grid item xs={12}>
+          <LgpdAdminCard userId={id} nome={store?.nome_comercial} onChanged={fetchDetails} />
+        </Grid>
+
+        {/* Aceite dos termos vigentes em nome do dropshipper, com evidência */}
+        <Grid item xs={12}>
+          <TermosEmNomeCard userId={id} onChanged={fetchDetails} />
         </Grid>
 
         {/* Profile Card */}

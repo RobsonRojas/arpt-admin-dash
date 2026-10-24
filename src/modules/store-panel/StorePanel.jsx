@@ -14,6 +14,7 @@ import Marketing from './sections/Marketing';
 import Team from './sections/Team';
 import Settings from './sections/Settings';
 import StoreOrdersTab from '../../components/orders/StoreOrdersTab';
+import MeuPerfilDropshipper from '../../components/dropshipping/MeuPerfilDropshipper';
 
 const OrdersSection = ({ storeId, readOnly, papel }) => (
   <StoreOrdersTab storeId={storeId} readOnly={readOnly} podeVerRepasses={papel === 'dono' || papel === 'financeiro'} />
@@ -35,7 +36,12 @@ function StoreIndex() {
   useEffect(() => { api.get('/api/v1/dropshipping/stores').then((r) => setStores(r.data)).catch(() => setFailed(true)); }, []);
   if (failed) return <Alert severity="error">{t('api_GENERIC')}</Alert>;
   if (!stores) return <CircularProgress />;
-  if (!stores.length) return <Box sx={{ p: 3 }}><Typography>{t('no_stores')}</Typography><Button href="/dropshipping" sx={{ mt: 1 }}>{t('create_store')}</Button></Box>;
+  if (!stores.length) return (
+    <Box sx={{ p: 3 }}>
+      <MeuPerfilDropshipper />
+      <Typography>{t('no_stores')}</Typography><Button href="/dropshipping" sx={{ mt: 1 }}>{t('create_store')}</Button>
+    </Box>
+  );
   return <Navigate to={`/loja/${stores[0].id}`} replace />;
 }
 
@@ -84,6 +90,7 @@ function StoreShell() {
 
   return (
     <PanelProvider value={ctx}>
+      <MeuPerfilDropshipper />
       <Paper sx={{ p: 2, mb: 2, display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
         <Select size="small" value={store.id} data-testid="store-select" onChange={(e) => navigate(`/loja/${e.target.value}/${defaultSection((stores.find((s) => s.id === e.target.value) ?? {}).meu_papel) ?? ''}`)}>
           {stores.map((s) => <MenuItem key={s.id} value={s.id}>{s.nome}</MenuItem>)}
