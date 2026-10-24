@@ -8,6 +8,9 @@ import {
 import { ArrowBack, Store, Person, ContactMail, VpnKey, Public, Event, Edit, LocationOn, Delete, AddBox, Inventory } from '@mui/icons-material';
 import { api } from '../services/api';
 import { leadTimeLabel, modoLabel } from '../utils/offer';
+import { parseBrNumber } from '../utils/numbers';
+import LifecycleCard from '../components/dropshipping/LifecycleCard';
+import MotivoDialog from '../components/dropshipping/MotivoDialog';
 
 export function DropshipperDetails() {
   const { id } = useParams();
@@ -20,6 +23,29 @@ export function DropshipperDetails() {
   const [selectedProductId, setSelectedProductId] = useState('');
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [userStores, setUserStores] = useState([]);
+  const [acaoLoja, setAcaoLoja] = useState(null); // 'suspend' | null
+  const [enviandoLoja, setEnviandoLoja] = useState(false);
+  const [erroLoja, setErroLoja] = useState('');
+
+  const executarAcaoLoja = async (acao, corpo) => {
+    setEnviandoLoja(true);
+    setErroLoja('');
+    try {
+      await api.post(`/api/v1/admin/dropshipping/stores/${store.store_id}/${acao}`, corpo);
+      setAcaoLoja(null);
+      await fetchDetails();
+    } catch (err) {
+      setErroLoja('Ação não realizada. ' + (err.response?.data?.message || err.message));
+    } finally {
+      setEnviandoLoja(false);
+    }
+  };
+
+  const reativarLoja = () => {
+    if (window.confirm('Reativar esta loja? Ela volta pausada e o dono decide quando republicar.')) {
+      executarAcaoLoja('reactivate');
+    }
+  };
 
   const fetchDetails = async () => {
     try {
@@ -64,10 +90,12 @@ export function DropshipperDetails() {
   const handleAddProduct = async () => {
     const produto = availableProducts.find((p) => String(p.id) === String(selectedProductId));
     if (!produto || !store?.store_id) return;
-    const entrada = window.prompt(`Preço de venda para "${produto.nome}" (R$):`, (Number(produto.preco) * 1.3).toFixed(2));
+    // Sugestão já no formato brasileiro, para o administrador poder digitar sem converter.
+    const entrada = window.prompt(`Preço de venda para "${produto.nome}" (R$):`, (Number(produto.preco) * 1.3).toFixed(2).replace('.', ','));
     if (entrada === null) return;
-    const precoVenda = Number(entrada.replace(',', '.'));
-    if (!(precoVenda > 0)) return alert('Informe um preço de venda válido.');
+    const parsed = parseBrNumber(entrada, { min: 0.01, mensagemCampo: 'o preço de venda' });
+    if (parsed.error) return alert(parsed.error);
+    const precoVenda = parsed.value;
     try {
       setLoadingProducts(true);
       await api.post(`/api/v1/admin/dropshipping/stores/${store.store_id}/products`, {
@@ -163,6 +191,11 @@ export function DropshipperDetails() {
       </Box>
 
       <Grid container spacing={3}>
+        {/* Ciclo de vida do dropshipper: aprovar, recusar, suspender, reativar e histórico */}
+        <Grid item xs={12}>
+          <LifecycleCard userId={id} status={store?.status} onChanged={fetchDetails} />
+        </Grid>
+
         {/* Profile Card */}
         <Grid item xs={12} md={6}>
           <Card variant="outlined" sx={{ borderRadius: 3, height: '100%' }}>
@@ -237,6 +270,17 @@ export function DropshipperDetails() {
                 </Typography>
                 <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
                   <Chip size="small" label={`Loja: ${store.loja_status ?? 'sem loja'}`} />
+                  {store.store_id && store.loja_status !== 'SUSPENSA' && (
+                    <Button variant="outlined" color="error" size="small" disabled={enviandoLoja} onClick={() => setAcaoLoja('suspend')}>
+                      Suspender loja
+                    </Button>
+                  )}
+                  {store.store_id && store.loja_status === 'SUSPENSA' && (
+                    <Button variant="contained" color="success" size="small" disabled={enviandoLoja} onClick={reativarLoja}>
+                      Reativar loja
+                    </Button>
+                  )}
+                  {erroLoja && <Typography variant="caption" color="error">{erroLoja}</Typography>}
                   <TextField
                     size="small"
                     label="Comissão desta loja (%)"
@@ -382,6 +426,16 @@ export function DropshipperDetails() {
           </Card>
         </Grid>
       </Grid>
+
+      <MotivoDialog
+        open={acaoLoja === 'suspend'}
+        titulo="Suspender loja"
+        descricao="A loja fica suspensa e o dono recebe este motivo por e-mail."
+        textoConfirmar="Suspender loja"
+        enviando={enviandoLoja}
+        onClose={() => setAcaoLoja(null)}
+        onConfirm={(motivo) => executarAcaoLoja('suspend', { motivo })}
+      />
     </Box>
   );
 }

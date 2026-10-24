@@ -15,6 +15,9 @@ import {
   CartesianGrid, Tooltip as RechartsTooltip, Legend
 } from 'recharts';
 import { api } from '../services/api';
+import { parseBrNumber } from '../utils/numbers';
+import { rotaDetalheDropshipper } from '../utils/dropshipper';
+import AnalyticsSection from '../components/dropshipping/AnalyticsSection';
 
 const fmt = (val) =>
   Number(val || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -103,11 +106,12 @@ function CatalogModal({ store, allProducts, onClose, onSuccess }) {
 
   const handleSave = async () => {
     if (selectedIds.length === 0) return alert('Selecione pelo menos um produto.');
-    if (!precoVenda || Number(precoVenda) <= 0) return alert('Informe o preço de venda.');
+    const preco = parseBrNumber(precoVenda, { min: 0.01, mensagemCampo: 'o preço de venda' });
+    if (preco.error) return alert(preco.error);
     setLoading(true);
     try {
       const results = await Promise.allSettled(selectedIds.map((produtoId) =>
-        api.post(`/api/v1/admin/dropshipping/stores/${store.id}/products`, { produto_id: produtoId, preco_venda: Number(precoVenda) })
+        api.post(`/api/v1/admin/dropshipping/stores/${store.id}/products`, { produto_id: produtoId, preco_venda: preco.value })
       ));
       const ok = results.filter((r) => r.status === 'fulfilled').length;
       const falhas = results
@@ -314,6 +318,7 @@ export function DropshippingAdmin() {
         </Box>
       </Box>
 
+      <AnalyticsSection />
 
       {loading ? (
         <Box display="flex" justifyContent="center" py={8}><CircularProgress /></Box>
@@ -448,7 +453,7 @@ export function DropshippingAdmin() {
                       </TableCell>
                       <TableCell align="right">
                         <Tooltip title="Ver Detalhes">
-                          <IconButton size="small" color="primary" onClick={() => navigate(`/dropshipping-admin/${store.id}`)}>
+                          <IconButton size="small" color="primary" disabled={!rotaDetalheDropshipper(store)} onClick={() => navigate(rotaDetalheDropshipper(store))}>
                             <Visibility fontSize="small" />
                           </IconButton>
                         </Tooltip>
@@ -467,10 +472,10 @@ export function DropshippingAdmin() {
                             size="small"
                             color="info"
                             onClick={async () => {
-                              if (!window.confirm(`Tem certeza que deseja reenviar o convite com novas credenciais para ${store.name}?`)) return;
+                              if (!window.confirm(`Tem certeza que deseja reenviar o convite para ${store.name}?`)) return;
                               try {
                                 await api.post(`/api/v1/admin/dropshipping/stores/${store.id}/resend-invite`);
-                                alert('Convite e credenciais reenviados com sucesso!');
+                                alert('Convite reenviado com sucesso!');
                               } catch (err) {
                                 alert('Erro: ' + (err.response?.data?.error || err.message));
                               }
