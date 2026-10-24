@@ -14,7 +14,7 @@ import {
  * (nunca o valor do produtor nem a comissão, que a API não envia). Pedido e repasse de outra loja não aparecem:
  * a API responde 404 para loja alheia.
  */
-export default function StoreOrdersTab({ storeId, readOnly = false }) {
+export default function StoreOrdersTab({ storeId, readOnly = false, podeVerRepasses = false }) {
   const [orders, setOrders] = useState(null);
   const [payouts, setPayouts] = useState(null);
   const [sla, setSla] = useState(null);
@@ -26,18 +26,24 @@ export default function StoreOrdersTab({ storeId, readOnly = false }) {
 
   const load = useCallback(async () => {
     setError('');
-    try {
-      const [o, p, s] = await Promise.all([api.get(`${base}/orders`), api.get(`${base}/payouts`), api.get(`${base}/sla`)]);
-      setOrders(o.data);
-      setPayouts(p.data);
-      setSla(s.data);
-    } catch (err) {
+    // Repasses só para dono e financeiro (a API responde 403 aos demais). Falha de um pedido não esconde o outro.
+    const [pedidos, repasses, prazo] = await Promise.allSettled([
+      api.get(`${base}/orders`),
+      podeVerRepasses ? api.get(`${base}/payouts`) : Promise.resolve(null),
+      api.get(`${base}/sla`),
+    ]);
+    if (pedidos.status === 'rejected') {
       // 404 quando os pedidos ainda não estão ligados para esta loja (loja piloto): não é erro do usuário.
+      const err = pedidos.reason;
       setError(err?.response?.status === 404
         ? 'Pedidos ainda não estão disponíveis para esta loja.'
         : apiError(err, 'Não foi possível carregar os pedidos.'));
+    } else {
+      setOrders(pedidos.value.data);
     }
-  }, [base]);
+    setPayouts(repasses.status === 'fulfilled' && repasses.value ? repasses.value.data : null);
+    setSla(prazo.status === 'fulfilled' ? prazo.value.data : null);
+  }, [base, podeVerRepasses]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -77,15 +83,17 @@ export default function StoreOrdersTab({ storeId, readOnly = false }) {
             <Typography variant="h5" sx={{ fontWeight: 'bold' }}>{money(totalMargin(orders))}</Typography>
           </Paper>
         </Grid>
-        <Grid item xs={12} sm={4}>
-          <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
-            <Typography variant="caption" color="textSecondary">Repasses liberados</Typography>
-            <Typography variant="h5" sx={{ fontWeight: 'bold' }}>{money(releasable)}</Typography>
-            {payouts?.total_debitos > 0 && (
-              <Typography variant="caption" color="error">Débito a compensar: {money(payouts.total_debitos)}</Typography>
-            )}
-          </Paper>
-        </Grid>
+        {podeVerRepasses && (
+          <Grid item xs={12} sm={4}>
+            <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
+              <Typography variant="caption" color="textSecondary">Repasses liberados</Typography>
+              <Typography variant="h5" sx={{ fontWeight: 'bold' }}>{money(releasable)}</Typography>
+              {payouts?.total_debitos > 0 && (
+                <Typography variant="caption" color="error">Débito a compensar: {money(payouts.total_debitos)}</Typography>
+              )}
+            </Paper>
+          </Grid>
+        )}
         <Grid item xs={12} sm={4}>
           <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
             <Typography variant="caption" color="textSecondary">Entrega no prazo dos produtores (30 dias)</Typography>
@@ -95,7 +103,7 @@ export default function StoreOrdersTab({ storeId, readOnly = false }) {
         </Grid>
       </Grid>
 
-      {held.length > 0 && (
+      {podeVerRepasses && held.length > 0 && (
         <Alert severity="warning" sx={{ mb: 2, borderRadius: 2 }}>
           {held.length} repasse(s) retido(s): {holdReasonLabel(held[0].motivo_retencao) || 'verifique sua conta de recebimento'}.
           Conclua a configuração de pagamentos e a liberação é automática.
@@ -146,6 +154,8 @@ export default function StoreOrdersTab({ storeId, readOnly = false }) {
         </Table>
       </TableContainer>
 
+      {podeVerRepasses && (
+      <>
       <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>Extrato de repasses</Typography>
       <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 2 }}>
         <Table size="small">
@@ -171,6 +181,8 @@ export default function StoreOrdersTab({ storeId, readOnly = false }) {
           </TableBody>
         </Table>
       </TableContainer>
+      </>
+      )}
     </Box>
   );
 }

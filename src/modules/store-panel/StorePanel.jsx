@@ -15,7 +15,9 @@ import Team from './sections/Team';
 import Settings from './sections/Settings';
 import StoreOrdersTab from '../../components/orders/StoreOrdersTab';
 
-const OrdersSection = ({ storeId, readOnly }) => <StoreOrdersTab storeId={storeId} readOnly={readOnly} />;
+const OrdersSection = ({ storeId, readOnly, papel }) => (
+  <StoreOrdersTab storeId={storeId} readOnly={readOnly} podeVerRepasses={papel === 'dono' || papel === 'financeiro'} />
+);
 const SECTION_VIEW = {
   overview: Overview, products: Products, appearance: Appearance, pages: Pages, domain: Domain, marketing: Marketing, team: Team, settings: Settings,
 };
@@ -96,7 +98,7 @@ function StoreShell() {
         {menu.map((id) => <Tab key={id} value={id} label={t(`menu_${id}`)} data-testid={`menu-${id}`} />)}
       </Tabs>
       {!access ? <NotFound /> : section === 'orders'
-        ? <OrdersSection storeId={store.id} readOnly={access !== 'edit'} />
+        ? <OrdersSection storeId={store.id} readOnly={access !== 'edit'} papel={papel} />
         : View ? <View /> : <NotFound />}
       <Snackbar open={!!toast} autoHideDuration={5000} onClose={() => setToast(null)} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
         {toast ? <Alert severity={toast.severity} onClose={() => setToast(null)} data-testid="toast">{toast.text}</Alert> : <span />}
