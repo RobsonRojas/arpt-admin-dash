@@ -177,9 +177,11 @@ export default function Dropshipping() {
         fetchStoreTeam(myStore.id);
       }
       
-      // Fetch all available products to pick from
-      const prodRes = await api.get('/produtos');
-      setAvailableProducts((prodRes.data || []).filter((p) => p.is_ativo));
+      // Seletor: só produtos que a loja ainda pode vender (sem recompensas, sem os já alocados, sem os do próprio produtor).
+      const disponiveis = myStore
+        ? await api.get(`/api/v1/admin/dropshipping/stores/${myStore.id}/catalog/available`)
+        : { data: [] };
+      setAvailableProducts((disponiveis.data || []).map((p) => ({ ...p, preco: p.preco_produtor })));
     } catch (error) {
       console.error("Error fetching dropshipping data", error);
     } finally {
