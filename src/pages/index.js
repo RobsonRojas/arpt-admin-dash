@@ -28,3 +28,4 @@ export * from './PrivacySettings';
 export * from './AnalyticsDashboard';
 export * from './TermsOfUse';
 export * from './AnalyticsPixels';
+export * from './ExitSurvey';
