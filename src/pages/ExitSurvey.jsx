@@ -99,6 +99,11 @@ export const ExitSurvey = () => {
 
       {resumo && (
         <>
+          {resumo.total === 0 && (
+            <Alert severity="info" sx={{ mb: 2 }}>
+              Nenhuma resposta neste filtro. Respostas de quem já apoiou o projeto (pelo e-mail informado ou pelo login) não são registradas.
+            </Alert>
+          )}
           <Grid container spacing={2} sx={{ mb: 2 }}>
             {[
               ['Respostas', resumo.total],
