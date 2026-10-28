@@ -4,6 +4,7 @@ import { Search, Add, Visibility, Assessment, ContentCopy, PictureAsPdf } from '
 import { StatusChip, RiskChip } from '../common/Chips';
 import MapEmbed from '../common/MapEmbed';
 import { CampaignAssistant } from '../CampaignAssistant';
+import { RevenueReportDialog } from './RevenueReportDialog';
 
 const ProjectsView = ({ projects, onStatusChange, onOpenCadastro }) => {
     const [searchTerm, setSearchTerm] = useState("");

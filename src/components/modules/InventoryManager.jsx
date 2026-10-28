@@ -533,7 +533,6 @@ export const InventoryManager = ({ property, onClose }) => {
 
   useEffect(() => {
     loadTrees();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [property.id]); // Only reload when property changes. Pagination/Sort/Filter is local.
 
 

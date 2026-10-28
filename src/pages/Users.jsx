@@ -4,7 +4,7 @@ import {
     TableRow, TableCell, TableBody, Paper, IconButton, Chip,
     Dialog, DialogTitle, DialogContent, DialogActions, Grid,
     TextField, MenuItem, Avatar, TablePagination, CircularProgress,
-    Snackbar, Alert
+    Snackbar, Alert, List, ListItem, ListItemText
 } from '@mui/material';
 import { Add, Edit, Delete, ManageAccounts, CardMembership, Visibility, History, QrCode, Public, PublicOff, Inventory, Sync, HomeWork, Warning } from '@mui/icons-material';
 import { QRCodeSVG } from 'qrcode.react';
@@ -44,7 +44,7 @@ export const Users = () => {
         status: 'Ativo',
     });
 
-    const { projects, getProperties } = useAdmin();
+    const { projects, properties, getProperties } = useAdmin();
     const [openCertForm, setOpenCertForm] = useState(false);
     const [openCertList, setOpenCertList] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);

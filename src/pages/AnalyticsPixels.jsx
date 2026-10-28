@@ -8,8 +8,10 @@ import {
 } from '@mui/icons-material';
 
 export const AnalyticsPixels = () => {
-  const facebookPixelId = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || process.env.REACT_APP_FACEBOOK_PIXEL_ID || '';
-  const gaId = process.env.NEXT_PUBLIC_GA_ID || process.env.REACT_APP_GA_ID || process.env.NEXT_PUBLIC_GTM_ID || process.env.REACT_APP_GTM_ID || '';
+  // Vite não tem `process`: as variáveis do painel usam o prefixo VITE_ (import.meta.env).
+  const env = import.meta.env;
+  const facebookPixelId = env.VITE_FACEBOOK_PIXEL_ID || '';
+  const gaId = env.VITE_GA_ID || env.VITE_GTM_ID || '';
 
   return (
     <Box>
