@@ -15,7 +15,12 @@ const ROTULOS = {
   FRETE_PRAZO: 'Frete ou prazo',
   MOMENTO_INADEQUADO: 'Momento inadequado',
   OUTRO: 'Outro',
+  NAO_ENCONTREI: 'Não encontrou o que procurava',
+  SO_CONHECENDO: 'Só conhecendo',
 };
+
+/** Valor do seletor para as respostas sem projeto (pesquisa geral): o servidor entende a ausência de idManejo como "geral". */
+const GERAL = 'geral';
 
 export const ExitSurvey = () => {
   const [projetos, setProjetos] = useState([]);
@@ -34,7 +39,7 @@ export const ExitSurvey = () => {
     api.get('/manejos').then((r) => setProjetos(Array.isArray(r.data) ? r.data : [])).catch(() => setErro('Não foi possível listar os projetos.'));
   }, []);
 
-  const filtro = () => ({ idManejo, ...(de ? { de } : {}), ...(ate ? { ate } : {}) });
+  const filtro = () => ({ ...(idManejo === GERAL ? {} : { idManejo }), ...(de ? { de } : {}), ...(ate ? { ate } : {}) });
 
   const carregar = async () => {
     setErro(''); setAnalise(null); setCarregando(true);
@@ -61,7 +66,7 @@ export const ExitSurvey = () => {
   const analisar = async () => {
     setErro(''); setAnalisando(true);
     try {
-      const r = await api.post('/admin/pesquisa-saida/analise', { filtro: { ...filtro(), idManejo: Number(idManejo) }, incluirTextos }, { timeout: 60 * 1000 });
+      const r = await api.post('/admin/pesquisa-saida/analise', { filtro: { ...filtro(), ...(idManejo === GERAL ? {} : { idManejo: Number(idManejo) }) }, incluirTextos }, { timeout: 60 * 1000 });
       setAnalise(r.data);
     } catch (e) {
       setErro(e?.response?.status === 503 ? 'A IA está desabilitada.' : 'Análise por IA indisponível.');
@@ -80,6 +85,7 @@ export const ExitSurvey = () => {
       <Grid container spacing={2} sx={{ mb: 2 }}>
         <Grid item xs={12} md={5}>
           <TextField select fullWidth size="small" label="Projeto" value={idManejo} onChange={(e) => { setIdManejo(e.target.value); setResumo(null); setAnalise(null); }}>
+            <MenuItem value={GERAL}>Geral (fora de campanha)</MenuItem>
             {projetos.map((p) => <MenuItem key={p.id} value={p.id}>{p.nome || `Projeto ${p.id}`}</MenuItem>)}
           </TextField>
         </Grid>
@@ -150,7 +156,7 @@ export const ExitSurvey = () => {
         <Card variant="outlined"><CardContent>
           <Typography variant="h6" gutterBottom>Análise por IA</Typography>
           <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
-            Gerada em {analise.geradoEm ? new Date(analise.geradoEm).toLocaleString('pt-BR') : '—'} · projeto {analise.filtro?.idManejo}
+            Gerada em {analise.geradoEm ? new Date(analise.geradoEm).toLocaleString('pt-BR') : '—'} · {analise.filtro?.idManejo ? `projeto ${analise.filtro.idManejo}` : 'geral (fora de campanha)'}
             {analise.filtro?.de ? ` · de ${analise.filtro.de}` : ''}{analise.filtro?.ate ? ` · até ${analise.filtro.ate}` : ''}
             {analise.incluiuTextos ? ' · com textos livres' : ' · só contagens'} · não é gravada no sistema
           </Typography>
