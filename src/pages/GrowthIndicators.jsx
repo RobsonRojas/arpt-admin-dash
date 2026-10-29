@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Alert, Box, Button, Card, CardContent, CircularProgress, Grid, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import { api } from '../services/api';
+import { ReferralReview } from './ReferralReview';
 
 const hoje = () => new Date().toISOString().slice(0, 10);
 const diasAtras = (n) => new Date(Date.now() - n * 86400000).toISOString().slice(0, 10);
@@ -13,6 +14,8 @@ export const GrowthIndicators = () => {
   const [de, setDe] = useState(diasAtras(30));
   const [ate, setAte] = useState(hoje());
   const [dados, setDados] = useState(null);
+  // Período efetivamente consultado e um contador: a revisão das indicações usa o mesmo período e recarrega junto.
+  const [consulta, setConsulta] = useState(null);
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState('');
 
@@ -22,6 +25,7 @@ export const GrowthIndicators = () => {
       // `ate` vai até o fim do dia escolhido.
       const r = await api.get('/admin/growth/indicadores', { params: { de: `${de}T00:00:00`, ate: `${ate}T23:59:59` } });
       setDados(r.data);
+      setConsulta((c) => ({ de, ate, versao: (c?.versao ?? 0) + 1 }));
     } catch { setErro('Não foi possível carregar os indicadores.'); setDados(null); }
     finally { setCarregando(false); }
   };
@@ -89,6 +93,8 @@ export const GrowthIndicators = () => {
           </CardContent></Card>
         </>
       )}
+
+      {consulta && <ReferralReview de={consulta.de} ate={consulta.ate} versao={consulta.versao} />}
     </Box>
   );
 };
