@@ -4,6 +4,7 @@ import { theme } from './theme';
 import { Layout, ErrorBoundary } from './components';
 import { Dashboard, Projects, Properties, Necromassa, Sponsors, Login, Users, Rewards, Certificates, Products, AuditLogs, GeminiSettings, PaymentConfig, MediaManager, ErrorLogs, Refunds, ForestIntelligence, Adoptions, PhysicalPieces, Notifications, DeveloperSettings, ProductSimulation, Dropshipping, ManejoLogs, DropshippingAdmin, DropshipperDetails, AdminOrders, PrivacySettings, AnalyticsDashboard, TermsOfUse, AnalyticsPixels, ExitSurvey } from './pages';
 import { CertificateView } from './pages/CertificateView';
+import { GrowthIndicators } from './pages/GrowthIndicators';
 import StorePanel from './modules/store-panel/StorePanel';
 import { useAdmin } from './contexts/AdminContext';
 import { useAuth } from './contexts/AuthContext.jsx';
@@ -61,6 +62,7 @@ export default function App() {
                   <Route path="analytics" element={<AnalyticsDashboard />} />
                   <Route path="analytics-pixels" element={<AnalyticsPixels />} />
                   <Route path="exit-survey" element={<ExitSurvey />} />
+                  <Route path="growth" element={<GrowthIndicators />} />
                   <Route path="projects" element={<Projects />} />
                   <Route path="properties" element={<Properties />} />
                   <Route path="necromassa" element={<Necromassa />} />

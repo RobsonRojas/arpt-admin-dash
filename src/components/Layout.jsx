@@ -58,6 +58,7 @@ export const Layout = ({ children }) => {
     { id: 'analytics', label: 'Analytics e IA', icon: <AutoGraph />, path: '/analytics' },
     { id: 'analytics-pixels', label: 'Analytics / Pixels', icon: <AutoGraph />, path: '/analytics-pixels' },
     { id: 'exit-survey', label: 'Pesquisa de saída', icon: <AutoGraph />, path: '/exit-survey' },
+    { id: 'growth', label: 'Indicadores de crescimento', icon: <AutoGraph />, path: '/growth' },
     { id: 'necromassa', label: 'Necromassa', icon: <Forest />, path: '/necromassa' },
     { id: 'projects', label: 'Gestão Projetos', icon: <FolderOpen />, path: '/projects' },
     { id: 'adoptions', label: 'Gestão de Adoções', icon: <Forest />, path: '/adoptions' },
