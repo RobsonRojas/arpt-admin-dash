@@ -3,7 +3,7 @@ import {
     Box, Typography, Button, Dialog, DialogTitle, DialogContent,
     DialogActions, CircularProgress, TableContainer,
     Table, TableHead, TableRow, TableCell, TableBody, Paper, Divider,
-    Grid, Card, CardContent, Chip
+    Grid, Card, CardContent, Chip, Alert
 } from '@mui/material';
 import { ContentCopy, PictureAsPdf, Description, Nature, People, Gavel } from '@mui/icons-material';
 import { api } from '../../services/api';
@@ -11,12 +11,20 @@ import { api } from '../../services/api';
 export const CarbonReportDialog = ({ open, onClose, project }) => {
     const [reportData, setReportData] = useState(null);
     const [loading, setLoading] = useState(false);
+    // O servidor devolveu a versão PÚBLICA (sem estimativa): a conta não é reconhecida como administradora, ou o servidor é antigo.
+    const [versaoPublica, setVersaoPublica] = useState(false);
 
     useEffect(() => {
         if (open && project) {
             setLoading(true);
+            setVersaoPublica(false);
             api.get(`/manejos/${project.id}/carbon-report`)
-                .then(res => setReportData(res.data))
+                .then(res => {
+                    // Só a resposta marcada como estimativa mostra carbono calculado (restrict-public-carbon-report). Sem a marca, não exibe.
+                    if (res.data?.natureza === 'ESTIMATIVA_NAO_CERTIFICADA') { setReportData(res.data); return; }
+                    setReportData(null);
+                    setVersaoPublica(res.data?.natureza === 'PUBLICO');
+                })
                 .catch(err => {
                     console.error(err);
                     setReportData(null);
@@ -27,9 +35,13 @@ export const CarbonReportDialog = ({ open, onClose, project }) => {
 
     const handleCopy = () => {
         if (!reportData) return;
+        const p = reportData.parametros;
+        // O texto copiado circula fora do painel, colado em e-mail e em documentos: o rótulo vai DENTRO dele, no começo e no fim.
         const text = `
+${reportData.rotulo}
+
 RELATÓRIO DE ESTOQUE DE CARBONO E ESG
-Projeto: ${reportData.project.name}
+Negócio: ${reportData.project.name}
 Localização: ${reportData.project.location}
 Área: ${reportData.project.area}
 
@@ -46,6 +58,13 @@ MÉTRICAS ESG
 - Governança: ${reportData.summary.esgMetrics.governance}
 
 Total de Árvores Inventariadas: ${reportData.summary.totalTrees}
+${p ? `
+PARÂMETROS DA ESTIMATIVA
+- Densidade padrão da madeira ${p.densidade_madeira_padrao}, usada em ${p.arvores_com_densidade_padrao} de ${p.total_arvores} árvores (espécie fora do mapa)
+- Árvores sem dado para o método contribuem com zero (Chave: ${p.arvores_sem_dado_para_chave}; Higuchi: ${p.arvores_sem_dado_para_higuchi})
+- Fração de carbono ${p.fracao_carbono}; fator de expansão de biomassa ${p.fator_expansao_biomassa}; razão raiz/parte aérea ${p.razao_raiz_parte_aerea}` : ''}
+
+${reportData.rotulo}
         `.trim();
         navigator.clipboard.writeText(text);
         alert("Relatório copiado!");
@@ -63,7 +82,8 @@ Total de Árvores Inventariadas: ${reportData.summary.totalTrees}
             const link = document.createElement('a');
             link.href = url;
             const extension = format === 'pdf' ? 'pdf' : format === 'odt' ? 'odt' : 'docx';
-            link.setAttribute('download', `relatorio-carbono-${reportData.project.slug || reportData.project.id}.${extension}`);
+            // O nome diz a versão: quem recebe o anexo sabe, sem abrir, que é uma estimativa e não um certificado.
+            link.setAttribute('download', `relatorio-carbono-estimativa-nao-certificada-${reportData.project.slug || reportData.project.id}.${extension}`);
             document.body.appendChild(link);
             link.click();
             link.remove();
@@ -83,6 +103,7 @@ Total de Árvores Inventariadas: ${reportData.summary.totalTrees}
                     <Box p={4} textAlign="center"><CircularProgress /></Box>
                 ) : reportData ? (
                     <Box>
+                        <Alert severity="warning" sx={{ mb: 2, fontWeight: 'bold' }} data-rotulo-estimativa>{reportData.rotulo}</Alert>
                         <Box mb={3}>
                             <Typography variant="h5" color="primary">
                                 {reportData.project.name}
@@ -211,7 +232,22 @@ Total de Árvores Inventariadas: ${reportData.summary.totalTrees}
                         <Typography variant="caption" sx={{ mt: 1, display: 'block' }}>
                             * Carbono estimado pela média das metodologias. CO2eq = Carbono * 3.67.
                         </Typography>
+                        {reportData.parametros && (
+                            <Box sx={{ mt: 2 }} data-parametros>
+                                <Typography variant="subtitle2">Parâmetros da estimativa</Typography>
+                                <Typography variant="caption" display="block">Densidade padrão da madeira {reportData.parametros.densidade_madeira_padrao}, usada em {reportData.parametros.arvores_com_densidade_padrao} de {reportData.parametros.total_arvores} árvores (espécie fora do mapa).</Typography>
+                                <Typography variant="caption" display="block">Árvores sem os dados que o método exige contribuem com zero (Chave: {reportData.parametros.arvores_sem_dado_para_chave}; Higuchi: {reportData.parametros.arvores_sem_dado_para_higuchi}).</Typography>
+                            </Box>
+                        )}
+                        {reportData.carbono_certificado && (
+                            <Alert severity="info" sx={{ mt: 2 }} data-carbono-certificado>
+                                Certificação registrada: {reportData.carbono_certificado.quantidade_tco2e} tCO2e ({reportData.carbono_certificado.origem.padrao}, registro {reportData.carbono_certificado.origem.registro_numero}). Este valor, e não a estimativa acima, é o certificado.
+                            </Alert>
+                        )}
+                        <Alert severity="warning" sx={{ mt: 2, fontWeight: 'bold' }}>{reportData.rotulo}</Alert>
                     </Box>
+                ) : versaoPublica ? (
+                    <Alert severity="info">O servidor devolveu a versão pública deste relatório, sem a estimativa. A estimativa de carbono só é exibida para administradores e donos do negócio; entre com uma conta de administrador.</Alert>
                 ) : (
                     <Typography color="error" align="center">Erro ao carregar dados do relatório.</Typography>
                 )}
