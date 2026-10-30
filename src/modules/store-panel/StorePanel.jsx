@@ -13,6 +13,7 @@ import Domain from './sections/Domain';
 import Marketing from './sections/Marketing';
 import Team from './sections/Team';
 import Settings from './sections/Settings';
+import Survey from './sections/Survey';
 import StoreOrdersTab from '../../components/orders/StoreOrdersTab';
 import MeuPerfilDropshipper from '../../components/dropshipping/MeuPerfilDropshipper';
 
@@ -20,7 +21,7 @@ const OrdersSection = ({ storeId, readOnly, papel }) => (
   <StoreOrdersTab storeId={storeId} readOnly={readOnly} podeVerRepasses={papel === 'dono' || papel === 'financeiro'} />
 );
 const SECTION_VIEW = {
-  overview: Overview, products: Products, appearance: Appearance, pages: Pages, domain: Domain, marketing: Marketing, team: Team, settings: Settings,
+  overview: Overview, products: Products, appearance: Appearance, pages: Pages, domain: Domain, marketing: Marketing, team: Team, survey: Survey, settings: Settings,
 };
 
 function NotFound() {

@@ -13,6 +13,8 @@ export const SECTIONS = [
   { id: 'domain', view: ['dono'], edit: ['dono'] },
   { id: 'marketing', view: ['dono', 'editor'], edit: ['dono', 'editor'] },
   { id: 'team', view: ['dono'], edit: ['dono'] },
+  // Pesquisa de visitantes: só o dono (o texto livre pode trazer dado pessoal). Somente leitura.
+  { id: 'survey', view: ['dono'], edit: [] },
   { id: 'settings', view: ['dono'], edit: ['dono'] },
 ];
 

@@ -38,14 +38,18 @@ const VALUES = {
   role_: perm.ROLES, menu_: perm.SECTIONS.map((s) => s.id), status_: Object.values(rules.STORE_STATUS), block_: ['hero', 'produtos_destaque', 'texto', 'imagem', 'faq', 'depoimentos', 'newsletter', 'contato'],
   color_: ['primaria', 'secundaria', 'fundo', 'texto', 'destaque'], font_: ['sistema', 'serifada', 'moderna', 'arredondada', 'monoespacada'],
   button_: ['arredondado', 'quadrado', 'pilula'], card_: ['sombra', 'borda', 'plano'], domain_: ['PENDENTE', 'VERIFICADO'], tls_: ['ATIVO', 'EMITINDO', 'FALHA'],
-  check_: ['product', 'shipping', 'logo', 'business', 'domain'], field_: [...new Set(Object.values(blocks.BLOCK_FIELDS).flat().map(([k]) => k))],
+  check_: ['product', 'shipping', 'logo', 'business', 'domain'],
+  origin_: ['INICIO', 'CATALOGO', 'PRODUTO', 'CONTEUDO', 'CARRINHO', 'CHECKOUT'],
+  reason_: ['PRECO', 'FRETE_PRAZO', 'FORMAS_PAGAMENTO', 'FALTOU_INFO_PRODUTO', 'NAO_CONFIO_LOJA', 'SO_PESQUISANDO', 'MOMENTO_INADEQUADO', 'OUTRO'], field_: [...new Set(Object.values(blocks.BLOCK_FIELDS).flat().map(([k]) => k))],
 };
 for (const p of dynamic) { assert.ok(VALUES[p], `prefixo dinâmico sem lista de valores no teste: ${p}`); for (const v of VALUES[p]) assert.ok(`${p}${v}` in pt, `falta ${p}${v}`); }
 for (const c of err.KNOWN_CODES) assert.ok(`api_${c}` in pt, `falta o texto do erro ${c}`);
 assert.ok('api_GENERIC' in pt);
 
 // ── permissões por papel (spec dropshipper-store-panel)
-assert.deepEqual(perm.menuFor('dono'), ['overview', 'products', 'orders', 'appearance', 'pages', 'domain', 'marketing', 'team', 'settings']);
+assert.deepEqual(perm.menuFor('dono'), ['overview', 'products', 'orders', 'appearance', 'pages', 'domain', 'marketing', 'team', 'survey', 'settings']);
+// Pesquisa de visitantes: só o dono, e só leitura (expand-exit-survey-to-dropshipping).
+assert.equal(perm.accessFor('dono', 'survey'), 'view'); assert.equal(perm.accessFor('editor', 'survey'), null); assert.equal(perm.accessFor('financeiro', 'survey'), null);
 const editor = perm.menuFor('editor');
 for (const s of ['products', 'appearance', 'pages', 'marketing']) assert.ok(editor.includes(s), `editor deve ver ${s}`);
 for (const s of ['orders', 'team', 'domain', 'settings']) assert.ok(!editor.includes(s), `editor não vê ${s}`);

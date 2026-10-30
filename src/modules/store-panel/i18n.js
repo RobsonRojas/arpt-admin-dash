@@ -5,6 +5,19 @@ export const LANGS = ['pt', 'en'];
 export const DEFAULT_LANG = 'pt';
 
 const pt = {
+  // Pesquisa de visitantes (expand-exit-survey-to-dropshipping)
+  menu_survey: 'Pesquisa de visitantes', survey_intro: 'Por que visitantes desta loja não compraram, nas páginas em que decidem. O e-mail do visitante nunca aparece aqui.',
+  survey_bias: 'A amostra é viesada: só responde quem ainda estava na página e quis responder.', survey_off: 'A pesquisa está desligada nesta loja. Ligue em Configurações.',
+  survey_free_text: 'O comentário é escrito pelo visitante e pode conter dados pessoais. Use só para melhorar a loja e não copie para fora do painel.',
+  survey_from: 'De', survey_to: 'Até', survey_page: 'Página', survey_product: 'Produto', survey_all: 'Todas', survey_all_products: 'Todos',
+  survey_total: '{n} respostas no período', survey_empty: 'Nenhuma resposta desde {de}.', survey_reasons: 'Motivos', survey_by_page: 'Por página', survey_by_product: 'Por produto',
+  survey_no_reasons: 'Sem motivos marcados.', survey_date: 'Data', survey_comment: 'Comentário', survey_view: 'Ver', survey_close: 'Fechar', survey_detail: 'Resposta',
+  survey_small_sample: 'Com menos de 10 respostas, mostramos só a contagem.',
+  survey_switch: 'Pesquisa de visitantes', survey_switch_help: 'Quando ligada, a loja pergunta ao visitante que vai sair sem comprar o que faltou (motivos, um comentário opcional e, se ele quiser, o e-mail para novidades desta loja). Nunca aparece depois da compra.',
+  survey_switch_on: 'Pesquisa ligada.', survey_switch_off: 'Pesquisa desligada.',
+  origin_INICIO: 'Página inicial', origin_CATALOGO: 'Catálogo', origin_PRODUTO: 'Produto', origin_CONTEUDO: 'Página de conteúdo', origin_CARRINHO: 'Carrinho', origin_CHECKOUT: 'Checkout',
+  reason_PRECO: 'O preço', reason_FRETE_PRAZO: 'Frete ou prazo de entrega', reason_FORMAS_PAGAMENTO: 'Formas de pagamento', reason_FALTOU_INFO_PRODUTO: 'Faltou informação sobre o produto',
+  reason_NAO_CONFIO_LOJA: 'Não teve confiança na loja', reason_SO_PESQUISANDO: 'Só estava pesquisando', reason_MOMENTO_INADEQUADO: 'Não é o momento', reason_OUTRO: 'Outro motivo',
   language: 'Idioma', save: 'Salvar', saved: 'Salvo.', saved_draft: 'Salvo no rascunho. Publique para o visitante ver.', remove: 'Remover', resend: 'Reenviar',
   status: 'Situação', active: 'Ativo', inactive: 'Inativo', paused: 'Pausado', default: 'Padrão', optional: 'opcional', read_only: 'Você só pode visualizar esta seção.',
   email: 'E-mail', phone: 'Telefone', address: 'Endereço', role: 'Papel',
@@ -68,6 +81,18 @@ const pt = {
 };
 
 const en = {
+  menu_survey: 'Visitor survey', survey_intro: 'Why visitors of this store did not buy, on the pages where they decide. The visitor e-mail never shows here.',
+  survey_bias: 'The sample is biased: only people still on the page who chose to answer respond.', survey_off: 'The survey is off for this store. Turn it on in Settings.',
+  survey_free_text: 'The comment is written by the visitor and may contain personal data. Use it only to improve the store and do not copy it outside the panel.',
+  survey_from: 'From', survey_to: 'To', survey_page: 'Page', survey_product: 'Product', survey_all: 'All', survey_all_products: 'All',
+  survey_total: '{n} answers in the period', survey_empty: 'No answers since {de}.', survey_reasons: 'Reasons', survey_by_page: 'By page', survey_by_product: 'By product',
+  survey_no_reasons: 'No reasons selected.', survey_date: 'Date', survey_comment: 'Comment', survey_view: 'View', survey_close: 'Close', survey_detail: 'Answer',
+  survey_small_sample: 'With fewer than 10 answers, we show only the count.',
+  survey_switch: 'Visitor survey', survey_switch_help: 'When on, the store asks visitors who are leaving without buying what was missing (reasons, an optional comment and, if they want, their e-mail for news from this store). It never shows after a purchase.',
+  survey_switch_on: 'Survey on.', survey_switch_off: 'Survey off.',
+  origin_INICIO: 'Home page', origin_CATALOGO: 'Catalog', origin_PRODUTO: 'Product', origin_CONTEUDO: 'Content page', origin_CARRINHO: 'Cart', origin_CHECKOUT: 'Checkout',
+  reason_PRECO: 'The price', reason_FRETE_PRAZO: 'Shipping cost or delivery time', reason_FORMAS_PAGAMENTO: 'Payment methods', reason_FALTOU_INFO_PRODUTO: 'Missing product information',
+  reason_NAO_CONFIO_LOJA: 'Did not trust the store', reason_SO_PESQUISANDO: 'Just browsing', reason_MOMENTO_INADEQUADO: 'Not the right time', reason_OUTRO: 'Other reason',
   language: 'Language', save: 'Save', saved: 'Saved.', saved_draft: 'Saved to the draft. Publish for visitors to see it.', remove: 'Remove', resend: 'Resend',
   status: 'Status', active: 'Active', inactive: 'Inactive', paused: 'Paused', default: 'Default', optional: 'optional', read_only: 'You can only view this section.',
   email: 'E-mail', phone: 'Phone', address: 'Address', role: 'Role',
