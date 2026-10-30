@@ -1,10 +1,10 @@
 import React from 'react';
 import { Box, Paper, Typography, Avatar, Button, Grid, Divider } from '@mui/material';
 import { Visibility, Edit, Assessment, Image as ImageIcon } from '@mui/icons-material';
-import { Nature } from '@mui/icons-material';
+import { Nature, Groups } from '@mui/icons-material';
 import { StatusChip } from '../../components/StatusChip';
 
-export const ProjectMobileCards = ({ projects, getProjectImage, onEdit, onReport, onCarbonReport, onSelect }) => {
+export const ProjectMobileCards = ({ projects, getProjectImage, onEdit, onReport, onCarbonReport, onGrowth, onSelect }) => {
   return (
     <Box sx={{ display: { xs: 'flex', md: 'none' }, flexDirection: 'column', gap: 2 }}>
       {projects.map((p) => (
@@ -41,6 +41,9 @@ export const ProjectMobileCards = ({ projects, getProjectImage, onEdit, onReport
                </Button>
                <Button size="small" variant="outlined" color="success" onClick={() => onCarbonReport(p)} title="Carbono">
                   <Nature fontSize="small" />
+               </Button>
+               <Button size="small" variant="outlined" onClick={() => onGrowth(p)} title="Crescimento" aria-label="Crescimento: donos, certificação e mural">
+                  <Groups fontSize="small" />
                </Button>
             </Grid>
           </Grid>

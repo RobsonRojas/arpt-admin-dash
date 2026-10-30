@@ -7,6 +7,7 @@ import { Close, ContentCopy } from '@mui/icons-material';
 import { FieldAppEmbedded } from '../components/FieldAppEmbedded';
 import { RevenueReportDialog } from '../components/modules/RevenueReportDialog';
 import { CarbonReportDialog } from '../components/modules/CarbonReportDialog';
+import { GrowthAdminDialog } from '../components/modules/growth/GrowthAdminDialog';
 import { ProjectToolbar } from './projects/ProjectToolbar';
 import { ProjectTable } from './projects/ProjectTable';
 import { ProjectMobileCards } from './projects/ProjectMobileCards';
@@ -55,6 +56,7 @@ export const Projects = () => {
   // Revenue Report State
   const [reportProject, setReportProject] = useState(null);
   const [carbonReportProject, setCarbonReportProject] = useState(null);
+  const [growthProject, setGrowthProject] = useState(null);
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -101,6 +103,7 @@ export const Projects = () => {
             onEdit={handleEditProject}
             onReport={setReportProject}
             onCarbonReport={setCarbonReportProject}
+            onGrowth={setGrowthProject}
             onSelect={(p) => { setSelectedProject(p); setTabValue(0); }}
           />
 
@@ -110,6 +113,7 @@ export const Projects = () => {
             onEdit={handleEditProject}
             onReport={setReportProject}
             onCarbonReport={setCarbonReportProject}
+            onGrowth={setGrowthProject}
             onSelect={(p) => { setSelectedProject(p); setTabValue(0); }}
           />
         </Box>
@@ -197,6 +201,11 @@ export const Projects = () => {
           open={!!carbonReportProject}
           onClose={() => setCarbonReportProject(null)}
           project={carbonReportProject}
+        />
+        <GrowthAdminDialog
+          open={!!growthProject}
+          onClose={() => setGrowthProject(null)}
+          project={growthProject}
         />
       </Box>
     </>

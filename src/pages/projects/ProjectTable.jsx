@@ -4,10 +4,10 @@ import {
   TableBody, Paper, Box, Typography, Avatar, IconButton 
 } from '@mui/material';
 import { Edit, Assessment, Visibility, Image as ImageIcon } from '@mui/icons-material';
-import { Nature } from '@mui/icons-material';
+import { Nature, Groups } from '@mui/icons-material';
 import { StatusChip } from '../../components/StatusChip';
 
-export const ProjectTable = ({ projects, getProjectImage, onEdit, onReport, onCarbonReport, onSelect }) => {
+export const ProjectTable = ({ projects, getProjectImage, onEdit, onReport, onCarbonReport, onGrowth, onSelect }) => {
   return (
     <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid #e0e0e0', display: { xs: 'none', md: 'block' } }}>
       <Table>
@@ -68,6 +68,14 @@ export const ProjectTable = ({ projects, getProjectImage, onEdit, onReport, onCa
                   aria-label="Relatório de Carbono & ESG"
                 >
                   <Nature color="success" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={() => onGrowth(p)}
+                  title="Crescimento: donos, certificação e mural"
+                  aria-label="Crescimento: donos, certificação e mural"
+                >
+                  <Groups />
                 </IconButton>
                 <IconButton
                   size="small"

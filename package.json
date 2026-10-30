@@ -8,7 +8,8 @@
     "build": "vite build",
     "lint": "eslint src",
     "preview": "vite preview",
-    "check:utils": "node scripts/check-offer-utils.mjs && node scripts/check-orders-utils.mjs && node scripts/check-terms-utils.mjs && node scripts/check-shipping-utils.mjs && node scripts/check-store-panel.mjs && node scripts/check-product-form.mjs && node scripts/check-number-utils.mjs && node scripts/check-dropshipper-utils.mjs && node scripts/check-motivo-utils.mjs && node scripts/check-lgpd-utils.mjs && node scripts/check-pwa-update.mjs && node scripts/check-referral-review.mjs"
+    "check:utils": "node scripts/check-offer-utils.mjs && node scripts/check-orders-utils.mjs && node scripts/check-terms-utils.mjs && node scripts/check-shipping-utils.mjs && node scripts/check-store-panel.mjs && node scripts/check-product-form.mjs && node scripts/check-number-utils.mjs && node scripts/check-dropshipper-utils.mjs && node scripts/check-motivo-utils.mjs && node scripts/check-lgpd-utils.mjs && node scripts/check-pwa-update.mjs && node scripts/check-referral-review.mjs",
+    "test": "vitest run"
   },
   "dependencies": {
     "@emotion/react": "^11.11.0",
@@ -29,12 +30,18 @@
     "recharts": "^3.7.0"
   },
   "devDependencies": {
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@vitejs/plugin-basic-ssl": "^1.2.0",
     "@vitejs/plugin-react": "^4.2.1",
     "eslint": "^9.39.5",
     "eslint-plugin-react": "^7.37.5",
     "globals": "^17.13.0",
+    "jsdom": "^25.0.1",
     "vite": "^5.0.8",
-    "vite-plugin-pwa": "^1.2.0"
+    "vite-plugin-pwa": "^1.2.0",
+    "vitest": "^2.1.9"
   }
 }
