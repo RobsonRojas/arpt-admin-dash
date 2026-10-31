@@ -142,8 +142,9 @@ export default function Dropshipping() {
       const res = await api.get('/api/v1/dropshipping/stores');
       const stores = res.data.map((st) => ({ ...st, name: st.nome, config: {} }));
       
-      if (stores.length > 0) {
-        const myStore = stores[0];
+      // Fora do `if`: o seletor de produtos disponíveis, abaixo, também usa a loja.
+      const myStore = stores[0] ?? null;
+      if (myStore) {
         setStore(myStore);
         
         let config = {};
@@ -166,11 +167,6 @@ export default function Dropshipping() {
           aiSlogan: myStore.ai_slogan || '',
           custom_domain: myStore.custom_domain || ''
         });
-
-        if (myStore.custom_domain) {
-        } else {
-          setDomainStatus('none');
-        }
 
         // Fetch products and team
         fetchCatalog(myStore.id);

@@ -11,7 +11,7 @@ export default function Team() {
   const [team, setTeam] = useState({ members: [], invites: [] });
   const [email, setEmail] = useState(''); const [papel, setPapel] = useState('editor'); const [busy, setBusy] = useState(false);
   const base = BASE(store.id);
-  const load = useCallback(() => api.get(`${base}/members`).then((r) => setTeam(r.data)).catch((e) => notify('error', err(e))), [base]); // eslint-disable-line react-hooks/exhaustive-deps
+  const load = useCallback(() => api.get(`${base}/members`).then((r) => setTeam(r.data)).catch((e) => notify('error', err(e))), [base]);
   useEffect(() => { load(); }, [load]);
   const run = async (fn, okKey) => { setBusy(true); try { await fn(); if (okKey) notify('success', t(okKey)); await load(); } catch (e) { notify('error', err(e)); } finally { setBusy(false); } };
 

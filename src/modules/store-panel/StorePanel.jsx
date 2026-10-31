@@ -57,7 +57,7 @@ function StoreShell() {
   const [loadError, setLoadError] = useState(null);
 
   // Só as lojas DESTE usuário: loja alheia nunca aparece, e a URL dela cai em "não encontrada".
-  const refreshStores = useCallback(() => api.get('/api/v1/dropshipping/stores').then((r) => setStores(r.data)).catch((e) => setLoadError(err(e))), []); // eslint-disable-line react-hooks/exhaustive-deps
+  const refreshStores = useCallback(() => api.get('/api/v1/dropshipping/stores').then((r) => setStores(r.data)).catch((e) => setLoadError(err(e))), []);
   useEffect(() => { refreshStores(); }, [refreshStores]);
   const store = useMemo(() => (stores ?? []).find((s) => String(s.id) === String(storeId)) ?? null, [stores, storeId]);
   const papel = store?.meu_papel ?? null;
@@ -74,7 +74,7 @@ function StoreShell() {
     const bad = results.find((r) => r.status === 'rejected' && r.reason?.response?.status !== 404);
     setData(next);
     if (bad) setToast({ severity: 'error', text: err(bad.reason) });
-  }, [store?.id, papel]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [store?.id, papel]);
   useEffect(() => { reload(); }, [reload]);
 
   if (loadError) return <Alert severity="error">{loadError}</Alert>;

@@ -14,7 +14,7 @@ export default function Marketing() {
   const [track, setTrack] = useState({}); const [seo, setSeo] = useState({}); const [touched, setTouched] = useState(false);
   const [busy, setBusy] = useState(false); const [serverErrors, setServerErrors] = useState({});
   const editable = access === 'edit';
-  useEffect(() => { setTrack({ ...(draft.tracking ?? {}) }); setSeo({ ...(draft.seo ?? {}) }); }, [config]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { setTrack({ ...(draft.tracking ?? {}) }); setSeo({ ...(draft.seo ?? {}) }); }, [config]);
 
   const trackErrors = validateTracking(track); const seoErrors = validateSeo(seo);
   const hasError = Object.keys(trackErrors).length + Object.keys(seoErrors).length > 0;
