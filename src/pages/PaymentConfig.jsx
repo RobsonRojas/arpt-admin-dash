@@ -4,14 +4,15 @@ import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination,
     IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert, Grid, Chip, Select, MenuItem, InputLabel, FormControl
 } from '@mui/material';
-import { Edit, Delete, Add, ContentCopy } from '@mui/icons-material';
+import { Edit, Delete, Add } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 
 const PaymentConfig = () => {
     const [tabValue, setTabValue] = useState(0);
     const [config, setConfig] = useState({ enabled: true, fee_percentage: 10, description: '' });
-    const [gateway, setGateway] = useState('mock');
+    // O Stripe é o padrão do backend; o Mercado Pago não é mais opção (remove-mercadopago-gateway).
+    const [gateway, setGateway] = useState('stripe');
     const [sellers, setSellers] = useState([]);
     const [loading, setLoading] = useState(false);
     const [sellerDialogOpen, setSellerDialogOpen] = useState(false);
@@ -142,7 +143,6 @@ const PaymentConfig = () => {
                                 onChange={(e) => setGateway(e.target.value)}
                             >
                                 <MenuItem value="stripe">Stripe</MenuItem>
-                                <MenuItem value="mercadopago">Mercado Pago</MenuItem>
                                 <MenuItem value="mock">Mock (Ambiente de Teste)</MenuItem>
                             </Select>
                         </FormControl>
@@ -191,7 +191,6 @@ const PaymentConfig = () => {
                                     <TableCell>ID Produtor</TableCell>
                                     <TableCell>Nome</TableCell>
                                     <TableCell>Email</TableCell>
-                                    <TableCell>Collector ID (MP)</TableCell>
                                     <TableCell>Chave PIX</TableCell>
                                     <TableCell>Status</TableCell>
                                     <TableCell>Ações</TableCell>
@@ -203,16 +202,6 @@ const PaymentConfig = () => {
                                         <TableCell>{seller.seller_id}</TableCell>
                                         <TableCell>{seller.seller_name}</TableCell>
                                         <TableCell>{seller.seller_email}</TableCell>
-                                        <TableCell>
-                                            {seller.mercado_pago_collector_id && (
-                                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                    {seller.mercado_pago_collector_id}
-                                                    <IconButton size="small" onClick={() => navigator.clipboard.writeText(seller.mercado_pago_collector_id)}>
-                                                        <ContentCopy fontSize="small" />
-                                                    </IconButton>
-                                                </Box>
-                                            )}
-                                        </TableCell>
                                         <TableCell>{seller.pix_key}</TableCell>
                                         <TableCell>
                                             <Chip label={seller.active ? "Ativo" : "Inativo"} color={seller.active ? "success" : "default"} size="small" />
@@ -259,14 +248,14 @@ const PaymentConfig = () => {
 
 const SellerDialog = ({ open, onClose, seller, onSave }) => {
     const [formData, setFormData] = useState({
-        seller_id: '', seller_name: '', seller_email: '', mercado_pago_collector_id: '', pix_key: ''
+        seller_id: '', seller_name: '', seller_email: '', pix_key: ''
     });
 
     useEffect(() => {
         if (seller) {
             setFormData(seller);
         } else {
-            setFormData({ seller_id: '', seller_name: '', seller_email: '', mercado_pago_collector_id: '', pix_key: '' });
+            setFormData({ seller_id: '', seller_name: '', seller_email: '', pix_key: '' });
         }
     }, [seller]);
 
@@ -287,10 +276,6 @@ const SellerDialog = ({ open, onClose, seller, onSave }) => {
                     />
                     <TextField
                         name="seller_email" label="Email" value={formData.seller_email} onChange={handleChange} fullWidth required
-                    />
-                    <TextField
-                        name="mercado_pago_collector_id" label="Mercado Pago Collector ID" value={formData.mercado_pago_collector_id || ''} onChange={handleChange} fullWidth
-                        helperText="ID do usuário no Mercado Pago que receberá o split"
                     />
                     <TextField
                         name="pix_key" label="Chave PIX" value={formData.pix_key || ''} onChange={handleChange} fullWidth
