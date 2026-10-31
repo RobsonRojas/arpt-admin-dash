@@ -7,6 +7,7 @@ import * as perm from '../src/modules/store-panel/permissions.js';
 import * as rules from '../src/modules/store-panel/rules.js';
 import * as err from '../src/modules/store-panel/errors.js';
 import * as blocks from '../src/modules/store-panel/blocks.js';
+import * as tpl from '../src/modules/store-panel/templates.js';
 
 const dir = path.join(path.dirname(fileURLToPath(import.meta.url)), '../src/modules/store-panel');
 const { pt, en } = i18n.DICTIONARIES;
@@ -38,7 +39,7 @@ const VALUES = {
   role_: perm.ROLES, menu_: perm.SECTIONS.map((s) => s.id), status_: Object.values(rules.STORE_STATUS), block_: ['hero', 'produtos_destaque', 'texto', 'imagem', 'faq', 'depoimentos', 'newsletter', 'contato'],
   color_: ['primaria', 'secundaria', 'fundo', 'texto', 'destaque'], font_: ['sistema', 'serifada', 'moderna', 'arredondada', 'monoespacada'],
   button_: ['arredondado', 'quadrado', 'pilula'], card_: ['sombra', 'borda', 'plano'], domain_: ['PENDENTE', 'VERIFICADO'], tls_: ['ATIVO', 'EMITINDO', 'FALHA'],
-  check_: ['product', 'shipping', 'logo', 'business', 'domain'],
+  check_: ['product', 'shipping', 'logo', 'business', 'domain', 'example'], scope_: ['tudo', 'tema', 'blocos'], lang_: ['pt', 'en'],
   origin_: ['INICIO', 'CATALOGO', 'PRODUTO', 'CONTEUDO', 'CARRINHO', 'CHECKOUT'],
   reason_: ['PRECO', 'FRETE_PRAZO', 'FORMAS_PAGAMENTO', 'FALTOU_INFO_PRODUTO', 'NAO_CONFIO_LOJA', 'SO_PESQUISANDO', 'MOMENTO_INADEQUADO', 'OUTRO'], field_: [...new Set(Object.values(blocks.BLOCK_FIELDS).flat().map(([k]) => k))],
 };
@@ -91,6 +92,29 @@ assert.deepEqual(rules.publishChecklist({ products: [], config: null, domains: n
 assert.equal(rules.publishChecklist({ ...ok, config: { ...ok.config, rodape: { negocio: { razao_social: 'X' } } } }).canPublish, false);
 assert.equal(rules.publishChecklist({ ...ok, config: { ...ok.config, rodape: { negocio: { telefone: '11 99999-0000' } } } }).canPublish, false);
 const item = (c, id) => rules.publishChecklist(c).items.find((i) => i.id === id);
+// texto de exemplo de template: avisa (item opcional) com os blocos, sem bloquear a publicação
+const comExemplo = { ...ok, config: { ...ok.config, blocos: [{ id: 'hero', exemplo: true }, { id: 'meu' }], paginas: { sobre: { blocos: [{ id: 'sobre-texto', exemplo: true }] } } } };
+assert.equal(rules.publishChecklist(comExemplo).canPublish, true);
+assert.deepEqual([item(comExemplo, 'example').ok, item(comExemplo, 'example').required, item(comExemplo, 'example').blocks], [false, false, ['hero', 'sobre/sobre-texto']]);
+assert.equal(item(ok, 'example').ok, true);
+
+// ── galeria de templates (add-dropshipper-store-template-library)
+const TPLS = [{ id: 'a', categoria: 'premium', estilo: 'classico' }, { id: 'b', categoria: 'premium', estilo: 'moderno' }, { id: 'c', categoria: 'presentes', estilo: 'classico' }];
+assert.deepEqual(tpl.filterTemplates(TPLS, { categoria: 'premium' }).map((t) => t.id), ['a', 'b']);
+assert.deepEqual(tpl.filterTemplates(TPLS, { estilo: 'classico' }).map((t) => t.id), ['a', 'c']);
+assert.deepEqual(tpl.filterTemplates(TPLS, { categoria: 'premium', estilo: 'classico' }).map((t) => t.id), ['a']);
+assert.equal(tpl.filterTemplates(TPLS).length, 3); assert.deepEqual(tpl.filterTemplates(null), []);
+assert.deepEqual(tpl.combination({ template: 'a', layout: 'x' }), { template: 'a' });
+assert.deepEqual(tpl.combination({ layout: 'l', paleta: 'p', estilo: 'e' }), { layout: 'l', paleta: 'p', estilo: 'e' });
+assert.equal(tpl.combination({ layout: 'l', paleta: 'p' }), null);
+assert.deepEqual(tpl.applyBody({ template: 'a' }, 'tema', ['en', 'pt']), { template: 'a', escopo: 'tema', idiomas: ['pt', 'en'] });
+assert.equal(tpl.applyBody({ template: 'a' }, 'tudo', []), null); assert.equal(tpl.applyBody({ template: 'a' }, 'outro', ['pt']), null); assert.equal(tpl.applyBody(null, 'tudo', ['pt']), null);
+assert.deepEqual(tpl.storeLanguages({ idiomas: ['en'] }), ['en']); assert.deepEqual(tpl.storeLanguages({}), ['pt']);
+assert.ok(Math.abs(tpl.contrastRatio('#000000', '#FFFFFF') - 21) < 0.01); assert.equal(tpl.contrastRatio('azul', '#fff'), null);
+assert.equal(tpl.paletteReadable({ primaria: '#2E7D32', fundo: '#FFFFFF', texto: '#212121' }), true);
+assert.equal(tpl.paletteReadable({ primaria: '#90CAF9', fundo: '#FFFFFF', texto: '#212121' }), false);
+assert.equal(tpl.inLang({ pt: 'Olá', en: 'Hi' }, 'en'), 'Hi'); assert.equal(tpl.inLang({ pt: 'Olá', en: 'Hi' }, 'fr'), 'Olá'); assert.equal(tpl.inLang('x', 'en'), 'x');
+assert.ok(tpl.SAMPLE_PRODUCTS.every((p) => p.nome.pt && p.nome.en && !JSON.stringify(p).includes('http')));
 assert.equal(item(ok, 'domain').ok, false); assert.equal(item(ok, 'domain').required, false);
 assert.equal(item({ ...ok, domains: [{ tls_status: 'ATIVO' }] }, 'domain').ok, true); assert.equal(item({ ...ok, domains: [{ tls_status: 'FALHA' }] }, 'domain').ok, false);
 assert.equal(item({ ...ok, products: [{ ativo: true, frete_calculavel: false }] }, 'shipping').ok, false);

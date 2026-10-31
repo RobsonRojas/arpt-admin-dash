@@ -1,5 +1,6 @@
 // Regras do painel da loja (puras): validação dos IDs de rastreio, "ativo/inativo", checklist de publicação e endereço da loja.
 // Os formatos espelham o backend (src/schemas/storefront.schema.ts); o servidor valida de novo.
+import { exampleBlocks } from './templates.js';
 
 export const GTM_RE = /^GTM-[A-Z0-9]{4,10}$/;
 export const GA4_RE = /^G-[A-Z0-9]{6,12}$/;
@@ -95,6 +96,8 @@ export function publishChecklist({ products, config, domains }) {
     { id: 'logo', required: true, ok: !!clean(config?.tema?.logo_url) },
     { id: 'business', required: true, ok: businessComplete(config?.rodape?.negocio) },
     { id: 'domain', required: false, ok: (domains ?? []).some((d) => d.tls_status === 'ATIVO') },
+    // Texto de exemplo de template ainda não editado: avisa, sem bloquear (add-dropshipper-store-template-library).
+    { id: 'example', required: false, ok: exampleBlocks(config).length === 0, blocks: exampleBlocks(config) },
   ];
   const missing = items.filter((i) => i.required && !i.ok).map((i) => i.id);
   return { items, missing, canPublish: missing.length === 0 };

@@ -5,6 +5,20 @@ export const LANGS = ['pt', 'en'];
 export const DEFAULT_LANG = 'pt';
 
 const pt = {
+  check_example: 'Textos de exemplo do template trocados pelos seus',
+  gallery: 'Templates', gallery_intro: 'Escolha um ponto de partida. Aplicar muda só o rascunho; a loja publicada continua igual até você publicar.',
+  gallery_category: 'Categoria', gallery_style: 'Estilo', gallery_all: 'Todos', gallery_empty: 'Nenhum template com esse filtro.',
+  gallery_preview: 'Pré-visualizar', gallery_choose: 'Escolher', gallery_selected: 'Escolhido', gallery_free: 'Combinar peças',
+  gallery_layout: 'Layout', gallery_palette: 'Paleta', gallery_contrast_ok: 'Leitura confortável (contraste AA)',
+  apply_scope: 'O que aplicar', scope_tudo: 'Tudo (tema, blocos, menu, rodapé e SEO)', scope_tema: 'Só o tema (cores, fonte e estilos)', scope_blocos: 'Só os blocos e páginas',
+  apply_langs: 'Idioma do conteúdo', lang_pt: 'Português', lang_en: 'Inglês', apply_langs_hint: 'Escolha um ou os dois.',
+  confirm_apply: 'Isso substitui {scope} no rascunho. Você pode desfazer logo depois. Continuar?',
+  undo_template: 'Desfazer', template_undone: 'Rascunho voltou ao que era antes do template.',
+  change_parts: 'Trocar só a paleta ou o estilo', change_parts_hint: 'Muda só as cores ou a fonte e os estilos; blocos e textos ficam como estão.',
+  apply_palette: 'Aplicar paleta', apply_style: 'Aplicar estilo', parts_applied: 'Tema atualizado no rascunho.',
+  preview_sample: 'Pré-visualização com produtos de exemplo. Nada é gravado.', example_mark: 'Texto de exemplo',
+  close: 'Fechar', cancel: 'Cancelar',
+  api_NOTHING_TO_UNDO: 'Não há template para desfazer (o prazo é de 1 hora).', api_DRAFT_CHANGED: 'O rascunho mudou depois do template; desfazer apagaria essas alterações.',
   // Pesquisa de visitantes (expand-exit-survey-to-dropshipping)
   menu_survey: 'Pesquisa de visitantes', survey_intro: 'Por que visitantes desta loja não compraram, nas páginas em que decidem. O e-mail do visitante nunca aparece aqui.',
   survey_bias: 'A amostra é viesada: só responde quem ainda estava na página e quis responder.', survey_off: 'A pesquisa está desligada nesta loja. Ligue em Configurações.',
@@ -81,6 +95,20 @@ const pt = {
 };
 
 const en = {
+  check_example: "Template sample texts replaced with your own",
+  gallery: 'Templates', gallery_intro: 'Pick a starting point. Applying changes only the draft; the published store stays the same until you publish.',
+  gallery_category: 'Category', gallery_style: 'Style', gallery_all: 'All', gallery_empty: 'No template matches this filter.',
+  gallery_preview: 'Preview', gallery_choose: 'Choose', gallery_selected: 'Chosen', gallery_free: 'Mix and match',
+  gallery_layout: 'Layout', gallery_palette: 'Palette', gallery_contrast_ok: 'Comfortable reading (AA contrast)',
+  apply_scope: 'What to apply', scope_tudo: 'Everything (theme, blocks, menu, footer and SEO)', scope_tema: 'Theme only (colors, font and styles)', scope_blocos: 'Blocks and pages only',
+  apply_langs: 'Content language', lang_pt: 'Portuguese', lang_en: 'English', apply_langs_hint: 'Choose one or both.',
+  confirm_apply: 'This replaces {scope} in the draft. You can undo right after. Continue?',
+  undo_template: 'Undo', template_undone: 'The draft is back to what it was before the template.',
+  change_parts: 'Change only the palette or the style', change_parts_hint: 'Changes only the colors, or the font and styles; blocks and texts stay as they are.',
+  apply_palette: 'Apply palette', apply_style: 'Apply style', parts_applied: 'Theme updated in the draft.',
+  preview_sample: 'Preview with sample products. Nothing is saved.', example_mark: 'Sample text',
+  close: 'Close', cancel: 'Cancel',
+  api_NOTHING_TO_UNDO: 'There is no template to undo (the limit is 1 hour).', api_DRAFT_CHANGED: 'The draft changed after the template; undoing would erase those changes.',
   menu_survey: 'Visitor survey', survey_intro: 'Why visitors of this store did not buy, on the pages where they decide. The visitor e-mail never shows here.',
   survey_bias: 'The sample is biased: only people still on the page who chose to answer respond.', survey_off: 'The survey is off for this store. Turn it on in Settings.',
   survey_free_text: 'The comment is written by the visitor and may contain personal data. Use it only to improve the store and do not copy it outside the panel.',

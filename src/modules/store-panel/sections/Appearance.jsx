@@ -5,21 +5,21 @@ import { useLang } from '../LangContext';
 import { BASE, usePanel } from '../PanelContext';
 import { validateTema } from '../rules';
 import { fieldErrors } from '../errors';
+import TemplateGallery from './TemplateGallery';
 
 const COLORS = ['primaria', 'secundaria', 'fundo', 'texto', 'destaque'];
 const FONTS = ['sistema', 'serifada', 'moderna', 'arredondada', 'monoespacada'];
 const BUTTONS = ['arredondado', 'quadrado', 'pilula'];
 const CARDS = ['sombra', 'borda', 'plano'];
 
-/** Aparência: logo, imagens, cores, fonte e estilos; ou partir de um template. Grava no rascunho (publicar é no Visão geral). */
+/** Aparência: logo, imagens, cores, fonte e estilos; ou partir de um template da galeria. Grava no rascunho (publicar é no Visão geral). */
 export default function Appearance() {
   const { t, err } = useLang();
   const { store, config, access, reload, notify } = usePanel();
-  const [tema, setTema] = useState({}); const [templates, setTemplates] = useState([]); const [tpl, setTpl] = useState('');
+  const [tema, setTema] = useState({});
   const [busy, setBusy] = useState(false); const [serverErrors, setServerErrors] = useState({});
   const editable = access === 'edit';
   useEffect(() => { setTema(JSON.parse(JSON.stringify(config?.rascunho?.tema ?? {}))); }, [config]);
-  useEffect(() => { api.get('/api/v1/dropshipping/storefront/templates').then((r) => setTemplates(r.data ?? [])).catch(() => {}); }, []);
 
   const errors = validateTema(tema);
   const hasError = Object.keys(errors).length > 0;
@@ -33,12 +33,6 @@ export default function Appearance() {
     try { await api.put(`${BASE(store.id)}/storefront/draft`, { tema: out }); notify('success', t('saved_draft')); await reload(); }
     catch (e) { setServerErrors(fieldErrors(e)); notify('error', err(e)); } finally { setBusy(false); }
   };
-  const applyTemplate = async () => {
-    if (!tpl || !window.confirm(t('confirm_template'))) return;
-    setBusy(true);
-    try { await api.post(`${BASE(store.id)}/storefront/template`, { template: tpl }); notify('success', t('template_applied')); await reload(); }
-    catch (e) { notify('error', err(e)); } finally { setBusy(false); }
-  };
   const text = (key, label) => (
     <TextField fullWidth size="small" label={label} value={tema[key] ?? ''} disabled={!editable} onChange={(e) => setTema({ ...tema, [key]: e.target.value })}
       error={!!errors[key]} helperText={errors[key] ? t(errors[key]) : ''} inputProps={{ 'data-testid': `field-${key}` }} />
@@ -51,15 +45,7 @@ export default function Appearance() {
   );
   return (
     <Box sx={{ display: 'grid', gap: 2 }}>
-      {editable && (
-        <Paper sx={{ p: 2, display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
-          <Typography variant="subtitle1">{t('template')}</Typography>
-          <Select size="small" value={tpl} displayEmpty onChange={(e) => setTpl(e.target.value)} sx={{ minWidth: 220 }} data-testid="template-select">
-            <MenuItem value="">{t('choose_template')}</MenuItem>{templates.map((x) => <MenuItem key={x.id} value={x.id}>{x.nome}</MenuItem>)}
-          </Select>
-          <Button onClick={applyTemplate} disabled={!tpl || busy} data-testid="apply-template">{t('apply_template')}</Button>
-        </Paper>
-      )}
+      {editable && <TemplateGallery />}
       <Paper sx={{ p: 2, display: 'grid', gap: 2 }}>
         <Typography variant="h6">{t('menu_appearance')}</Typography>
         {text('logo_url', t('logo_url'))}{text('favicon_url', t('favicon_url'))}{text('banner_url', t('banner_url'))}
