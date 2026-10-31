@@ -8,6 +8,7 @@ import * as rules from '../src/modules/store-panel/rules.js';
 import * as err from '../src/modules/store-panel/errors.js';
 import * as blocks from '../src/modules/store-panel/blocks.js';
 import * as tpl from '../src/modules/store-panel/templates.js';
+import * as ai from '../src/modules/store-panel/ai.js';
 
 const dir = path.join(path.dirname(fileURLToPath(import.meta.url)), '../src/modules/store-panel');
 const { pt, en } = i18n.DICTIONARIES;
@@ -39,7 +40,7 @@ const VALUES = {
   role_: perm.ROLES, menu_: perm.SECTIONS.map((s) => s.id), status_: Object.values(rules.STORE_STATUS), block_: ['hero', 'produtos_destaque', 'texto', 'imagem', 'faq', 'depoimentos', 'newsletter', 'contato'],
   color_: ['primaria', 'secundaria', 'fundo', 'texto', 'destaque'], font_: ['sistema', 'serifada', 'moderna', 'arredondada', 'monoespacada'],
   button_: ['arredondado', 'quadrado', 'pilula'], card_: ['sombra', 'borda', 'plano'], domain_: ['PENDENTE', 'VERIFICADO'], tls_: ['ATIVO', 'EMITINDO', 'FALHA'],
-  check_: ['product', 'shipping', 'logo', 'business', 'domain', 'example'], scope_: ['tudo', 'tema', 'blocos'], lang_: ['pt', 'en'],
+  check_: ['product', 'shipping', 'logo', 'business', 'domain', 'example'], scope_: ['tudo', 'tema', 'blocos'], lang_: ['pt', 'en'], ai_section_: ['tema', 'blocos', 'paginas', 'menu', 'rodape', 'seo'],
   origin_: ['INICIO', 'CATALOGO', 'PRODUTO', 'CONTEUDO', 'CARRINHO', 'CHECKOUT'],
   reason_: ['PRECO', 'FRETE_PRAZO', 'FORMAS_PAGAMENTO', 'FALTOU_INFO_PRODUTO', 'NAO_CONFIO_LOJA', 'SO_PESQUISANDO', 'MOMENTO_INADEQUADO', 'OUTRO'], field_: [...new Set(Object.values(blocks.BLOCK_FIELDS).flat().map(([k]) => k))],
 };
@@ -156,4 +157,17 @@ assert.equal(blocks.validatePageSlug('carrinho', {}), 'err_page_reserved'); asse
 for (const bad of ['', 'a b', '-x', 'x-', 'ação', 'a'.repeat(41)]) assert.equal(blocks.validatePageSlug(bad, {}), 'err_page_slug', bad);
 assert.deepEqual(blocks.addPage({}, ' Sobre ', ' Quem somos '), { sobre: { titulo: 'Quem somos', blocos: [] } });
 assert.deepEqual(blocks.removePage({ a: { titulo: 'A', blocos: [] }, b: { titulo: 'B', blocos: [] } }, 'a'), { b: { titulo: 'B', blocos: [] } });
+// ── assistente de IA (add-ai-storefront-customization)
+assert.deepEqual(ai.proposeBody('  loja de móveis  ', ['en', 'pt']), { pedido: 'loja de móveis', idiomas: ['pt', 'en'] });
+for (const [p, l] of [['oi', ['pt']], ['x'.repeat(2001), ['pt']], ['loja de móveis', []], ['loja de móveis', ['es']]]) assert.equal(ai.proposeBody(p, l), null);
+assert.deepEqual(ai.acceptBody('id', ['seo', 'tema', 'outra']), { proposta_id: 'id', secoes: ['tema', 'seo'] });
+assert.equal(ai.acceptBody('id', []), null); assert.equal(ai.acceptBody('', ['tema']), null);
+const PROP = { tema: { cores: { primaria: '#111111' }, fonte: 'serifada' }, conteudo: { pt: { blocos: [{ id: 'hero', tipo: 'hero', titulo: 'Olá' }], paginas: {}, menu: [], rodape: { texto: 'r' }, seo: { titulo: 's', descricao: 'd' } }, en: { blocos: [{ id: 'hero', tipo: 'hero', titulo: 'Hi' }], paginas: {}, menu: [], rodape: { texto: 'r-en' }, seo: { titulo: 's', descricao: 'd' } } } };
+const DRAFT = { idiomas: ['pt', 'en'], idioma_padrao: 'pt', blocos: [{ id: 'hero', tipo: 'hero', titulo: 'Olá' }], rodape: { texto: 'r' }, traducoes: { en: { blocos: [{ id: 'hero', tipo: 'hero', titulo: 'Hello' }], rodape: { texto: 'r-en' } } } };
+const dpt = ai.sectionDiff(DRAFT, PROP, 'pt'); const den = ai.sectionDiff(DRAFT, PROP, 'en');
+assert.deepEqual([dpt.tema.changed, dpt.blocos.changed, dpt.rodape.changed, dpt.seo.changed, dpt.menu.changed], [true, false, false, true, false]);
+assert.deepEqual([den.blocos.changed, den.rodape.changed], [true, false]); // em inglês, o bloco muda (Hello → Hi)
+assert.equal(ai.sectionDiff({}, PROP, 'pt').blocos.changed, true);
+assert.deepEqual(ai.previewConfig(PROP, 'en'), { tema: PROP.tema, blocos: PROP.conteudo.en.blocos });
+assert.equal(ai.releaseTime(null, 'pt'), ''); assert.equal(ai.releaseTime('lixo', 'pt'), ''); assert.ok(ai.releaseTime('2026-10-31T12:00:00Z', 'en').length > 0);
 console.log('check-store-panel: ok');

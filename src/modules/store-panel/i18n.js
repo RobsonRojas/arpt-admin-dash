@@ -5,6 +5,17 @@ export const LANGS = ['pt', 'en'];
 export const DEFAULT_LANG = 'pt';
 
 const pt = {
+  ai_title: 'Assistente de IA', ai_intro: 'Descreva a loja que você quer. A IA propõe tema, blocos e textos; nada muda até você aceitar, e o que aceitar vai só para o rascunho.',
+  ai_privacy: 'O texto que você escrever e o nome, a descrição e o preço dos produtos da loja vão para um provedor de IA (Anthropic). Não escreva dados pessoais.',
+  ai_request: 'O que você quer na loja?', ai_request_hint: 'Ex.: loja de móveis rústicos, tom acolhedor, verde e madeira.', ai_langs: 'Idioma do conteúdo',
+  ai_propose: 'Pedir proposta', ai_loading: 'Gerando a proposta...', ai_unavailable: 'O assistente de IA está indisponível no momento. Você continua editando a loja à mão.',
+  ai_remaining: 'Propostas disponíveis: {hora} nesta hora, {dia} hoje.', ai_limit: 'Limite de propostas atingido. Libera em {quando}.',
+  ai_proposal: 'Proposta', ai_compare: 'Atual × proposta', ai_unchanged: 'igual ao rascunho', ai_changed: 'muda',
+  ai_section_tema: 'Tema (cores e fonte)', ai_section_blocos: 'Blocos da página inicial', ai_section_paginas: 'Páginas', ai_section_menu: 'Menu', ai_section_rodape: 'Texto do rodapé', ai_section_seo: 'SEO (título e descrição)',
+  ai_count_blocks: '{antes} → {depois} blocos', ai_count_pages: '{antes} → {depois} páginas', ai_count_menu: '{antes} → {depois} itens',
+  ai_accept_selected: 'Aceitar as seções marcadas', ai_discard: 'Descartar', ai_accepted: 'Proposta aplicada ao rascunho. Publique quando quiser.', ai_discarded: 'Proposta descartada. O rascunho não mudou.',
+  ai_preview_lang: 'Ver em',
+  api_AI_UNAVAILABLE: 'O assistente de IA está indisponível.', api_AI_LIMIT_REACHED: 'Limite de propostas atingido.', api_AI_PROVIDER_FAILED: 'O assistente de IA não respondeu. Tente de novo em instantes.', api_AI_PROPOSAL_INVALID: 'Não foi possível gerar uma proposta válida. Tente descrever de outro jeito.', api_AI_PROPOSAL_NOT_FOUND: 'A proposta expirou. Peça outra.',
   check_example: 'Textos de exemplo do template trocados pelos seus',
   gallery: 'Templates', gallery_intro: 'Escolha um ponto de partida. Aplicar muda só o rascunho; a loja publicada continua igual até você publicar.',
   gallery_category: 'Categoria', gallery_style: 'Estilo', gallery_all: 'Todos', gallery_empty: 'Nenhum template com esse filtro.',
@@ -95,6 +106,17 @@ const pt = {
 };
 
 const en = {
+  ai_title: 'AI assistant', ai_intro: 'Describe the store you want. The AI proposes a theme, blocks and texts; nothing changes until you accept, and what you accept goes only to the draft.',
+  ai_privacy: "What you write and the name, description and price of the store's products are sent to an AI provider (Anthropic). Do not write personal data.",
+  ai_request: 'What do you want in the store?', ai_request_hint: 'E.g.: rustic furniture store, warm tone, green and wood.', ai_langs: 'Content language',
+  ai_propose: 'Get a proposal', ai_loading: 'Generating the proposal...', ai_unavailable: 'The AI assistant is unavailable right now. You can still edit the store by hand.',
+  ai_remaining: 'Proposals available: {hora} this hour, {dia} today.', ai_limit: 'Proposal limit reached. Available again at {quando}.',
+  ai_proposal: 'Proposal', ai_compare: 'Current × proposal', ai_unchanged: 'same as the draft', ai_changed: 'changes',
+  ai_section_tema: 'Theme (colors and font)', ai_section_blocos: 'Home page blocks', ai_section_paginas: 'Pages', ai_section_menu: 'Menu', ai_section_rodape: 'Footer text', ai_section_seo: 'SEO (title and description)',
+  ai_count_blocks: '{antes} → {depois} blocks', ai_count_pages: '{antes} → {depois} pages', ai_count_menu: '{antes} → {depois} items',
+  ai_accept_selected: 'Accept the checked sections', ai_discard: 'Discard', ai_accepted: 'Proposal applied to the draft. Publish whenever you like.', ai_discarded: 'Proposal discarded. The draft did not change.',
+  ai_preview_lang: 'View in',
+  api_AI_UNAVAILABLE: 'The AI assistant is unavailable.', api_AI_LIMIT_REACHED: 'Proposal limit reached.', api_AI_PROVIDER_FAILED: 'The AI assistant did not respond. Try again in a moment.', api_AI_PROPOSAL_INVALID: 'We could not generate a valid proposal. Try describing it another way.', api_AI_PROPOSAL_NOT_FOUND: 'The proposal expired. Ask for another one.',
   check_example: "Template sample texts replaced with your own",
   gallery: 'Templates', gallery_intro: 'Pick a starting point. Applying changes only the draft; the published store stays the same until you publish.',
   gallery_category: 'Category', gallery_style: 'Style', gallery_all: 'All', gallery_empty: 'No template matches this filter.',
