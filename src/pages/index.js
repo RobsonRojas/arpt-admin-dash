@@ -31,3 +31,4 @@ export * from './TermsOfUse';
 export * from './AnalyticsPixels';
 export * from './ExitSurvey';
 export * from './GrowthIndicators';
+export * from './Monitoring';

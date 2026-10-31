@@ -58,7 +58,9 @@ export default defineConfig({
             workbox: {
                 maximumFileSizeToCacheInBytes: 5242880,
                 // O worker ativado remove o precache do build anterior (requisito de pwa-support).
-                cleanupOutdatedCaches: true
+                cleanupOutdatedCaches: true,
+                // Notificações de monitoramento (add-admin-service-monitoring, 8.3): handlers `push` e `notificationclick`.
+                importScripts: ['push-sw.js']
             }
         })
     ]

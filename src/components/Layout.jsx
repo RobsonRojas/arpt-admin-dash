@@ -20,7 +20,8 @@ import {
   Storefront,
   Security,
   AutoGraph,
-  Policy
+  Policy,
+  MonitorHeart
 } from '@mui/icons-material';
 import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -80,6 +81,7 @@ export const Layout = ({ children }) => {
     { id: 'gemini-settings', label: 'Configuração IA', icon: <SettingsSuggest />, path: '/gemini-settings' },
     { id: 'developer-settings', label: 'Configurações Dev', icon: <Code />, path: '/developer-settings' },
     { id: 'error-logs', label: 'Log de Erros', icon: <BugReport />, path: '/error-logs' },
+    { id: 'monitoring', label: 'Monitoramento', icon: <MonitorHeart />, path: '/monitoring' },
     { id: 'store-panel', label: 'Minha loja', icon: <Storefront />, path: '/loja' },
     { id: 'dropshipping-admin', label: 'Admin Dropshipping', icon: <Storefront />, path: '/dropshipping-admin' },
     { id: 'orders-admin', label: 'Pedidos Dropshipping', icon: <Storefront />, path: '/orders-admin' },
