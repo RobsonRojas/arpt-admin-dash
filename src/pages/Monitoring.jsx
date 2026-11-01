@@ -296,6 +296,64 @@ export const FilasTab = () => {
     );
 };
 
+/** Estoque preso em reservas por produto (sessões de pagamento abertas). `alerta` vem do servidor, com os mesmos limites do aviso por e-mail. */
+export const ReservasTab = () => {
+    const [dados, setDados] = useState(null);
+    const [erro, setErro] = useState('');
+
+    const carregar = useCallback(async () => {
+        try {
+            const r = await api.get(`${BASE}/reservations`);
+            setDados(r.data); setErro('');
+        } catch (err) { setErro(mensagemServidor(err, 'Não foi possível carregar as reservas de estoque.')); }
+    }, []);
+
+    useEffect(() => {
+        carregar();
+        const t = setInterval(carregar, ATUALIZAR_MS);
+        return () => clearInterval(t);
+    }, [carregar]);
+
+    if (!dados) return erro ? <Alert severity="error">{erro}</Alert> : <Box p={3} textAlign="center"><CircularProgress size={28} /></Box>;
+    const produtos = dados.produtos ?? [];
+    return (
+        <Box>
+            {erro && <Alert severity="error" sx={{ mb: 2 }}>{erro}</Alert>}
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Reservas ativas e ainda não vencidas, dos produtos mais acumulados para os menos. Marcado como "Acúmulo" quando passa de {Math.round((dados.limite_fracao ?? 0.8) * 100)}% do estoque
+                e de {dados.limite_minimo ?? 5} unidades; o administrador também recebe um e-mail. As reservas vencem sozinhas.
+            </Typography>
+            <TableContainer component={Paper}>
+                <Table size="small">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Produto</TableCell>
+                            <TableCell align="right">Estoque</TableCell>
+                            <TableCell align="right">Reservado</TableCell>
+                            <TableCell align="right">% do estoque</TableCell>
+                            <TableCell align="right">Sessões</TableCell>
+                            <TableCell>Situação</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {produtos.map((p) => (
+                            <TableRow key={p.produto_id} data-testid={`reserva-${p.produto_id}`}>
+                                <TableCell>{p.nome || `Produto #${p.produto_id}`} <Typography component="span" variant="caption" color="text.secondary">#{p.produto_id}</Typography></TableCell>
+                                <TableCell align="right">{p.estoque}</TableCell>
+                                <TableCell align="right">{p.reservado}</TableCell>
+                                <TableCell align="right">{Math.round(p.fracao * 100)}%</TableCell>
+                                <TableCell align="right">{p.sessoes}</TableCell>
+                                <TableCell>{p.alerta ? <Chip size="small" color="warning" label="Acúmulo" data-reserva-alerta="1" /> : <Chip size="small" label="Normal" />}</TableCell>
+                            </TableRow>
+                        ))}
+                        {!produtos.length && <TableRow><TableCell colSpan={6}><Typography variant="body2" color="text.secondary">Nenhuma reserva ativa no momento.</Typography></TableCell></TableRow>}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Box>
+    );
+};
+
 export const Monitoring = () => {
     const [aba, setAba] = useState(0);
     return (
@@ -309,9 +367,10 @@ export const Monitoring = () => {
                 <Tabs value={aba} onChange={(_e, v) => setAba(v)}>
                     <Tab label="Serviços" />
                     <Tab label="Filas" />
+                    <Tab label="Estoque reservado" />
                 </Tabs>
             </Paper>
-            {aba === 0 ? <ServicosTab /> : <FilasTab />}
+            {aba === 0 ? <ServicosTab /> : aba === 1 ? <FilasTab /> : <ReservasTab />}
         </Box>
     );
 };

@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { api } from '../services/api';
-import { FilasTab, ServicosTab } from './Monitoring';
+import { FilasTab, ReservasTab, ServicosTab } from './Monitoring';
 import { chaveParaBytes, NotificacoesMonitoramento } from '../components/NotificacoesMonitoramento';
 import { duracaoDesde, duracaoSegundos, erroMotivo, resumoAcaoFila, situacaoFila } from '../utils/monitoring';
 
@@ -236,5 +236,37 @@ describe('situação das filas', () => {
         expect(celula('dropshipping-network').querySelector('[data-fila-situacao="warning"]')).not.toBeNull();
         expect(celula('dropshipping-housekeeping').textContent).toMatch(/2 min/);
         expect(celula('dropshipping-housekeeping').querySelector('[data-fila-situacao]')).toBeNull();
+    });
+});
+
+describe('estoque reservado', () => {
+    const RESERVAS = {
+        limite_fracao: 0.8, limite_minimo: 5,
+        produtos: [
+            { produto_id: 7, nome: 'Castanha', estoque: 10, reservado: 9, sessoes: 3, fracao: 0.9, alerta: true },
+            { produto_id: 8, nome: 'Cacau', estoque: 100, reservado: 6, sessoes: 1, fracao: 0.06, alerta: false },
+        ],
+    };
+
+    it('lista os produtos, marca o acúmulo e mostra os limites', async () => {
+        api.get.mockResolvedValue({ data: RESERVAS });
+        render(<ReservasTab />);
+        const linha = await screen.findByTestId('reserva-7');
+        expect(api.get).toHaveBeenCalledWith(`${BASE}/reservations`);
+        expect(linha).toHaveTextContent('Castanha');
+        expect(linha).toHaveTextContent('90%');
+        expect(linha.querySelector('[data-reserva-alerta]')).not.toBeNull();
+        expect(screen.getByTestId('reserva-8').querySelector('[data-reserva-alerta]')).toBeNull();
+        expect(screen.getByText(/passa de 80% do estoque e de 5 unidades/)).toBeInTheDocument();
+    });
+
+    it('sem reservas diz que não há nenhuma; erro do servidor aparece', async () => {
+        api.get.mockResolvedValueOnce({ data: { limite_fracao: 0.8, limite_minimo: 5, produtos: [] } });
+        const { unmount } = render(<ReservasTab />);
+        expect(await screen.findByText('Nenhuma reserva ativa no momento.')).toBeInTheDocument();
+        unmount();
+        api.get.mockRejectedValueOnce({ response: { data: { error: 'sem permissão' } } });
+        render(<ReservasTab />);
+        expect(await screen.findByText('sem permissão')).toBeInTheDocument();
     });
 });
