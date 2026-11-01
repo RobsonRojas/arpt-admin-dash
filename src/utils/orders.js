@@ -114,7 +114,7 @@ export function apiError(err, fallback = 'Algo deu errado. Tente de novo.') {
 // O frete é do produtor: não entra na margem da loja nem na comissão. Aqui só se formata o que a API devolve.
 
 export const DEBIT_TYPE_LABEL = {
-    DEVOLUCAO: 'Devolução (produto e frete)', LOGISTICA_REVERSA: 'Logística reversa', MARGEM_NEGATIVA: 'Margem negativa',
+    DEVOLUCAO: 'Devolução (produto e frete)', LOGISTICA_REVERSA: 'Logística reversa', EXTRAVIO: 'Extravio (prejuízo dividido)', MARGEM_NEGATIVA: 'Margem negativa',
     CONTESTACAO: 'Pagamento contestado', REEMBOLSO_EXTERNO: 'Reembolso feito fora do sistema',
 };
 export const debitTypeLabel = (t) => DEBIT_TYPE_LABEL[t] ?? t ?? '—';
@@ -160,6 +160,22 @@ export function parseReverseCost(raw, order) {
     if (Math.round(n * 100) > teto) return { ok: false, error: `O custo não pode passar do total pago pelo sub-pedido (${money(teto / 100)}).` };
     return { ok: true, value: Math.round(n * 100) / 100 };
 }
+
+/**
+ * Prejuízo do extravio digitado (aceita vírgula). Diferente do custo da logística reversa, ZERO vale: a transportadora indenizou tudo e ninguém é debitado.
+ * Mesmo teto do servidor: total pago pelo sub-pedido (produtos mais frete).
+ */
+export function parseLostCost(raw, order) {
+    const txt = String(raw ?? '').trim();
+    const n = Number(txt.replace(/\./g, '').replace(',', '.'));
+    if (txt === '' || !Number.isFinite(n) || n < 0) return { ok: false, error: 'Informe o prejuízo (0 se a transportadora indenizou tudo).' };
+    const teto = cents(order?.valor_total) + cents(order?.valor_frete);
+    if (Math.round(n * 100) > teto) return { ok: false, error: `O prejuízo não pode passar do total pago pelo sub-pedido (${money(teto / 100)}).` };
+    return { ok: true, value: Math.round(n * 100) / 100 };
+}
+
+/** O servidor, com a responsabilidade do extravio dividida, recusa o cancelamento sem o prejuízo: a tela então o pergunta. */
+export const exigePrejuizoDoExtravio = (err) => err?.response?.data?.code === 'EXTRAVIO_CUSTO_OBRIGATORIO';
 
 /** Pedido devolvido que ainda aguarda o registro do custo da logística reversa. */
 export const needsReverseCost = (order) => order?.status === 'DEVOLVIDO' && (order.custo_logistica_reversa === null || order.custo_logistica_reversa === undefined);

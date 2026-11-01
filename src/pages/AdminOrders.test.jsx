@@ -88,6 +88,34 @@ describe('aba de enviados sem confirmação', () => {
         expect(window.confirm.mock.calls.at(-1)[0]).toMatch(/reembolsado integralmente.*estoque NÃO volta/);
     });
 
+    it('extraviado com responsabilidade dividida: o servidor pede o prejuízo, a tela o pergunta (zero vale) e reenvia o cancelamento', async () => {
+        shipped = [ENVIADO(3, { status: 'EXTRAVIADO', valor_total: 100, valor_frete: 20 })];
+        api.post.mockImplementation((url, corpo) => (url.endsWith('/cancel') && corpo?.custo_extravio === undefined
+            ? Promise.reject({ response: { data: { code: 'EXTRAVIO_CUSTO_OBRIGATORIO', error: 'Informe o prejuízo.' } } })
+            : Promise.resolve({ data: {} })));
+        await abrirAba(/Enviados sem confirmação/);
+        await userEvent.click(within(linha(3)).getByRole('button', { name: 'Cancelar e reembolsar' }));
+        const dialogo = await screen.findByRole('dialog');
+        expect(within(dialogo).getByText(/dividido meio a meio/)).toBeTruthy();
+        await userEvent.click(within(dialogo).getByRole('button', { name: 'Cancelar e reembolsar' }));
+        expect(within(dialogo).getByText(/Informe o prejuízo/)).toBeTruthy(); // vazio não envia
+        await userEvent.type(within(dialogo).getByLabelText('Prejuízo do extravio (R$)'), '500');
+        await userEvent.click(within(dialogo).getByRole('button', { name: 'Cancelar e reembolsar' }));
+        expect(within(dialogo).getByText(/não pode passar do total pago/)).toBeTruthy(); // teto: R$ 120,00
+        await userEvent.clear(within(dialogo).getByLabelText('Prejuízo do extravio (R$)'));
+        await userEvent.type(within(dialogo).getByLabelText('Prejuízo do extravio (R$)'), '0');
+        await userEvent.click(within(dialogo).getByRole('button', { name: 'Cancelar e reembolsar' }));
+        await waitFor(() => expect(api.post).toHaveBeenCalledWith(`${A}/orders/3/cancel`, { motivo: 'Extravio confirmado', custo_extravio: 0 }));
+    });
+
+    it('outro erro ao cancelar o extraviado aparece como erro, sem abrir o diálogo do prejuízo', async () => {
+        api.post.mockRejectedValue({ response: { data: { code: 'CANCEL_NOT_ALLOWED', error: 'Não pode cancelar.' } } });
+        await abrirAba(/Enviados sem confirmação/);
+        await userEvent.click(within(linha(3)).getByRole('button', { name: 'Cancelar e reembolsar' }));
+        expect(await screen.findByText('Não pode cancelar.')).toBeTruthy();
+        expect(screen.queryByText(/Prejuízo do extravio/)).toBeNull();
+    });
+
     it('lista vazia e falha só da consulta de enviados não derrubam a tela', async () => {
         shipped = [];
         await abrirAba(/Enviados sem confirmação/);

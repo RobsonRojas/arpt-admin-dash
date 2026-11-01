@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import { api } from '../services/api';
 import {
-  apiError, beneficiaryLabel, dateTime, deadlineText, debitTypeLabel, freightBreakdown, freightText, holdReasonLabel, money, needsReverseCost,
+  apiError, beneficiaryLabel, exigePrejuizoDoExtravio, parseLostCost, dateTime, deadlineText, debitTypeLabel, freightBreakdown, freightText, holdReasonLabel, money, needsReverseCost,
   batchResultText, canConfirmShipped, canReopenPayout, daysShippedText, openDebitTotal, shippedAttention, trackingStatusLabel, parseReverseCost, payoutStatusLabel, reverseLogisticsSplit, slaDelay, slaRate, statusColor, statusLabel, STATUS_LABEL,
 } from '../utils/orders';
 
@@ -23,6 +23,10 @@ export const AdminOrders = () => {
   const [selected, setSelected] = useState([]);
   const [lost, setLost] = useState(null); // { order }
   const [lostReason, setLostReason] = useState('');
+  // Cancelar extraviado com a responsabilidade dividida: o servidor pede o prejuízo; este é o diálogo para informá-lo.
+  const [lostLoss, setLostLoss] = useState(null); // { order }
+  const [lostLossValue, setLostLossValue] = useState('');
+  const [lostLossError, setLostLossError] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -99,8 +103,24 @@ export const AdminOrders = () => {
   };
   const lostFound = (o) => window.confirm(`O sub-pedido #${o.id} foi encontrado e entregue? O prazo de arrependimento começa agora e o repasse segue o fluxo normal.`)
     && act(`found-${o.id}`, () => api.post(`${A}/orders/${o.id}/deliver`), 'Entrega confirmada.');
-  const lostCancel = (o) => window.confirm(`Cancelar o sub-pedido extraviado #${o.id}? O cliente será reembolsado integralmente (produtos e frete), os repasses pendentes são cancelados e o estoque NÃO volta (a mercadoria se perdeu).`)
-    && act(`lostcancel-${o.id}`, () => api.post(`${A}/orders/${o.id}/cancel`, { motivo: 'Extravio confirmado' }), 'Extravio cancelado e cliente reembolsado.');
+  const lostCancel = async (o) => {
+    if (!window.confirm(`Cancelar o sub-pedido extraviado #${o.id}? O cliente será reembolsado integralmente (produtos e frete), os repasses pendentes são cancelados e o estoque NÃO volta (a mercadoria se perdeu).`)) return;
+    setBusy(`lostcancel-${o.id}`); setNotice(''); setError('');
+    try {
+      await api.post(`${A}/orders/${o.id}/cancel`, { motivo: 'Extravio confirmado' });
+      setNotice('Extravio cancelado e cliente reembolsado.'); await load();
+    } catch (err) {
+      // Responsabilidade dividida: nada foi cancelado; pergunta o prejuízo e reenvia.
+      if (exigePrejuizoDoExtravio(err)) { setLostLoss({ order: o }); setLostLossValue(''); setLostLossError(''); } else setError(apiError(err));
+    } finally { setBusy(null); }
+  };
+  const confirmLostLoss = () => {
+    const order = lostLoss.order;
+    const parsed = parseLostCost(lostLossValue, order);
+    if (!parsed.ok) { setLostLossError(parsed.error); return; }
+    setLostLoss(null);
+    act(`lostcancel-${order.id}`, () => api.post(`${A}/orders/${order.id}/cancel`, { motivo: 'Extravio confirmado', custo_extravio: parsed.value }), 'Extravio cancelado, cliente reembolsado e prejuízo dividido entre produtor e loja.');
+  };
   const registerReturn = (o) => { setReverse({ order: o, registerReturn: true }); setReverseCost(''); setReverseError(''); };
   const registerReverseCost = (o) => { setReverse({ order: o, registerReturn: false }); setReverseCost(''); setReverseError(''); };
   const confirmReverse = () => {
@@ -370,6 +390,22 @@ export const AdminOrders = () => {
         <DialogActions>
           <Button onClick={() => setLost(null)}>Voltar</Button>
           <Button variant="contained" color="error" disabled={lostReason.trim().length < 3} onClick={markLost}>Marcar extraviado</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={!!lostLoss} onClose={() => setLostLoss(null)} fullWidth maxWidth="xs">
+        <DialogTitle>Prejuízo do extravio do sub-pedido #{lostLoss?.order?.id}</DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ mb: 2 }}>
+            O extravio está configurado para ser dividido: informe o prejuízo líquido, o que a transportadora NÃO indenizou. Ele é dividido meio a meio entre o produtor e o dono da loja
+            (o centavo ímpar fica com a ARPT) e abatido dos próximos repasses de cada um. Se a transportadora indenizou tudo, informe 0. O cliente é reembolsado por inteiro de qualquer forma.
+          </DialogContentText>
+          <TextField autoFocus fullWidth label="Prejuízo do extravio (R$)" value={lostLossValue} error={!!lostLossError} helperText={lostLossError || ' '}
+            onChange={(e) => { setLostLossValue(e.target.value); setLostLossError(''); }} inputProps={{ inputMode: 'decimal' }} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setLostLoss(null)}>Voltar</Button>
+          <Button variant="contained" color="error" onClick={confirmLostLoss}>Cancelar e reembolsar</Button>
         </DialogActions>
       </Dialog>
 
