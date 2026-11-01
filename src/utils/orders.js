@@ -20,12 +20,17 @@ export const STATUS_COLOR = {
 export const statusLabel = (s) => STATUS_LABEL[s] ?? s ?? '—';
 export const statusColor = (s) => STATUS_COLOR[s] ?? 'default';
 
-export const PAYOUT_STATUS_LABEL = { PENDENTE: 'Pendente', RETIDO: 'Retido', LIBERADO: 'Liberado', CANCELADO: 'Cancelado' };
+export const PAYOUT_STATUS_LABEL = { PENDENTE: 'Pendente', RETIDO: 'Retido', EM_TRANSFERENCIA: 'Em transferência', LIBERADO: 'Liberado', CANCELADO: 'Cancelado', FALHA: 'Falhou' };
+/** Só o repasse em FALHA (limite de tentativas atingido) pode ser reaberto pelo administrador. */
+export const canReopenPayout = (r) => r?.status === 'FALHA';
+export const payoutStatusColor = (s) => (s === 'FALHA' ? 'error' : s === 'LIBERADO' ? 'success' : s === 'RETIDO' ? 'warning' : 'default');
 export const payoutStatusLabel = (s) => PAYOUT_STATUS_LABEL[s] ?? s ?? '—';
 
 export const HOLD_REASON_LABEL = {
     SEM_CONTA: 'Sem conta de recebimento',
     CONTA_NAO_ATIVA: 'Conta de recebimento ainda não ativa',
+    MARGEM_NEGATIVA: 'Margem negativa (vira débito)',
+    CONTESTACAO: 'Pagamento contestado pelo cliente',
 };
 export const holdReasonLabel = (m) => (m ? HOLD_REASON_LABEL[m] ?? m : '');
 
@@ -107,7 +112,10 @@ export function apiError(err, fallback = 'Algo deu errado. Tente de novo.') {
 // ───────── frete (route-shipping-fee-to-producer) ─────────
 // O frete é do produtor: não entra na margem da loja nem na comissão. Aqui só se formata o que a API devolve.
 
-export const DEBIT_TYPE_LABEL = { DEVOLUCAO: 'Devolução (produto e frete)', LOGISTICA_REVERSA: 'Logística reversa' };
+export const DEBIT_TYPE_LABEL = {
+    DEVOLUCAO: 'Devolução (produto e frete)', LOGISTICA_REVERSA: 'Logística reversa', MARGEM_NEGATIVA: 'Margem negativa',
+    CONTESTACAO: 'Pagamento contestado', REEMBOLSO_EXTERNO: 'Reembolso feito fora do sistema',
+};
 export const debitTypeLabel = (t) => DEBIT_TYPE_LABEL[t] ?? t ?? '—';
 
 const cents = (v) => Math.round(Number(v ?? 0) * 100);

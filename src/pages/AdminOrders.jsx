@@ -6,7 +6,7 @@ import {
 import { api } from '../services/api';
 import {
   apiError, beneficiaryLabel, dateTime, deadlineText, debitTypeLabel, freightBreakdown, freightText, holdReasonLabel, money, needsReverseCost,
-  openDebitTotal, parseReverseCost, payoutStatusLabel, reverseLogisticsSplit, slaDelay, slaRate, statusColor, statusLabel, STATUS_LABEL,
+  canReopenPayout, openDebitTotal, parseReverseCost, payoutStatusLabel, reverseLogisticsSplit, slaDelay, slaRate, statusColor, statusLabel, STATUS_LABEL,
 } from '../utils/orders';
 
 const A = '/api/v1/admin';
@@ -56,6 +56,12 @@ export const AdminOrders = () => {
     const verbo = aprovar ? 'APROVAR o cancelamento (o cliente será reembolsado)' : 'REJEITAR o cancelamento';
     if (!window.confirm(`${verbo} do pedido #${c.subpedido_id}?`)) return;
     act(`dec-${c.id}`, () => api.post(`${A}/orders/cancellations/${c.id}/decision`, { aprovar }), aprovar ? 'Cancelamento aprovado.' : 'Cancelamento rejeitado.');
+  };
+  // Reabre um repasse que falhou depois de todas as tentativas: o valor e a chave de pagamento são os mesmos, e o gateway é consultado antes
+  // de transferir (não paga duas vezes). O job de repasses o retoma na próxima execução (até 30 minutos).
+  const reopenPayout = (r) => {
+    if (!window.confirm(`Reabrir o repasse #${r.id} (${money(r.valor)}) de ${beneficiaryLabel(r.beneficiario_tipo)}? Confira antes se a conta de recebimento e o saldo no gateway estão em ordem.`)) return;
+    act(`reopen-${r.id}`, () => api.post(`${A}/payouts/${r.id}/reopen`), 'Repasse reaberto: será tentado na próxima execução do job de repasses.');
   };
   const deliver = (o) => window.confirm(`Confirmar a entrega do pedido #${o.id}? O prazo de arrependimento começa agora.`)
     && act(`del-${o.id}`, () => api.post(`${A}/orders/${o.id}/deliver`), 'Entrega confirmada.');
@@ -212,6 +218,16 @@ export const AdminOrders = () => {
                     <TableCell>{beneficiaryLabel(r.beneficiario_tipo)}</TableCell>
                     <TableCell>
                       {payoutStatusLabel(r.status)}
+                      {r.status === 'FALHA' && (
+                        <Typography variant="caption" display="block" color="error.main" data-payout-error>
+                          {r.tentativas} tentativas{r.ultimo_erro ? `: ${r.ultimo_erro}` : ''}
+                        </Typography>
+                      )}
+                      {canReopenPayout(r) && (
+                        <Button size="small" variant="outlined" sx={{ mt: 0.5 }} disabled={busy === `reopen-${r.id}`} data-payout-reopen={r.id} onClick={() => reopenPayout(r)}>
+                          Reabrir
+                        </Button>
+                      )}
                       {r.motivo_retencao && <Typography variant="caption" display="block" color="warning.main">{holdReasonLabel(r.motivo_retencao)}</Typography>}
                     </TableCell>
                     <TableCell align="right">{money(r.valor)}{Number(r.valor_frete_incluido) > 0 && <Typography variant="caption" display="block" color="textSecondary">inclui frete líquido: {money(r.valor_frete_incluido)}</Typography>}{Number(r.valor_compensado) > 0 && <Typography variant="caption" display="block" color="textSecondary">compensado: {money(r.valor_compensado)}</Typography>}</TableCell>
