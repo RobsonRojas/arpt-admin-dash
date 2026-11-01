@@ -2,12 +2,12 @@ import { useCallback, useEffect, useState } from 'react';
 import {
     Alert, Box, Button, Checkbox, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormControl,
     InputLabel, MenuItem, Paper, Select, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow,
-    Tabs, TextField, Typography,
+    Tabs, TextField, Tooltip, Typography,
 } from '@mui/material';
 import { api } from '../services/api';
 import {
-    avisoReinicio, dataHora, duracaoDesde, erroMotivo, ESTADOS_JOB, estadoServico, LIMITE_LOTE, MOTIVO_MAX, mensagemServidor,
-    resumoAcaoFila, rotuloEstadoJob,
+    avisoReinicio, dataHora, duracaoDesde, duracaoSegundos, erroMotivo, ESTADOS_JOB, estadoServico, LIMITE_FILA_PARADA_PADRAO_S, LIMITE_LOTE, MOTIVO_MAX, mensagemServidor,
+    resumoAcaoFila, rotuloEstadoJob, situacaoFila,
 } from '../utils/monitoring';
 import { NotificacoesMonitoramento } from '../components/NotificacoesMonitoramento';
 
@@ -125,6 +125,7 @@ export const ServicosTab = () => {
 /** Filas BullMQ: contagens, jobs por estado, reenfileirar falhos e limpar falhos ou concluídos (nunca os em execução). */
 export const FilasTab = () => {
     const [filas, setFilas] = useState(null);
+    const [limiteParada, setLimiteParada] = useState(LIMITE_FILA_PARADA_PADRAO_S);
     const [fila, setFila] = useState('');
     const [estado, setEstado] = useState('failed');
     const [pagina, setPagina] = useState(0);
@@ -139,6 +140,7 @@ export const FilasTab = () => {
         try {
             const r = await api.get(`${BASE}/queues`);
             setFilas(r.data?.filas ?? []);
+            if (Number(r.data?.limite_parada_segundos) > 0) setLimiteParada(Number(r.data.limite_parada_segundos));
             setFila((f) => f || r.data?.filas?.[0]?.nome || '');
         } catch (err) { setErro(mensagemServidor(err, 'Não foi possível carregar as filas.')); }
     }, []);
@@ -188,6 +190,7 @@ export const FilasTab = () => {
                             <TableRow>
                                 <TableCell>Fila</TableCell>
                                 {ESTADOS_JOB.map(([v, r]) => <TableCell key={v} align="right">{r}</TableCell>)}
+                                <TableCell>Espera mais antiga</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -197,6 +200,16 @@ export const FilasTab = () => {
                                     {ESTADOS_JOB.map(([v]) => (
                                         <TableCell key={v} align="right" sx={v === 'failed' && f.contagens?.[v] ? { color: 'error.main', fontWeight: 'bold' } : undefined}>{f.contagens?.[v] ?? 0}</TableCell>
                                     ))}
+                                    <TableCell data-fila-espera={f.nome}>
+                                        {(() => {
+                                            const sit = situacaoFila(f, limiteParada);
+                                            return sit.espera === null ? '—' : (
+                                                <Tooltip title={sit.dica ?? ''} disableHoverListener={!sit.dica}>
+                                                    <span>{duracaoSegundos(sit.espera)}{sit.nivel !== 'ok' && <Chip size="small" label={sit.rotulo} color={sit.nivel} data-fila-situacao={sit.nivel} sx={{ ml: 1 }} />}</span>
+                                                </Tooltip>
+                                            );
+                                        })()}
+                                    </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>

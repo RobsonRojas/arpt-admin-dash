@@ -64,3 +64,29 @@ export const resumoAcaoFila = (r, acao) => {
     if (r?.nao_encontrados) partes.push(`${r.nao_encontrados} não encontrado(s)`);
     return partes.join('; ') + '.';
 };
+
+// ───────── situação das filas (isolate-dropshipping-maintenance-jobs) ─────────
+
+/** Limite de espera usado se a API antiga não o informar; o servidor manda o valor real (`QUEUE_STALE_MINUTES`) junto das filas. */
+export const LIMITE_FILA_PARADA_PADRAO_S = 900;
+
+/** Duração legível de um número de segundos (a espera mais antiga da fila). */
+export const duracaoSegundos = (s) => {
+    if (s === null || s === undefined || !Number.isFinite(Number(s)) || Number(s) < 0) return '—';
+    const agora = Date.now();
+    return duracaoDesde(new Date(agora - Number(s) * 1000).toISOString(), agora);
+};
+
+/**
+ * Situação de uma fila para a tabela. Espera velha SEM nenhum job em execução = parada (ninguém processa: o mesmo critério do alerta ao
+ * administrador); espera velha COM job em execução = lenta; resto = normal. Fila sem job esperando não tem espera. A tela só destaca; quem
+ * decide o alerta é o servidor.
+ */
+export function situacaoFila(fila, limiteSegundos = LIMITE_FILA_PARADA_PADRAO_S) {
+    const espera = fila?.espera_mais_antiga_segundos;
+    if (espera === null || espera === undefined) return { nivel: 'ok', rotulo: 'Sem espera', espera: null };
+    const emExecucao = Number(fila?.contagens?.active ?? 0);
+    if (espera >= limiteSegundos && emExecucao === 0) return { nivel: 'error', rotulo: 'Parada', espera, dica: 'Há jobs esperando e nenhum em execução: confira se o worker está no ar.' };
+    if (espera >= limiteSegundos) return { nivel: 'warning', rotulo: 'Lenta', espera, dica: 'Há jobs esperando há muito tempo, mas a fila está processando.' };
+    return { nivel: 'ok', rotulo: 'Normal', espera };
+}

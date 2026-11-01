@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { api } from '../services/api';
 import { FilasTab, ServicosTab } from './Monitoring';
 import { chaveParaBytes, NotificacoesMonitoramento } from '../components/NotificacoesMonitoramento';
-import { duracaoDesde, erroMotivo, resumoAcaoFila } from '../utils/monitoring';
+import { duracaoDesde, duracaoSegundos, erroMotivo, resumoAcaoFila, situacaoFila } from '../utils/monitoring';
 
 vi.mock('../services/api', () => ({ api: { get: vi.fn(), post: vi.fn(), delete: vi.fn() } }));
 
@@ -191,5 +191,50 @@ describe('notificações no navegador', () => {
         expect(api.delete).toHaveBeenCalledWith(`${BASE}/push/subscriptions`, { data: { endpoint: 'https://push.example/x' } });
         expect(unsubscribe).toHaveBeenCalled();
         expect(await screen.findByRole('button', { name: 'Receber alertas neste navegador' })).toBeInTheDocument();
+    });
+});
+
+/** isolate-dropshipping-maintenance-jobs, 3.3: a tabela de filas mostra a espera mais antiga e destaca fila parada ou lenta. */
+describe('situação das filas', () => {
+    const fila = (espera, active = 0, waiting = 1) => ({ espera_mais_antiga_segundos: espera, contagens: { waiting, active, failed: 0, delayed: 0, completed: 0 } });
+
+    it('sem job esperando não há espera; espera curta é normal', () => {
+        expect(situacaoFila(fila(null, 0, 0))).toMatchObject({ nivel: 'ok', espera: null });
+        expect(situacaoFila({ contagens: {} })).toMatchObject({ nivel: 'ok', espera: null }); // API antiga, sem o campo
+        expect(situacaoFila(fila(120))).toMatchObject({ nivel: 'ok', rotulo: 'Normal', espera: 120 });
+    });
+
+    it('espera acima do limite e NENHUM job em execução = parada; com job em execução = lenta; o limite vem do servidor', () => {
+        expect(situacaoFila(fila(1200, 0))).toMatchObject({ nivel: 'error', rotulo: 'Parada' });
+        expect(situacaoFila(fila(1200, 2))).toMatchObject({ nivel: 'warning', rotulo: 'Lenta' });
+        expect(situacaoFila(fila(899, 0)).nivel).toBe('ok');
+        expect(situacaoFila(fila(900, 0)).nivel).toBe('error'); // no limite já vale
+        expect(situacaoFila(fila(1200, 0), 3600).nivel).toBe('ok'); // QUEUE_STALE_MINUTES=60
+    });
+
+    it('duração em segundos legível; inválido vira traço', () => {
+        expect(duracaoSegundos(30)).toBe('menos de 1 min');
+        expect(duracaoSegundos(600)).toBe('10 min');
+        expect(duracaoSegundos(9000)).toBe('2 h 30 min');
+        for (const v of [null, undefined, -5, 'abc']) expect(duracaoSegundos(v)).toBe('—');
+    });
+
+    it('a tabela mostra a espera de cada fila e o selo só onde há problema, usando o limite que o servidor mandou', async () => {
+        const dados = { limite_parada_segundos: 600, filas: [
+            { nome: 'emailQueue', espera_mais_antiga_segundos: null, contagens: { waiting: 0, active: 0, failed: 0, delayed: 0, completed: 0 } },
+            { nome: 'dropshipping-critical', espera_mais_antiga_segundos: 720, contagens: { waiting: 4, active: 0, failed: 0, delayed: 0, completed: 9 } },
+            { nome: 'dropshipping-network', espera_mais_antiga_segundos: 700, contagens: { waiting: 1, active: 1, failed: 0, delayed: 0, completed: 0 } },
+            { nome: 'dropshipping-housekeeping', espera_mais_antiga_segundos: 120, contagens: { waiting: 1, active: 0, failed: 0, delayed: 0, completed: 0 } },
+        ] };
+        api.get.mockImplementation((url) => Promise.resolve({ data: url.endsWith('/queues') ? dados : { total: 0, jobs: [] } }));
+        render(<FilasTab />);
+        await screen.findByTestId('fila-emailQueue');
+        const celula = (nome) => document.querySelector(`[data-fila-espera="${nome}"]`);
+        expect(celula('emailQueue').textContent).toBe('—');
+        expect(celula('dropshipping-critical').textContent).toMatch(/12 min.*Parada/);
+        expect(celula('dropshipping-critical').querySelector('[data-fila-situacao="error"]')).not.toBeNull();
+        expect(celula('dropshipping-network').querySelector('[data-fila-situacao="warning"]')).not.toBeNull();
+        expect(celula('dropshipping-housekeeping').textContent).toMatch(/2 min/);
+        expect(celula('dropshipping-housekeeping').querySelector('[data-fila-situacao]')).toBeNull();
     });
 });
