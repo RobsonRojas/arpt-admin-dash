@@ -10,11 +10,12 @@ export const STATUS_LABEL = {
     ENTREGUE: 'Entregue',
     CANCELADO: 'Cancelado',
     DEVOLVIDO: 'Devolvido',
+    EXTRAVIADO: 'Extraviado',
 };
 
 export const STATUS_COLOR = {
     PAGO: 'warning', ACEITO: 'info', EM_PRODUCAO: 'info', PRONTO: 'primary', ENVIADO: 'primary',
-    ENTREGUE: 'success', CANCELADO: 'default', DEVOLVIDO: 'error',
+    ENTREGUE: 'success', CANCELADO: 'default', DEVOLVIDO: 'error', EXTRAVIADO: 'error',
 };
 
 export const statusLabel = (s) => STATUS_LABEL[s] ?? s ?? '—';
@@ -162,3 +163,39 @@ export function parseReverseCost(raw, order) {
 
 /** Pedido devolvido que ainda aguarda o registro do custo da logística reversa. */
 export const needsReverseCost = (order) => order?.status === 'DEVOLVIDO' && (order.custo_logistica_reversa === null || order.custo_logistica_reversa === undefined);
+
+// ───────── enviados sem confirmação de entrega (automate-delivery-confirmation-and-lost-shipments) ─────────
+
+export const TRACKING_STATUS_LABEL = {
+    ENTREGUE: 'Entregue (transportadora)', EM_TRANSITO: 'Em trânsito', PROBLEMA: 'Problema no transporte', DESCONHECIDO: 'Sem informação',
+    DESTINO_DIVERGENTE: 'Destino diferente do pedido', ERRO_CONSULTA: 'Consulta ao rastreio falhou',
+};
+export const trackingStatusLabel = (s) => (s ? TRACKING_STATUS_LABEL[s] ?? s : 'Sem consulta automática');
+
+/**
+ * O que chama a atenção numa linha da lista, do mais grave ao menos: extraviado, destino do rastreio diferente, problema informado pela
+ * transportadora, e enviado há mais que o limite sem confirmação (o servidor carimba `alerta_envio_atrasado_em`). `null` = nada a destacar.
+ */
+export function shippedAttention(row) {
+    if (!row) return null;
+    if (row.status === 'EXTRAVIADO') return { level: 'error', text: 'Extraviado: decida entre entregue (achado) e cancelar com reembolso.' };
+    if (row.rastreio_status === 'DESTINO_DIVERGENTE') return { level: 'error', text: 'A transportadora informa entrega para outro CEP: confira o código de rastreio.' };
+    if (row.rastreio_status === 'PROBLEMA') return { level: 'warning', text: 'A transportadora informa problema no transporte.' };
+    if (row.alerta_envio_atrasado_em) return { level: 'warning', text: 'Enviado há muito tempo sem confirmação de entrega.' };
+    return null;
+}
+
+/** Só o ENVIADO entra na confirmação em lote; o extraviado tem decisão própria (achado ou cancelar). */
+export const canConfirmShipped = (row) => row?.status === 'ENVIADO';
+
+export const daysShippedText = (n) => (n === null || n === undefined ? '—' : n === 0 ? 'hoje' : n === 1 ? 'há 1 dia' : `há ${n} dias`);
+
+/** Resumo do resultado da confirmação em lote: quantas entregas e, de cada recusa, o motivo. */
+export function batchResultText(resultados) {
+    const lista = Array.isArray(resultados) ? resultados : [];
+    const ok = lista.filter((r) => r.resultado === 'ENTREGUE').length;
+    const recusados = lista.filter((r) => r.resultado === 'RECUSADO');
+    const partes = [`${ok} entrega${ok === 1 ? '' : 's'} confirmada${ok === 1 ? '' : 's'}`];
+    if (recusados.length) partes.push(`${recusados.length} recusada${recusados.length === 1 ? '' : 's'}: ${recusados.map((r) => `#${r.id} (${r.motivo})`).join('; ')}`);
+    return { text: `${partes.join('. ')}.`, ok, recusados: recusados.length };
+}

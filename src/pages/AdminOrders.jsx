@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  Alert, Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, MenuItem, Paper,
+  Alert, Box, Button, Checkbox, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, MenuItem, Paper,
   Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, TextField, Typography,
 } from '@mui/material';
 import { api } from '../services/api';
 import {
   apiError, beneficiaryLabel, dateTime, deadlineText, debitTypeLabel, freightBreakdown, freightText, holdReasonLabel, money, needsReverseCost,
-  canReopenPayout, openDebitTotal, parseReverseCost, payoutStatusLabel, reverseLogisticsSplit, slaDelay, slaRate, statusColor, statusLabel, STATUS_LABEL,
+  batchResultText, canConfirmShipped, canReopenPayout, daysShippedText, openDebitTotal, shippedAttention, trackingStatusLabel, parseReverseCost, payoutStatusLabel, reverseLogisticsSplit, slaDelay, slaRate, statusColor, statusLabel, STATUS_LABEL,
 } from '../utils/orders';
 
 const A = '/api/v1/admin';
@@ -18,6 +18,11 @@ export const AdminOrders = () => {
   const [cancellations, setCancellations] = useState([]);
   const [sla, setSla] = useState([]);
   const [payouts, setPayouts] = useState(null);
+  // Enviados (e extraviados) sem confirmação de entrega; `selected` são os ids marcados para a confirmação em lote.
+  const [shipped, setShipped] = useState([]);
+  const [selected, setSelected] = useState([]);
+  const [lost, setLost] = useState(null); // { order }
+  const [lostReason, setLostReason] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -30,13 +35,17 @@ export const AdminOrders = () => {
   const load = useCallback(async () => {
     setError('');
     try {
-      const [o, c, s, p] = await Promise.all([
+      const [o, c, s, p, sh] = await Promise.all([
         api.get(`${A}/orders`, { params: statusFilter ? { status: statusFilter } : {} }),
         api.get(`${A}/orders/cancellations`),
         api.get(`${A}/orders/sla`),
         api.get(`${A}/payouts`),
+        // Tolerante: se esta consulta falhar, o resto da tela continua funcionando.
+        api.get(`${A}/orders/shipped`).catch(() => ({ data: [] })),
       ]);
-      setOrders(o.data); setCancellations(c.data); setSla(s.data); setPayouts(p.data);
+      setOrders(o.data); setCancellations(c.data); setSla(s.data); setPayouts(p.data); setShipped(sh.data);
+      // Só continuam marcados os que ainda estão enviados (a lista acabou de ser recarregada).
+      setSelected((atual) => atual.filter((id) => sh.data.some((x) => x.id === id && canConfirmShipped(x))));
     } catch (err) {
       setError(err?.response?.status === 404 ? 'O módulo de pedidos está desligado neste ambiente (ORDERS_ENABLED).' : apiError(err, 'Não foi possível carregar os pedidos.'));
       setOrders([]);
@@ -65,6 +74,33 @@ export const AdminOrders = () => {
   };
   const deliver = (o) => window.confirm(`Confirmar a entrega do pedido #${o.id}? O prazo de arrependimento começa agora.`)
     && act(`del-${o.id}`, () => api.post(`${A}/orders/${o.id}/deliver`), 'Entrega confirmada.');
+  const toggleSelected = (id) => setSelected((a) => (a.includes(id) ? a.filter((x) => x !== id) : [...a, id]));
+  const confirmable = shipped.filter(canConfirmShipped);
+  const allSelected = confirmable.length > 0 && confirmable.every((x) => selected.includes(x.id));
+  const confirmBatch = async () => {
+    if (!window.confirm(`Confirmar a entrega de ${selected.length} sub-pedido(s)? O prazo de arrependimento de cada um começa agora.`)) return;
+    setBusy('batch'); setNotice(''); setError('');
+    try {
+      const { data } = await api.post(`${A}/orders/deliver-batch`, { ids: selected });
+      const r = batchResultText(data.resultados);
+      setSelected([]);
+      // Recarrega ANTES de mostrar o resultado: `load` limpa o erro ao começar e apagaria a mensagem de recusa.
+      await load();
+      // Recusa parcial é erro visível, não sucesso: cada motivo vem do servidor.
+      if (r.recusados) setError(r.text); else setNotice(r.text);
+    } catch (err) { setError(apiError(err)); } finally { setBusy(null); }
+  };
+  const markLost = () => {
+    const order = lost.order;
+    const motivo = lostReason.trim();
+    if (motivo.length < 3) return;
+    setLost(null);
+    act(`lost-${order.id}`, () => api.post(`${A}/orders/${order.id}/lost`, { motivo }), `Sub-pedido #${order.id} marcado como extraviado.`);
+  };
+  const lostFound = (o) => window.confirm(`O sub-pedido #${o.id} foi encontrado e entregue? O prazo de arrependimento começa agora e o repasse segue o fluxo normal.`)
+    && act(`found-${o.id}`, () => api.post(`${A}/orders/${o.id}/deliver`), 'Entrega confirmada.');
+  const lostCancel = (o) => window.confirm(`Cancelar o sub-pedido extraviado #${o.id}? O cliente será reembolsado integralmente (produtos e frete), os repasses pendentes são cancelados e o estoque NÃO volta (a mercadoria se perdeu).`)
+    && act(`lostcancel-${o.id}`, () => api.post(`${A}/orders/${o.id}/cancel`, { motivo: 'Extravio confirmado' }), 'Extravio cancelado e cliente reembolsado.');
   const registerReturn = (o) => { setReverse({ order: o, registerReturn: true }); setReverseCost(''); setReverseError(''); };
   const registerReverseCost = (o) => { setReverse({ order: o, registerReturn: false }); setReverseCost(''); setReverseError(''); };
   const confirmReverse = () => {
@@ -97,6 +133,7 @@ export const AdminOrders = () => {
         <Tab label={`Cancelamentos pendentes${cancellations.length ? ` (${cancellations.length})` : ''}`} />
         <Tab label="SLA dos produtores" />
         <Tab label="Comissões e repasses" />
+        <Tab label={`Enviados sem confirmação${shipped.length ? ` (${shipped.length})` : ''}`} />
       </Tabs>
 
       {tab === 0 && (
@@ -265,6 +302,76 @@ export const AdminOrders = () => {
           </TableContainer>
         </Box>
       )}
+
+      {tab === 4 && (
+        <Box data-shipped-tab>
+          <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+            Sub-pedidos enviados cuja entrega ainda não foi confirmada. Sem rastreio automático, a confirmação é manual e é ela que libera o repasse do produtor
+            (depois do prazo de arrependimento). Extraviado: decida entre entregue (achado) e cancelar com reembolso integral.
+          </Typography>
+          <Box sx={{ mb: 1, display: 'flex', gap: 2, alignItems: 'center' }}>
+            <Button variant="contained" disabled={selected.length === 0 || busy === 'batch'} onClick={confirmBatch} data-confirm-batch>
+              Confirmar entrega dos selecionados{selected.length ? ` (${selected.length})` : ''}
+            </Button>
+          </Box>
+          <TableContainer component={Paper} variant="outlined">
+            <Table size="small">
+              <TableHead><TableRow>
+                <TableCell padding="checkbox"><Checkbox size="small" checked={allSelected} indeterminate={selected.length > 0 && !allSelected} disabled={confirmable.length === 0}
+                  inputProps={{ 'aria-label': 'Selecionar todos os enviados' }} onChange={() => setSelected(allSelected ? [] : confirmable.map((x) => x.id))} /></TableCell>
+                <TableCell>Sub-pedido</TableCell><TableCell>Loja</TableCell><TableCell>Status</TableCell><TableCell>Enviado</TableCell><TableCell>Transportadora e código</TableCell><TableCell>Rastreio</TableCell><TableCell>Ações</TableCell>
+              </TableRow></TableHead>
+              <TableBody>
+                {shipped.length === 0 && <TableRow><TableCell colSpan={8} align="center">Nenhum enviado sem confirmação</TableCell></TableRow>}
+                {shipped.map((o) => {
+                  const atencao = shippedAttention(o);
+                  return (
+                    <TableRow key={o.id} hover data-shipped-row={o.id}>
+                      <TableCell padding="checkbox">
+                        {canConfirmShipped(o) && <Checkbox size="small" checked={selected.includes(o.id)} onChange={() => toggleSelected(o.id)} inputProps={{ 'aria-label': `Selecionar o sub-pedido ${o.id}` }} />}
+                      </TableCell>
+                      <TableCell>#{o.id}<Typography variant="caption" display="block" color="textSecondary">pedido #{o.pedido_id}</Typography></TableCell>
+                      <TableCell>{o.loja_nome}</TableCell>
+                      <TableCell><Chip size="small" label={statusLabel(o.status)} color={statusColor(o.status)} /></TableCell>
+                      <TableCell>{daysShippedText(o.dias_enviado)}<Typography variant="caption" display="block" color="textSecondary">{o.enviado_em ? dateTime(o.enviado_em) : ''}</Typography></TableCell>
+                      <TableCell>{o.transportadora || '—'}<Typography variant="caption" display="block" sx={{ fontFamily: 'monospace' }}>{o.rastreio_codigo || '—'}</Typography></TableCell>
+                      <TableCell>
+                        {trackingStatusLabel(o.rastreio_status)}
+                        {atencao && <Typography variant="caption" display="block" color={`${atencao.level}.main`} data-shipped-attention={atencao.level}>{atencao.text}</Typography>}
+                      </TableCell>
+                      <TableCell>
+                        {o.status === 'ENVIADO' && (<>
+                          <Button size="small" disabled={busy === `del-${o.id}`} onClick={() => deliver({ id: o.id })}>Confirmar entrega</Button>
+                          <Button size="small" color="error" disabled={busy === `lost-${o.id}`} onClick={() => { setLost({ order: o }); setLostReason(''); }}>Marcar extraviado</Button>
+                        </>)}
+                        {o.status === 'EXTRAVIADO' && (<>
+                          <Button size="small" disabled={busy === `found-${o.id}`} onClick={() => lostFound(o)}>Encontrado (entregue)</Button>
+                          <Button size="small" color="error" disabled={busy === `lostcancel-${o.id}`} onClick={() => lostCancel(o)}>Cancelar e reembolsar</Button>
+                        </>)}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+      )}
+
+      <Dialog open={!!lost} onClose={() => setLost(null)} fullWidth maxWidth="xs">
+        <DialogTitle>Marcar o sub-pedido #{lost?.order?.id} como extraviado</DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ mb: 2 }}>
+            O repasse deste sub-pedido não será gerado enquanto estiver extraviado. Depois, marque como entregue (se for encontrado) ou cancele para reembolsar o cliente.
+          </DialogContentText>
+          <TextField autoFocus fullWidth label="Motivo" value={lostReason} onChange={(e) => setLostReason(e.target.value)} inputProps={{ maxLength: 500 }}
+            helperText={lostReason.trim().length < 3 ? 'Informe o motivo (mínimo 3 letras).' : ' '} error={lostReason.length > 0 && lostReason.trim().length < 3} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setLost(null)}>Voltar</Button>
+          <Button variant="contained" color="error" disabled={lostReason.trim().length < 3} onClick={markLost}>Marcar extraviado</Button>
+        </DialogActions>
+      </Dialog>
 
       <Dialog open={!!reverse} onClose={() => setReverse(null)} fullWidth maxWidth="xs">
         <DialogTitle>{reverse?.registerReturn ? `Registrar devolução do pedido #${reverse?.order?.id}` : `Logística reversa do pedido #${reverse?.order?.id}`}</DialogTitle>
