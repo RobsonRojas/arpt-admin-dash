@@ -14,6 +14,7 @@ import { api } from '../services/api';
 import { usePersistence } from '../hooks/usePersistence';
 import { AssignPropertyModal } from '../components/modules/AssignPropertyModal';
 import { StripeConnectModal } from '../components/modules/StripeConnectModal';
+import { ProducerRoleControl } from '../components/modules/ProducerRoleControl';
 
 const ROLES = ['Administrador', 'Gestor', 'Operador', 'Visualizador'];
 const STATUS = ['Ativo', 'Inativo'];
@@ -1150,6 +1151,7 @@ export const Users = () => {
                             </Grid>
                         </Grid>
 
+                    <ProducerRoleControl userId={selectedUser.id} getToken={() => authUser.getIdToken()} />
 
                     <Box mt={3} mb={4} p={2} sx={{ border: '1px solid #e0e0e0', borderRadius: 1 }}>
                         <Typography variant="h6" gutterBottom display="flex" alignItems="center" gap={1} sx={{ fontWeight: 'bold' }}>
