@@ -40,7 +40,7 @@ const VALUES = {
   role_: perm.ROLES, menu_: perm.SECTIONS.map((s) => s.id), status_: Object.values(rules.STORE_STATUS), block_: ['hero', 'produtos_destaque', 'texto', 'imagem', 'faq', 'depoimentos', 'newsletter', 'contato'],
   color_: ['primaria', 'secundaria', 'fundo', 'texto', 'destaque'], font_: ['sistema', 'serifada', 'moderna', 'arredondada', 'monoespacada'],
   button_: ['arredondado', 'quadrado', 'pilula'], card_: ['sombra', 'borda', 'plano'], domain_: ['PENDENTE', 'VERIFICADO'], tls_: ['ATIVO', 'EMITINDO', 'FALHA'],
-  check_: ['product', 'shipping', 'logo', 'business', 'domain', 'example'], scope_: ['tudo', 'tema', 'blocos'], lang_: ['pt', 'en'], ai_section_: ['tema', 'blocos', 'paginas', 'menu', 'rodape', 'seo'],
+  check_: ['product', 'shipping', 'logo', 'business', 'domain', 'example'], scope_: ['tudo', 'tema', 'blocos'], lang_: ['pt', 'en'], ai_section_: ['tema', 'blocos', 'paginas', 'menu', 'rodape', 'seo'], adv_sev_: ['alta', 'media', 'baixa'],
   origin_: ['INICIO', 'CATALOGO', 'PRODUTO', 'CONTEUDO', 'CARRINHO', 'CHECKOUT'],
   reason_: ['PRECO', 'FRETE_PRAZO', 'FORMAS_PAGAMENTO', 'FALTOU_INFO_PRODUTO', 'NAO_CONFIO_LOJA', 'SO_PESQUISANDO', 'MOMENTO_INADEQUADO', 'OUTRO'], field_: [...new Set(Object.values(blocks.BLOCK_FIELDS).flat().map(([k]) => k))],
 };

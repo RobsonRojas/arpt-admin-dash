@@ -7,6 +7,7 @@ import { validateTema } from '../rules';
 import { fieldErrors } from '../errors';
 import TemplateGallery from './TemplateGallery';
 import AiAssistant from './AiAssistant';
+import AiAdvisor from './AiAdvisor';
 
 const COLORS = ['primaria', 'secundaria', 'fundo', 'texto', 'destaque'];
 const FONTS = ['sistema', 'serifada', 'moderna', 'arredondada', 'monoespacada'];
@@ -47,6 +48,7 @@ export default function Appearance() {
   return (
     <Box sx={{ display: 'grid', gap: 2 }}>
       {editable && <AiAssistant />}
+      {editable && <AiAdvisor />}
       {editable && <TemplateGallery />}
       <Paper sx={{ p: 2, display: 'grid', gap: 2 }}>
         <Typography variant="h6">{t('menu_appearance')}</Typography>
