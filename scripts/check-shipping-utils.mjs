@@ -20,6 +20,11 @@ assert.match(s.buildShippingPayload({ length_cm: 'abc' }).error, /Profundidade/)
 assert.ok(s.buildShippingPayload({ width_cm: NaN }).error);
 assert.match(s.buildShippingPayload({ cep_origem: '12' }).error, /CEP de origem/);
 // o primeiro erro vence e nenhum payload é devolvido junto
+// O erro diz qual campo marcar no formulário.
+assert.equal(s.buildShippingPayload({ height_cm: '-3' }).field, 'height_cm');
+assert.equal(s.buildShippingPayload({ width_cm: s.MAX_DIMENSION_CM + 1 }).field, 'width_cm');
+assert.equal(s.buildShippingPayload({ cep_origem: '12' }).field, 'cep_origem');
+assert.equal(s.buildShippingPayload({}).field, undefined);
 const r = s.buildShippingPayload({ weight_grams: '1.5', cep_origem: '12' }); assert.ok(r.error); assert.equal(r.payload, undefined);
 // o que falta para vender com frete
 assert.deepEqual(s.missingShippingLabels({ weight_grams: 1, width_cm: 1, height_cm: 1, length_cm: 1, cep_origem: '69000000' }), []);

@@ -85,6 +85,6 @@ export function buildProductTextAndShipping(form, loaded) {
     const text = buildTextPayload(form, loaded);
     if (text.error) return { error: text.error };
     const shipping = buildShippingPayload(form);
-    if (shipping.error) return { error: shipping.error };
+    if (shipping.error) return { error: shipping.error, field: shipping.field };
     return { payload: { ...text.payload, ...shipping.payload } };
 }

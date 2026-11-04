@@ -53,6 +53,8 @@ export const Products = () => {
     // Form state
     // Form state with Persistence
     const [persistenceKey, setPersistenceKey] = useState(draftKey(null));
+    // Campo de frete recusado no último salvar ({ chave: mensagem }), para marcá-lo no próprio campo.
+    const [shippingFieldError, setShippingFieldError] = useState({});
     const [formData, setFormData, clearDraft] = usePersistence(persistenceKey, {
         nome: '',
         nome_en: '',
@@ -160,6 +162,7 @@ export const Products = () => {
         // We set the initial data immediately. 
         // If a draft exists, the usePersistence hook will overwrite this state asynchronously.
         setFormData(initialData);
+        setShippingFieldError({});
         setOpenDialog(true);
     };
 
@@ -183,6 +186,7 @@ export const Products = () => {
         // Textos por idioma (só o que foi carregado) e frete (peso, medidas e CEP): validados aqui como no servidor, que continua sendo a fonte da verdade.
         const loaded = formData.loaded || NEW_PRODUCT_LANGUAGES;
         const textAndShipping = buildProductTextAndShipping(formData, loaded);
+        setShippingFieldError(textAndShipping.field ? { [textAndShipping.field]: textAndShipping.error } : {});
         if (textAndShipping.error) {
             setSnackbar({ open: true, message: textAndShipping.error, severity: 'warning' });
             return;
@@ -608,37 +612,46 @@ export const Products = () => {
                                 type="number"
                                 fullWidth
                                 value={formData.weight_grams}
-                                onChange={(e) => setFormData({ ...formData, weight_grams: e.target.value })}
+                                error={Boolean(shippingFieldError.weight_grams)}
+                                helperText={shippingFieldError.weight_grams}
+                                onChange={(e) => { setShippingFieldError({}); setFormData({ ...formData, weight_grams: e.target.value }); }}
                             />
                             <TextField
                                 label="Largura (cm)"
                                 type="number"
                                 fullWidth
                                 value={formData.width_cm}
-                                onChange={(e) => setFormData({ ...formData, width_cm: e.target.value })}
+                                error={Boolean(shippingFieldError.width_cm)}
+                                helperText={shippingFieldError.width_cm}
+                                onChange={(e) => { setShippingFieldError({}); setFormData({ ...formData, width_cm: e.target.value }); }}
                             />
                             <TextField
                                 label="Altura (cm)"
                                 type="number"
                                 fullWidth
                                 value={formData.height_cm}
-                                onChange={(e) => setFormData({ ...formData, height_cm: e.target.value })}
+                                error={Boolean(shippingFieldError.height_cm)}
+                                helperText={shippingFieldError.height_cm}
+                                onChange={(e) => { setShippingFieldError({}); setFormData({ ...formData, height_cm: e.target.value }); }}
                             />
                             <TextField
                                 label="Profundidade (cm)"
                                 type="number"
                                 fullWidth
                                 value={formData.length_cm}
-                                onChange={(e) => setFormData({ ...formData, length_cm: e.target.value })}
+                                error={Boolean(shippingFieldError.length_cm)}
+                                helperText={shippingFieldError.length_cm}
+                                onChange={(e) => { setShippingFieldError({}); setFormData({ ...formData, length_cm: e.target.value }); }}
                             />
                         </Box>
                         <TextField
                             label="CEP de origem do envio"
                             fullWidth
                             placeholder="69000-000"
-                            helperText="De onde este produto é despachado. Sem peso, medidas e CEP de origem o produto não é vendido com frete."
+                            error={Boolean(shippingFieldError.cep_origem)}
+                            helperText={shippingFieldError.cep_origem || "De onde este produto é despachado. Sem peso, medidas e CEP de origem o produto não é vendido com frete."}
                             value={formData.cep_origem ?? ''}
-                            onChange={(e) => setFormData({ ...formData, cep_origem: e.target.value })}
+                            onChange={(e) => { setShippingFieldError({}); setFormData({ ...formData, cep_origem: e.target.value }); }}
                             inputProps={{ inputMode: 'numeric' }}
                         />
                         <TextField

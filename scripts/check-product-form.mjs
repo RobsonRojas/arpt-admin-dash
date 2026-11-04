@@ -74,5 +74,9 @@ assert.equal(r.error, undefined); assert.equal(r.payload.width_cm, 0);
 // o erro do nome vence o do frete e nenhum payload sai
 r = f.buildProductTextAndShipping({ nome: 'Curto', weight_grams: '-1' }, { pt: true, en: true });
 assert.match(r.error, /nome/); assert.equal(r.payload, undefined);
+// Nome curto não é campo de frete: nenhum campo de medida fica marcado.
+assert.equal(r.field, undefined);
+r = f.buildProductTextAndShipping({ ...f.formFromProduct(api()), length_cm: '-2' }, { pt: true, en: true });
+assert.equal(r.field, 'length_cm'); assert.equal(r.payload, undefined);
 
 console.log('check-product-form: ok');

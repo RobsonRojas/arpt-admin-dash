@@ -21,7 +21,7 @@ const FIELDS = [
 /**
  * Monta os campos de frete do payload do produto. Em branco ou 0 = não informado (grava 0; sem o dado o produto não
  * é vendido com frete). Peso e medidas são inteiros de 0 até o teto. CEP vazio apaga a origem (`null`).
- * Devolve `{ payload }` ou `{ error }` com a mensagem para o campo.
+ * Devolve `{ payload }` ou `{ error, field }`: a mensagem e a chave do campo inválido, para o formulário marcá-lo.
  */
 export function buildShippingPayload(form) {
     const payload = {};
@@ -29,15 +29,15 @@ export function buildShippingPayload(form) {
         const raw = form?.[key];
         if (raw === '' || raw === null || raw === undefined) { payload[key] = 0; continue; }
         const n = Number(raw);
-        if (!Number.isInteger(n) || n < 0) return { error: `${label}: use um número inteiro, sem casas decimais.` };
-        if (n > max) return { error: `${label}: o máximo é ${max.toLocaleString('pt-BR')}.` };
+        if (!Number.isInteger(n) || n < 0) return { error: `${label}: use um número inteiro, sem casas decimais.`, field: key };
+        if (n > max) return { error: `${label}: o máximo é ${max.toLocaleString('pt-BR')}.`, field: key };
         payload[key] = n;
     }
     const cep = String(form?.cep_origem ?? '').trim();
     if (cep === '') payload.cep_origem = null;
     else {
         const ok = normalizeCep(cep);
-        if (!ok) return { error: 'CEP de origem: informe 8 dígitos (ex.: 69000-000).' };
+        if (!ok) return { error: 'CEP de origem: informe 8 dígitos (ex.: 69000-000).', field: 'cep_origem' };
         payload.cep_origem = ok;
     }
     return { payload };
