@@ -31,7 +31,7 @@ export default function AiAdvisor() {
 
   const rota = `${BASE(store.id)}/storefront/ai`;
   const carregar = () => api.get(`${rota}/advice`).then((r) => setEstado(r.data)).catch(() => setEstado({ disponivel: false, sinais: null, analise: null, dispensadas: [] }));
-  useEffect(() => { carregar(); }, [store.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { carregar(); }, [store.id]);
 
   const analisar = async () => {
     setCarregando(true); setErro(null);
