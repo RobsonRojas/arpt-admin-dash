@@ -4,6 +4,7 @@ import {
   TableCell, TableContainer, TableHead, TableRow, Tabs, TextField, Tooltip, Typography,
 } from '@mui/material';
 import { api } from '../services/api';
+import { PromocaoCampanha } from '../components/PromocaoCampanha';
 import {
   acoesPermitidas, ALERTAS, ativacaoBloqueada, COR_ESTADO, corpoCampanha, errosCampanha, ESTADOS, ETAPAS, METAS, moeda, MOTIVOS_ENCERRAMENTO, percentual,
   previaCustoMaximo,
@@ -111,6 +112,7 @@ function DetalheCampanha({ campanha, tipo, incentivosLigados, onFechar, onAcao, 
   const [erro, setErro] = useState('');
   const [confirmando, setConfirmando] = useState(null);
   const [erroAcao, setErroAcao] = useState('');
+  const [aba, setAba] = useState(0);
   const permitidas = acoesPermitidas(campanha.estado);
   const bloqueadaPorChave = ativacaoBloqueada(tipo, incentivosLigados);
 
@@ -153,9 +155,11 @@ function DetalheCampanha({ campanha, tipo, incentivosLigados, onFechar, onAcao, 
           <Button size="small" variant="outlined" disabled={!permitidas.duplicate} onClick={() => onDuplicar(campanha)}>Duplicar</Button>
           <Button size="small" variant="outlined" onClick={exportar}>Exportar (CSV)</Button>
         </Box>
-        {erro && <Alert severity="error">{erro}</Alert>}
-        {!m && !erro && <CircularProgress size={24} />}
-        {m && (
+        <Tabs value={aba} onChange={(_, v) => setAba(v)} sx={{ mb: 2 }}><Tab label="Resultados" /><Tab label="Promoção" /></Tabs>
+        {aba === 1 && <PromocaoCampanha campanha={campanha} tipo={tipo} />}
+        {aba === 0 && erro && <Alert severity="error">{erro}</Alert>}
+        {aba === 0 && !m && !erro && <CircularProgress size={24} />}
+        {aba === 0 && m && (
           <>
             {m.alertas.map((a) => <Alert key={a} severity="warning" sx={{ mb: 1 }}>{ALERTAS[a]}</Alert>)}
             <Grid container spacing={2} sx={{ mb: 2 }}>

@@ -5,6 +5,13 @@ export const LANGS = ['pt', 'en'];
 export const DEFAULT_LANG = 'pt';
 
 const pt = {
+  camp_title: 'Campanhas para você', camp_empty: 'Nenhuma campanha ativa para o seu perfil no momento.', camp_valid_until: 'Vale até {data}',
+  camp_participating: 'Você participa', camp_see: 'Ver condições', camp_hide: 'Dispensar', camp_join: 'Quero participar', camp_leave: 'Deixar de participar',
+  camp_bonus: 'Cada indicado que criar uma loja soma {passo} ponto(s) percentual(is) na sua comissão, até o teto de {teto}% de comissão total. Cada passo vale por {meses} mês(es).',
+  camp_bonus_rule: 'O bônus vale só para indicações feitas depois da sua adesão: indicados anteriores não geram bônus retroativo.',
+  camp_badge: 'Selo de participante na sua vitrine enquanto a campanha estiver ativa.', camp_materials: 'Acesso antecipado aos materiais de divulgação (kit de imprensa e cartões de compartilhamento).',
+  camp_email_title: 'Convites de campanhas por e-mail', camp_email_text: 'Quero receber convites de campanhas da ARPT por e-mail. Posso mudar de ideia a qualquer momento e todo e-mail traz um link para me descadastrar.',
+  camp_email_help: 'Opcional. Sem esta opção você continua vendo as campanhas aqui, no painel.', camp_saved: 'Preferência salva.', camp_error: 'Não foi possível concluir. Tente de novo.', camp_load_error: 'Não foi possível carregar as campanhas.',
   ai_title: 'Assistente de IA', ai_intro: 'Descreva a loja que você quer. A IA propõe tema, blocos e textos; nada muda até você aceitar, e o que aceitar vai só para o rascunho.',
   ai_privacy: 'O texto que você escrever e o nome, a descrição e o preço dos produtos da loja vão para um provedor de IA (Anthropic). Não escreva dados pessoais.',
   ai_request: 'O que você quer na loja?', ai_request_hint: 'Ex.: loja de móveis rústicos, tom acolhedor, verde e madeira.', ai_langs: 'Idioma do conteúdo',
@@ -116,6 +123,13 @@ const pt = {
 };
 
 const en = {
+  camp_title: 'Campaigns for you', camp_empty: 'No active campaign for your profile right now.', camp_valid_until: 'Valid until {data}',
+  camp_participating: 'You are taking part', camp_see: 'See conditions', camp_hide: 'Dismiss', camp_join: 'I want to take part', camp_leave: 'Stop taking part',
+  camp_bonus: 'Each referral who creates a store adds {passo} percentage point(s) to your commission, up to a {teto}% total commission cap. Each step lasts {meses} month(s).',
+  camp_bonus_rule: 'The bonus only applies to referrals made after you join: earlier referrals do not earn a retroactive bonus.',
+  camp_badge: 'Participant badge on your storefront while the campaign is active.', camp_materials: 'Early access to the promotion materials (press kit and share cards).',
+  camp_email_title: 'Campaign invitations by e-mail', camp_email_text: 'I want to receive ARPT campaign invitations by e-mail. I can change my mind at any time and every e-mail has an unsubscribe link.',
+  camp_email_help: 'Optional. Without it you still see the campaigns here, in the panel.', camp_saved: 'Preference saved.', camp_error: 'Could not complete. Please try again.', camp_load_error: 'Could not load the campaigns.',
   ai_title: 'AI assistant', ai_intro: 'Describe the store you want. The AI proposes a theme, blocks and texts; nothing changes until you accept, and what you accept goes only to the draft.',
   ai_privacy: "What you write and the name, description and price of the store's products are sent to an AI provider (Anthropic). Do not write personal data.",
   ai_request: 'What do you want in the store?', ai_request_hint: 'E.g.: rustic furniture store, warm tone, green and wood.', ai_langs: 'Content language',

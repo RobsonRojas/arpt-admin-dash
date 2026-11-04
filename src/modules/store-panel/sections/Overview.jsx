@@ -6,6 +6,7 @@ import { useLang } from '../LangContext';
 import { BASE, usePanel } from '../PanelContext';
 import { canChangeStoreStatus, canPublishConfig } from '../permissions';
 import { publishChecklist, statusKey, storeUrl } from '../rules';
+import CampaignsCard from '../CampaignsCard';
 
 const BASE_DOMAIN = import.meta.env.VITE_STOREFRONT_BASE_DOMAIN || 'arpt.site';
 const LOCAL_URL = import.meta.env.VITE_STOREFRONT_LOCAL_URL || '';
@@ -94,6 +95,8 @@ export default function Overview() {
           </Box>
         )}
       </Paper>
+      {/* Campanhas de crescimento (campaign-adhesion): aviso, condições e adesão do dono da loja. */}
+      <CampaignsCard />
       <Dialog open={!!preview} onClose={() => setPreview(null)} maxWidth="sm" fullWidth>
         <DialogTitle>{t('preview')}</DialogTitle><DialogContent><PreviewSummary preview={preview} /></DialogContent>
       </Dialog>
