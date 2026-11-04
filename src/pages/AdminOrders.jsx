@@ -166,7 +166,7 @@ export const AdminOrders = () => {
             <Table size="small">
               <TableHead><TableRow>
                 <TableCell>Pedido</TableCell><TableCell>Loja</TableCell><TableCell>Status</TableCell><TableCell>Prazo</TableCell>
-                <TableCell align="right">Total</TableCell><TableCell align="right">Frete (do produtor)</TableCell><TableCell align="right">Produtor</TableCell><TableCell align="right">Comissão</TableCell><TableCell align="right">Margem loja</TableCell><TableCell align="right">Ações</TableCell>
+                <TableCell align="right">Total</TableCell><TableCell align="right">Frete (do produtor)</TableCell><TableCell align="right">Produtor</TableCell><TableCell align="right">Comissão ARPT (bruta)</TableCell><TableCell align="right">Margem loja</TableCell><TableCell align="right">Ações</TableCell>
               </TableRow></TableHead>
               <TableBody>
                 {orders.length === 0 && <TableRow><TableCell colSpan={10} align="center">Nenhum pedido</TableCell></TableRow>}
@@ -183,7 +183,15 @@ export const AdminOrders = () => {
                     <TableCell align="right">{money(o.valor_total)}</TableCell>
                     <TableCell align="right">{freightText(o)}{freightBreakdown(o) && freightBreakdown(o).taxa > 0 && <Typography variant="caption" display="block" color="textSecondary">taxa do gateway: {money(freightBreakdown(o).taxa)}</Typography>}{Number(o.custo_logistica_reversa) > 0 && <Typography variant="caption" display="block" color="error">logística reversa: {money(o.custo_logistica_reversa)}</Typography>}</TableCell>
                     <TableCell align="right">{money(o.valor_produtor)}</TableCell>
-                    <TableCell align="right">{money(o.valor_comissao)}</TableCell>
+                    <TableCell align="right">
+                      {money(o.comissao_bruta ?? o.valor_comissao)}
+                      {Number(o.comissao_repassada) > 0 && (
+                        <>
+                          <Typography variant="caption" display="block" color="textSecondary">repassada ao dropshipper: {money(o.comissao_repassada)} ({Number(o.comissao_dropshipper_percent)}%{Number(o.bonus_percent_aplicado) > 0 ? `, bônus ${Number(o.bonus_percent_aplicado)} p.p.` : ''})</Typography>
+                          <Typography variant="caption" display="block" color="textSecondary">líquida ARPT: {money(o.comissao_liquida)}</Typography>
+                        </>
+                      )}
+                    </TableCell>
                     <TableCell align="right">{money(o.valor_margem)}</TableCell>
                     <TableCell align="right">
                       {o.status === 'ENVIADO' && <Button size="small" disabled={busy === `del-${o.id}`} onClick={() => deliver(o)}>Confirmar entrega</Button>}
@@ -256,7 +264,7 @@ export const AdminOrders = () => {
             {['PRODUTOR', 'DROPSHIPPER', 'ARPT'].map((t) => (
               <Grid item xs={12} sm={4} key={t}>
                 <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
-                  <Typography variant="caption" color="textSecondary">{t === 'ARPT' ? 'Comissão ARPT' : `Total ${beneficiaryLabel(t)}`}</Typography>
+                  <Typography variant="caption" color="textSecondary">{t === 'ARPT' ? 'Comissão ARPT (líquida, após repasse ao dropshipper)' : `Total ${beneficiaryLabel(t)}`}</Typography>
                   <Typography variant="h5" sx={{ fontWeight: 'bold' }}>{money(payouts.totais?.[t] ?? 0)}</Typography>
                 </Paper>
               </Grid>
