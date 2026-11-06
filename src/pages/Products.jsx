@@ -16,6 +16,7 @@ import { api } from '../services/api';
 import { usePersistence } from '../hooks/usePersistence';
 import { NEW_PRODUCT_LANGUAGES, buildProductTextAndShipping, draftKey, formFromProduct, languageWarning } from '../utils/productForm';
 import { MODOS, OFFER_DEFAULTS, buildOfferPayload, leadTimeLabel, modoLabel, offerFormFromProduct } from '../utils/offer';
+import { DescricaoRica } from '../components/dropshipping/DescricaoProduto';
 
 export const Products = () => {
     const { user } = useAuth();
@@ -771,14 +772,14 @@ export const Products = () => {
                             </Grid>
                             <Grid item xs={12}>
                                 <Typography variant="subtitle2" color="textSecondary">Descrição (PT)</Typography>
-                                <Typography variant="body1" paragraph>
-                                    {viewingProduct.info || "Sem descrição."}
-                                </Typography>
+                                {viewingProduct.info?.trim()
+                                    ? <DescricaoRica value={viewingProduct.info} />
+                                    : <Typography variant="body1" paragraph>Sem descrição.</Typography>}
 
                                 <Typography variant="subtitle2" color="textSecondary">Descrição (EN)</Typography>
-                                <Typography variant="body1" paragraph>
-                                    {viewingProduct.translations?.en?.info || viewingProduct.info_en || "No description available."}
-                                </Typography>
+                                {(viewingProduct.translations?.en?.info || viewingProduct.info_en)?.trim()
+                                    ? <DescricaoRica value={viewingProduct.translations?.en?.info || viewingProduct.info_en} />
+                                    : <Typography variant="body1" paragraph>No description available.</Typography>}
 
                                 <Box display="flex" justifyContent="space-between" mt={2}>
                                     <Box>

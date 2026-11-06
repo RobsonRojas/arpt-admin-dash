@@ -28,6 +28,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import ShieldIcon from '@mui/icons-material/Shield';
 import { leadTimeLabel, modoLabel } from '../../utils/offer';
 import StoreOrdersTab from '../../components/orders/StoreOrdersTab';
+import DescricaoRecolhivel from '../../components/dropshipping/DescricaoProduto';
 import { 
   ResponsiveContainer, ComposedChart, Bar, Line, XAxis, YAxis, 
   CartesianGrid, Tooltip, Legend, BarChart, Cell
@@ -551,6 +552,7 @@ export default function Dropshipping() {
                               sx={{ height: 20 }}
                             />
                           </Box>
+                          <DescricaoRecolhivel id={`meu-${prod.id}`} value={prod.descricao} />
                         </CardContent>
                       </Card>
                     </Grid>
@@ -598,6 +600,7 @@ export default function Dropshipping() {
                               sx={{ height: 18 }}
                             />
                           </Box>
+                          <DescricaoRecolhivel id={`disp-${prod.id}`} value={prod.descricao} />
                         </CardContent>
                         <CardActions sx={{ p: 2, pt: 0 }}>
                           <Button 
