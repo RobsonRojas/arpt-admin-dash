@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, Box, Button, Chip, Dialog, DialogContent, DialogTitle, Link, List, ListItem, ListItemText, Paper, Typography } from '@mui/material';
 import { CheckCircle, RadioButtonUnchecked } from '@mui/icons-material';
 import { api } from '../../../services/api';
@@ -39,6 +39,17 @@ export default function Overview() {
   const checklist = publishChecklist({ products, config: draft, domains });
   const status = statusKey(store.status);
   const url = storeUrl({ slug: store.slug, domains, baseDomain: BASE_DOMAIN, localUrl: LOCAL_URL });
+  // Estado do endereço da plataforma (DNS). Em desenvolvimento local o acesso é por caminho e não há o que consultar.
+  // Só `indisponivel` troca o link por um aviso; carregando, `desconhecido` ou falha na consulta mantêm o comportamento de antes.
+  const [endereco, setEndereco] = useState(null);
+  useEffect(() => {
+    if (LOCAL_URL) return undefined;
+    let vivo = true;
+    setEndereco(null);
+    api.get(`${base}/storefront/address`).then((res) => { if (vivo) setEndereco(res.data); }).catch(() => undefined);
+    return () => { vivo = false; };
+  }, [base, domains]);
+  const enderecoInativo = endereco?.estado === 'indisponivel' && endereco?.origem === 'plataforma';
   const canPublish = canPublishConfig(papel);
   const owner = canChangeStoreStatus(papel);
 
@@ -71,7 +82,8 @@ export default function Overview() {
         <Chip label={t(`status_${status}`)} color={status === 'active' ? 'success' : status === 'suspended' ? 'error' : 'default'} data-testid="store-status" />
         {config && <Chip label={config.tem_alteracoes ? t('has_changes') : t('no_changes')} variant="outlined" data-testid="draft-state" />}
         {config?.versao_publicada ? <Typography variant="body2" color="text.secondary">{t('version', { n: config.versao_publicada })}</Typography> : null}
-        {url && <Link href={url} target="_blank" rel="noreferrer" data-testid="store-link">{t('open_store')}</Link>}
+        {url && !enderecoInativo && <Link href={url} target="_blank" rel="noreferrer" data-testid="store-link">{t('open_store')}</Link>}
+        {enderecoInativo && <Alert severity="info" sx={{ flexBasis: '100%' }} data-testid="address-inactive">{t('address_inactive', { endereco: endereco.endereco })}</Alert>}
       </Paper>
 
       <Paper sx={{ p: 2 }}>
@@ -89,7 +101,7 @@ export default function Overview() {
             <Button variant="contained" onClick={publish} disabled={busy || !canPublish || !checklist.canPublish} data-testid="publish">{t('publish')}</Button>
             {owner && store.status === 'ATIVA' && <Button variant="outlined" color="warning" onClick={pause} disabled={busy} data-testid="pause">{t('pause')}</Button>}
             <Button variant="text" onClick={openPreview} data-testid="preview-open">{t('preview')}</Button>
-            {url && <Button variant="outlined" onClick={openLivePreview} data-testid="preview-live" title={t('preview_live_hint')}>{t('preview_live')}</Button>}
+            {url && !enderecoInativo && <Button variant="outlined" onClick={openLivePreview} data-testid="preview-live" title={t('preview_live_hint')}>{t('preview_live')}</Button>}
             {!checklist.canPublish && <Typography variant="body2" color="warning.main" data-testid="missing">{t('missing', { items: missing })}</Typography>}
             {canPublish && !owner && store.status !== 'ATIVA' && <Typography variant="body2" color="text.secondary">{t('owner_activates')}</Typography>}
           </Box>
