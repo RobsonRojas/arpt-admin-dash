@@ -7,6 +7,10 @@ import { AuthProvider } from './contexts/AuthContext.jsx';
 import './styles/index.css';
 
 import { BrowserRouter } from 'react-router-dom';
+import { startVersionWatch } from './pwa/versionWatch';
+import UpdateBanner from './pwa/UpdateBanner';
+
+startVersionWatch();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
@@ -15,6 +19,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                 <AuthProvider>
                     <AdminProvider>
                         <App />
+                        <UpdateBanner />
                     </AdminProvider>
                 </AuthProvider>
             </BrowserRouter>

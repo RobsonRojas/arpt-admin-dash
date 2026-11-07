@@ -4,15 +4,19 @@ import {
     TableRow, TableCell, TableBody, Paper, IconButton, Chip,
     Dialog, DialogTitle, DialogContent, DialogActions, TextField,
     FormControlLabel, Switch, CircularProgress, Alert, Snackbar,
-    Avatar, Grid, useMediaQuery, useTheme
+    Avatar, Grid, useMediaQuery, useTheme, MenuItem
 } from '@mui/material';
 import { Add, Edit, Delete, Visibility, Close, Image as ImageIcon, Search, Refresh, BrokenImage } from '@mui/icons-material';
 import { AIAssistant } from '../components/AIAssistant';
 import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
 import { recordAudit } from '../services/auditLog';
+import { countPending, filterProducts, hasPendingShipping, pendingLabels, reminderSummaryText } from '../utils/shipping';
 import { api } from '../services/api';
 import { usePersistence } from '../hooks/usePersistence';
+import { NEW_PRODUCT_LANGUAGES, buildProductTextAndShipping, draftKey, formFromProduct, languageWarning } from '../utils/productForm';
+import { MODOS, OFFER_DEFAULTS, buildOfferPayload, leadTimeLabel, modoLabel, offerFormFromProduct } from '../utils/offer';
+import { DescricaoRica } from '../components/dropshipping/DescricaoProduto';
 
 export const Products = () => {
     const { user } = useAuth();
@@ -25,6 +29,22 @@ export const Products = () => {
 
     const handleCloseSnackbar = () => setSnackbar(prev => ({ ...prev, open: false }));
 
+    // Acompanhamento do frete (a pendência vem calculada do servidor; aqui só filtra e avisa)
+    const [onlyPending, setOnlyPending] = useState(false);
+    const [reminder, setReminder] = useState({ open: false, busy: false, result: null, error: '' });
+    const pendingCount = countPending(products);
+    const visibleProducts = filterProducts(products, { onlyPending });
+    const runReminder = async (simular) => {
+        setReminder((r) => ({ ...r, busy: true, error: '' }));
+        try {
+            const res = await api.post('/api/v1/admin/producers/shipping-data-reminders', { simular });
+            setReminder({ open: true, busy: false, result: res.data, error: '' });
+        } catch (err) {
+            const msg = err?.response?.status === 429 ? 'Muitos disparos seguidos. Aguarde um minuto.' : (err?.response?.data?.error || 'Não foi possível disparar o aviso.');
+            setReminder((r) => ({ ...r, open: true, busy: false, error: msg }));
+        }
+    };
+
     // Dialog state
     const [openDialog, setOpenDialog] = useState(false);
     const [openViewDialog, setOpenViewDialog] = useState(false);
@@ -33,14 +53,16 @@ export const Products = () => {
 
     // Form state
     // Form state with Persistence
-    const [persistenceKey, setPersistenceKey] = useState('product_draft_new');
+    const [persistenceKey, setPersistenceKey] = useState(draftKey(null));
+    // Campo de frete recusado no último salvar ({ chave: mensagem }), para marcá-lo no próprio campo.
+    const [shippingFieldError, setShippingFieldError] = useState({});
     const [formData, setFormData, clearDraft] = usePersistence(persistenceKey, {
         nome: '',
         nome_en: '',
         info: '',
         info_en: '',
         preco: 0,
-        prazo_entrega_meses: 0,
+        ...OFFER_DEFAULTS,
         is_ativo: true,
         is_physical_reward: false,
         carbon_stored_kg: 0,
@@ -48,8 +70,9 @@ export const Products = () => {
         width_cm: 0,
         height_cm: 0,
         length_cm: 0,
+        cep_origem: '',
         foto_url: '',
-        translations: {}
+        loaded: NEW_PRODUCT_LANGUAGES
     });
 
     // Image Error State for View and Preview
@@ -102,39 +125,27 @@ export const Products = () => {
 
         if (product) {
             setEditingProduct(product);
-            key = `product_draft_${product.id}`;
-            initialData = {
-                nome: product.nome,
-                nome_en: product.nome_en || '',
-                info: product.info,
-                info_en: product.info_en || '',
+            key = draftKey(product.id);
+            // Os textos vêm dos campos explícitos de cada idioma (nome_pt, info_pt, nome_en, info_en): `nome` e `info` chegam traduzidos
+            // conforme o idioma do navegador e gravariam o inglês no campo em português.
+            initialData = formFromProduct(product, {
                 preco: product.preco,
-                prazo_entrega_meses: product.prazo_entrega_meses,
+                ...offerFormFromProduct(product),
                 is_ativo: product.is_ativo,
                 is_physical_reward: product.is_physical_reward || false,
                 carbon_stored_kg: product.carbon_stored_kg || 0,
-                weight_grams: product.weight_grams || 0,
-                width_cm: product.width_cm || 0,
-                height_cm: product.height_cm || 0,
-                length_cm: product.length_cm || 0,
                 foto_url: product.fotos?.[0]?.url || '',
-                translations: product.translations || {}
-            };
-            // Map translations to local fields
-            if (product.translations && product.translations.en) {
-                initialData.nome_en = product.translations.en.nome || '';
-                initialData.info_en = product.translations.en.info || '';
-            }
+            });
         } else {
             setEditingProduct(null);
-            key = 'product_draft_new';
+            key = draftKey(null);
             initialData = {
                 nome: '',
                 nome_en: '',
                 info: '',
                 info_en: '',
                 preco: 0,
-                prazo_entrega_meses: 0,
+                ...OFFER_DEFAULTS,
                 is_ativo: true,
                 is_physical_reward: false,
                 carbon_stored_kg: 0,
@@ -142,8 +153,9 @@ export const Products = () => {
                 width_cm: 0,
                 height_cm: 0,
                 length_cm: 0,
+                cep_origem: '',
                 foto_url: '',
-                translations: {}
+                loaded: NEW_PRODUCT_LANGUAGES
             };
         }
 
@@ -151,6 +163,7 @@ export const Products = () => {
         // We set the initial data immediately. 
         // If a draft exists, the usePersistence hook will overwrite this state asynchronously.
         setFormData(initialData);
+        setShippingFieldError({});
         setOpenDialog(true);
     };
 
@@ -171,34 +184,31 @@ export const Products = () => {
     };
 
     const handleSave = async () => {
-        if (!formData.nome || formData.nome.length < 10) {
-            setSnackbar({ open: true, message: 'O nome do produto deve ter pelo menos 10 caracteres', severity: 'warning' });
+        // Textos por idioma (só o que foi carregado) e frete (peso, medidas e CEP): validados aqui como no servidor, que continua sendo a fonte da verdade.
+        const loaded = formData.loaded || NEW_PRODUCT_LANGUAGES;
+        const textAndShipping = buildProductTextAndShipping(formData, loaded);
+        setShippingFieldError(textAndShipping.field ? { [textAndShipping.field]: textAndShipping.error } : {});
+        if (textAndShipping.error) {
+            setSnackbar({ open: true, message: textAndShipping.error, severity: 'warning' });
+            return;
+        }
+
+        // Prazos e estoque são validados aqui como no servidor.
+        const offer = buildOfferPayload(formData);
+        if (offer.error) {
+            setSnackbar({ open: true, message: offer.error, severity: 'warning' });
             return;
         }
 
         try {
             const payload = {
-                nome: formData.nome,
-                nome_en: formData.nome_en,
-                info: formData.info,
-                info_en: formData.info_en,
+                ...textAndShipping.payload,
                 preco: Number(formData.preco),
-                prazo_entrega_meses: Number(formData.prazo_entrega_meses),
+                ...offer.payload,
                 is_ativo: formData.is_ativo,
                 is_physical_reward: formData.is_physical_reward,
                 carbon_stored_kg: Number(formData.carbon_stored_kg),
-                weight_grams: Number(formData.weight_grams),
-                width_cm: Number(formData.width_cm),
-                height_cm: Number(formData.height_cm),
-                length_cm: Number(formData.length_cm),
-                translations: {
-                    ...(formData.translations || {}),
-                    en: {
-                        nome: formData.nome_en,
-                        info: formData.info_en
-                    }
-                },
-                fotos: formData.foto_url ? [{ src: formData.foto_url, alt: formData.nome.padEnd(10, '_'), type: 'principal' }] : []
+                fotos: formData.foto_url ? [{ src: formData.foto_url, alt: (formData.nome || 'produto').padEnd(10, '_'), type: 'principal' }] : []
             };
 
             const token = await user.getIdToken();
@@ -275,6 +285,9 @@ export const Products = () => {
                     Gestão de Produtos
                 </Typography>
                 <Box display="flex" gap={2}>
+                    <Button onClick={() => setReminder({ open: true, busy: false, result: null, error: '' })} disabled={pendingCount === 0} data-testid="open-reminder">
+                        Avisar produtores
+                    </Button>
                     <Button onClick={fetchProducts} startIcon={<Refresh />}>
                         Atualizar
                     </Button>
@@ -285,6 +298,13 @@ export const Products = () => {
             </Box>
 
             {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+
+            {pendingCount > 0 && (
+                <Alert severity="warning" sx={{ mb: 2 }} data-testid="pending-banner"
+                    action={<FormControlLabel control={<Switch size="small" checked={onlyPending} onChange={(e) => setOnlyPending(e.target.checked)} inputProps={{ 'aria-label': 'Mostrar só produtos sem dados de frete' }} />} label="Só sem dados de frete" />}>
+                    {pendingCount} produto(s) ativo(s) sem dados de frete: não são vendidos com frete até o produtor informar peso, medidas e CEP de origem.
+                </Alert>
+            )}
 
             {loading ? (
                 <Box display="flex" justifyContent="center" p={4}>
@@ -299,13 +319,14 @@ export const Products = () => {
                                 <TableRow>
                                     <TableCell>Produto</TableCell>
                                     <TableCell>Preço</TableCell>
-                                    <TableCell>Prazo (meses)</TableCell>
+                                    <TableCell>Oferta e prazo</TableCell>
+                                    <TableCell>Dados de frete</TableCell>
                                     <TableCell>Status</TableCell>
                                     <TableCell align="right">Ações</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {products.map((row) => (
+                                {visibleProducts.map((row) => (
                                     <TableRow key={row.id} hover>
                                         <TableCell>
                                             <Box display="flex" alignItems="center" gap={2}>
@@ -323,7 +344,19 @@ export const Products = () => {
                                             </Box>
                                         </TableCell>
                                         <TableCell>R$ {row.preco}</TableCell>
-                                        <TableCell>{row.prazo_entrega_meses}</TableCell>
+                                        <TableCell>
+                                            <Chip size="small" label={modoLabel(row.modo_oferta)} color={row.modo_oferta === 'PRONTA_ENTREGA' ? 'success' : 'default'} />
+                                            <Typography variant="body2" color="textSecondary">{leadTimeLabel(row)}</Typography>
+                                        </TableCell>
+                                        <TableCell data-testid={`frete-${row.id}`}>
+                                            {pendingLabels(row.dados_de_frete_pendentes).length === 0
+                                                ? <Chip size="small" color="success" variant="outlined" label="Completo" />
+                                                : (<>
+                                                    <Chip size="small" color={hasPendingShipping(row) ? 'warning' : 'default'} label={hasPendingShipping(row) ? 'Não vende com frete' : 'Incompleto (inativo)'} />
+                                                    <Typography variant="caption" display="block" color="textSecondary">Falta: {pendingLabels(row.dados_de_frete_pendentes).join(', ')}</Typography>
+                                                    {row.produtor_user_id && <Typography variant="caption" display="block" color="textSecondary">Produtor: {row.produtor_user_id}</Typography>}
+                                                </>)}
+                                        </TableCell>
                                         <TableCell>
                                             <Chip
                                                 label={row.is_ativo ? "Ativo" : "Inativo"}
@@ -346,7 +379,7 @@ export const Products = () => {
                                 ))}
                                 {products.length === 0 && (
                                     <TableRow>
-                                        <TableCell colSpan={6} align="center">Nenhum produto encontrado</TableCell>
+                                        <TableCell colSpan={7} align="center">Nenhum produto encontrado</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
@@ -355,7 +388,7 @@ export const Products = () => {
 
                     {/* Mobile Card View */}
                     <Box sx={{ display: { xs: 'flex', md: 'none' }, flexDirection: 'column', gap: 2 }}>
-                        {products.map((row) => (
+                        {visibleProducts.map((row) => (
                             <Paper key={row.id} sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
                                 <Box display="flex" gap={2} alignItems="center">
                                     <Avatar
@@ -385,6 +418,8 @@ export const Products = () => {
                                     />
                                 </Box>
 
+                                {hasPendingShipping(row) && <Alert severity="warning" sx={{ py: 0 }}>Sem dados de frete: {pendingLabels(row.dados_de_frete_pendentes).join(', ')}</Alert>}
+
                                 <Box display="flex" justifyContent="flex-end" gap={1} mt={1}>
                                     <Button size="small" startIcon={<Visibility />} onClick={() => handleOpenView(row)}>
                                         Ver
@@ -410,9 +445,13 @@ export const Products = () => {
                 <DialogTitle>{editingProduct ? 'Editar Produto' : 'Novo Produto'}</DialogTitle>
                 <DialogContent dividers>
                     <Box display="flex" flexDirection="column" gap={2}>
+                        {languageWarning(formData.loaded || NEW_PRODUCT_LANGUAGES) && (
+                            <Alert severity="warning">{languageWarning(formData.loaded || NEW_PRODUCT_LANGUAGES)}</Alert>
+                        )}
                         <TextField
                             label="Nome do Produto (PT)"
                             fullWidth
+                            disabled={!(formData.loaded || NEW_PRODUCT_LANGUAGES).pt}
                             value={formData.nome}
                             onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
                         />
@@ -429,6 +468,7 @@ export const Products = () => {
                             </Box>
                             <TextField
                                 fullWidth
+                                disabled={!(formData.loaded || NEW_PRODUCT_LANGUAGES).en}
                                 value={formData.nome_en}
                                 onChange={(e) => setFormData({ ...formData, nome_en: e.target.value })}
                             />
@@ -446,6 +486,7 @@ export const Products = () => {
                             <TextField
                                 fullWidth
                                 label="Informações Adicionais (PT)"
+                                disabled={!(formData.loaded || NEW_PRODUCT_LANGUAGES).pt}
                                 multiline
                                 rows={3}
                                 value={formData.info}
@@ -466,6 +507,7 @@ export const Products = () => {
                             <TextField
                                 fullWidth
                                 label="Additional Info (EN)"
+                                disabled={!(formData.loaded || NEW_PRODUCT_LANGUAGES).en}
                                 multiline
                                 rows={3}
                                 value={formData.info_en}
@@ -481,12 +523,80 @@ export const Products = () => {
                                 onChange={(e) => setFormData({ ...formData, preco: e.target.value })}
                             />
                             <TextField
-                                label="Prazo de Entrega (meses)"
+                                select
+                                label="Modo de oferta"
+                                fullWidth
+                                value={formData.modo_oferta || 'ENCOMENDA'}
+                                onChange={(e) => setFormData({ ...formData, modo_oferta: e.target.value })}
+                                helperText="Pronta entrega tem estoque; encomenda é produzida sob pedido."
+                            >
+                                {Object.entries(MODOS).map(([value, label]) => (
+                                    <MenuItem key={value} value={value}>{label}</MenuItem>
+                                ))}
+                            </TextField>
+                            {(formData.modo_oferta || 'ENCOMENDA') === 'PRONTA_ENTREGA' ? (
+                                <TextField
+                                    label="Estoque (unidades)"
+                                    type="number"
+                                    fullWidth
+                                    required
+                                    inputProps={{ min: 0, step: 1 }}
+                                    value={formData.estoque ?? ''}
+                                    onChange={(e) => setFormData({ ...formData, estoque: e.target.value })}
+                                />
+                            ) : (
+                                <Box display="flex" gap={2}>
+                                    <TextField
+                                        label="Produção mínima (dias)"
+                                        type="number"
+                                        fullWidth
+                                        required
+                                        inputProps={{ min: 0, step: 1 }}
+                                        value={formData.prazo_producao_dias_min ?? ''}
+                                        onChange={(e) => setFormData({ ...formData, prazo_producao_dias_min: e.target.value })}
+                                    />
+                                    <TextField
+                                        label="Produção máxima (dias)"
+                                        type="number"
+                                        fullWidth
+                                        required
+                                        inputProps={{ min: 0, step: 1 }}
+                                        value={formData.prazo_producao_dias_max ?? ''}
+                                        onChange={(e) => setFormData({ ...formData, prazo_producao_dias_max: e.target.value })}
+                                    />
+                                </Box>
+                            )}
+                            <TextField
+                                label="Prazo de despacho (dias)"
                                 type="number"
                                 fullWidth
-                                value={formData.prazo_entrega_meses}
-                                onChange={(e) => setFormData({ ...formData, prazo_entrega_meses: e.target.value })}
+                                required={(formData.modo_oferta || 'ENCOMENDA') === 'PRONTA_ENTREGA'}
+                                inputProps={{ min: 0, step: 1 }}
+                                value={formData.prazo_despacho_dias ?? ''}
+                                onChange={(e) => setFormData({ ...formData, prazo_despacho_dias: e.target.value })}
+                                helperText="O frete é somado pelo servidor na cotação."
                             />
+                            <Box display="flex" gap={2}>
+                                <TextField
+                                    label="Capacidade semanal (opcional)"
+                                    type="number"
+                                    fullWidth
+                                    inputProps={{ min: 0, step: 1 }}
+                                    value={formData.capacidade_semanal ?? ''}
+                                    onChange={(e) => setFormData({ ...formData, capacidade_semanal: e.target.value })}
+                                />
+                                {(formData.modo_oferta || 'ENCOMENDA') === 'ENCOMENDA' && (
+                                    <TextField
+                                        label="Limite da fila (opcional)"
+                                        type="number"
+                                        fullWidth
+                                        inputProps={{ min: 0, step: 1 }}
+                                        value={formData.limite_fila ?? ''}
+                                        onChange={(e) => setFormData({ ...formData, limite_fila: e.target.value })}
+                                        helperText="Sem limite, a fila nunca enche."
+                                    />
+                                )}
+                            </Box>
                             <TextField
                                 label="Carbono Estocado (kg)"
                                 type="number"
@@ -503,30 +613,48 @@ export const Products = () => {
                                 type="number"
                                 fullWidth
                                 value={formData.weight_grams}
-                                onChange={(e) => setFormData({ ...formData, weight_grams: e.target.value })}
+                                error={Boolean(shippingFieldError.weight_grams)}
+                                helperText={shippingFieldError.weight_grams}
+                                onChange={(e) => { setShippingFieldError({}); setFormData({ ...formData, weight_grams: e.target.value }); }}
                             />
                             <TextField
                                 label="Largura (cm)"
                                 type="number"
                                 fullWidth
                                 value={formData.width_cm}
-                                onChange={(e) => setFormData({ ...formData, width_cm: e.target.value })}
+                                error={Boolean(shippingFieldError.width_cm)}
+                                helperText={shippingFieldError.width_cm}
+                                onChange={(e) => { setShippingFieldError({}); setFormData({ ...formData, width_cm: e.target.value }); }}
                             />
                             <TextField
                                 label="Altura (cm)"
                                 type="number"
                                 fullWidth
                                 value={formData.height_cm}
-                                onChange={(e) => setFormData({ ...formData, height_cm: e.target.value })}
+                                error={Boolean(shippingFieldError.height_cm)}
+                                helperText={shippingFieldError.height_cm}
+                                onChange={(e) => { setShippingFieldError({}); setFormData({ ...formData, height_cm: e.target.value }); }}
                             />
                             <TextField
                                 label="Profundidade (cm)"
                                 type="number"
                                 fullWidth
                                 value={formData.length_cm}
-                                onChange={(e) => setFormData({ ...formData, length_cm: e.target.value })}
+                                error={Boolean(shippingFieldError.length_cm)}
+                                helperText={shippingFieldError.length_cm}
+                                onChange={(e) => { setShippingFieldError({}); setFormData({ ...formData, length_cm: e.target.value }); }}
                             />
                         </Box>
+                        <TextField
+                            label="CEP de origem do envio"
+                            fullWidth
+                            placeholder="69000-000"
+                            error={Boolean(shippingFieldError.cep_origem)}
+                            helperText={shippingFieldError.cep_origem || "De onde este produto é despachado. Sem peso, medidas e CEP de origem o produto não é vendido com frete."}
+                            value={formData.cep_origem ?? ''}
+                            onChange={(e) => { setShippingFieldError({}); setFormData({ ...formData, cep_origem: e.target.value }); }}
+                            inputProps={{ inputMode: 'numeric' }}
+                        />
                         <TextField
                             label="URL da Foto"
                             fullWidth
@@ -644,14 +772,14 @@ export const Products = () => {
                             </Grid>
                             <Grid item xs={12}>
                                 <Typography variant="subtitle2" color="textSecondary">Descrição (PT)</Typography>
-                                <Typography variant="body1" paragraph>
-                                    {viewingProduct.info || "Sem descrição."}
-                                </Typography>
+                                {viewingProduct.info?.trim()
+                                    ? <DescricaoRica value={viewingProduct.info} />
+                                    : <Typography variant="body1" paragraph>Sem descrição.</Typography>}
 
                                 <Typography variant="subtitle2" color="textSecondary">Descrição (EN)</Typography>
-                                <Typography variant="body1" paragraph>
-                                    {viewingProduct.translations?.en?.info || viewingProduct.info_en || "No description available."}
-                                </Typography>
+                                {(viewingProduct.translations?.en?.info || viewingProduct.info_en)?.trim()
+                                    ? <DescricaoRica value={viewingProduct.translations?.en?.info || viewingProduct.info_en} />
+                                    : <Typography variant="body1" paragraph>No description available.</Typography>}
 
                                 <Box display="flex" justifyContent="space-between" mt={2}>
                                     <Box>
@@ -659,8 +787,11 @@ export const Products = () => {
                                         <Typography variant="h6" color="primary">R$ {viewingProduct.preco}</Typography>
                                     </Box>
                                     <Box>
-                                        <Typography variant="subtitle2" color="textSecondary">Prazo</Typography>
-                                        <Typography variant="body1">{viewingProduct.prazo_entrega_meses} meses</Typography>
+                                        <Typography variant="subtitle2" color="textSecondary">Oferta e prazo</Typography>
+                                        <Typography variant="body1">{modoLabel(viewingProduct.modo_oferta)} · {leadTimeLabel(viewingProduct)}</Typography>
+                                        {viewingProduct.modo_oferta === 'PRONTA_ENTREGA' && (
+                                            <Typography variant="body2" color="textSecondary">Estoque: {viewingProduct.estoque ?? 0}</Typography>
+                                        )}
                                     </Box>
                                     <Box>
                                         <Typography variant="subtitle2" color="textSecondary">Status</Typography>
@@ -690,6 +821,24 @@ export const Products = () => {
                     >
                         Editar
                     </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={reminder.open} onClose={() => !reminder.busy && setReminder((r) => ({ ...r, open: false }))} maxWidth="sm" fullWidth>
+                <DialogTitle>Avisar produtores</DialogTitle>
+                <DialogContent>
+                    <Typography variant="body2" sx={{ mb: 2 }}>
+                        Envia e-mail e push aos produtores que têm produto ativo sem dados de frete, com a contagem e a orientação de abrir o app Manejar.
+                        Cada produtor recebe no máximo um aviso por intervalo. Use <strong>Simular</strong> para ver quantos seriam avisados, sem enviar nada.
+                    </Typography>
+                    {reminder.error && <Alert severity="error" data-testid="reminder-error">{reminder.error}</Alert>}
+                    {reminder.result && <Alert severity={reminder.result.simulado ? 'info' : 'success'} data-testid="reminder-result">{reminderSummaryText(reminder.result)}</Alert>}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setReminder((r) => ({ ...r, open: false }))} disabled={reminder.busy}>Fechar</Button>
+                    <Button onClick={() => runReminder(true)} disabled={reminder.busy} data-testid="reminder-simulate">Simular</Button>
+                    <Button variant="contained" color="warning" disabled={reminder.busy} data-testid="reminder-send"
+                        onClick={() => { if (window.confirm('Enviar o aviso por e-mail e push aos produtores com pendência?')) runReminder(false); }}>Enviar aviso</Button>
                 </DialogActions>
             </Dialog>
 

@@ -20,7 +20,8 @@ import {
   Storefront,
   Security,
   AutoGraph,
-  Policy
+  Policy,
+  MonitorHeart
 } from '@mui/icons-material';
 import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -58,6 +59,8 @@ export const Layout = ({ children }) => {
     { id: 'analytics', label: 'Analytics e IA', icon: <AutoGraph />, path: '/analytics' },
     { id: 'analytics-pixels', label: 'Analytics / Pixels', icon: <AutoGraph />, path: '/analytics-pixels' },
     { id: 'exit-survey', label: 'Pesquisa de saída', icon: <AutoGraph />, path: '/exit-survey' },
+    { id: 'growth', label: 'Indicadores de crescimento', icon: <AutoGraph />, path: '/growth' },
+    { id: 'growth-campaigns', label: 'Campanhas de crescimento', icon: <AutoGraph />, path: '/growth-campaigns' },
     { id: 'necromassa', label: 'Necromassa', icon: <Forest />, path: '/necromassa' },
     { id: 'projects', label: 'Gestão Projetos', icon: <FolderOpen />, path: '/projects' },
     { id: 'adoptions', label: 'Gestão de Adoções', icon: <Forest />, path: '/adoptions' },
@@ -79,13 +82,16 @@ export const Layout = ({ children }) => {
     { id: 'gemini-settings', label: 'Configuração IA', icon: <SettingsSuggest />, path: '/gemini-settings' },
     { id: 'developer-settings', label: 'Configurações Dev', icon: <Code />, path: '/developer-settings' },
     { id: 'error-logs', label: 'Log de Erros', icon: <BugReport />, path: '/error-logs' },
+    { id: 'monitoring', label: 'Monitoramento', icon: <MonitorHeart />, path: '/monitoring' },
+    { id: 'store-panel', label: 'Minha loja', icon: <Storefront />, path: '/loja' },
     { id: 'dropshipping-admin', label: 'Admin Dropshipping', icon: <Storefront />, path: '/dropshipping-admin' },
+    { id: 'orders-admin', label: 'Pedidos Dropshipping', icon: <Storefront />, path: '/orders-admin' },
     { id: 'privacy-settings', label: 'Privacidade (LGPD)', icon: <Security />, path: '/privacy-settings' },
     { id: 'terms-of-use', label: 'Termos de Uso', icon: <Policy />, path: '/terms-of-use' },
   ];
 
   const getPageTitle = () => {
-    const currentItem = menuItems.find(item => item.path === location.pathname);
+    const currentItem = menuItems.find(item => item.path === location.pathname || (item.path === '/loja' && location.pathname.startsWith('/loja')));
     if (currentItem) return currentItem.label;
 
     // Fallbacks or special cases

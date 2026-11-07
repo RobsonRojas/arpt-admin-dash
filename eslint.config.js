@@ -11,7 +11,8 @@ export default [
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
-      globals: { ...globals.browser },
+      // `__APP_BUILD_ID__` é injetado no build pelo `define` do vite.config.js.
+      globals: { ...globals.browser, __APP_BUILD_ID__: 'readonly' },
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
     rules: {
