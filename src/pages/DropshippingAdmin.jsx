@@ -19,6 +19,7 @@ import { parseBrNumber } from '../utils/numbers';
 import { rotaDetalheDropshipper } from '../utils/dropshipper';
 import AnalyticsSection from '../components/dropshipping/AnalyticsSection';
 import CandidaturaEmNomeCard from '../components/dropshipping/CandidaturaEmNomeCard';
+import MarketplaceVisibilidadeCard from '../components/dropshipping/MarketplaceVisibilidadeCard';
 
 const fmt = (val) =>
   Number(val || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -328,6 +329,8 @@ export function DropshippingAdmin() {
       ) : (
         <>
           <FeeSettingsCard />
+
+          <MarketplaceVisibilidadeCard />
 
           {/* KPI Row */}
           <Grid container spacing={2} sx={{ mb: 3 }}>
