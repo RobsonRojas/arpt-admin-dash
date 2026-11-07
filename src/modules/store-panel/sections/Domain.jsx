@@ -3,6 +3,7 @@ import { Alert, Box, Button, Chip, Paper, TextField, Typography } from '@mui/mat
 import { api } from '../../../services/api';
 import { useLang } from '../LangContext';
 import { BASE, usePanel } from '../PanelContext';
+import DnsGuide, { DiagnosticoDaVerificacao } from '../DnsGuide';
 
 const TLS_COLOR = { ATIVO: 'success', EMITINDO: 'info', FALHA: 'error' };
 
@@ -37,13 +38,8 @@ export default function Domain() {
             <Button size="small" color="error" onClick={() => remove(x)} disabled={busy}>{t('remove')}</Button>
           </Box>
           {x.tls_status === 'FALHA' && x.tls_motivo && <Alert severity="error">{t('tls_failed')}</Alert>}
-          {x.status !== 'VERIFICADO' && x.instrucoes && (
-            <Box data-testid="dns-instructions">
-              <Typography variant="body2">{t('dns_txt', { name: x.instrucoes.txt?.nome ?? '', value: x.instrucoes.txt?.valor ?? '' })}</Typography>
-              <Typography variant="body2">{t('dns_cname', { value: x.instrucoes.cname?.valor ?? x.instrucoes.apontamento?.valor ?? '' })}</Typography>
-            </Box>
-          )}
-          {lastCheck[x.id] && lastCheck[x.id].verificado === false && <Alert severity="warning" data-testid="verify-pending">{t('verify_pending', { items: (lastCheck[x.id].faltando ?? []).join(', ') })}</Alert>}
+          {x.status !== 'VERIFICADO' && x.instrucoes && <DnsGuide x={x} />}
+          <DiagnosticoDaVerificacao resultado={lastCheck[x.id]} instrucoes={x.instrucoes} />
         </Paper>
       ))}
     </Box>
