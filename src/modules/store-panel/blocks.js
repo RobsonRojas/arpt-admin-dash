@@ -2,8 +2,8 @@
 export const PAGE_SLUG = /^[a-z0-9](?:[a-z0-9-]{0,38})[a-z0-9]$|^[a-z0-9]$/;
 export const RESERVED_PAGES = ['produto', 'produtos', 'carrinho', 'checkout', 'api', 'store', 'loja', 'admin', 'sitemap', 'robots'];
 
-/** Blocos que a tela edita; os demais tipos (faq, depoimentos...) são preservados como estão. */
-export const EDITABLE_TYPES = ['hero', 'texto', 'produtos_destaque', 'imagem', 'contato', 'newsletter'];
+/** Blocos que a tela edita; os demais tipos (faq, depoimentos...) são preservados como está. */
+export const EDITABLE_TYPES = ['hero', 'texto', 'produtos_destaque', 'imagem', 'contato', 'newsletter', 'faq', 'depoimentos'];
 
 /** Campos de cada tipo: `[chave, tipo do campo]` (`text` | `long` | `number`). */
 export const BLOCK_FIELDS = {
@@ -13,6 +13,8 @@ export const BLOCK_FIELDS = {
   imagem: [['url', 'text'], ['alt', 'text'], ['link', 'text']],
   contato: [['email', 'text'], ['telefone', 'text'], ['texto', 'long']],
   newsletter: [['titulo', 'text'], ['texto', 'long']],
+  faq: [['pergunta', 'text'], ['resposta', 'long']],
+  depoimentos: [['nome', 'text'], ['texto', 'long']],
 };
 const DEFAULTS = {
   hero: { titulo: 'Título' }, texto: { html: '<p>Texto</p>' }, produtos_destaque: { quantidade: 8 },
