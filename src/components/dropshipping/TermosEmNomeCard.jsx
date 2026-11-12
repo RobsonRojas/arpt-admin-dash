@@ -25,7 +25,7 @@ export default function TermosEmNomeCard({ userId, onChanged }) {
       setConfirma(false);
       onChanged?.();
     } catch (err) {
-      setErro(err.response?.data?.message || 'Não foi possível registrar o aceite.');
+      setErro(err.response?.data?.error || err.response?.data?.message || 'Não foi possível registrar o aceite.');
     } finally {
       setEnviando(false);
     }
@@ -37,7 +37,7 @@ export default function TermosEmNomeCard({ userId, onChanged }) {
         <Typography variant="h6" gutterBottom>Aceite de termos em nome do dropshipper</Typography>
         <Typography variant="body2" color="text.secondary" gutterBottom>
           Use somente quando o dropshipper aceitou a versão vigente por outro meio. O registro leva o seu nome e a evidência abaixo.
-          Se o dropshipper já aceitou, a ação é recusada.
+          Se o dropshipper já aceitou e o perfil está em dia, a ação é recusada. O aceite destrava só o painel do dropshipper: a loja vender depende também do diagnóstico acima.
         </Typography>
         {erro && <Alert severity="error" sx={{ my: 2 }}>{erro}</Alert>}
         {aviso && <Alert severity="success" sx={{ my: 2 }}>{aviso}</Alert>}

@@ -12,6 +12,7 @@ import { parseBrNumber } from '../utils/numbers';
 import LifecycleCard from '../components/dropshipping/LifecycleCard';
 import LgpdAdminCard from '../components/dropshipping/LgpdAdminCard';
 import TermosEmNomeCard from '../components/dropshipping/TermosEmNomeCard';
+import DiagnosticoVendasCard from '../components/dropshipping/DiagnosticoVendasCard';
 import MotivoDialog from '../components/dropshipping/MotivoDialog';
 
 export function DropshipperDetails() {
@@ -28,6 +29,8 @@ export function DropshipperDetails() {
   const [acaoLoja, setAcaoLoja] = useState(null); // 'suspend' | null
   const [enviandoLoja, setEnviandoLoja] = useState(false);
   const [erroLoja, setErroLoja] = useState('');
+  const [diagChave, setDiagChave] = useState(0); // muda depois do aceite em nome: recarrega o diagnóstico
+  const [aposAceite, setAposAceite] = useState(false);
 
   const executarAcaoLoja = async (acao, corpo) => {
     setEnviandoLoja(true);
@@ -203,9 +206,16 @@ export function DropshipperDetails() {
           <LgpdAdminCard userId={id} nome={store?.nome_comercial} onChanged={fetchDetails} />
         </Grid>
 
+        {/* Por que cada loja vende ou não, com quem resolve cada motivo */}
+        {userStores.map((s) => (
+          <Grid item xs={12} key={`diag-${s.id}`}>
+            <DiagnosticoVendasCard storeId={s.id} nome={s.name} recarregarChave={diagChave} aposAceite={aposAceite} />
+          </Grid>
+        ))}
+
         {/* Aceite dos termos vigentes em nome do dropshipper, com evidência */}
         <Grid item xs={12}>
-          <TermosEmNomeCard userId={id} onChanged={fetchDetails} />
+          <TermosEmNomeCard userId={id} onChanged={() => { fetchDetails(); setAposAceite(true); setDiagChave((k) => k + 1); }} />
         </Grid>
 
         {/* Profile Card */}
