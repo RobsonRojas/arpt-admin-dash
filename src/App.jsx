@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { ThemeProvider, CssBaseline, CircularProgress, Box } from '@mui/material';
 import { theme } from './theme';
 import { Layout, ErrorBoundary } from './components';
-import { Dashboard, Projects, Properties, Necromassa, Sponsors, Login, Users, Rewards, Certificates, Products, AuditLogs, GeminiSettings, PaymentConfig, MediaManager, ErrorLogs, Refunds, ForestIntelligence, Adoptions, PhysicalPieces, Notifications, DeveloperSettings, ProductSimulation, Dropshipping, ManejoLogs, DropshippingAdmin, DropshipperDetails, AdminOrders, PrivacySettings, AnalyticsDashboard, TermsOfUse, AnalyticsPixels, ExitSurvey, Monitoring } from './pages';
+import { Dashboard, Projects, Properties, Necromassa, Sponsors, Login, Users, Rewards, Certificates, Products, AuditLogs, GeminiSettings, PaymentConfig, MediaManager, ErrorLogs, Refunds, ForestIntelligence, Adoptions, PhysicalPieces, Notifications, DeveloperSettings, ProductSimulation, Dropshipping, ManejoLogs, DropshippingAdmin, DropshipperDetails, AdminOrders, PrivacySettings, AnalyticsDashboard, TermsOfUse, AnalyticsPixels, ExitSurvey, Monitoring, StoreCustomers } from './pages';
 import { CertificateView } from './pages/CertificateView';
 import { GrowthIndicators } from './pages/GrowthIndicators';
 import { GrowthCampaigns } from './pages/GrowthCampaigns';
@@ -86,6 +86,7 @@ export default function App() {
                   <Route path="developer-settings" element={<DeveloperSettings />} />
                   <Route path="error-logs" element={<ErrorLogs />} />
                   <Route path="monitoring" element={<Monitoring />} />
+                  <Route path="store-customers" element={<StoreCustomers />} />
                   <Route path="product-simulation" element={<ProductSimulation />} />
                   <Route path="dropshipping" element={<Dropshipping />} />
                   <Route path="loja/*" element={<StorePanel />} />

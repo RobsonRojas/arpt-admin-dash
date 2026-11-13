@@ -33,3 +33,4 @@ export * from './ExitSurvey';
 export * from './GrowthIndicators';
 export * from './GrowthCampaigns';
 export * from './Monitoring';
+export * from './StoreCustomers';
