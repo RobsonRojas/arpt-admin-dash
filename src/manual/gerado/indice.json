@@ -1,0 +1,699 @@
+{
+ "secoes": [
+  {
+   "id": "visao-geral",
+   "titulo": "Visão geral do ecossistema",
+   "grupo": "Começar",
+   "resumo": "O que é o ecossistema ARPT, quem são os atores (visitante, patrocinador, produtor, dropshipper, administrador) e como as partes se conectam: arpt.site, painéis, lojas, app móvel e infraestrutura.",
+   "rotas": [],
+   "specs": [],
+   "docs": [
+    {
+     "titulo": "Projeto ARPT Manejo Florestal - Instruções para o deploy",
+     "ancora": "doc-readme"
+    }
+   ]
+  },
+  {
+   "id": "pendencias",
+   "titulo": "Pendências",
+   "grupo": "Começar",
+   "resumo": "Tudo que ainda está aberto: ações manuais (deploy, produção, console de terceiros, decisões) e tarefas de código das changes ativas. Gerado automaticamente.",
+   "rotas": [],
+   "specs": [],
+   "docs": []
+  },
+  {
+   "id": "sala-de-situacao",
+   "titulo": "Sala de Situação e governança",
+   "grupo": "Painel administrativo",
+   "resumo": "Visão geral do painel, governança, receita padronizada e falhas de sincronização.",
+   "rotas": [
+    "/dashboard"
+   ],
+   "specs": [
+    "admin-core",
+    "admin-governance",
+    "standardized-revenue-and-purchases",
+    "sync-failures"
+   ],
+   "docs": []
+  },
+  {
+   "id": "analytics-e-ia",
+   "titulo": "Analytics e inteligência artificial",
+   "grupo": "Painel administrativo",
+   "resumo": "Indicadores, assistentes de IA, modelos configuráveis e análise de pesquisas.",
+   "rotas": [
+    "/analytics",
+    "/forest-intelligence",
+    "/gemini-settings"
+   ],
+   "specs": [
+    "admin-product-ai-translation",
+    "analytics",
+    "arpt-ai",
+    "configurable-ai-models",
+    "producer-product-ai-text",
+    "reward-ai-translation",
+    "store-ai-advisor",
+    "store-ai-customization",
+    "survey-analysis-ai",
+    "survey-analysis-panel"
+   ],
+   "docs": [
+    {
+     "titulo": "Tutorial Completo: Configuração do Microsserviço `arpt-ai` com `GEMINI_API_KEY`",
+     "ancora": "doc-arpt-ai-tutorial"
+    },
+    {
+     "titulo": "Tutorial: llm-store-customizer (IA nas lojas de dropshipper)",
+     "ancora": "doc-llm-store-customizer-tutorial"
+    },
+    {
+     "titulo": "Assistente de IA da vitrine: operação",
+     "ancora": "doc-assistente-ia-vitrine"
+    },
+    {
+     "titulo": "Tutorial: Gerenciamento e Tradução Automática de Projetos no ARPT Admin Dash",
+     "ancora": "doc-translation-feature-tutorial"
+    }
+   ]
+  },
+  {
+   "id": "pixels-e-rastreio",
+   "titulo": "Pixels, rastreio e SEO",
+   "grupo": "Painel administrativo",
+   "resumo": "Google Tag Manager, Analytics, Meta Pixel, verificação do Google e dados estruturados.",
+   "rotas": [
+    "/analytics-pixels"
+   ],
+   "specs": [
+    "google-site-verification",
+    "search-structured-data",
+    "store-tracking-seo"
+   ],
+   "docs": [
+    {
+     "titulo": "Tutorial: Centralização de Rastreamento e Microsoft Clarity no Next.js (manejo-app)",
+     "ancora": "doc-tracking-tutorial"
+    },
+    {
+     "titulo": "Tutorial Detalhado: Configuração do Google Tag Manager e Pixel do Facebook",
+     "ancora": "doc-tutorial-gtm-e-pixel"
+    },
+    {
+     "titulo": "Tutorial: Configuração do Pixel do Facebook no manejo-app",
+     "ancora": "doc-tutorial-facebook-pixel"
+    }
+   ]
+  },
+  {
+   "id": "pesquisa-de-saida",
+   "titulo": "Pesquisa de saída",
+   "grupo": "Painel administrativo",
+   "resumo": "Pesquisas de saída de campanhas e lojas, pop-up de saída e leitura dos resultados.",
+   "rotas": [
+    "/exit-survey"
+   ],
+   "specs": [
+    "campaign-exit-survey",
+    "exit-intent-signup-popup",
+    "owner-survey-insights",
+    "store-exit-survey"
+   ],
+   "docs": []
+  },
+  {
+   "id": "crescimento",
+   "titulo": "Crescimento, campanhas e indicações",
+   "grupo": "Painel administrativo",
+   "resumo": "Atribuição, campanhas de crescimento, indicações e recompensas por indicação, recuperação de carrinho, consentimento de marketing e materiais de divulgação.",
+   "rotas": [
+    "/growth",
+    "/growth-campaigns"
+   ],
+   "specs": [
+    "admin-growth-console",
+    "campaign-adhesion",
+    "campaign-outreach-admin-ui",
+    "campaign-outreach-messaging",
+    "cart-recovery",
+    "certificate-share-card",
+    "content-sharing",
+    "growth-attribution",
+    "growth-campaign-metrics",
+    "growth-campaigns",
+    "growth-campaigns-admin-ui",
+    "growth-referral-commission-bonus",
+    "marketing-consent",
+    "owner-growth-console",
+    "owner-support-notification",
+    "partner-press-kit",
+    "piece-share-card",
+    "referral-configuration",
+    "referral-review",
+    "referral-rewards",
+    "sponsor-recognition",
+    "sponsor-recognition-prompt",
+    "supporter-updates",
+    "whatsapp-contact"
+   ],
+   "docs": [
+    {
+     "titulo": "Crescimento orgânico: práticas e estratégias para a ARPT",
+     "ancora": "doc-crescimento-organico"
+    },
+    {
+     "titulo": "Sugestões de melhoria para o carrinho de compras",
+     "ancora": "doc-sugestoes-carrinho"
+    },
+    {
+     "titulo": "Deploy: consentimento de marketing e rastreio com consentimento",
+     "ancora": "doc-deploy-consentimento-marketing"
+    },
+    {
+     "titulo": "Ativar a comparação por dispositivo na indicação",
+     "ancora": "doc-roteiro-referral-device-secret"
+    }
+   ]
+  },
+  {
+   "id": "projetos-e-floresta",
+   "titulo": "Projetos, propriedades e floresta",
+   "grupo": "Painel administrativo",
+   "resumo": "Projetos, adoções, propriedades, árvores, necromassa, inventários e manejo.",
+   "rotas": [
+    "/projects",
+    "/adoptions",
+    "/properties",
+    "/necromassa",
+    "/manejo-logs"
+   ],
+   "specs": [
+    "admin-forestry",
+    "dynamic-project-commission",
+    "inventarios",
+    "manejo",
+    "project-en-translation",
+    "project-impact-report",
+    "project-page-cutoff",
+    "project-page-responsiveness",
+    "project-rewards-ordering",
+    "propriedades",
+    "trees",
+    "tutorial-recebimentos"
+   ],
+   "docs": []
+  },
+  {
+   "id": "recompensas-e-pecas",
+   "titulo": "Recompensas, peças e certificados",
+   "grupo": "Painel administrativo",
+   "resumo": "Recompensas, peças físicas, certificados e passaporte públicos.",
+   "rotas": [
+    "/rewards",
+    "/physical-pieces",
+    "/certificates"
+   ],
+   "specs": [
+    "admin-blockchain-token-trigger",
+    "crowdfunding-reward-detail",
+    "passport",
+    "piece-claim-integrity",
+    "public-certificate-viewing",
+    "public-piece-story",
+    "reward-card-actions-and-price",
+    "reward-card-display",
+    "reward-list-call-to-action",
+    "reward-piece-tracking",
+    "reward-product-catalog-separation",
+    "reward-stock-display"
+   ],
+   "docs": []
+  },
+  {
+   "id": "patrocinios",
+   "titulo": "Patrocinadores e divisão de patrocínio",
+   "grupo": "Painel administrativo",
+   "resumo": "Registro de patrocínios, roteamento do pagamento e divisão entre projeto e plataforma.",
+   "rotas": [
+    "/sponsors"
+   ],
+   "specs": [
+    "admin-sponsorship-division",
+    "crowdfunding-payment-routing",
+    "crowdfunding-sponsorship-recording",
+    "sponsorship-division-history"
+   ],
+   "docs": []
+  },
+  {
+   "id": "produtos-e-catalogo",
+   "titulo": "Produtos e catálogo",
+   "grupo": "Painel administrativo",
+   "resumo": "Cadastro e regras de produtos, prazos, modo de oferta, descrições, identificadores públicos e simulação.",
+   "rotas": [
+    "/products",
+    "/product-simulation"
+   ],
+   "specs": [
+    "admin-product-dimensions",
+    "admin-product-form-languages",
+    "localized-currency-display",
+    "made-to-order-purchase",
+    "product-description-resize",
+    "product-lead-times",
+    "product-offer-mode",
+    "product-public-identifiers",
+    "product-rich-description",
+    "produtos",
+    "related-items-carousel"
+   ],
+   "docs": []
+  },
+  {
+   "id": "pagamentos-e-repasses",
+   "titulo": "Pagamentos, reembolsos e repasses",
+   "grupo": "Painel administrativo",
+   "resumo": "Gateways, Stripe Connect, Pix, idempotência, webhooks, reembolsos e repasses a produtores e dropshippers.",
+   "rotas": [
+    "/payment-config",
+    "/refunds"
+   ],
+   "specs": [
+    "dropshipping-payout-resilience",
+    "dropshipping-payouts",
+    "gateway-receiving-config-ui",
+    "mp-webhook-resilience",
+    "pagamentos",
+    "payment-idempotency-safety",
+    "payments",
+    "payout-transfer-safety",
+    "shipping-fee-settlement",
+    "stripe-connect-onboarding",
+    "stripe-connect-status-ui",
+    "stripe-dynamic-currency-and-pix"
+   ],
+   "docs": [
+    {
+     "titulo": "Tutorial Completo: Como Configurar a Stripe para Aceitar Pix",
+     "ancora": "doc-stripe-pix-tutorial"
+    },
+    {
+     "titulo": "💳 Tutorial Passo a Passo: Configuração do Stripe para Produção",
+     "ancora": "doc-stripe-production-tutorial"
+    },
+    {
+     "titulo": "Tutorial: Testando Stripe e Mercado Pago Localmente",
+     "ancora": "doc-tutorial-payments-test"
+    },
+    {
+     "titulo": "Tutorial: Testar Troca de Gateway de Pagamento pelo Painel Admin",
+     "ancora": "doc-admin-dashboard-gateway-test-tutorial"
+    }
+   ]
+  },
+  {
+   "id": "usuarios-e-acesso",
+   "titulo": "Usuários, acesso e notificações",
+   "grupo": "Painel administrativo",
+   "resumo": "Gestão de usuários, vínculos, perfis, sessão e cadastro; log de modificações e central de notificações.",
+   "rotas": [
+    "/users",
+    "/audit",
+    "/notifications"
+   ],
+   "specs": [
+    "admin-user-id-sync",
+    "admin-user-linking",
+    "admin-user-relations-view",
+    "auth",
+    "home-tabs",
+    "invite-signup-profile",
+    "session-token-renewal",
+    "signup-profile-choice",
+    "user-management",
+    "user-profile-display",
+    "user-profile-edit"
+   ],
+   "docs": [
+    {
+     "titulo": "Roteiro: tarefas restantes de `replace-mobile-sync-password-encryption`",
+     "ancora": "doc-roteiro-senha-sync-app"
+    }
+   ]
+  },
+  {
+   "id": "termos-e-privacidade",
+   "titulo": "Termos de uso e privacidade",
+   "grupo": "Painel administrativo",
+   "resumo": "Termos por público, aceite e reaceite, revisão jurídica e privacidade (LGPD).",
+   "rotas": [
+    "/terms-of-use",
+    "/privacy-settings"
+   ],
+   "specs": [
+    "audience-terms-of-use",
+    "dropshipper-audit-privacy",
+    "dropshipper-terms-page",
+    "dropshipper-terms-reacceptance",
+    "producer-role-terms-acceptance",
+    "producer-terms-page",
+    "shipping-fee-terms-content",
+    "terms-legal-review",
+    "terms-of-use-acceptance",
+    "terms-of-use-management"
+   ],
+   "docs": []
+  },
+  {
+   "id": "midia",
+   "titulo": "Gerenciador de arquivos",
+   "grupo": "Painel administrativo",
+   "resumo": "Mídias e arquivos enviados à plataforma.",
+   "rotas": [
+    "/media-manager"
+   ],
+   "specs": [
+    "medias"
+   ],
+   "docs": []
+  },
+  {
+   "id": "login-social",
+   "titulo": "Login social (Google)",
+   "grupo": "Painel administrativo",
+   "resumo": "Interruptores do login com Google no arpt.site e nas lojas, verificação das configurações e passo a passo do Google Cloud e do Keycloak.",
+   "rotas": [
+    "/social-login"
+   ],
+   "specs": [],
+   "docs": [
+    {
+     "titulo": "Login com Google: passo a passo (Google Cloud + Keycloak)",
+     "ancora": "doc-login-google-passo-a-passo"
+    },
+    {
+     "titulo": "Client do Keycloak para o login das lojas",
+     "ancora": "doc-keycloak-client-loja"
+    },
+    {
+     "titulo": "Revisão de segurança: login com Google (add-google-social-login-via-keycloak)",
+     "ancora": "doc-revisao-seguranca-login-google"
+    },
+    {
+     "titulo": "Revisão de segurança do login do cliente da loja",
+     "ancora": "doc-revisao-seguranca-login-loja"
+    },
+    {
+     "titulo": "Revisão de segurança: cadastro, login e recuperação nos modais da loja",
+     "ancora": "doc-revisao-seguranca-modais-loja"
+    }
+   ]
+  },
+  {
+   "id": "monitoramento",
+   "titulo": "Monitoramento e operação",
+   "grupo": "Painel administrativo",
+   "resumo": "Estado dos serviços, filas, relatórios operacionais, logs de erro e isolamento de jobs.",
+   "rotas": [
+    "/monitoring",
+    "/error-logs"
+   ],
+   "specs": [
+    "client-ip-rate-limiting",
+    "maintenance-job-isolation"
+   ],
+   "docs": [
+    {
+     "titulo": "Operação: filas de manutenção, relatórios e alertas do administrador",
+     "ancora": "doc-operacao-filas-e-relatorios"
+    }
+   ]
+  },
+  {
+   "id": "lojas",
+   "titulo": "Lojas de dropshippers (vitrine)",
+   "grupo": "Painel administrativo",
+   "resumo": "Lojas, domínios próprios e DNS, temas e modelos, conteúdo e idiomas, contas e painel do cliente, checkout, endereço e frete da vitrine.",
+   "rotas": [
+    "/loja",
+    "/store-customers"
+   ],
+   "specs": [
+    "dropshipper-default-store-template",
+    "dropshipper-store-marketing",
+    "dropshipper-store-orders",
+    "dropshipper-store-panel",
+    "dropshipper-store-performance",
+    "dropshipper-store-team",
+    "dropshipper-store-templates",
+    "dropshipper-store-theme",
+    "dropshipper-stores",
+    "store-address-availability",
+    "store-checkout-guards",
+    "store-content-languages",
+    "store-custom-domains",
+    "store-customer-addresses",
+    "store-customer-auth",
+    "store-customer-panel",
+    "store-domain-dns-guide",
+    "store-template-library",
+    "store-theme-customization",
+    "storefront-content-editing",
+    "storefront-freight-consistency",
+    "storefront-tenancy"
+   ],
+   "docs": [
+    {
+     "titulo": "Guia de Verificação e Desbloqueio do Domínio no Google",
+     "ancora": "doc-instrucoes-desbloqueio-dominio"
+    }
+   ]
+  },
+  {
+   "id": "dropshipping",
+   "titulo": "Dropshipping: administração e pedidos",
+   "grupo": "Painel administrativo",
+   "resumo": "Perfis de dropshipper, catálogo, preços, pedidos, integridade, convites e operação administrativa.",
+   "rotas": [
+    "/dropshipping-admin",
+    "/orders-admin",
+    "/dropshipping"
+   ],
+   "specs": [
+    "admin-dropshipping",
+    "admin-marketplace",
+    "admin-store-availability",
+    "dropshipper-admin-console",
+    "dropshipper-admin-operations",
+    "dropshipper-catalog",
+    "dropshipper-integrity-security",
+    "dropshipper-invite-acceptance",
+    "dropshipper-panel-tab",
+    "dropshipper-pricing-rules",
+    "dropshipper-profile",
+    "dropshipper-self-activation",
+    "dropshipping-journey-test",
+    "dropshipping-order-integrity",
+    "dropshipping-orders",
+    "marketplace-cart-checkout",
+    "marketplace-catalog",
+    "marketplace-menu-item",
+    "marketplace-tab",
+    "marketplace-visibility",
+    "shopping-cart"
+   ],
+   "docs": [
+    {
+     "titulo": "Tutorial de Deploy – Novas Funcionalidades (com foco em Frete)",
+     "ancora": "doc-deploy-shipping-tutorial"
+    }
+   ]
+  },
+  {
+   "id": "pedidos-e-frete",
+   "titulo": "Pedidos e frete",
+   "grupo": "Ecossistema",
+   "resumo": "Identificadores públicos, rastreio, transições, confirmação de entrega e cotação de frete.",
+   "rotas": [],
+   "specs": [
+    "delivery-confirmation",
+    "freight-quote-resilience",
+    "order-public-identifiers",
+    "order-tracking-access",
+    "order-transition-consistency",
+    "order-webhook-recovery",
+    "producer-product-form-shipping",
+    "producer-shipping-data",
+    "shipping",
+    "shipping-integration-tests"
+   ],
+   "docs": [
+    {
+     "titulo": "Correios como segunda opção do frete internacional",
+     "ancora": "doc-correios-frete-internacional"
+    },
+    {
+     "titulo": "Integração com a 17TRACK (rastreio de entrega)",
+     "ancora": "doc-integracao-track17"
+    },
+    {
+     "titulo": "Tutorial: configurar a integração com a DHL (frete internacional)",
+     "ancora": "doc-tutorial-integracao-dhl"
+    },
+    {
+     "titulo": "Tutorial: Integração de Cálculo de Frete",
+     "ancora": "doc-tutorial-shipping-integration"
+    },
+    {
+     "titulo": "Tutorial: Como Testar o Cálculo de Frete",
+     "ancora": "doc-tutorial-testar-calculo-frete"
+    }
+   ]
+  },
+  {
+   "id": "painel-do-produtor",
+   "titulo": "Painel do produtor",
+   "grupo": "Ecossistema",
+   "resumo": "Papel, ativação, produtos, fotos, prazos, desempenho e uso offline do produtor.",
+   "rotas": [],
+   "specs": [
+    "producer-app-validation-parity",
+    "producer-assignment",
+    "producer-catalog-availability",
+    "producer-client-invite",
+    "producer-form-field-help",
+    "producer-identity-access",
+    "producer-offline-product-edits",
+    "producer-panel-tab-access",
+    "producer-photo-upload-feedback",
+    "producer-product-images",
+    "producer-product-management",
+    "producer-product-performance",
+    "producer-product-registration",
+    "producer-role-activation",
+    "producer-role-activation-card",
+    "producer-role-consistency",
+    "producer-role-management",
+    "producer-sla",
+    "producer-web-panel"
+   ],
+   "docs": []
+  },
+  {
+   "id": "app-e-site",
+   "titulo": "arpt.site e app móvel",
+   "grupo": "Ecossistema",
+   "resumo": "Páginas e abas públicas do arpt.site, PWA e o app móvel (sessão, sincronização, inventário, manejo, pedidos).",
+   "rotas": [],
+   "specs": [
+    "mobile-auth",
+    "mobile-i18n-headers",
+    "mobile-inventory",
+    "mobile-manejo",
+    "mobile-order-fulfillment",
+    "mobile-session-lifecycle",
+    "mobile-sync",
+    "pwa-support"
+   ],
+   "docs": []
+  },
+  {
+   "id": "infraestrutura-e-deploy",
+   "titulo": "Infraestrutura, deploy e segredos",
+   "grupo": "Ecossistema",
+   "resumo": "Build, deploy, TLS, nginx, webhooks, testes de ponta a ponta e higiene de segredos.",
+   "rotas": [
+    "/developer-settings"
+   ],
+   "specs": [
+    "bitbucket-webhook-deploy",
+    "build",
+    "deploy-script",
+    "jwt-secret-configuration",
+    "lets-encrypt-docker-certificate",
+    "nginx-config-live-mount",
+    "production-secret-rollout",
+    "secret-hygiene",
+    "smoke-test-host-header",
+    "ssl-certbot-preflight",
+    "ssl-environment-scripts",
+    "ssl-prod-setup"
+   ],
+   "docs": [
+    {
+     "titulo": "Integration Testing",
+     "ancora": "doc-testing"
+    },
+    {
+     "titulo": "Google Unwanted Software Policy - Compliance Report",
+     "ancora": "doc-google-unwanted-software-policy-compliance"
+    },
+    {
+     "titulo": "Manual do ecossistema no painel admin",
+     "ancora": "doc-manual-do-painel"
+    },
+    {
+     "titulo": "Roteiro: rotação dos segredos em produção",
+     "ancora": "doc-roteiro-segredos-producao"
+    },
+    {
+     "titulo": "Inventário de segredos",
+     "ancora": "doc-segredos-inventario"
+    },
+    {
+     "titulo": "Roteiro: teste da jornada do dropshipping",
+     "ancora": "doc-roteiro-teste-jornada"
+    },
+    {
+     "titulo": "Tutorial: Executar o teste da jornada do dropshipping em produção",
+     "ancora": "doc-tutorial-execucao-teste-jornada-producao"
+    },
+    {
+     "titulo": "Validação de TLS das lojas no servidor",
+     "ancora": "doc-validacao-tls-producao"
+    }
+   ]
+  }
+ ],
+ "areas": {
+  "/dashboard": "sala-de-situacao",
+  "/analytics": "analytics-e-ia",
+  "/forest-intelligence": "analytics-e-ia",
+  "/gemini-settings": "analytics-e-ia",
+  "/analytics-pixels": "pixels-e-rastreio",
+  "/exit-survey": "pesquisa-de-saida",
+  "/growth": "crescimento",
+  "/growth-campaigns": "crescimento",
+  "/projects": "projetos-e-floresta",
+  "/adoptions": "projetos-e-floresta",
+  "/properties": "projetos-e-floresta",
+  "/necromassa": "projetos-e-floresta",
+  "/manejo-logs": "projetos-e-floresta",
+  "/rewards": "recompensas-e-pecas",
+  "/physical-pieces": "recompensas-e-pecas",
+  "/certificates": "recompensas-e-pecas",
+  "/sponsors": "patrocinios",
+  "/products": "produtos-e-catalogo",
+  "/product-simulation": "produtos-e-catalogo",
+  "/payment-config": "pagamentos-e-repasses",
+  "/refunds": "pagamentos-e-repasses",
+  "/users": "usuarios-e-acesso",
+  "/audit": "usuarios-e-acesso",
+  "/notifications": "usuarios-e-acesso",
+  "/terms-of-use": "termos-e-privacidade",
+  "/privacy-settings": "termos-e-privacidade",
+  "/media-manager": "midia",
+  "/social-login": "login-social",
+  "/monitoring": "monitoramento",
+  "/error-logs": "monitoramento",
+  "/loja": "lojas",
+  "/store-customers": "lojas",
+  "/dropshipping-admin": "dropshipping",
+  "/orders-admin": "dropshipping",
+  "/dropshipping": "dropshipping",
+  "/developer-settings": "infraestrutura-e-deploy"
+ }
+}

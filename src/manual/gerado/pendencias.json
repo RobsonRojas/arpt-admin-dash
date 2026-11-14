@@ -1,0 +1,4662 @@
+{
+ "itens": [
+  {
+   "id": "add-admin-ecosystem-manual#1.8",
+   "area": "sala-de-situacao",
+   "tipo": "manual",
+   "origem": "add-admin-ecosystem-manual",
+   "tarefa": "1.8",
+   "descricao": "Revisar a classificação manual × código e marcar ` ` nos itens de ação humana das demais changes ativas",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-admin-ecosystem-manual#5.1",
+   "area": "sala-de-situacao",
+   "tipo": "codigo",
+   "origem": "add-admin-ecosystem-manual",
+   "tarefa": "5.1",
+   "descricao": "Rodar o gerador e revisar o manual: distribuição das specs, textos de `resumo`, documentos incluídos, nenhuma credencial; commitar os arquivos gerados no `arpt-admin-dash`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-admin-ecosystem-manual#5.4",
+   "area": "sala-de-situacao",
+   "tipo": "codigo",
+   "origem": "add-admin-ecosystem-manual",
+   "tarefa": "5.4",
+   "descricao": "Reconstruir `arpt-admin-dash` com `up -d --build --no-deps` e conferir `/manual`, o alerta no cabeçalho, uma seção por área, contagens e o link \"Manual\" em cada área",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-ai-terms-legal-assistant-and-translation#1.1",
+   "area": "termos-e-privacidade",
+   "tipo": "codigo",
+   "origem": "add-ai-terms-legal-assistant-and-translation",
+   "tarefa": "1.1",
+   "descricao": "Rota `/ai/terms-review`: persona de advogado, regras (sem inventar norma, marcar \"verificar\", não prometer comportamento inexistente) e saída JSON estruturada",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-ai-terms-legal-assistant-and-translation#1.2",
+   "area": "termos-e-privacidade",
+   "tipo": "codigo",
+   "origem": "add-ai-terms-legal-assistant-and-translation",
+   "tarefa": "1.2",
+   "descricao": "Rota `/ai/terms-translate`: inglês jurídico, preserva Markdown, numeração, títulos e glossário",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-ai-terms-legal-assistant-and-translation#1.3",
+   "area": "termos-e-privacidade",
+   "tipo": "codigo",
+   "origem": "add-ai-terms-legal-assistant-and-translation",
+   "tarefa": "1.3",
+   "descricao": "Respeitar o liga/desliga (503) e o fallback de modelos já existentes",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-ai-terms-legal-assistant-and-translation#1.4",
+   "area": "termos-e-privacidade",
+   "tipo": "codigo",
+   "origem": "add-ai-terms-legal-assistant-and-translation",
+   "tarefa": "1.4",
+   "descricao": "Testes: formato da saída, JSON inválido, IA desligada",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-ai-terms-legal-assistant-and-translation#2.1",
+   "area": "termos-e-privacidade",
+   "tipo": "codigo",
+   "origem": "add-ai-terms-legal-assistant-and-translation",
+   "tarefa": "2.1",
+   "descricao": "Fonte única de fatos fixos do sistema (frete ao produtor etc.) e glossário de termos, injetados nos prompts",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-ai-terms-legal-assistant-and-translation#2.2",
+   "area": "termos-e-privacidade",
+   "tipo": "codigo",
+   "origem": "add-ai-terms-legal-assistant-and-translation",
+   "tarefa": "2.2",
+   "descricao": "`POST /admin/ai/terms/review` e `POST /admin/ai/terms/translate` em `routes/admin/ai.ts`: papel `administrador`, Zod, tamanho máximo (413), limite de taxa (429), validação da saída com uma nova tentativa",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-ai-terms-legal-assistant-and-translation#2.3",
+   "area": "termos-e-privacidade",
+   "tipo": "codigo",
+   "origem": "add-ai-terms-legal-assistant-and-translation",
+   "tarefa": "2.3",
+   "descricao": "Log com ator, público, tamanho e resultado, sem o conteúdo",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-ai-terms-legal-assistant-and-translation#2.4",
+   "area": "termos-e-privacidade",
+   "tipo": "codigo",
+   "origem": "add-ai-terms-legal-assistant-and-translation",
+   "tarefa": "2.4",
+   "descricao": "Testes de integração: 403, 413, 429, saída válida, saída inválida, serviço de IA fora",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-ai-terms-legal-assistant-and-translation#3.1",
+   "area": "termos-e-privacidade",
+   "tipo": "codigo",
+   "origem": "add-ai-terms-legal-assistant-and-translation",
+   "tarefa": "3.1",
+   "descricao": "Botão \"Revisar com assistente jurídico\" e painel de observações (tipo, gravidade, sugestão, aplicar, texto sugerido com comparação e desfazer)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-ai-terms-legal-assistant-and-translation#3.2",
+   "area": "termos-e-privacidade",
+   "tipo": "codigo",
+   "origem": "add-ai-terms-legal-assistant-and-translation",
+   "tarefa": "3.2",
+   "descricao": "Botão \"Traduzir do português\" na aba ENGLISH; resultado editável, sem salvar sozinho",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-ai-terms-legal-assistant-and-translation#3.3",
+   "area": "termos-e-privacidade",
+   "tipo": "codigo",
+   "origem": "add-ai-terms-legal-assistant-and-translation",
+   "tarefa": "3.3",
+   "descricao": "Aviso de tradução desatualizada (hash do português usado na última tradução)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-ai-terms-legal-assistant-and-translation#3.4",
+   "area": "termos-e-privacidade",
+   "tipo": "codigo",
+   "origem": "add-ai-terms-legal-assistant-and-translation",
+   "tarefa": "3.4",
+   "descricao": "Aviso fixo de que a IA não substitui revisão de profissional; estados de carregando, erro, IA desligada, limite",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-ai-terms-legal-assistant-and-translation#3.5",
+   "area": "termos-e-privacidade",
+   "tipo": "codigo",
+   "origem": "add-ai-terms-legal-assistant-and-translation",
+   "tarefa": "3.5",
+   "descricao": "Sem uso do fallback com chave no navegador para este fluxo",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-ai-terms-legal-assistant-and-translation#3.6",
+   "area": "termos-e-privacidade",
+   "tipo": "codigo",
+   "origem": "add-ai-terms-legal-assistant-and-translation",
+   "tarefa": "3.6",
+   "descricao": "Testes de componente: aplicar, recusar, desfazer, tradução, tradução desatualizada, IA desligada",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-ai-terms-legal-assistant-and-translation#4.1",
+   "area": "termos-e-privacidade",
+   "tipo": "codigo",
+   "origem": "add-ai-terms-legal-assistant-and-translation",
+   "tarefa": "4.1",
+   "descricao": "Reconstruir `arpt-ai` e `manejo-api` e publicar o `arpt-admin-dash`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-ai-terms-legal-assistant-and-translation#4.2",
+   "area": "termos-e-privacidade",
+   "tipo": "codigo",
+   "origem": "add-ai-terms-legal-assistant-and-translation",
+   "tarefa": "4.2",
+   "descricao": "Validar com um termo real (PRODUTOR e DROPSHIPPER) que a saída é útil e registrar ajustes de prompt",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-ai-terms-legal-assistant-and-translation#4.3",
+   "area": "termos-e-privacidade",
+   "tipo": "codigo",
+   "origem": "add-ai-terms-legal-assistant-and-translation",
+   "tarefa": "4.3",
+   "descricao": "Documentar no `ARPT_AI_TUTORIAL.md` e no runbook de termos que a IA é apoio e não revisão",
+   "roteiro": {
+    "secao": "analytics-e-ia",
+    "ancora": "doc-arpt-ai-tutorial",
+    "titulo": "Tutorial Completo: Configuração do Microsserviço `arpt-ai` com `GEMINI_API_KEY`"
+   },
+   "bloqueia": false
+  },
+  {
+   "id": "add-automatic-store-domain-activation#1.1",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-automatic-store-domain-activation",
+   "tarefa": "1.1",
+   "descricao": "Extrair de `verifyDomain` a transição `PENDENTE` → `VERIFICADO` (com a emissão do TLS enfileirada uma vez) para uma função usada pelo botão e pelo job",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-automatic-store-domain-activation#1.2",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-automatic-store-domain-activation",
+   "tarefa": "1.2",
+   "descricao": "Job `domain-verify-pending` em `dropshippingMaintenance` (a cada poucos minutos), com lote, tempo máximo por consulta e recuo por idade do cadastro (decidir no design: calcular por `created_at`/`ultima_checagem_em` ou coluna de próxima checagem)",
+   "roteiro": null,
+   "bloqueia": true
+  },
+  {
+   "id": "add-automatic-store-domain-activation#1.3",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-automatic-store-domain-activation",
+   "tarefa": "1.3",
+   "descricao": "Consulta inconclusiva não altera o estado; atualizar pendências só com consulta conclusiva",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-automatic-store-domain-activation#1.4",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-automatic-store-domain-activation",
+   "tarefa": "1.4",
+   "descricao": "E-mails: domínio ativo, falha definitiva de TLS e aviso antes de expirar, cada um uma vez por evento",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-automatic-store-domain-activation#1.5",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-automatic-store-domain-activation",
+   "tarefa": "1.5",
+   "descricao": "Testes de integração com DNS e emissor falsos: ativação sem clique, pendente que segue pendente, inconclusivo, corrida manual × automática, lote maior que o limite, expiração, e-mails sem repetição",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-automatic-store-domain-activation#2.1",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-automatic-store-domain-activation",
+   "tarefa": "2.1",
+   "descricao": "Tela do domínio atualiza o estado sozinha enquanto aberta (consulta periódica com pausa quando a aba está oculta); textos do guia deixam de pedir o clique",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-automatic-store-domain-activation#2.2",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-automatic-store-domain-activation",
+   "tarefa": "2.2",
+   "descricao": "Testes do painel",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-automatic-store-domain-activation#3.1",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-automatic-store-domain-activation",
+   "tarefa": "3.1",
+   "descricao": "Atualizar `STOREFRONT_DOMINIOS_TLS.md` (a verificação deixa de depender do clique) e o guia do dropshipper",
+   "roteiro": null,
+   "bloqueia": true
+  },
+  {
+   "id": "add-automatic-store-domain-activation#4.1",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-automatic-store-domain-activation",
+   "tarefa": "4.1",
+   "descricao": "Deploy: backend primeiro, depois o painel",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-automatic-store-domain-activation#4.2",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-automatic-store-domain-activation",
+   "tarefa": "4.2",
+   "descricao": "Em produção: cadastrar um domínio de teste, criar só os registros de DNS e conferir que ele ativa sem abrir o painel e que o e-mail chega",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-cep-autofill-to-store-delivery-address#1.1",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-cep-autofill-to-store-delivery-address",
+   "tarefa": "1.1",
+   "descricao": "Conferir termos de uso e limites do ViaCEP e da BrasilAPI e registrar a escolha (principal e reserva); trocar se algum for inadequado para produção",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-cep-autofill-to-store-delivery-address#1.2",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-cep-autofill-to-store-delivery-address",
+   "tarefa": "1.2",
+   "descricao": "Serviço de consulta de CEP com interface de provedor, timeout curto, fallback, cache (achado e não achado com TTLs diferentes) e disjuntor simples",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-cep-autofill-to-store-delivery-address#1.3",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-cep-autofill-to-store-delivery-address",
+   "tarefa": "1.3",
+   "descricao": "Rota pública `GET /public/stores/:slug/cep/:cep` em `routes/public/stores.ts`: validar 8 dígitos (400), 404, 503 e 429, devolvendo só logradouro, bairro, cidade e UF; limite de taxa com a mesma chave de cliente do frete",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-cep-autofill-to-store-delivery-address#1.4",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-cep-autofill-to-store-delivery-address",
+   "tarefa": "1.4",
+   "descricao": "Log sem juntar CEP e IP",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-cep-autofill-to-store-delivery-address#1.5",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-cep-autofill-to-store-delivery-address",
+   "tarefa": "1.5",
+   "descricao": "Testes de integração: achado, cache, 404, 400, provedor principal fora com reserva, ambos fora (503), 429",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-cep-autofill-to-store-delivery-address#2.1",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-cep-autofill-to-store-delivery-address",
+   "tarefa": "2.1",
+   "descricao": "Proxy same-origin para a consulta, no estilo do proxy do frete",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-cep-autofill-to-store-delivery-address#2.2",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-cep-autofill-to-store-delivery-address",
+   "tarefa": "2.2",
+   "descricao": "`CartView.tsx`: consultar ao ter o CEP do frete e a cada mudança, ignorar respostas fora de ordem, preencher só campos vazios e não editados, refazer ao mudar o CEP preservando o digitado",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-cep-autofill-to-store-delivery-address#2.3",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-cep-autofill-to-store-delivery-address",
+   "tarefa": "2.3",
+   "descricao": "Foco no campo Número, região `aria-live` com o aviso de conferir, nota discreta para CEP não encontrado, textos em português e inglês em `strings.ts`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-cep-autofill-to-store-delivery-address#2.4",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-cep-autofill-to-store-delivery-address",
+   "tarefa": "2.4",
+   "descricao": "Testes de componente: completo, genérico, cliente já digitou, CEP muda, 404, 503, foco e aviso, inglês",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-cep-autofill-to-store-delivery-address#3.1",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-cep-autofill-to-store-delivery-address",
+   "tarefa": "3.1",
+   "descricao": "Confirmar que o formulário compartilhado cobre todos os templates de loja",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-cep-autofill-to-store-delivery-address#3.2",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-cep-autofill-to-store-delivery-address",
+   "tarefa": "3.2",
+   "descricao": "Reconstruir `manejo-api` e `manejo-app` com `up -d --build --no-deps` e testar numa loja real com CEP completo, CEP genérico e provedor simulado fora do ar",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-store-availability-alerts#1.1",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-store-availability-alerts",
+   "tarefa": "1.1",
+   "descricao": "Extrair de `resolverProduto` (`checkout.services.ts`) uma função que devolve todos os motivos de bloqueio de um produto, sem mudar as respostas do checkout",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-store-availability-alerts#1.2",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-store-availability-alerts",
+   "tarefa": "1.2",
+   "descricao": "Criar o serviço de diagnóstico da loja (motivos de loja: `ORDERS_DISABLED`, cláusula de frete por público, `TERMS_OUTDATED`, status da loja; motivos por produto) com código e responsável",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-store-availability-alerts#1.3",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-store-availability-alerts",
+   "tarefa": "1.3",
+   "descricao": "Criar `GET /dropshipping/stores/:id/availability` restrito a dono e equipe, respondendo como inexistente para outra loja",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-store-availability-alerts#1.4",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-store-availability-alerts",
+   "tarefa": "1.4",
+   "descricao": "Testes: cada motivo, loja de outro dono, resposta sem estoque nem dados do produtor, e igualdade entre diagnóstico e checkout",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-store-availability-alerts#2.1",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-store-availability-alerts",
+   "tarefa": "2.1",
+   "descricao": "Criar `POST /dropshipping/stores/:id/availability/report` com observação opcional (máx. 2000, texto puro) e limite de taxa por loja",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-store-availability-alerts#2.2",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-store-availability-alerts",
+   "tarefa": "2.2",
+   "descricao": "Montar o e-mail (loja, dono, contato, domínios, termos, flags sem segredos, motivos por produto, observação) e enviar via `EmailService` ao destinatário configurado, com `Reply-To` do dono",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-store-availability-alerts#2.3",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-store-availability-alerts",
+   "tarefa": "2.3",
+   "descricao": "Testes: com e sem observação, 429, falha do serviço de e-mail e destinatário não controlável pelo cliente",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-store-availability-alerts#3.1",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-store-availability-alerts",
+   "tarefa": "3.1",
+   "descricao": "Componente de painel de alertas no `PainelDoDropshipper`, com motivos, responsável e textos em `dropshipperTextos.ts`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-store-availability-alerts#3.2",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-store-availability-alerts",
+   "tarefa": "3.2",
+   "descricao": "Integrar `AvisoTermosDropshipper` ao painel, recarregar o diagnóstico após o aceite e mostrar quando a venda segue bloqueada pelo sistema",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-store-availability-alerts#3.3",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-store-availability-alerts",
+   "tarefa": "3.3",
+   "descricao": "Etiquetas de disponibilidade por produto na lista de produtos da loja",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-store-availability-alerts#3.4",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-store-availability-alerts",
+   "tarefa": "3.4",
+   "descricao": "Botão \"Avisar a administração\" e modal com campo opcional, estados de envio, erro e limite excedido",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-store-availability-alerts#3.5",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-store-availability-alerts",
+   "tarefa": "3.5",
+   "descricao": "Testes de componente: sem alertas, loja bloqueada, aceite, etiquetas e modal",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-store-availability-alerts#4.1",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-store-availability-alerts",
+   "tarefa": "4.1",
+   "descricao": "Reconstruir `manejo-api` e `manejo-app` com `up -d --build --no-deps` e conferir no ambiente com a loja `acurui`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-store-availability-alerts#4.2",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-store-availability-alerts",
+   "tarefa": "4.2",
+   "descricao": "Documentar o diagnóstico e o e-mail em `docs/`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-google-social-login-via-keycloak#1.1",
+   "area": "login-social",
+   "tipo": "codigo",
+   "origem": "add-google-social-login-via-keycloak",
+   "tarefa": "1.1",
+   "descricao": "Criar no Google Cloud o cliente OAuth \"Aplicativo da Web\" com redirect URI `https://auth.arpt.site/realms/arpt/broker/google/endpoint`; configurar tela de consentimento (nome ARPT, links de privacidade e termos, domínio `arpt.site`, escopos openid/email/profile) e publicá-la em produção",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-google-social-login-via-keycloak#1.2",
+   "area": "login-social",
+   "tipo": "codigo",
+   "origem": "add-google-social-login-via-keycloak",
+   "tarefa": "1.2",
+   "descricao": "No Keycloak (realm `arpt`), criar o Identity Provider `google` com o client ID/segredo (segredo só no console), Trust Email ligado, Store tokens desligado, Sync mode `import`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-google-social-login-via-keycloak#1.3",
+   "area": "login-social",
+   "tipo": "codigo",
+   "origem": "add-google-social-login-via-keycloak",
+   "tarefa": "1.3",
+   "descricao": "Copiar o fluxo \"first broker login\", com Review Profile desligado e \"Handle Existing Account\" exigindo verificação por e-mail ou senha (sem ligação automática); associar ao provedor `google`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-google-social-login-via-keycloak#1.4",
+   "area": "login-social",
+   "tipo": "codigo",
+   "origem": "add-google-social-login-via-keycloak",
+   "tarefa": "1.4",
+   "descricao": "Conferir que o client público do arpt.site e `arpt-loja` aceitam o login via provedor (redirect URIs já registrados) e que o direct grant `arpt-loja-direto` continua funcionando",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-google-social-login-via-keycloak#3.5",
+   "area": "login-social",
+   "tipo": "codigo",
+   "origem": "add-google-social-login-via-keycloak",
+   "tarefa": "3.5",
+   "descricao": "Conferir o visual em todos os templates e em tela pequena",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-google-social-login-via-keycloak#4.5",
+   "area": "login-social",
+   "tipo": "codigo",
+   "origem": "add-google-social-login-via-keycloak",
+   "tarefa": "4.5",
+   "descricao": "Garantir que o provedor `google` não tem mapeadores de grupos/papéis e que o login social não concede `produtor`/`dropshipper`; teste cobrindo",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-google-social-login-via-keycloak#5.1",
+   "area": "login-social",
+   "tipo": "codigo",
+   "origem": "add-google-social-login-via-keycloak",
+   "tarefa": "5.1",
+   "descricao": "Atualizar a política de privacidade para citar o Google como provedor de login e os dados recebidos (e-mail, nome, foto não armazenada)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-google-social-login-via-keycloak#6.1",
+   "area": "login-social",
+   "tipo": "codigo",
+   "origem": "add-google-social-login-via-keycloak",
+   "tarefa": "6.1",
+   "descricao": "Reconstruir `manejo-api`, `manejo-app` e `arpt-admin-dash` com `up -d --build --no-deps`, com os interruptores desligados; ligar só pelo painel depois de 1.x pronto e da verificação verde",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-google-social-login-via-keycloak#6.2",
+   "area": "login-social",
+   "tipo": "codigo",
+   "origem": "add-google-social-login-via-keycloak",
+   "tarefa": "6.2",
+   "descricao": "Testar: primeiro acesso, cadastro de dropshipper com Google (ativação e convite de equipe), acesso seguinte, cancelamento, mesma conta em duas lojas (subdomínio e domínio próprio), e-mail já cadastrado por senha (exige confirmação), cliente só com Google definindo senha",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-google-social-login-via-keycloak#6.3",
+   "area": "login-social",
+   "tipo": "codigo",
+   "origem": "add-google-social-login-via-keycloak",
+   "tarefa": "6.3",
+   "descricao": "Ao remover o fluxo por redirecionamento (5.3 de `replace-store-login-redirect-with-store-modals`), manter a ponte para `idp=google`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-manual-tls-issue-for-verified-domains#1.1",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-manual-tls-issue-for-verified-domains",
+   "tarefa": "1.1",
+   "descricao": "Criar migration aditiva `add_tls_solicitado_em` em `backend/manejo-api/db/migrations/` com a coluna nullable `tls_solicitado_em timestamptz` em `dropshipper_loja_dominios` e `down` que a remove.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-manual-tls-issue-for-verified-domains#1.2",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-manual-tls-issue-for-verified-domains",
+   "tarefa": "1.2",
+   "descricao": "Em `backend/manejo-api/src/services/storefront/domains.services.ts`, implementar `requestTlsIssue(loja, domainId, userId)`: 404 quando o domínio não é da loja; 409 `DOMAIN_NOT_VERIFIED` fora de `VERIFICADO`; 409 `TLS_ALREADY_ACTIVE` com `ATIVO`; 409 `TLS_ISSUE_IN_PROGRESS` com `EMITINDO`; 409 `COMPANION_ROOT_NOT_READY` para `www` sem raiz ativa; 429 `TLS_ISSUE_TOO_SOON` com `retry_after_seconds` quando `tls_solicitado_em` estiver dentro de `STOREFRONT_TLS_MANUAL_MIN_INTERVAL_SECONDS` (padrão 60, 0 desliga).",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-manual-tls-issue-for-verified-domains#1.3",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-manual-tls-issue-for-verified-domains",
+   "tarefa": "1.3",
+   "descricao": "Na aceitação, atualizar condicionalmente para `EMITINDO` (incluindo `tls_solicitado_em = now()`, `tls_tentativas = 0` e `tls_proxima_tentativa_em = null`), gravar `logAction` com o tipo `DOMINIO_TLS_SOLICITADO` e o ator `userId`, chamar `enqueueDomainTls(id)` e, se o enfileiramento falhar, restaurar o estado anterior e responder 503 `TLS_QUEUE_UNAVAILABLE`. Devolver o domínio no formato de `presentDomain`.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-manual-tls-issue-for-verified-domains#1.4",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-manual-tls-issue-for-verified-domains",
+   "tarefa": "1.4",
+   "descricao": "Adicionar em `backend/manejo-api/src/routes/storefront/domains.ts` a rota `POST /stores/:storeId/storefront/domains/:domainId/tls` com o mesmo preHandler de dono, validação de `domainId` inteiro, `config.rateLimit` de 5 requisições por minuto e resposta 202.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-manual-tls-issue-for-verified-domains#1.5",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-manual-tls-issue-for-verified-domains",
+   "tarefa": "1.5",
+   "descricao": "Cobrir em `backend/manejo-api/tests/integration/storefront/domains.itest.ts`: aceite com `FALHA` e com `tls_status` nulo (estado `EMITINDO`, id em `enfileirados`, linha de auditoria com o ator), 403 para papel que não é dono, 404 de domínio de outra loja, 409 para pendente/ativo/emitindo/companheiro sem raiz, 429 de cooldown sem enfileirar e restauração do estado quando o enfileirador lança erro.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-manual-tls-issue-for-verified-domains#1.6",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-manual-tls-issue-for-verified-domains",
+   "tarefa": "1.6",
+   "descricao": "Documentar o botão, o endpoint e `STOREFRONT_TLS_MANUAL_MIN_INTERVAL_SECONDS` em `backend/manejo-api/docs/STOREFRONT_DOMINIOS_TLS.md` e no `env.example` (ou equivalente) junto de `STOREFRONT_VERIFY_MIN_INTERVAL_SECONDS`.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-manual-tls-issue-for-verified-domains#2.1",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-manual-tls-issue-for-verified-domains",
+   "tarefa": "2.1",
+   "descricao": "Em `src/components/dominioLoja.ts`, acrescentar os textos pt/en do botão (rótulo, rótulo durante a solicitação), da confirmação de pedido e da mensagem de intervalo de espera com `{segundos}`.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-manual-tls-issue-for-verified-domains#2.2",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-manual-tls-issue-for-verified-domains",
+   "tarefa": "2.2",
+   "descricao": "Em `src/components/DominioProprioDaLoja.tsx`, exibir o botão somente para `status === \"VERIFICADO\"` e `tls_status !== \"ATIVO\"`; desabilitar durante `EMITINDO` e durante a chamada; chamar `POST ${url}/${x.id}/tls`; tratar o código `TLS_ISSUE_TOO_SOON` com a mensagem local e `retry_after_seconds`, e os demais erros como hoje.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-manual-tls-issue-for-verified-domains#2.3",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-manual-tls-issue-for-verified-domains",
+   "tarefa": "2.3",
+   "descricao": "Recarregar a lista a cada 10 s enquanto houver domínio em `EMITINDO`, limpando o intervalo ao desmontar ou quando nenhum domínio estiver nesse estado.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-manual-tls-issue-for-verified-domains#2.4",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-manual-tls-issue-for-verified-domains",
+   "tarefa": "2.4",
+   "descricao": "Atualizar `src/components/PainelDoDropshipper.vitest.tsx` (ou criar teste do componente) com: botão visível em `VERIFICADO`+`FALHA`, ausente em `PENDENTE` e em `ATIVO`, desabilitado em `EMITINDO`, pedido aceito mostrando a confirmação e a mensagem de cooldown em pt e en.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-manual-tls-issue-for-verified-domains#3.1",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-manual-tls-issue-for-verified-domains",
+   "tarefa": "3.1",
+   "descricao": "Em `src/modules/store-panel/i18n.js`, acrescentar os textos pt/en do botão, da confirmação e do intervalo de espera; adicionar `TLS_ALREADY_ACTIVE`, `TLS_ISSUE_IN_PROGRESS`, `TLS_ISSUE_TOO_SOON` e `TLS_QUEUE_UNAVAILABLE` a `KNOWN_CODES` em `src/modules/store-panel/errors.js` e as chaves `api_*` correspondentes.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-manual-tls-issue-for-verified-domains#3.2",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-manual-tls-issue-for-verified-domains",
+   "tarefa": "3.2",
+   "descricao": "Em `src/modules/store-panel/sections/Domain.jsx`, exibir o botão com a mesma condição do painel do dropshipper, desabilitar em `EMITINDO` e durante a chamada, chamar `POST ${d()}/${x.id}/tls`, mostrar confirmação e a espera do cooldown, e recarregar a cada 10 s enquanto houver domínio em `EMITINDO`.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-manual-tls-issue-for-verified-domains#3.3",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-manual-tls-issue-for-verified-domains",
+   "tarefa": "3.3",
+   "descricao": "Criar `src/modules/store-panel/sections/Domain.test.jsx` cobrindo visibilidade do botão, pedido aceito e mensagem de cooldown.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-manual-tls-issue-for-verified-domains#4.1",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-manual-tls-issue-for-verified-domains",
+   "tarefa": "4.1",
+   "descricao": "Rodar lint, typecheck e a suíte de testes da API (`backend/manejo-api`) e confirmar os novos casos de integração.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-manual-tls-issue-for-verified-domains#4.2",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-manual-tls-issue-for-verified-domains",
+   "tarefa": "4.2",
+   "descricao": "Rodar a suíte de testes do `manejo-app` e do `arpt-admin-dash` e confirmar os testes de componente.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-manual-tls-issue-for-verified-domains#4.3",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-manual-tls-issue-for-verified-domains",
+   "tarefa": "4.3",
+   "descricao": "Rodar `openspec validate add-manual-tls-issue-for-verified-domains --strict` e confirmar a mudança válida.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-manual-tls-issue-for-verified-domains#4.4",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-manual-tls-issue-for-verified-domains",
+   "tarefa": "4.4",
+   "descricao": "Em produção, após o deploy, confirmar em um domínio com `FALHA` que o botão aparece, que o clique leva a `EMITINDO` e que o desfecho (`ATIVO` ou `FALHA` com motivo) aparece no painel.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#1.1",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "1.1",
+   "descricao": "Migrations `marketplace_conexoes`, `marketplace_anuncios`, `marketplace_pedidos`, `marketplace_eventos` e teste de subida e descida",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#1.2",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "1.2",
+   "descricao": "Interface `MarketplaceAdapter` (inclui `cancelOrder`), registro de canais habilitados por configuração (`MARKETPLACE_<CANAL>_ENABLED`, desligados por padrão) e adaptador falso para testes",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#1.3",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "1.3",
+   "descricao": "Cifragem dos tokens (AES-256-GCM, `MARKETPLACE_TOKEN_KEY` com `kid`) e estado do OAuth assinado, de uso único e preso à loja",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#1.4",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "1.4",
+   "descricao": "Cliente HTTP com limites, espera exponencial em 429 e 5xx, e redação de segredos nos logs",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#2.1",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "2.1",
+   "descricao": "Rotas de conectar (início e retorno do OAuth), listar, renovar e desconectar, só para o dono; 404 para loja alheia; tokens nunca devolvidos",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#2.2",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "2.2",
+   "descricao": "Adaptador do Mercado Livre (OAuth2, renovação, criação e atualização de anúncio, pausa), verificado contra a documentação oficial e a conta de teste do canal",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#2.3",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "2.3",
+   "descricao": "Mapeamento de categoria e atributos obrigatórios do canal e validação antes de publicar, com a lista do que falta",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#2.4",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "2.4",
+   "descricao": "Publicar, pausar e encerrar anúncios; estados e motivo do erro do canal",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#2.5",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "2.5",
+   "descricao": "Preço do canal com piso incluindo a tarifa do canal e pausa automática quando a tarifa muda",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#2.6",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "2.6",
+   "descricao": "Testes de integração com o adaptador falso: conexão, estado inválido, conta já conectada, papéis, token fora da resposta, publicar completo e incompleto, produto fora da loja, preço abaixo do piso",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#3.1",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "3.1",
+   "descricao": "Saldo oferecido por canal vindo de estoque menos reservas, com a reserva compartilhada e bloqueio da linha do produto",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#3.2",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "3.2",
+   "descricao": "Job de sincronização quando estoque, preço ou estado mudam, e reconciliação periódica com registro da divergência",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#3.3",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "3.3",
+   "descricao": "Pausa de anúncios quando o produto é pausado ou removido, ou a loja é pausada ou suspensa",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#3.4",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "3.4",
+   "descricao": "Testes: última unidade vendida na vitrine zera os canais, vendas simultâneas (uma só reserva), encomenda com fila cheia, divergência corrigida, loja suspensa",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#4.1",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "4.1",
+   "descricao": "Webhook público com verificação de origem, resposta rápida e processamento na fila; consulta periódica de segurança",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#4.2",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "4.2",
+   "descricao": "Pedido externo idempotente por canal e id externo; anúncio desconhecido ignorado e registrado",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#4.3",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "4.3",
+   "descricao": "Pedido nasce `AGUARDANDO_REPASSE` (ou `AGUARDANDO_DESTINO` sem CEP, com nova consulta ao canal) com o prazo gravado quando pode ser pago, sem sub-pedido para o produtor; o valor devido só fecha no pagamento (itens 5.2 a 5.4)",
+   "roteiro": null,
+   "bloqueia": true
+  },
+  {
+   "id": "add-marketplace-channel-integrations#4.4",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "4.4",
+   "descricao": "Privacidade do comprador: mesma retenção e anonimização dos pedidos da vitrine",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#4.5",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "4.5",
+   "descricao": "Testes: pedido novo, repetido, webhook falsificado, webhook perdido recuperado pela consulta, anúncio desconhecido, anonimização",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#5.1",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "5.1",
+   "descricao": "Migration do repasse de canal (prazo, estado, cotação de frete com validade, composição do valor, pagamento, lembretes enviados), das advertências e do estado `PAUSADA_REPASSE` da integração",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#5.2",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "5.2",
+   "descricao": "Ferramenta de frete no repasse: CEP de destino sempre do pedido do canal (nunca digitado), cotação por produtor pelo serviço de frete existente, escolha da opção, cotação gravada válida por 30 minutos (`MARKETPLACE_COTACAO_VALIDADE_MIN`) e travada na sessão de pagamento; erros de destino ausente, de cotação indisponível e de medidas faltando",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#5.3",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "5.3",
+   "descricao": "Verificar na documentação do Stripe se a taxa pode ser obtida antes do pagamento; taxa do pagamento somada ao valor como linha separada no Stripe Checkout, uma sessão por meio (cartão ou Pix) que expira em 30 minutos, detalhamento antes de pagar e registro da diferença para a taxa real lida da transação",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#5.4",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "5.4",
+   "descricao": "Pagamento do repasse pelo Stripe (cartão e Pix), por pedido e em lote; confirmação idempotente pelo webhook; pagamento menor, a maior e repetido",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#5.5",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "5.5",
+   "descricao": "Confirmado o repasse: criar os sub-pedidos para o produtor (frete pago repassado integralmente) e seguir a máquina de estados e o repasse normal ao produtor",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#5.6",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "5.6",
+   "descricao": "Lembretes 24 e 6 horas antes do vencimento por e-mail e notificação no painel, uma vez por momento, com registro",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#5.7",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "5.7",
+   "descricao": "Job de vencimento (fila de manutenção) com bloqueio de linha e consulta ao Stripe: cancela o pedido no sistema (sem tocar no canal), devolve o estoque e registra a advertência (e-mail e painel, no idioma do dropshipper), uma única vez",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#5.8",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "5.8",
+   "descricao": "Terceira advertência: pausar a integração em todas as lojas do dropshipper e os anúncios; marcar `PERDIDO` os pedidos cancelados por atraso ainda abertos no canal e enfileirar o cancelamento no canal (`cancelOrder` com espera e novas tentativas, falha visível ao administrador); não tocar na vitrine, nos pedidos dentro do prazo nem nos já pagos",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#5.9",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "5.9",
+   "descricao": "Liberação ao pagar todos os repasses pendentes, com as advertências zeradas e registro; sem repasse pendente na pausa, liberação pelo administrador com registro",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#110",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "",
+   "descricao": "5.9a Reabertura de pedido cancelado por atraso (só com a integração ativa): valida pedido válido no canal, estoque e anúncio, recota o frete, cobra o repasse, a taxa de reativação de 2% (configurável) sobre o valor do pedido reaberto e a taxa do pagamento, pagamento idempotente, segue para o produtor; recusa com motivo quando encerrado ou `PERDIDO`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#5.10",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "5.10",
+   "descricao": "Divergência entre o CEP cotado e o CEP do endereço de entrega sinalizada ao administrador e ao produtor antes do envio",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#5.11",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "5.11",
+   "descricao": "Testes de integração: repasse confirmado envia ao produtor com o frete, vencimento cancela só no sistema e gera uma advertência, terceira advertência pausa as 3 lojas e cancela no canal os pedidos atrasados (e só eles), pedidos dentro do prazo e pagos intactos, falha de cancelamento no canal com nova tentativa, pedido perdido não reabre, vitrine segue vendendo, pagamento no último momento, corrida, pagamento tardio, lote, evento repetido, soma da taxa por meio de pagamento, cotação vencida, CEP vindo do pedido (e ignorado se enviado), destino ausente sem prazo correndo, divergência, taxa de 2% só sobre pedidos reabertos (cálculo e pagamento repetido), liberação com e sem repasse pendente",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#6.1",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "6.1",
+   "descricao": "Público `DROPSHIPPER_CANAIS` nos termos por público e o portão de aceite para conectar, e a exigência de novo aceite para novos anúncios em nova versão",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#6.2",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "6.2",
+   "descricao": "Rascunho do termo em português e inglês (repasse antecipado, frete e taxa somados, prazo, cancelamento, advertências, pausa, perda definitiva dos pedidos no canal, taxa de reativação de 2% na reabertura e liberação)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#6.3",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "6.3",
+   "descricao": "Revisão jurídica do texto (change própria, como `legal-review-shipping-fee-terms`) e publicação antes de ligar qualquer canal",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#6.4",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "6.4",
+   "descricao": "Testes: conectar sem o termo, com o termo, nova versão, sem termo publicado",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#7.1",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "7.1",
+   "descricao": "Aba Canais na loja: conectar (com o termo), estado da conexão, reconexão necessária, integração bloqueada",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#7.2",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "7.2",
+   "descricao": "Anúncios por canal: publicar, preço do canal com o piso, estado e erros",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#7.3",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "7.3",
+   "descricao": "Área de vendas nos marketplaces (pedidos por canal e estado)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#7.4",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "7.4",
+   "descricao": "Área de repasses: ferramenta de frete, detalhamento (produto, frete, comissão, taxa), prazo, estado, advertências, pagar por pedido e em lote; só dono e financeiro",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#7.5",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "7.5",
+   "descricao": "Banner de alerta não dispensável em toda a gestão da loja, com prazo, advertências, penalidades e link para os repasses; urgência abaixo de 24 horas; estado de pausa com o caminho de liberação",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#7.6",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "7.6",
+   "descricao": "Painel da integração com a explicação do repasse de taxas e frete e as taxas vigentes por meio de pagamento",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#7.7",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "7.7",
+   "descricao": "Todas as telas do dropshipper desta mudança em português e inglês, usando a infraestrutura de idiomas do painel da loja (change `add-multitenant-dropshipper-storefront`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#7.8",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "7.8",
+   "descricao": "Funções puras (prazo restante, urgência, soma da taxa, totais) e verificações em `check:utils`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#8.1",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "8.1",
+   "descricao": "Confirmar o acesso, os custos e a disponibilidade no Brasil de Submarino, TikTok Shop e outros, e abrir uma mudança por canal (só depois de 2.x concluída)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#8.2",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "8.2",
+   "descricao": "Resolver as perguntas abertas do design (liberação sem repasse pendente, alcance do cancelamento no canal, origem das taxas do Stripe por meio de pagamento)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-marketplace-channel-integrations#8.3",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "add-marketplace-channel-integrations",
+   "tarefa": "8.3",
+   "descricao": "Documentar a operação (chaves, flags, prazo, advertências, pausa e liberação, rotação da chave de cifragem) e rodar a suíte local",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-per-store-checkout-branding#0.1",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-per-store-checkout-branding",
+   "tarefa": "0.1",
+   "descricao": "Com chave de TESTE do Stripe, criar sessões com parâmetros de branding e registrar: nome exato dos parâmetros, versão da API e do SDK que os aceitam, tipos aceitos para logo e ícone, `purpose` da Files API, formatos e tamanhos, lista de fontes aceitas e se campo omitido herda o padrão da conta",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-per-store-checkout-branding#0.2",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-per-store-checkout-branding",
+   "tarefa": "0.2",
+   "descricao": "Decidir entre subir o SDK e a `apiVersion` globalmente ou usar uma segunda instância do cliente só na criação de sessão de loja; checar o formato dos eventos do webhook em cada caso",
+   "roteiro": null,
+   "bloqueia": true
+  },
+  {
+   "id": "add-per-store-checkout-branding#0.3",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-per-store-checkout-branding",
+   "tarefa": "0.3",
+   "descricao": "Se o recurso não existir para a conta: parar, registrar e rediscutir a alternativa (`show-seller-context-on-checkout-page`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-per-store-checkout-branding#1.1",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-per-store-checkout-branding",
+   "tarefa": "1.1",
+   "descricao": "Migration aditiva: `dropshipper_loja_checkout_branding` e `arpt_checkout_abertos.stripe_session_id`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-per-store-checkout-branding#1.2",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-per-store-checkout-branding",
+   "tarefa": "1.2",
+   "descricao": "Constante única da lista de fontes e schema Zod do branding (cores, `border_style`, fonte, nome higienizado)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-per-store-checkout-branding#1.3",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-per-store-checkout-branding",
+   "tarefa": "1.3",
+   "descricao": "Função que deriva os valores iniciais do tema da loja (mapeamento de estilo, fonte, logo e favicon)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-per-store-checkout-branding#1.4",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-per-store-checkout-branding",
+   "tarefa": "1.4",
+   "descricao": "Testes: cada validação, mapeamento do tema, tema alterado depois não muda o branding",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-per-store-checkout-branding#2.1",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-per-store-checkout-branding",
+   "tarefa": "2.1",
+   "descricao": "Upload de logo e ícone: validar tipo e tamanho, enviar pela Files API, gravar `file_id`; reutilizar a proteção contra SSRF ao usar a URL do tema",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-per-store-checkout-branding#2.2",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-per-store-checkout-branding",
+   "tarefa": "2.2",
+   "descricao": "Serviço de branding com cache por loja (TTL curto) e checagem de versão (`atualizado_em`) para várias instâncias; invalidar ao salvar e ao subir imagem",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-per-store-checkout-branding#2.3",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-per-store-checkout-branding",
+   "tarefa": "2.3",
+   "descricao": "Testes: upload válido, inválido, falha do Stripe sem alterar o registro, cache e invalidação, duas instâncias",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-per-store-checkout-branding#3.1",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-per-store-checkout-branding",
+   "tarefa": "3.1",
+   "descricao": "`StripeCheckoutSessionCreator` recebe `branding?` já resolvido no servidor pela loja da rota; enviar só os campos preenchidos",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-per-store-checkout-branding#3.2",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-per-store-checkout-branding",
+   "tarefa": "3.2",
+   "descricao": "Repetir uma vez sem branding se o Stripe recusar por causa dele, registrando o evento",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-per-store-checkout-branding#3.3",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-per-store-checkout-branding",
+   "tarefa": "3.3",
+   "descricao": "Gravar `stripe_session_id` e `loja_id` e logar na criação; alertar se a gravação falhar sem perder a venda",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-per-store-checkout-branding#3.4",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-per-store-checkout-branding",
+   "tarefa": "3.4",
+   "descricao": "Garantir que marketplace e financiamento coletivo não enviam branding",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-per-store-checkout-branding#3.5",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-per-store-checkout-branding",
+   "tarefa": "3.5",
+   "descricao": "Testes com Stripe simulado: duas lojas de estilos diferentes com sessões simultâneas, cada uma com o nome, o logo e as cores corretos; loja sem branding; corpo da requisição com outra loja ignorado; marketplace e crowdfunding sem branding; recusa do Stripe com nova tentativa; registro da loja em toda sessão",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-per-store-checkout-branding#4.1",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-per-store-checkout-branding",
+   "tarefa": "4.1",
+   "descricao": "Rotas do painel: ler, salvar, enviar imagem e \"usar o tema\", restritas a dono e editor",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-per-store-checkout-branding#4.2",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-per-store-checkout-branding",
+   "tarefa": "4.2",
+   "descricao": "Aba \"Checkout\" no painel da loja: formulário, upload, \"Usar o tema da loja\", preview aproximado com aviso, textos pt/en",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-per-store-checkout-branding#4.3",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-per-store-checkout-branding",
+   "tarefa": "4.3",
+   "descricao": "Testes: preview não salva, 403 para quem não é dono ou editor, validações no formulário",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-per-store-checkout-branding#5.1",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-per-store-checkout-branding",
+   "tarefa": "5.1",
+   "descricao": "Aplicar a migration pelo `docker-compose.migrations.yml` e reconstruir `manejo-api` e `manejo-app` com `up -d --build --no-deps`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-per-store-checkout-branding#5.2",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-per-store-checkout-branding",
+   "tarefa": "5.2",
+   "descricao": "Validar com duas lojas reais de teste em sessões simultâneas e conferir as duas páginas de pagamento no Stripe em modo de teste",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-per-store-checkout-branding#5.3",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "add-per-store-checkout-branding",
+   "tarefa": "5.3",
+   "descricao": "Definir revisão ou denúncia de nome e logo de loja que imite outra marca, no processo de suspensão existente",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-producer-terms-reacceptance-to-web-panel#1.1",
+   "area": "termos-e-privacidade",
+   "tipo": "codigo",
+   "origem": "add-producer-terms-reacceptance-to-web-panel",
+   "tarefa": "1.1",
+   "descricao": "Serviço no `manejo-app` para `GET /api/v1/producer/terms` e `POST /api/v1/producer/terms/:id/accept` (usando o cliente `api` e a recuperação de papel já usada no painel)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-producer-terms-reacceptance-to-web-panel#1.2",
+   "area": "termos-e-privacidade",
+   "tipo": "codigo",
+   "origem": "add-producer-terms-reacceptance-to-web-panel",
+   "tarefa": "1.2",
+   "descricao": "Componente `AvisoTermosProdutor`: versão, link para `/termo-de-uso/produtor` (nova aba), checkbox, botão, texto do efeito (só aceitar novos pedidos), erro anunciável, textos em português e inglês",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-producer-terms-reacceptance-to-web-panel#1.3",
+   "area": "termos-e-privacidade",
+   "tipo": "codigo",
+   "origem": "add-producer-terms-reacceptance-to-web-panel",
+   "tarefa": "1.3",
+   "descricao": "Integrar em `PainelDoProdutor.tsx` no topo da aba, só quando o painel tem acesso e sessão; carregar ao montar e recarregar depois do aceite",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-producer-terms-reacceptance-to-web-panel#1.4",
+   "area": "termos-e-privacidade",
+   "tipo": "codigo",
+   "origem": "add-producer-terms-reacceptance-to-web-panel",
+   "tarefa": "1.4",
+   "descricao": "Corrida de versão: se o aceite for recusado (404/termo diferente), recarregar o termo vigente e mostrar o aviso atualizado com mensagem curta",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-producer-terms-reacceptance-to-web-panel#1.5",
+   "area": "termos-e-privacidade",
+   "tipo": "codigo",
+   "origem": "add-producer-terms-reacceptance-to-web-panel",
+   "tarefa": "1.5",
+   "descricao": "Falha na consulta não derruba o painel: sem aviso e registro no log do cliente",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-producer-terms-reacceptance-to-web-panel#2.1",
+   "area": "termos-e-privacidade",
+   "tipo": "codigo",
+   "origem": "add-producer-terms-reacceptance-to-web-panel",
+   "tarefa": "2.1",
+   "descricao": "Componente: pendente (aviso, botão desabilitado até marcar), aceitar (chama a rota com o `id` certo e remove o aviso), em dia, sem termo, falha na consulta, erro no aceite, versão trocada, inglês",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-producer-terms-reacceptance-to-web-panel#2.2",
+   "area": "termos-e-privacidade",
+   "tipo": "codigo",
+   "origem": "add-producer-terms-reacceptance-to-web-panel",
+   "tarefa": "2.2",
+   "descricao": "`PainelDoProdutor`: o aviso aparece no topo e não aparece sem acesso ou sessão",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-producer-terms-reacceptance-to-web-panel#3.1",
+   "area": "termos-e-privacidade",
+   "tipo": "codigo",
+   "origem": "add-producer-terms-reacceptance-to-web-panel",
+   "tarefa": "3.1",
+   "descricao": "Reconstruir o `manejo-app` com `up -d --build --no-deps`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-producer-terms-reacceptance-to-web-panel#3.2",
+   "area": "termos-e-privacidade",
+   "tipo": "codigo",
+   "origem": "add-producer-terms-reacceptance-to-web-panel",
+   "tarefa": "3.2",
+   "descricao": "Validar com um produtor real: publicar uma versão nova do termo do produtor, ver o aviso, aceitar e confirmar que aceitar pedido volta a funcionar",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "bind-checkout-freight-to-delivery-address#2.4",
+   "area": "pedidos-e-frete",
+   "tipo": "codigo",
+   "origem": "bind-checkout-freight-to-delivery-address",
+   "tarefa": "2.4",
+   "descricao": "Preencher cidade e UF a partir do CEP (ex.: consulta de CEP). **Não feito: exigiria uma API externa, e a política de segurança do conteúdo da vitrine (`connect-src 'self'`) bloqueia chamadas do navegador a outros sites.**",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "bind-checkout-freight-to-delivery-address#4.1",
+   "area": "pedidos-e-frete",
+   "tipo": "codigo",
+   "origem": "bind-checkout-freight-to-delivery-address",
+   "tarefa": "4.1",
+   "descricao": "O endereço coletado vai nos metadados da sessão do Stripe (que já guarda os dados do pagamento). Fica ali sob a retenção do próprio Stripe; a retenção do nosso lado segue a do pedido (`ORDERS_ADDRESS_RETENTION_DAYS`).",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "bind-checkout-freight-to-delivery-address#4.2",
+   "area": "pedidos-e-frete",
+   "tipo": "codigo",
+   "origem": "bind-checkout-freight-to-delivery-address",
+   "tarefa": "4.2",
+   "descricao": "Não há correção de endereço depois do pagamento: o pedido nasce com o que foi digitado. Erro de digitação em rua, número ou bairro (o CEP já é garantido) só se corrige por contato com a loja.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "bind-checkout-freight-to-delivery-address#4.3",
+   "area": "pedidos-e-frete",
+   "tipo": "codigo",
+   "origem": "bind-checkout-freight-to-delivery-address",
+   "tarefa": "4.3",
+   "descricao": "O E2E (Playwright) não cobre o formulário: ele só aparece depois de um frete calculado, e o E2E não tem transportadora. Coberto pelos testes de componente e de integração.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-console-noise-and-duplicate-pixel#1.1",
+   "area": "pixels-e-rastreio",
+   "tipo": "codigo",
+   "origem": "fix-console-noise-and-duplicate-pixel",
+   "tarefa": "1.1",
+   "descricao": "No navegador, em produção, com consentimento dado: listar as requisições a `fbevents.js` e rodar `fbq.getState().pixels`; registrar quantas inicializações do ID `613938378456467` existem",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-console-noise-and-duplicate-pixel#1.2",
+   "area": "pixels-e-rastreio",
+   "tipo": "codigo",
+   "origem": "fix-console-noise-and-duplicate-pixel",
+   "tarefa": "1.2",
+   "descricao": "No contêiner GTM, procurar tags do Facebook Pixel (ou HTML personalizado com `fbq`) e registrar o que encontrou (exige acesso ao Google Tag Manager)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-console-noise-and-duplicate-pixel#1.3",
+   "area": "pixels-e-rastreio",
+   "tipo": "codigo",
+   "origem": "fix-console-noise-and-duplicate-pixel",
+   "tarefa": "1.3",
+   "descricao": "Conferir se `storefront/track.ts` e `FacebookPixel.tsx` podem estar ativos na mesma página; registrar a conclusão no `design.md`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-console-noise-and-duplicate-pixel#2.1",
+   "area": "pixels-e-rastreio",
+   "tipo": "codigo",
+   "origem": "fix-console-noise-and-duplicate-pixel",
+   "tarefa": "2.1",
+   "descricao": "Deixar uma só origem do Pixel por página, mantendo a que respeita o consentimento (código do app ou GTM, conforme o diagnóstico)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-console-noise-and-duplicate-pixel#2.2",
+   "area": "pixels-e-rastreio",
+   "tipo": "codigo",
+   "origem": "fix-console-noise-and-duplicate-pixel",
+   "tarefa": "2.2",
+   "descricao": "Garantir que o `PageView` sai uma vez no carregamento e uma vez por navegação",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-console-noise-and-duplicate-pixel#2.3",
+   "area": "pixels-e-rastreio",
+   "tipo": "codigo",
+   "origem": "fix-console-noise-and-duplicate-pixel",
+   "tarefa": "2.3",
+   "descricao": "`UserMenu.tsx` e `UserMenuMobile.tsx`: tirar `src=\"broken-image.jpg\"` do `Avatar`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-console-noise-and-duplicate-pixel#2.4",
+   "area": "pixels-e-rastreio",
+   "tipo": "codigo",
+   "origem": "fix-console-noise-and-duplicate-pixel",
+   "tarefa": "2.4",
+   "descricao": "`app/layouts/index.tsx`: remover os `console.log` de `GTM ID` e `GA ID` do corpo de `RootLayout`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-console-noise-and-duplicate-pixel#2.5",
+   "area": "pixels-e-rastreio",
+   "tipo": "codigo",
+   "origem": "fix-console-noise-and-duplicate-pixel",
+   "tarefa": "2.5",
+   "descricao": "`app/layouts/index.tsx`: acrescentar `<meta name=\"mobile-web-app-capable\" content=\"yes\" />`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-console-noise-and-duplicate-pixel#3.1",
+   "area": "pixels-e-rastreio",
+   "tipo": "codigo",
+   "origem": "fix-console-noise-and-duplicate-pixel",
+   "tarefa": "3.1",
+   "descricao": "Teste do `FacebookPixel`: com `window.fbq` já definido, o `init` não roda de novo; sem consentimento, nada é carregado",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-console-noise-and-duplicate-pixel#3.2",
+   "area": "pixels-e-rastreio",
+   "tipo": "codigo",
+   "origem": "fix-console-noise-and-duplicate-pixel",
+   "tarefa": "3.2",
+   "descricao": "Teste do menu: o avatar sem foto não tem atributo `src` e mostra o ícone de reserva",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-console-noise-and-duplicate-pixel#3.3",
+   "area": "pixels-e-rastreio",
+   "tipo": "codigo",
+   "origem": "fix-console-noise-and-duplicate-pixel",
+   "tarefa": "3.3",
+   "descricao": "`npx vitest run` dos arquivos alterados e `npx tsc --noEmit` do `manejo-app`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-console-noise-and-duplicate-pixel#4.1",
+   "area": "pixels-e-rastreio",
+   "tipo": "codigo",
+   "origem": "fix-console-noise-and-duplicate-pixel",
+   "tarefa": "4.1",
+   "descricao": "Reconstruir o `manejo-app` com `up -d --build --no-deps`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-console-noise-and-duplicate-pixel#4.2",
+   "area": "pixels-e-rastreio",
+   "tipo": "codigo",
+   "origem": "fix-console-noise-and-duplicate-pixel",
+   "tarefa": "4.2",
+   "descricao": "Em produção: console sem `Duplicate Pixel ID`, sem 404 de `broken-image.jpg` e sem os `GTM ID`/`GA ID`; Meta Events Manager recebendo um `PageView` por página",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-console-noise-and-duplicate-pixel#4.3",
+   "area": "pixels-e-rastreio",
+   "tipo": "codigo",
+   "origem": "fix-console-noise-and-duplicate-pixel",
+   "tarefa": "4.3",
+   "descricao": "Registrar a data da virada nos relatórios de campanha e avisar quem lê os dados do Pixel",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-mobile-auth-token-handling#3.4",
+   "area": "app-e-site",
+   "tipo": "codigo",
+   "origem": "fix-mobile-auth-token-handling",
+   "tarefa": "3.4",
+   "descricao": "Teste: o login offline com internet obtém token; sem internet segue offline; a senha não aparece em nenhum armazenamento (feito na JVM: agendamento, offline, falha engolida, sem campo que retenha a senha; falta conferir no aparelho que nenhum arquivo guarda a senha, item 6.3)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-mobile-auth-token-handling#5.3",
+   "area": "app-e-site",
+   "tipo": "codigo",
+   "origem": "fix-mobile-auth-token-handling",
+   "tarefa": "5.3",
+   "descricao": "Teste de interface: a faixa aparece com a sessão expirada e some depois do login",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-store-account-data-edit-and-delete-modal#3.2",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "fix-store-account-data-edit-and-delete-modal",
+   "tarefa": "3.2",
+   "descricao": "Validar no navegador: editar dados, excluir pelo modal, tentar entrar de novo (recusado) e entrar em outra loja",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-store-login-start-url-double-api#2.2",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "fix-store-login-start-url-double-api",
+   "tarefa": "2.2",
+   "descricao": "Reconstruir o `manejo-app` no servidor (`git pull` e `docker compose up -d --build --no-deps manejo-app`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-store-login-start-url-double-api#2.3",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "fix-store-login-start-url-double-api",
+   "tarefa": "2.3",
+   "descricao": "Em `acurui.arpt.site`, \"Criar conta\" abre o cadastro do Keycloak (sem 404)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-store-modal-shape-and-add-customer-verification-admin#1.3",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "fix-store-modal-shape-and-add-customer-verification-admin",
+   "tarefa": "1.3",
+   "descricao": "Conferir visual em tema de botões em pílula, quadrado e arredondado, e em tela pequena (entrar, criar conta, esqueci a senha, aviso de e-mail enviado)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-store-modal-shape-and-add-customer-verification-admin#5.1",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "fix-store-modal-shape-and-add-customer-verification-admin",
+   "tarefa": "5.1",
+   "descricao": "Reconstruir `manejo-api`, `manejo-app` e o painel admin (`up -d --build --no-deps`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-store-modal-shape-and-add-customer-verification-admin#5.2",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "fix-store-modal-shape-and-add-customer-verification-admin",
+   "tarefa": "5.2",
+   "descricao": "Validar: modal sem corte; reenviar verificação do cadastro de teste e recebê-lo; verificar manualmente e entrar na loja",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-docker-proxy-read-only-mode#1.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-docker-proxy-read-only-mode",
+   "tarefa": "1.1",
+   "descricao": "Criar `docker-proxy/nginx.readonly.conf` (só `GET /version` e `GET /containers/json`; todo o resto 403) e renomear a atual para `docker-proxy/nginx.restart.conf`, com a lista de reinício reduzida aos serviços sem estado",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-docker-proxy-read-only-mode#1.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-docker-proxy-read-only-mode",
+   "tarefa": "1.2",
+   "descricao": "`docker-compose.yml`: o serviço `docker-proxy` monta `./docker-proxy/nginx.${DOCKER_PROXY_MODE:-readonly}.conf`; documentar os valores aceitos (`readonly` e `restart`) e recusar valor desconhecido",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-docker-proxy-read-only-mode#1.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-docker-proxy-read-only-mode",
+   "tarefa": "1.3",
+   "descricao": "`docker-proxy/validar-proxy.sh`: aceitar `MODO` (`leitura` por padrão, `reinicio`); em `leitura`, todo `POST .../restart` esperado é 403; em `reinicio`, o `204|404` atual para a allowlist e 403 para `arpt-db`, `redis_manejo`, `keycloak` e `nginx`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-docker-proxy-read-only-mode#1.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-docker-proxy-read-only-mode",
+   "tarefa": "1.4",
+   "descricao": "`deploy.sh`: rodar `validar-proxy.sh` no modo configurado quando o contêiner `arpt-docker-proxy` estiver no ar, abortando o deploy se divergir; sem o proxy, seguir",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-docker-proxy-read-only-mode#2.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-docker-proxy-read-only-mode",
+   "tarefa": "2.1",
+   "descricao": "`env/index.ts` e `env.example`: `MONITORING_RESTART_ENABLED` (padrão `false`) e `MONITORING_RESTARTABLE` (padrão: os cinco serviços sem estado); documentar a relação com `DOCKER_PROXY_MODE`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-docker-proxy-read-only-mode#2.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-docker-proxy-read-only-mode",
+   "tarefa": "2.2",
+   "descricao": "`services/monitoring/config.ts`: `reinicioHabilitado()` e `podeReiniciar` exigindo monitorado, na lista de reinício e fora dos sempre bloqueados",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-docker-proxy-read-only-mode#2.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-docker-proxy-read-only-mode",
+   "tarefa": "2.3",
+   "descricao": "`services/monitoring/reinicio.ts`: com o reinício desligado, recusar com código `RESTART_DISABLED`, auditando a tentativa (`recusado_reinicio_desligado`), antes de qualquer chamada ao proxy; tratar 403 do proxy como \"reinício desligado no proxy\"",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-docker-proxy-read-only-mode#2.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-docker-proxy-read-only-mode",
+   "tarefa": "2.4",
+   "descricao": "`routes/admin/monitoring.ts`: devolver `reinicio_habilitado` em `GET /services`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-docker-proxy-read-only-mode#2.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-docker-proxy-read-only-mode",
+   "tarefa": "2.5",
+   "descricao": "Alerta por e-mail depois de cada reinício aceito (serviço, motivo, administrador, IP; sem segredos), sem afetar o resultado se o envio falhar",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-docker-proxy-read-only-mode#2.6",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-docker-proxy-read-only-mode",
+   "tarefa": "2.6",
+   "descricao": "Testes: reinício desligado recusa e audita sem chamar o proxy; `arpt-db` e `redis_manejo` recusados mesmo com o reinício ligado; 403 do proxy vira a mensagem própria; e-mail enviado no reinício aceito e falha de envio não derruba o reinício",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-docker-proxy-read-only-mode#3.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-docker-proxy-read-only-mode",
+   "tarefa": "3.1",
+   "descricao": "`pages/Monitoring.jsx`: sem `reinicio_habilitado`, não mostrar o botão e exibir a nota \"reinício desligado por configuração\"; com ele ligado, botão só para `reiniciavel`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-docker-proxy-read-only-mode#3.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-docker-proxy-read-only-mode",
+   "tarefa": "3.2",
+   "descricao": "Teste de componente: reinício desligado (sem botão, com nota) e ligado (botão só nos reiniciáveis)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-docker-proxy-read-only-mode#4.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-docker-proxy-read-only-mode",
+   "tarefa": "4.1",
+   "descricao": "Subir o proxy em modo `readonly` localmente e rodar `validar-proxy.sh`: todo reinício dá 403 e a listagem dá 200",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-docker-proxy-read-only-mode#4.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-docker-proxy-read-only-mode",
+   "tarefa": "4.2",
+   "descricao": "Subir em modo `restart` localmente, rodar `MODO=reinicio ./docker-proxy/validar-proxy.sh` e conferir que `arpt-db`, `redis_manejo`, `keycloak` e `nginx` dão 403",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-docker-proxy-read-only-mode#4.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-docker-proxy-read-only-mode",
+   "tarefa": "4.3",
+   "descricao": "Atualizar o passo a passo em `pendencias-manuais-de-producao` (seção 1): ligar o proxy em modo só leitura, e o reinício só como decisão separada",
+   "roteiro": null,
+   "bloqueia": true
+  },
+  {
+   "id": "harden-redis-auth-and-exposure#1.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-redis-auth-and-exposure",
+   "tarefa": "1.1",
+   "descricao": "Remover `ports: [\"6379:6379\"]` do serviço `redis` em `docker-compose.yml`.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-redis-auth-and-exposure#1.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-redis-auth-and-exposure",
+   "tarefa": "1.2",
+   "descricao": "Ajustar o serviço `redis` em `docker-compose.override.yml` para publicar, se necessário, apenas `127.0.0.1:6379:6379` (ou remover o bloco duplicado e herdar o do compose base).",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-redis-auth-and-exposure#1.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-redis-auth-and-exposure",
+   "tarefa": "1.3",
+   "descricao": "Trocar `\"56379:6379\"` por `\"127.0.0.1:56379:6379\"` em `backend/manejo-api/docker-compose.integration.yml`.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-redis-auth-and-exposure#1.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-redis-auth-and-exposure",
+   "tarefa": "1.4",
+   "descricao": "Confirmar que nenhum serviço fora da stack depende de `host:6379` antes do deploy.",
+   "roteiro": null,
+   "bloqueia": true
+  },
+  {
+   "id": "harden-redis-auth-and-exposure#2.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-redis-auth-and-exposure",
+   "tarefa": "2.1",
+   "descricao": "Em `docker-compose.yml`, trocar `command: redis-server --appendonly yes` pelo `sh -c` com `${REDIS_PASSWORD:+--requirepass \"$REDIS_PASSWORD\"}` (com `$$` para o shell do container).",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-redis-auth-and-exposure#2.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-redis-auth-and-exposure",
+   "tarefa": "2.2",
+   "descricao": "No serviço `redis`, adicionar `REDIS_PASSWORD: ${REDIS_PASSWORD}` ao `environment` e remover `REDIS_HOST`/`REDIS_PORT`, que o servidor não usa.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-redis-auth-and-exposure#2.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-redis-auth-and-exposure",
+   "tarefa": "2.3",
+   "descricao": "Aplicar o mesmo `command` e `environment` no serviço `redis` de `docker-compose.override.yml` (ou remover o bloco duplicado).",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-redis-auth-and-exposure#2.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-redis-auth-and-exposure",
+   "tarefa": "2.4",
+   "descricao": "Atualizar `env.example` com comentário: `REDIS_PASSWORD=` vazio = sem senha; valor definido = senha aplicada no start e igual em todos os serviços.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-redis-auth-and-exposure#3.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-redis-auth-and-exposure",
+   "tarefa": "3.1",
+   "descricao": "Adicionar `REDIS_PORT: ${REDIS_PORT}` e `REDIS_PASSWORD: ${REDIS_PASSWORD}` ao `email-worker` em `docker-compose.yml`.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-redis-auth-and-exposure#3.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-redis-auth-and-exposure",
+   "tarefa": "3.2",
+   "descricao": "Revisar `manejo-api`, `dropshipping-pause-worker`, `blockchain-worker`, `precaduser-worker` e `docker-compose.migrations.yml` e confirmar as três variáveis em todos.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-redis-auth-and-exposure#3.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-redis-auth-and-exposure",
+   "tarefa": "3.3",
+   "descricao": "Confirmar que `backend/manejo-api/src/modules/redis/redisConfig.ts` continua lendo `REDIS_HOST`, `REDIS_PORT` e `REDIS_PASSWORD` sem alteração.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-redis-auth-and-exposure#4.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-redis-auth-and-exposure",
+   "tarefa": "4.1",
+   "descricao": "Trocar o healthcheck do `redis` por `CMD-SHELL` com `redis-cli $${REDIS_PASSWORD:+-a \"$$REDIS_PASSWORD\"} --no-auth-warning ping | grep -q PONG`.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-redis-auth-and-exposure#4.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-redis-auth-and-exposure",
+   "tarefa": "4.2",
+   "descricao": "Adicionar `start_period: 10s` ao healthcheck.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-redis-auth-and-exposure#4.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-redis-auth-and-exposure",
+   "tarefa": "4.3",
+   "descricao": "Garantir o mesmo healthcheck no serviço `redis` do `docker-compose.override.yml`, se o bloco for mantido.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-redis-auth-and-exposure#5.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-redis-auth-and-exposure",
+   "tarefa": "5.1",
+   "descricao": "Criar `docs/REDIS_OPERACAO.md` com sintomas (`NOAUTH`, `WRONGPASS`), comandos de diagnóstico (`docker inspect`, `CONFIG GET requirepass`, `redis-cli -a`) e a diferença entre senha runtime e persistente.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-redis-auth-and-exposure#5.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-redis-auth-and-exposure",
+   "tarefa": "5.2",
+   "descricao": "Documentar ativação, rotação e desativação da senha, incluindo a ordem de recriação de `redis` e clientes e o motivo de `restart` não reler o `.env`.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-redis-auth-and-exposure#6.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-redis-auth-and-exposure",
+   "tarefa": "6.1",
+   "descricao": "Rodar `docker compose -f docker-compose.yml config` e confirmar que o `redis` não tem `ports` e que o `command`/healthcheck foram renderizados corretamente.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-redis-auth-and-exposure#6.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-redis-auth-and-exposure",
+   "tarefa": "6.2",
+   "descricao": "Com `REDIS_PASSWORD` vazia, recriar `redis` e confirmar `redis-cli ping` = `PONG` e healthcheck `healthy`.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-redis-auth-and-exposure#6.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-redis-auth-and-exposure",
+   "tarefa": "6.3",
+   "descricao": "Com uma senha temporária, recriar `redis`, confirmar `NOAUTH` sem senha e `PONG` com `-a`, e confirmar que `docker restart redis_manejo` mantém a exigência de senha.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-redis-auth-and-exposure#6.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-redis-auth-and-exposure",
+   "tarefa": "6.4",
+   "descricao": "Recriar `manejo-api` e `email-worker` e confirmar que os logs não repetem `Redis connection error` com `NOAUTH`.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-redis-auth-and-exposure#6.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-redis-auth-and-exposure",
+   "tarefa": "6.5",
+   "descricao": "Restaurar o `.env` do servidor para o valor acordado (vazio ou senha definitiva) e recriar os serviços na ordem documentada.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "migrate-admin-dash-auth-to-keycloak#1.1",
+   "area": "usuarios-e-acesso",
+   "tipo": "codigo",
+   "origem": "migrate-admin-dash-auth-to-keycloak",
+   "tarefa": "1.1",
+   "descricao": "Criar o client público do painel (PKCE, redirect URIs e web origins de `admin.arpt.com.br` e do ambiente local), documentado no repositório",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "migrate-admin-dash-auth-to-keycloak#1.2",
+   "area": "usuarios-e-acesso",
+   "tipo": "codigo",
+   "origem": "migrate-admin-dash-auth-to-keycloak",
+   "tarefa": "1.2",
+   "descricao": "Criar os usuários administradores no realm e atribuir o papel `administrador`; script ou passo a passo para repetir",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "migrate-admin-dash-auth-to-keycloak#1.3",
+   "area": "usuarios-e-acesso",
+   "tipo": "codigo",
+   "origem": "migrate-admin-dash-auth-to-keycloak",
+   "tarefa": "1.3",
+   "descricao": "Aplicar o tema de login `arpt-keycloak-theme` ao client, se aplicável",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "migrate-admin-dash-auth-to-keycloak#2.1",
+   "area": "usuarios-e-acesso",
+   "tipo": "codigo",
+   "origem": "migrate-admin-dash-auth-to-keycloak",
+   "tarefa": "2.1",
+   "descricao": "Config `ADMIN_FIREBASE_UIDS` (e documentação no `env.example`); `temPapel` e `isAdministrador` passam a exigir o `sub` na lista, em vez de \"projeto certo\"",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "migrate-admin-dash-auth-to-keycloak#2.2",
+   "area": "usuarios-e-acesso",
+   "tipo": "codigo",
+   "origem": "migrate-admin-dash-auth-to-keycloak",
+   "tarefa": "2.2",
+   "descricao": "Rota que emite custom token do Firebase para administrador autenticado no Keycloak (Admin SDK, `createCustomToken`), 403 para os demais",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "migrate-admin-dash-auth-to-keycloak#2.3",
+   "area": "usuarios-e-acesso",
+   "tipo": "codigo",
+   "origem": "migrate-admin-dash-auth-to-keycloak",
+   "tarefa": "2.3",
+   "descricao": "Verificar o uso de `firebaseFirestore` em `routes/pagamentos.ts` e de `validateFirebaseToken` em `routes/admin/manejo.ts`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "migrate-admin-dash-auth-to-keycloak#2.4",
+   "area": "usuarios-e-acesso",
+   "tipo": "codigo",
+   "origem": "migrate-admin-dash-auth-to-keycloak",
+   "tarefa": "2.4",
+   "descricao": "Testes: Firebase fora da lista (403), na lista (ok), Keycloak com papel (ok), sem papel (403), custom token por não admin (403)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "migrate-admin-dash-auth-to-keycloak#3.1",
+   "area": "usuarios-e-acesso",
+   "tipo": "codigo",
+   "origem": "migrate-admin-dash-auth-to-keycloak",
+   "tarefa": "3.1",
+   "descricao": "Adicionar `keycloak-js` e reescrever `AuthContext.jsx`/`Login.jsx` (login, renovação, logout, recusa sem papel)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "migrate-admin-dash-auth-to-keycloak#3.2",
+   "area": "usuarios-e-acesso",
+   "tipo": "codigo",
+   "origem": "migrate-admin-dash-auth-to-keycloak",
+   "tarefa": "3.2",
+   "descricao": "`services/api.js`: anexar o token do Keycloak; manter o bypass de E2E (`arpt_e2e_token`, `VITE_SKIP_AUTH`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "migrate-admin-dash-auth-to-keycloak#3.3",
+   "area": "usuarios-e-acesso",
+   "tipo": "codigo",
+   "origem": "migrate-admin-dash-auth-to-keycloak",
+   "tarefa": "3.3",
+   "descricao": "`services/firebase.js`: entrar no Firebase com o custom token só para o Firestore; remover `signInWithEmailAndPassword`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "migrate-admin-dash-auth-to-keycloak#3.4",
+   "area": "usuarios-e-acesso",
+   "tipo": "codigo",
+   "origem": "migrate-admin-dash-auth-to-keycloak",
+   "tarefa": "3.4",
+   "descricao": "`DropshippingAdmin.jsx` e demais telas: trocar \"firebase_uid\" pelo id do Keycloak",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "migrate-admin-dash-auth-to-keycloak#3.5",
+   "area": "usuarios-e-acesso",
+   "tipo": "codigo",
+   "origem": "migrate-admin-dash-auth-to-keycloak",
+   "tarefa": "3.5",
+   "descricao": "Variáveis `VITE_KEYCLOAK_*`, README e testes (incluindo E2E com Keycloak falso)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "migrate-admin-dash-auth-to-keycloak#4.1",
+   "area": "usuarios-e-acesso",
+   "tipo": "codigo",
+   "origem": "migrate-admin-dash-auth-to-keycloak",
+   "tarefa": "4.1",
+   "descricao": "Publicar a API da fase 1 primeiro, depois o painel; manter um administrador de reserva em `ADMIN_FIREBASE_UIDS` até validar o login novo",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "migrate-admin-dash-auth-to-keycloak#4.2",
+   "area": "usuarios-e-acesso",
+   "tipo": "codigo",
+   "origem": "migrate-admin-dash-auth-to-keycloak",
+   "tarefa": "4.2",
+   "descricao": "Conferir no console do Firebase que o cadastro livre (sign-up) está desligado enquanto o Firebase ainda existir",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "migrate-admin-dash-auth-to-keycloak#4.3",
+   "area": "usuarios-e-acesso",
+   "tipo": "codigo",
+   "origem": "migrate-admin-dash-auth-to-keycloak",
+   "tarefa": "4.3",
+   "descricao": "Fase final: remover o caminho Firebase de autorização (`papeis.ts`, `admin-check.ts`, `validateHybridAuth`, `firebaseAuth.plugin.ts`) e a lista de transição, após validar",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "migrate-admin-dash-auth-to-keycloak#5.1",
+   "area": "usuarios-e-acesso",
+   "tipo": "codigo",
+   "origem": "migrate-admin-dash-auth-to-keycloak",
+   "tarefa": "5.1",
+   "descricao": "Abrir change para migrar `audit_logs`, `certificates`, `settings/gemini` e rascunhos do Firestore para a API/Postgres e então remover o Firebase do painel",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-admin-service-monitoring#8.4",
+   "area": "monitoramento",
+   "tipo": "manual",
+   "origem": "add-admin-service-monitoring",
+   "tarefa": "8.4",
+   "descricao": "Verificação no navegador: estados, reinício, filas e push (manual, registrada)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-admin-service-monitoring#9.3",
+   "area": "monitoramento",
+   "tipo": "manual",
+   "origem": "add-admin-service-monitoring",
+   "tarefa": "9.3",
+   "descricao": "Período de observação de 48 h com alertas desligados, depois ligar",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-admin-service-monitoring#9.4",
+   "area": "monitoramento",
+   "tipo": "manual",
+   "origem": "add-admin-service-monitoring",
+   "tarefa": "9.4",
+   "descricao": "Remover `backend/manejo-api/JobsMonitor/` após a tela nativa estar em uso",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-admin-service-monitoring#9.5",
+   "area": "monitoramento",
+   "tipo": "manual",
+   "origem": "add-admin-service-monitoring",
+   "tarefa": "9.5",
+   "descricao": "Follow-up: monitor externo simples (check HTTP de fora da stack) para cobrir a queda do próprio backend",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-campaign-adhesion-outreach#7.2",
+   "area": "crescimento",
+   "tipo": "manual",
+   "origem": "add-campaign-adhesion-outreach",
+   "tarefa": "7.2",
+   "descricao": "Com os dois canais desligados, criar a promoção em rascunho no painel e conferir que nada é enviado nem exibido",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-campaign-adhesion-outreach#7.3",
+   "area": "crescimento",
+   "tipo": "manual",
+   "origem": "add-campaign-adhesion-outreach",
+   "tarefa": "7.3",
+   "descricao": "Em teste: ligar a notificação, aderir com um dropshipper, conferir o selo e a regra do bônus com e sem adesão",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-campaign-adhesion-outreach#7.4",
+   "area": "crescimento",
+   "tipo": "manual",
+   "origem": "add-campaign-adhesion-outreach",
+   "tarefa": "7.4",
+   "descricao": "Em teste: conceder `CAMPANHA` com um endereço de teste, ligar o e-mail, conferir convite, descadastro, ausência de lembrete para quem aderiu e a pausa no meio do envio",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-campaign-adhesion-outreach#7.5",
+   "area": "crescimento",
+   "tipo": "manual",
+   "origem": "add-campaign-adhesion-outreach",
+   "tarefa": "7.5",
+   "descricao": "Em produção: ligar primeiro a notificação na plataforma e o e-mail só depois de formado o público com consentimento",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-campaign-adhesion-outreach#7.7",
+   "area": "crescimento",
+   "tipo": "manual",
+   "origem": "add-campaign-adhesion-outreach",
+   "tarefa": "7.7",
+   "descricao": "Rodar `tests/manejo.test.ts` e `tests/adminManejo.test.ts` do `manejo-api` com a pilha completa (`npm run test:docker`): no host elas não carregam sem as variáveis do Firebase e, com valores fictícios, ficam presas tentando falar com serviços reais",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-campaign-adhesion-outreach#6.6",
+   "area": "crescimento",
+   "tipo": "manual",
+   "origem": "add-campaign-adhesion-outreach",
+   "tarefa": "6.6",
+   "descricao": "Acesso antecipado aos materiais de divulgação: hoje o kit de imprensa e a página de parceiros são públicos, então não há o que liberar antes; definir com o produto qual material passa a ter acesso restrito antes de implementar (o gancho `temMateriaisAntecipados` já existe no servidor e a opção está desabilitada no painel)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-correios-international-shipping-fallback#5.1",
+   "area": "pedidos-e-frete",
+   "tipo": "manual",
+   "origem": "add-correios-international-shipping-fallback",
+   "tarefa": "5.1",
+   "descricao": "Confirmar com o responsável se há contrato com os Correios com os serviços 38202 (API PRECOS) e 38210 (API PRAZOS); sem contrato, a mudança fica desligada",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-correios-international-shipping-fallback#5.2",
+   "area": "pedidos-e-frete",
+   "tipo": "manual",
+   "origem": "add-correios-international-shipping-fallback",
+   "tarefa": "5.2",
+   "descricao": "Na homologação (`CORREIOS_API_URL=https://apihom.correios.com.br`), cotar um destino real e registrar a resposta (sem credenciais); confirmar o nome do campo de total da resposta internacional e ajustar o parser se for diferente",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-correios-international-shipping-fallback#5.3",
+   "area": "pedidos-e-frete",
+   "tipo": "manual",
+   "origem": "add-correios-international-shipping-fallback",
+   "tarefa": "5.3",
+   "descricao": "Ligar em produção (`CORREIOS_INTERNACIONAL_ENABLED=true`) e conferir uma cotação com a DHL desligada",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipping-journey-integration-test#0.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "add-dropshipping-journey-integration-test",
+   "tarefa": "0.1",
+   "descricao": "Responsável decide as perguntas em aberto do `design.md`: aprovar o modo produção com pagamento simulado e contas de teste dedicadas (ou restringir o modo produção), quem confirma a entrega, e se o repasse é acionado direto ou espera o job. As seções 6 e 9 dependem disso; as seções 1 a 5 e 7 a 8 podem seguir antes, só no modo desenvolvimento",
+   "roteiro": null,
+   "bloqueia": true
+  },
+  {
+   "id": "add-dropshipping-journey-integration-test#9.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "add-dropshipping-journey-integration-test",
+   "tarefa": "9.2",
+   "descricao": "Ligar `JOURNEY_TEST_ENABLED` e o segredo no `.env` de produção só durante a janela; rodar com `--prod`; conferir a reversão; desligar de novo",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipping-journey-integration-test#9.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "add-dropshipping-journey-integration-test",
+   "tarefa": "9.3",
+   "descricao": "Registrar a execução (data, resultado, relatório) e tratar as falhas como na seção 7",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipping-journey-integration-test#9.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "add-dropshipping-journey-integration-test",
+   "tarefa": "9.1",
+   "descricao": "Criar as contas de teste dedicadas (administrador, produtor, dropshipper) com senha forte guardada fora do repositório",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-multitenant-dropshipper-storefront#9.1",
+   "area": "lojas",
+   "tipo": "manual",
+   "origem": "add-multitenant-dropshipper-storefront",
+   "tarefa": "9.1",
+   "descricao": "Antes do deploy: revisar e commitar o trabalho acumulado, tratar o `.env` do frontend modificado, `backend/arpt-ai/.env` rastreado e a credencial de teste no app Android, e rodar as suítes locais",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-multitenant-dropshipper-storefront#9.2",
+   "area": "lojas",
+   "tipo": "manual",
+   "origem": "add-multitenant-dropshipper-storefront",
+   "tarefa": "9.2",
+   "descricao": "Aplicar o `nginx.conf`, `start-nginx.sh` e `docker-compose.yml` revisados (gerar `STOREFRONT_FRONT_SECRET`, deploy, conferências pós-deploy e reversão) e decidir sobre `X-Forwarded-Host` nos `location /api/`",
+   "roteiro": null,
+   "bloqueia": true
+  },
+  {
+   "id": "add-multitenant-dropshipper-storefront#9.3",
+   "area": "lojas",
+   "tipo": "manual",
+   "origem": "add-multitenant-dropshipper-storefront",
+   "tarefa": "9.3",
+   "descricao": "Certificados e DNS: confirmar que o DNS é da Hostinger, criar `lojas.arpt.site`, token da API, ligar o serviço no `.env`, ensaio em staging com domínio real, emissão real, só então `*.arpt.site`, e a renovação do curinga — **só dá para validar no servidor, com a versão do dropshipping no ar: roteiro em `openspec/changes/pendencias-manuais-de-producao/docs/VALIDACAO_TLS_PRODUCAO.md`, script `scripts/verify-storefront-tls-prod.sh` (ainda não executado em servidor real)**",
+   "roteiro": {
+    "secao": "infraestrutura-e-deploy",
+    "ancora": "doc-validacao-tls-producao",
+    "titulo": "Validação de TLS das lojas no servidor"
+   },
+   "bloqueia": false
+  },
+  {
+   "id": "add-multitenant-dropshipper-storefront#9.4",
+   "area": "lojas",
+   "tipo": "manual",
+   "origem": "add-multitenant-dropshipper-storefront",
+   "tarefa": "9.4",
+   "descricao": "Decisões de produto: vínculo do selo com certificado e rastreio (4.3), escopo restante do painel (7.2), contraste do tema, revisão jurídica e retomada de marketplaces",
+   "roteiro": null,
+   "bloqueia": true
+  },
+  {
+   "id": "add-multitenant-dropshipper-storefront#9.5",
+   "area": "lojas",
+   "tipo": "manual",
+   "origem": "add-multitenant-dropshipper-storefront",
+   "tarefa": "9.5",
+   "descricao": "Pendência deixada para o fim: falha intermitente do harness de TLS (`scripts/test-storefront-tls.sh`) — **reproduzida (4 de 8 rodadas), causa desconhecida, não fechável localmente: o passo 3 de `openspec/changes/pendencias-manuais-de-producao/docs/VALIDACAO_TLS_PRODUCAO.md` mede a janela de recarga no servidor**",
+   "roteiro": {
+    "secao": "infraestrutura-e-deploy",
+    "ancora": "doc-validacao-tls-producao",
+    "titulo": "Validação de TLS das lojas no servidor"
+   },
+   "bloqueia": false
+  },
+  {
+   "id": "add-producer-offer-mode-and-lead-times#7.10",
+   "area": "produtos-e-catalogo",
+   "tipo": "manual",
+   "origem": "add-producer-offer-mode-and-lead-times",
+   "tarefa": "7.10",
+   "descricao": "Executar o script em simulação e depois com `--apply` no Keycloak de cada ambiente",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-producer-offer-mode-and-lead-times#7.11",
+   "area": "produtos-e-catalogo",
+   "tipo": "manual",
+   "origem": "add-producer-offer-mode-and-lead-times",
+   "tarefa": "7.11",
+   "descricao": "Confirmar que o client `manejo-api` do Keycloak tem o fluxo de senha habilitado (necessário ao vínculo automático)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-producer-offer-mode-and-lead-times#7.12",
+   "area": "produtos-e-catalogo",
+   "tipo": "manual",
+   "origem": "add-producer-offer-mode-and-lead-times",
+   "tarefa": "7.12",
+   "descricao": "Definir `JWT_SECRET` forte em produção e falhar a inicialização quando for o valor padrão (fora do escopo do código desta mudança)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-producer-role-self-service#4.1",
+   "area": "painel-do-produtor",
+   "tipo": "manual",
+   "origem": "add-producer-role-self-service",
+   "tarefa": "4.1",
+   "descricao": "Reconstruir `manejo-api` e `manejo-app` com `up -d --build --no-deps`; publicar o `arpt-admin-dash`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-producer-role-self-service#5.1",
+   "area": "painel-do-produtor",
+   "tipo": "manual",
+   "origem": "add-producer-role-self-service",
+   "tarefa": "5.1",
+   "descricao": "Rodar a simulação de `setup-produtor-keycloak.ts` e confirmar o grupo e a role `produtor` no Keycloak",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-producer-role-self-service#5.4",
+   "area": "painel-do-produtor",
+   "tipo": "manual",
+   "origem": "add-producer-role-self-service",
+   "tarefa": "5.4",
+   "descricao": "Conferir que `administrador` não pode ser concedido por nenhum desses caminhos",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-producer-role-self-service#5.2",
+   "area": "painel-do-produtor",
+   "tipo": "manual",
+   "origem": "add-producer-role-self-service",
+   "tarefa": "5.2",
+   "descricao": "Proprietário de teste ativa o papel no painel; **Meus produtos** aparece; cadastra um produto",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-producer-role-self-service#5.3",
+   "area": "painel-do-produtor",
+   "tipo": "manual",
+   "origem": "add-producer-role-self-service",
+   "tarefa": "5.3",
+   "descricao": "Administrador concede e retira o papel de outro usuário no dash; o usuário perde o cadastro de produtos",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "enforce-strong-jwt-secret#1.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "enforce-strong-jwt-secret",
+   "tarefa": "1.2",
+   "descricao": "(procedimento em `rollout-production-secrets`, 3.1) Gerar um segredo com `openssl rand -base64 48` e gravá-lo no `.env` de produção (nunca no repositório) — **aguardando a decisão do responsável: invalida todos os tokens existentes**",
+   "roteiro": null,
+   "bloqueia": true
+  },
+  {
+   "id": "enforce-strong-jwt-secret#1.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "enforce-strong-jwt-secret",
+   "tarefa": "1.3",
+   "descricao": "(procedimento em `rollout-production-secrets`, 3.2 a 3.4) Reiniciar a API e confirmar que um token assinado com o valor padrão passa a receber 401",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "enforce-strong-jwt-secret#1.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "enforce-strong-jwt-secret",
+   "tarefa": "1.4",
+   "descricao": "Avisar os usuários do Manejar — **o app da loja (1.5.02, publicado em 9/05) provavelmente envia o token. Ao trocar o `JWT_SECRET`, quem está com o app aberto passa a receber 401 nas rotas autenticadas (sync de propriedades e de peças) e o app não trata isso: o sync falha em silêncio até o usuário entrar de novo. Avisar, e preferir horário de pouco uso. O site (Keycloak) não é afetado**",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "enforce-strong-jwt-secret#4.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "enforce-strong-jwt-secret",
+   "tarefa": "4.2",
+   "descricao": "Rotacionar o segredo do client no Keycloak e atualizar o `.env` — **executada na mudança `remove-committed-secrets` (2.1 a 2.5)**",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "enforce-strong-jwt-secret#4.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "enforce-strong-jwt-secret",
+   "tarefa": "4.3",
+   "descricao": "Rotacionar o segredo versionado em `keycloak.json` e remover o arquivo do controle de versão (ou o segredo dele) — **executada na mudança `remove-committed-secrets` (3.1 a 3.4)**",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-admin-blank-page-analytics-pixels#1.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-admin-blank-page-analytics-pixels",
+   "tarefa": "1.2",
+   "descricao": "`vite build` passou. Falta abrir `/analytics-pixels` no navegador, autenticado, para confirmar que renderiza.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-admin-blank-page-analytics-pixels#1.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-admin-blank-page-analytics-pixels",
+   "tarefa": "1.3",
+   "descricao": "Publicar (pendente) a correção (pode ser antes das demais tarefas).",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-admin-blank-page-analytics-pixels#3.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-admin-blank-page-analytics-pixels",
+   "tarefa": "3.2",
+   "descricao": "(pendente, manual) Confirmar o fallback lançando um erro de teste no `App` em desenvolvimento, e remover o erro de teste.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-admin-product-form-translations-and-dimensions#1.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-admin-product-form-translations-and-dimensions",
+   "tarefa": "1.1",
+   "descricao": "Reproduzir os três defeitos no painel com o navegador em inglês e em português, registrando o que a API devolve (nome, info, `translations`) e o que o formulário envia",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-mobile-auth-token-handling#6.1",
+   "area": "app-e-site",
+   "tipo": "manual",
+   "origem": "fix-mobile-auth-token-handling",
+   "tarefa": "6.1",
+   "descricao": "Primeiro login com internet, fechar o app à força, abrir de novo e confirmar que o sync autenticado responde 200",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-mobile-auth-token-handling#6.4",
+   "area": "app-e-site",
+   "tipo": "manual",
+   "origem": "fix-mobile-auth-token-handling",
+   "tarefa": "6.4",
+   "descricao": "Trocar o segredo num ambiente de teste e confirmar o aviso de sessão expirada, sem perda de dados",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-mobile-auth-token-handling#6.5",
+   "area": "app-e-site",
+   "tipo": "manual",
+   "origem": "fix-mobile-auth-token-handling",
+   "tarefa": "6.5",
+   "descricao": "Confirmar que o idioma ainda vai nas requisições autenticadas (respostas localizadas)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-mobile-auth-token-handling#6.6",
+   "area": "app-e-site",
+   "tipo": "manual",
+   "origem": "fix-mobile-auth-token-handling",
+   "tarefa": "6.6",
+   "descricao": "Restaurar um backup em outro aparelho e confirmar que o app trata a ausência do token sem falhar",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-mobile-auth-token-handling#7.1",
+   "area": "app-e-site",
+   "tipo": "manual",
+   "origem": "fix-mobile-auth-token-handling",
+   "tarefa": "7.1",
+   "descricao": "Mesclar `feat/secure-communication` no `main` do app (a internacionalização já foi resolvida neste branch) e conferir que o build de release sai do `main`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-mobile-auth-token-handling#7.3",
+   "area": "app-e-site",
+   "tipo": "manual",
+   "origem": "fix-mobile-auth-token-handling",
+   "tarefa": "7.3",
+   "descricao": "Publicar em teste interno e fechado, depois em produção por etapas",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-mobile-auth-token-handling#6.2",
+   "area": "app-e-site",
+   "tipo": "manual",
+   "origem": "fix-mobile-auth-token-handling",
+   "tarefa": "6.2",
+   "descricao": "Sync periódico com o app fechado, confirmado pelo status das respostas no backend",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-mobile-auth-token-handling#6.3",
+   "area": "app-e-site",
+   "tipo": "manual",
+   "origem": "fix-mobile-auth-token-handling",
+   "tarefa": "6.3",
+   "descricao": "Login offline com internet disponível obtém token novo",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-mobile-auth-token-handling#7.2",
+   "area": "app-e-site",
+   "tipo": "manual",
+   "origem": "fix-mobile-auth-token-handling",
+   "tarefa": "7.2",
+   "descricao": "Definir o versionCode (maior que 1502, o publicado) e o versionName",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-mobile-auth-token-handling#7.4",
+   "area": "app-e-site",
+   "tipo": "manual",
+   "origem": "fix-mobile-auth-token-handling",
+   "tarefa": "7.4",
+   "descricao": "Só depois, executar `rollout-production-secrets` com aviso aos usuários",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-producer-role-keycloak-403-and-proxy-rate-limit#1.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-producer-role-keycloak-403-and-proxy-rate-limit",
+   "tarefa": "1.1",
+   "descricao": "Confirmar qual chamada administrativa devolve 403 (logs da API após a tarefa 2.1, ou `curl` com o token da conta de serviço) e quais roles `realm-management` ela tem hoje.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-producer-role-keycloak-403-and-proxy-rate-limit#1.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-producer-role-keycloak-403-and-proxy-rate-limit",
+   "tarefa": "1.2",
+   "descricao": "Rodar `setup-produtor-keycloak.ts` sem `--apply` e registrar se o grupo `produtor` tem a role `produtor` mapeada.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-producer-role-keycloak-403-and-proxy-rate-limit#1.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-producer-role-keycloak-403-and-proxy-rate-limit",
+   "tarefa": "1.3",
+   "descricao": "Confirmar com `docker compose logs manejo-api` que `remoteAddress` é sempre o do nginx e que o 429 vem do limite global.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-producer-role-keycloak-403-and-proxy-rate-limit#6.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-producer-role-keycloak-403-and-proxy-rate-limit",
+   "tarefa": "6.1",
+   "descricao": "Rodar o script de permissões em simulação, revisar e aplicar com `--apply` após confirmação do responsável.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-producer-role-keycloak-403-and-proxy-rate-limit#6.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-producer-role-keycloak-403-and-proxy-rate-limit",
+   "tarefa": "6.2",
+   "descricao": "Reconstruir: `docker compose up -d --build --no-deps manejo-api manejo-app`.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-producer-role-keycloak-403-and-proxy-rate-limit#6.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-producer-role-keycloak-403-and-proxy-rate-limit",
+   "tarefa": "6.3",
+   "descricao": "Com o usuário afetado: ativar o papel, sair/entrar e conferir aba \"Painel do produtor\", perfil \"Produtor\" na lista de roles e grupo/role no Keycloak.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-producer-role-keycloak-403-and-proxy-rate-limit#6.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-producer-role-keycloak-403-and-proxy-rate-limit",
+   "tarefa": "6.4",
+   "descricao": "Conferir nos logs que `remoteAddress`/IP do limite é o do cliente e que não há 429 em rajada de `/user/me/roles`.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-producer-role-persistence-and-profiles#1.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-producer-role-persistence-and-profiles",
+   "tarefa": "1.1",
+   "descricao": "Com um produtor + proprietário real, comparar `GET /user/me/roles` com os papéis do Keycloak e registrar o resultado.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-producer-role-persistence-and-profiles#1.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-producer-role-persistence-and-profiles",
+   "tarefa": "1.2",
+   "descricao": "No `manejo-app` em execução, reproduzir a ausência da aba \"Painel do Produtor\" e identificar a causa (build antigo, `userGroups` vazio, service worker).",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-producer-role-persistence-and-profiles#5.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-producer-role-persistence-and-profiles",
+   "tarefa": "5.4",
+   "descricao": "No navegador: aba \"Painel do Produtor\" visível, botão não reaparece ao recarregar, botão laranja, todos os perfis ao lado do avatar.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-producer-role-token-mismatch#1.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-producer-role-token-mismatch",
+   "tarefa": "1.1",
+   "descricao": "Confirmar no Keycloak de produção: o usuário afetado está no grupo `produtor`? o grupo tem a role de realm `produtor` mapeada? (somente leitura; combinar com o responsável o acesso).",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-producer-role-token-mismatch#1.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-producer-role-token-mismatch",
+   "tarefa": "1.2",
+   "descricao": "Rodar `setup-produtor-keycloak.ts` em modo simulação (sem `--apply`) em produção e registrar o que ele criaria ou mapearia.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-producer-role-token-mismatch#4.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-producer-role-token-mismatch",
+   "tarefa": "4.3",
+   "descricao": "Reconstruir `manejo-api` e `manejo-app` com `up -d --build --no-deps`.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-producer-role-token-mismatch#4.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-producer-role-token-mismatch",
+   "tarefa": "4.4",
+   "descricao": "Em produção, com o usuário afetado: ativar o papel, entrar de novo e conferir \"Melhorar texto\", envio de foto e cadastro sem 403.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-producer-tab-visibility#1.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-producer-tab-visibility",
+   "tarefa": "1.1",
+   "descricao": "Confirmar no `manejo-app` em execução se a aba aparece para um usuário com `produtor` no token (descartar build desatualizado).",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-producer-tab-visibility#1.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-producer-tab-visibility",
+   "tarefa": "1.2",
+   "descricao": "Reproduzir com um usuário que ganhou `produtor` depois do login e confirmar que o token antigo esconde a aba.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-producer-tab-visibility#4.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-producer-tab-visibility",
+   "tarefa": "4.2",
+   "descricao": "Conferir no navegador que a aba \"Painel do produtor\" aparece para produtor/proprietário em \"Minha Conta e Impacto\".",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "legal-review-shipping-fee-terms#1.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "legal-review-shipping-fee-terms",
+   "tarefa": "1.1",
+   "descricao": "Montar o pacote do revisor: quatro rascunhos, `REVISAO_JURIDICA.md` e uma página em linguagem não técnica sobre o comportamento do sistema (frete no repasse, reembolso com frete, débito, logística reversa 50/50, aceite obrigatório do produtor)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "legal-review-shipping-fee-terms#1.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "legal-review-shipping-fee-terms",
+   "tarefa": "1.2",
+   "descricao": "Definir e registrar o revisor responsável e o prazo em `registro-da-revisao.md`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "legal-review-shipping-fee-terms#1.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "legal-review-shipping-fee-terms",
+   "tarefa": "1.3",
+   "descricao": "Entregar o pacote e registrar a data",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "legal-review-shipping-fee-terms#2.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "legal-review-shipping-fee-terms",
+   "tarefa": "2.1",
+   "descricao": "Registrar a decisão, a justificativa e a data de cada questão do roteiro, incluindo a devolução do frete em arrependimento e em defeito (tarefa 0.2 de `route-shipping-fee-to-producer`)",
+   "roteiro": null,
+   "bloqueia": true
+  },
+  {
+   "id": "legal-review-shipping-fee-terms#2.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "legal-review-shipping-fee-terms",
+   "tarefa": "2.5",
+   "descricao": "Se alguma decisão contrariar o comportamento do sistema, abrir a mudança de código correspondente e manter a publicação bloqueada até ela ser aplicada",
+   "roteiro": null,
+   "bloqueia": true
+  },
+  {
+   "id": "legal-review-shipping-fee-terms#3.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "legal-review-shipping-fee-terms",
+   "tarefa": "3.1",
+   "descricao": "Registrar a aprovação: quem aprovou, quando e quais arquivos",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "legal-review-shipping-fee-terms#3.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "legal-review-shipping-fee-terms",
+   "tarefa": "3.2",
+   "descricao": "Registrar o SHA-256 de cada texto aprovado (produtor e dropshipper, pt e en), com `sha256sum`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "legal-review-shipping-fee-terms#4.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "legal-review-shipping-fee-terms",
+   "tarefa": "4.2",
+   "descricao": "Passar para a tarefa 6.3 (publicar com a marca, conferir o hash do conteúdo gravado e acompanhar os aceites)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "legal-review-shipping-fee-terms#2.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "legal-review-shipping-fee-terms",
+   "tarefa": "2.2",
+   "descricao": "Ajustar os quatro textos conforme as decisões e remover a marca \"RASCUNHO\"",
+   "roteiro": null,
+   "bloqueia": true
+  },
+  {
+   "id": "legal-review-shipping-fee-terms#2.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "legal-review-shipping-fee-terms",
+   "tarefa": "2.3",
+   "descricao": "Revisar a versão em inglês junto com a em português",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "legal-review-shipping-fee-terms#2.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "legal-review-shipping-fee-terms",
+   "tarefa": "2.4",
+   "descricao": "Incorporar as seções aprovadas aos termos completos do produtor e do dropshipper",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "legal-review-shipping-fee-terms#4.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "legal-review-shipping-fee-terms",
+   "tarefa": "4.1",
+   "descricao": "Marcar 0.2 e 6.2 em `route-shipping-fee-to-producer`, referenciando o registro",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "reduce-free-donation-minimum-to-1-real#2.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "reduce-free-donation-minimum-to-1-real",
+   "tarefa": "2.3",
+   "descricao": "Concluir o cadastro Stripe do dono do `projeto-ybiraete` para que a divisão pendente possa ser feita (ação manual do dono)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "reduce-free-donation-minimum-to-1-real#4.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "reduce-free-donation-minimum-to-1-real",
+   "tarefa": "4.1",
+   "descricao": "Reconstruir `manejo-api` e `manejo-app` com `up -d --build --no-deps`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "reduce-free-donation-minimum-to-1-real#4.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "reduce-free-donation-minimum-to-1-real",
+   "tarefa": "4.4",
+   "descricao": "Registrar no `docs/` a taxa efetiva do gateway em R$ 1,00, para o negócio rever o mínimo se preciso",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "remove-committed-secrets#2.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "remove-committed-secrets",
+   "tarefa": "2.1",
+   "descricao": "(procedimento em `rollout-production-secrets`, seção 2) Regenerar o segredo do client `manejo-api` no Keycloak, em janela de baixo uso",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "remove-committed-secrets#2.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "remove-committed-secrets",
+   "tarefa": "2.2",
+   "descricao": "Gravar `KEYCLOAK_API_CLIENT_SECRET` no `.env` de produção e recriar a API (`docker compose up -d --force-recreate manejo-api`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "remove-committed-secrets#2.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "remove-committed-secrets",
+   "tarefa": "2.4",
+   "descricao": "Confirmar que uma autenticação de client com o valor antigo é recusada pelo Keycloak",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "remove-committed-secrets#2.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "remove-committed-secrets",
+   "tarefa": "2.5",
+   "descricao": "Registrar a rotação no inventário",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "remove-committed-secrets#2.6",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "remove-committed-secrets",
+   "tarefa": "2.6",
+   "descricao": "Revogar a conta de serviço do Firebase Admin comitada em `firebase.json` (commit `28db881`, 3 branches remotos): conferir se é a mesma chave de `FIREBASE_PRIVATE_KEY` em produção; se for, gerar outra, atualizar o `.env`, recriar a API e só então revogar a antiga — **achado da varredura de 2026-10-21, fora do escopo original; ver `docs/SEGREDOS_INVENTARIO.md`**",
+   "roteiro": {
+    "secao": "infraestrutura-e-deploy",
+    "ancora": "doc-segredos-inventario",
+    "titulo": "Inventário de segredos"
+   },
+   "bloqueia": false
+  },
+  {
+   "id": "remove-committed-secrets#4.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "remove-committed-secrets",
+   "tarefa": "4.1",
+   "descricao": "Decidir e registrar: reescrever o histórico ou não (e por quê)",
+   "roteiro": null,
+   "bloqueia": true
+  },
+  {
+   "id": "remove-committed-secrets#2.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "remove-committed-secrets",
+   "tarefa": "2.3",
+   "descricao": "Validar: login mobile devolve roles, criação de usuário e token administrativo funcionam",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "remove-committed-secrets#3.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "remove-committed-secrets",
+   "tarefa": "3.3",
+   "descricao": "Repetir 3.1 em cada branch ativo que contenha o arquivo",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "remove-committed-secrets#4.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "remove-committed-secrets",
+   "tarefa": "4.2",
+   "descricao": "Se escolhido, listar branches e clones, avisar a todos e executar a reescrita como etapa coordenada",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "remove-committed-secrets#5.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "remove-committed-secrets",
+   "tarefa": "5.1",
+   "descricao": "Verificar se o app usa Play App Signing e a força da senha do `.jks`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "remove-committed-secrets#5.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "remove-committed-secrets",
+   "tarefa": "5.2",
+   "descricao": "Definir o plano: substituir a chave de upload pelo console, ou migrar para o Play App Signing",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "remove-committed-secrets#5.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "remove-committed-secrets",
+   "tarefa": "5.3",
+   "descricao": "Tirar `manejar_key_store.jks` (as duas cópias) do repositório e de cada branch ativo, depois de o plano estar executado",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "remove-committed-secrets#5.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "remove-committed-secrets",
+   "tarefa": "5.4",
+   "descricao": "Documentar onde o keystore passa a ficar (fora do repositório) e quem tem acesso",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "remove-committed-secrets#6.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "remove-committed-secrets",
+   "tarefa": "6.1",
+   "descricao": "Adicionar a varredura de segredos (gitleaks) ao CI do backend e do app, com falha em novo achado — **escrito e testado localmente nos dois repositórios (`bitbucket-pipelines.yml`: passo \"Secret scan\" com gitleaks 8.18.4, no `main` e em pull requests; no app o arquivo é novo). **Falta rodar no Bitbucket:** commitar, e habilitar o Pipelines no app**",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "remove-committed-secrets#6.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "remove-committed-secrets",
+   "tarefa": "6.4",
+   "descricao": "Teste: um commit com credencial falsa faz o CI falhar sem imprimir o valor — **passou **localmente** num clone descartável do backend, com a mesma linha de comando do CI: credencial falsa falha em `staged` e em `history` (exit 1) sem imprimir o valor; histórico limpo passa. **Não foi executado no Bitbucket****",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "remove-mercadopago-gateway#2.2",
+   "area": "pagamentos-e-repasses",
+   "tipo": "manual",
+   "origem": "remove-mercadopago-gateway",
+   "tarefa": "2.2",
+   "descricao": "Conferir que não há compra `pending` do Mercado Pago; resolver as restantes manualmente",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "remove-mercadopago-gateway#2.3",
+   "area": "pagamentos-e-repasses",
+   "tipo": "manual",
+   "origem": "remove-mercadopago-gateway",
+   "tarefa": "2.3",
+   "descricao": "Escrever o procedimento de reembolso manual de compras antigas no painel do Mercado Pago",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "remove-mercadopago-gateway#4.1",
+   "area": "pagamentos-e-repasses",
+   "tipo": "manual",
+   "origem": "remove-mercadopago-gateway",
+   "tarefa": "4.1",
+   "descricao": "Remover `MP_TEST_TOKEN`/`MP_PROD_TOKEN` de `env.example`, dos quatro serviços de `docker-compose.yml`, de `docker-compose.override.yml` e de `docker-compose.migrations.yml`, e do `.env` de produção",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "remove-mercadopago-gateway#2.1",
+   "area": "pagamentos-e-repasses",
+   "tipo": "manual",
+   "origem": "remove-mercadopago-gateway",
+   "tarefa": "2.1",
+   "descricao": "Aguardar o prazo de 0.2 com `mp-webhook` e `mp-return` ainda ativos",
+   "roteiro": null,
+   "bloqueia": true
+  },
+  {
+   "id": "remove-mercadopago-gateway#0.2",
+   "area": "pagamentos-e-repasses",
+   "tipo": "manual",
+   "origem": "remove-mercadopago-gateway",
+   "tarefa": "0.2",
+   "descricao": "Levantar compras do Mercado Pago ainda `pending` e o prazo de validade delas",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "remove-mercadopago-gateway#0.3",
+   "area": "pagamentos-e-repasses",
+   "tipo": "manual",
+   "origem": "remove-mercadopago-gateway",
+   "tarefa": "0.3",
+   "descricao": "Levantar quantos recebedores têm `mercado_pago_collector_id` e como serão avisados e migrados para o Stripe Connect",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "remove-mercadopago-gateway#4.2",
+   "area": "pagamentos-e-repasses",
+   "tipo": "manual",
+   "origem": "remove-mercadopago-gateway",
+   "tarefa": "4.2",
+   "descricao": "Retirar a URL do webhook no painel do Mercado Pago",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "replace-mobile-sync-password-encryption#2.7",
+   "area": "app-e-site",
+   "tipo": "manual",
+   "origem": "replace-mobile-sync-password-encryption",
+   "tarefa": "2.7",
+   "descricao": "Publicar a nova versão (release assinada) e definir a versão mínima",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "replace-mobile-sync-password-encryption#3.2",
+   "area": "app-e-site",
+   "tipo": "manual",
+   "origem": "replace-mobile-sync-password-encryption",
+   "tarefa": "3.2",
+   "descricao": "Ligar o 426 na data combinada",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "replace-mobile-sync-password-encryption#3.1",
+   "area": "app-e-site",
+   "tipo": "manual",
+   "origem": "replace-mobile-sync-password-encryption",
+   "tarefa": "3.1",
+   "descricao": "Acompanhar o contador do formato antigo até zerar por 14 dias",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "replace-mobile-sync-password-encryption#3.5",
+   "area": "app-e-site",
+   "tipo": "manual",
+   "origem": "replace-mobile-sync-password-encryption",
+   "tarefa": "3.5",
+   "descricao": "Recomendar a troca de senha aos usuários que se cadastraram quando o tráfego sem criptografia era permitido",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "replace-mobile-sync-password-encryption#4.1",
+   "area": "app-e-site",
+   "tipo": "manual",
+   "origem": "replace-mobile-sync-password-encryption",
+   "tarefa": "4.1",
+   "descricao": "Avaliar cadastro e login pelo Keycloak (OIDC com PKCE) para o app não manusear senhas",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rollout-production-secrets#1.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "rollout-production-secrets",
+   "tarefa": "1.3",
+   "descricao": "Registrar o impacto como não confirmado para o App Manejar e identificar qual versão está publicada (`shorten-mobile-token-lifetime-and-revocation`, 0.1). Dado já levantado: a 1.5.02 da loja foi publicada em 9/05 e provavelmente envia o token (tarefa 0.1 de `shorten-mobile-token-lifetime-and-revocation`); trate o impacto no app como provável",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rollout-production-secrets#1.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "rollout-production-secrets",
+   "tarefa": "1.4",
+   "descricao": "Escolher a janela de menor uso e avisar quem opera o sistema",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rollout-production-secrets#2.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "rollout-production-secrets",
+   "tarefa": "2.1",
+   "descricao": "Editar o `.env` com `KEYCLOAK_API_CLIENT_SECRET=<valor novo>` **depois** de regenerá-lo no console (Clients > manejo-api > Credentials > Regenerate), com o arquivo já aberto para reduzir o intervalo",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rollout-production-secrets#2.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "rollout-production-secrets",
+   "tarefa": "2.4",
+   "descricao": "Confirmar que uma autenticação de client com o valor antigo é recusada pelo Keycloak",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rollout-production-secrets#2.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "rollout-production-secrets",
+   "tarefa": "2.5",
+   "descricao": "Registrar a rotação no inventário (`remove-committed-secrets`, 1.2)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rollout-production-secrets#3.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "rollout-production-secrets",
+   "tarefa": "3.3",
+   "descricao": "Conferir presença e tamanho no container (64 caracteres ou mais), sem imprimir o valor",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rollout-production-secrets#3.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "rollout-production-secrets",
+   "tarefa": "3.4",
+   "descricao": "Confirmar que um token assinado com o valor padrão recebe 401",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rollout-production-secrets#4.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "rollout-production-secrets",
+   "tarefa": "4.2",
+   "descricao": "Só então construir e publicar a imagem com a trava: `docker compose build manejo-api && docker compose up -d --force-recreate manejo-api`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rollout-production-secrets#4.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "rollout-production-secrets",
+   "tarefa": "4.3",
+   "descricao": "Confirmar no log de inicialização que a API subiu e que a trava aceitou os segredos",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rollout-production-secrets#5.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "rollout-production-secrets",
+   "tarefa": "5.4",
+   "descricao": "Remover `JWT_SECRET_PREVIOUS` e recriar a API; confirmar que um token do segredo antigo recebe 401",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rollout-production-secrets#6.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "rollout-production-secrets",
+   "tarefa": "6.1",
+   "descricao": "Testar a reversão de cada passo em ambiente de homologação, quando houver",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rollout-production-secrets#1.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "rollout-production-secrets",
+   "tarefa": "1.2",
+   "descricao": "Guardar os valores novos num local seguro de segredos antes de qualquer troca (nunca em chat, ticket ou repositório)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rollout-production-secrets#2.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "rollout-production-secrets",
+   "tarefa": "2.2",
+   "descricao": "Recriar a API: `docker compose up -d --force-recreate manejo-api` (sem `--build`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rollout-production-secrets#2.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "rollout-production-secrets",
+   "tarefa": "2.3",
+   "descricao": "Validar: o login mobile devolve roles, a criação de usuário funciona e o token administrativo é obtido",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rollout-production-secrets#3.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "rollout-production-secrets",
+   "tarefa": "3.1",
+   "descricao": "Gerar o valor com `openssl rand -base64 48` e gravar `JWT_SECRET=<valor>` no `.env`; **não** definir `JWT_SECRET_PREVIOUS`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rollout-production-secrets#3.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "rollout-production-secrets",
+   "tarefa": "3.2",
+   "descricao": "Recriar a API: `docker compose up -d --force-recreate manejo-api` (sem `--build`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rollout-production-secrets#3.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "rollout-production-secrets",
+   "tarefa": "3.5",
+   "descricao": "Comunicar o impacto aos usuários afetados, conforme o que se souber da versão do app",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rollout-production-secrets#4.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "rollout-production-secrets",
+   "tarefa": "4.1",
+   "descricao": "Rodar a pré-verificação com o `.env` final (num container temporário, ou depois de construir a imagem sem subi-la) e exigir código de saída 0",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rollout-production-secrets#5.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "rollout-production-secrets",
+   "tarefa": "5.1",
+   "descricao": "Definir a periodicidade (ou o gatilho) da rotação e quem a executa",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rollout-production-secrets#5.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "rollout-production-secrets",
+   "tarefa": "5.2",
+   "descricao": "Procedimento: `JWT_SECRET_PREVIOUS=<valor atual>`, `JWT_SECRET=<valor novo>`, pré-verificação, recriar a API",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rollout-production-secrets#5.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "rollout-production-secrets",
+   "tarefa": "5.3",
+   "descricao": "Esperar o prazo de vida dos tokens antigos (7 dias, ou 15 minutos quando a renovação de sessão existir)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rollout-production-secrets#6.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "rollout-production-secrets",
+   "tarefa": "6.2",
+   "descricao": "Manter `docs/RUNBOOK_SEGREDOS.md` alinhado a esta mudança",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "separate-dropshipping-from-crowdfunding-resources#0.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "separate-dropshipping-from-crowdfunding-resources",
+   "tarefa": "0.2",
+   "descricao": "Listar recompensas cujo preço difere de `arpt_produto.preco` e decidir a conferência com o time de produto.",
+   "roteiro": null,
+   "bloqueia": true
+  },
+  {
+   "id": "separate-dropshipping-from-crowdfunding-resources#5.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "separate-dropshipping-from-crowdfunding-resources",
+   "tarefa": "5.2",
+   "descricao": "Roteiro de produção com conta Stripe de teste antes de qualquer alteração de conta de destino.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "separate-dropshipping-from-crowdfunding-resources#3.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "separate-dropshipping-from-crowdfunding-resources",
+   "tarefa": "3.5",
+   "descricao": "Teste com conta Stripe de teste: patrocínio com divisão, patrocínio sem permissão (vai inteiro para a plataforma), repasse de loja. *Roteiro em `teste-divisao-stripe.md`.*",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "shorten-mobile-token-lifetime-and-revocation#0.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "shorten-mobile-token-lifetime-and-revocation",
+   "tarefa": "0.1",
+   "descricao": "Confirmar qual build 1.5.02 está na loja (quase fechada) — **informado em 2026-10-19: o 1502 (1.5.02) foi publicado em produção em 9 de maio, às 23:52. O último commit do branch `feat/product-reward-pages`/`arpt-dropshipping-system` antes dessa data é `5beec8c` (9 de maio, 18:29), ainda com versionCode 1502, e o commit seguinte (10 de maio, `18683f0`) subiu para 1.6.00. Nesse `5beec8c` o login guarda o token (`AuthResponse.token` → `ApiServices.setAuthToken`) e o interceptor o envia. Conclusão provável, não provada: o app da loja foi construído desse código e **envia o token**. A alternativa, um build do `main` (código de 1º/03, sem token), é improvável porque o `main` não recebeu nenhum commit entre 1º/03 e 9/05 (os dois commits seguintes são de 10 e 12/09). Confirmação final: status das respostas de `propriedades/sync` em produção desde 9 de maio (200 = envia token; 401 = não envia). O token fica só em memória: ao matar o app, ele se perde até o próximo login, e nada trata o 401**",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "shorten-mobile-token-lifetime-and-revocation#0.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "shorten-mobile-token-lifetime-and-revocation",
+   "tarefa": "0.3",
+   "descricao": "O token passa a ser guardado de forma persistente (Keystore) e o app trata 401 pedindo novo login. **Verificado em 2026-10-19 no branch `feat/secure-communication` já rebaseado no `main` (`057b43b`): (a) o token só é obtido em `attemptServerLogin`, que só roda no primeiro login do usuário no aparelho; o login offline (caso normal depois disso) e a abertura direta com `ID_LOGGED` salvo nunca chamam `setAuthToken`; (b) o token fica numa variável estática em memória, então morre com o processo; o `SyncScheduler` (WorkManager) sincroniza em segundo plano sem token e recebe 401; (c) cada fábrica de serviço chama `.client(getOkHttpClient())` e logo depois `.client(getAuthenticatedClient())`: o Retrofit usa só a última, então o `Accept-Language` da internacionalização (PR #85) se perde nos 11 serviços autenticados (`AuthService` fica só com o idioma, o que é correto); (d) o código não foi compilado nem executado nesta verificação** — **executada na mudança `fix-mobile-auth-token-handling` (seções 1 a 5)**",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "shorten-mobile-token-lifetime-and-revocation#0.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "shorten-mobile-token-lifetime-and-revocation",
+   "tarefa": "0.4",
+   "descricao": "Conferir nos logs de **produção** o status das respostas de `POST /propriedades/sync` e `sync/pecas`: muitos 401 indicam app sem token. Os logs da API não registram cabeçalhos, então só o status serve de evidência (e a checagem de `Authorization` por log, tentada antes, não era válida)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "shorten-mobile-token-lifetime-and-revocation#3.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "shorten-mobile-token-lifetime-and-revocation",
+   "tarefa": "3.4",
+   "descricao": "Enviar `X-Session-Mode: refresh` e publicar a versão — ****código feito:** `AuthService.login` envia `X-Session-Mode: refresh` e `Api.serverLogin` guarda o `refresh_token`. **Falta publicar a versão (é com você)**, e nenhum aparelho foi usado. Depois de publicar, a 4.2 passa a fazer sentido**",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "shorten-mobile-token-lifetime-and-revocation#0.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "shorten-mobile-token-lifetime-and-revocation",
+   "tarefa": "0.2",
+   "descricao": "**Incorporar o código seguro ao branch principal do app e evitar regressão:** o PR #88 (secure communication) foi **mesclado no `main` do backend em 31/03/2026**, mas **nunca foi mesclado no `main` do app**: `origin/main` e `origin/master` do app não contêm o commit `e0fb418`, e não há merge dele no histórico. O código que envia o token vive só nos branches de funcionalidade (`feat/secure-communication`, `feat/wood-product-passport`, `feat/product-reward-pages`, `arpt-dropshipping-system`, que se empilham uns sobre os outros). O `main` do app tem 2 commits que essa linha não tem (10 e 12/09, incluindo `feature/internationalization`, PR #85), e a linha tem de 1 a 67 commits que o `main` não tem. O branch de trabalho atual (`feature/shoppshipping`) descende do `main`, então **não tem o envio do token**: um build dele regride. Reconciliar (mesclar a linha do token no `main`, resolvendo a internacionalização) antes de qualquer build. `mobile/build_release.sh` compila o que estiver na pasta, sem fixar branch — **executada na mudança `fix-mobile-auth-token-handling` (seção 7)**",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "shorten-mobile-token-lifetime-and-revocation#4.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "shorten-mobile-token-lifetime-and-revocation",
+   "tarefa": "4.2",
+   "descricao": "`MOBILE_LEGACY_SESSION_CUTOFF` e resposta 426 depois da data",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-store-subdomain-unreachable#1.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-store-subdomain-unreachable",
+   "tarefa": "1.1",
+   "descricao": "No servidor, rodar `scripts/verify-storefront-tls-prod.sh preflight acurui.arpt.site` e registrar o resultado (serviços, include, `nginx -t`, DNS); confirmar `dig +short NS arpt.site` (Hostinger) — **não executável a partir da máquina de desenvolvimento** (2026-11-07: sem `nginx` nem `storefront-tls` rodando aqui; o preflight falhou nos dois serviços). Rodar no servidor, sem passar o domínio da plataforma como argumento (o script recusa)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-store-subdomain-unreachable#1.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-store-subdomain-unreachable",
+   "tarefa": "1.2",
+   "descricao": "Decidir o caminho: (a) curinga `*.arpt.site` (bloco C do roteiro, o destino), ou (b) provisório só para esta loja: registro A/AAAA de `acurui.arpt.site` e certificado individual por HTTP-01",
+   "roteiro": null,
+   "bloqueia": true
+  },
+  {
+   "id": "fix-store-subdomain-unreachable#1.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-store-subdomain-unreachable",
+   "tarefa": "1.3",
+   "descricao": "Executar na ordem certa: certificado antes do DNS (C8, depois C9); com o curinga, ligar a renovação (C10). Não criar `*.arpt.site` antes do certificado instalado — **atenção: a ordem foi invertida** (o registro `*` foi criado antes do certificado curinga). Efeito atual: todo subdomínio de `arpt.site` sem registro próprio abre com erro de certificado, inclusive `www.arpt.site`. Para estancar já: emitir o curinga (guia de staging, fases 2 e 4); desfazer o registro `*` no hPanel também resolve, mas tira o endereço de todas as lojas do ar",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-store-subdomain-unreachable#1.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-store-subdomain-unreachable",
+   "tarefa": "1.4",
+   "descricao": "Conferir de fora: `dig +short acurui.arpt.site` resolve, `curl -I https://acurui.arpt.site/` responde 200 com certificado válido, e um nome inexistente (`https://qualquer.arpt.site/`) responde 404 — **reconferido em 2026-11-07 (mais tarde): o DNS curinga JÁ EXISTE** (`acurui.arpt.site`, `lojas.arpt.site` e um nome qualquer resolvem para 147.93.15.75). **O certificado curinga NÃO existe:** o servidor entrega o certificado de `arpt.site` (SAN: `arpt.site`, `auth.arpt.site`) para `acurui.arpt.site`, e o navegador mostra `NET::ERR_CERT_COMMON_NAME_INVALID`. Com `curl -k` a aplicação responde (Acurui 200, nome inexistente 404, `www.arpt.site` 200): só falta o certificado. `arpt.site` e `auth.arpt.site` seguem normais. Faltam os passos 4 a 6 do guia de staging (emitir o curinga) e a conferência `curl -vkI --resolve …` pedida lá",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-store-subdomain-unreachable#1.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-store-subdomain-unreachable",
+   "tarefa": "1.5",
+   "descricao": "Conferir no log do nginx que os pedidos `Failed to find Server Action \"x\"` vêm de sondagens (cabeçalho `Next-Action: x`, origem externa) e não de visitantes; se vierem de usuários reais, abrir investigação à parte",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-store-subdomain-unreachable#4.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-store-subdomain-unreachable",
+   "tarefa": "4.2",
+   "descricao": "Deploy: backend primeiro, depois o painel (sem o endpoint o painel mantém o comportamento atual)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-store-subdomain-unreachable#4.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-store-subdomain-unreachable",
+   "tarefa": "4.3",
+   "descricao": "Em produção: antes da ativação do DNS, o painel mostra o aviso para a loja `acurui`; depois de ativar, o aviso some e o link abre a loja",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "improve-marketplace-experience#1.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "improve-marketplace-experience",
+   "tarefa": "1.3",
+   "descricao": "Seletor \"Por produto | Por loja\" sem encolher e busca ocupando só o resto (`flexShrink`/`minWidth`), conferido em 360, 768 e 1280 px — **implementado** (seletor com `flexShrink: 0`, busca com `flex: 1; minWidth: 0`); falta conferir visualmente em 360, 768 e 1280 px (o E2E novo cobre 768 e 1280 e ainda não rodou)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "improve-marketplace-experience#2.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "improve-marketplace-experience",
+   "tarefa": "2.3",
+   "descricao": "Revisar espaçamentos e alinhamentos da página (filtros, grade, rodapé da lista) em 360, 768, 1280 e 1920 px, sem rolagem horizontal — **falta a conferência visual** em 360, 768, 1280 e 1920 px no navegador; não havia navegador neste ambiente",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "improve-marketplace-experience#6.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "improve-marketplace-experience",
+   "tarefa": "6.3",
+   "descricao": "Confirmar com o responsável do Keycloak se o fim do login é por tempo ocioso (SSO Session Idle) ou por tempo máximo da sessão; se for o máximo, abrir mudança de configuração do realm — manual, depende de quem administra o Keycloak",
+   "roteiro": null,
+   "bloqueia": true
+  },
+  {
+   "id": "improve-marketplace-experience#8.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "improve-marketplace-experience",
+   "tarefa": "8.2",
+   "descricao": "E2E em `e2e/tests/marketplace.spec.ts`: título e carrinho visíveis abaixo do menu, \"Ver produtos da loja\" abre a loja, alternar lista/grade, carrossel e zoom — **escrito, não executado** (sem dependências do E2E nem pilha do compose de E2E aqui); rodar no compose de E2E antes do deploy",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "improve-marketplace-experience#8.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "improve-marketplace-experience",
+   "tarefa": "8.4",
+   "descricao": "Deploy na ordem backend, depois app; reconstruir com `up -d --build --no-deps`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "improve-marketplace-experience#8.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "improve-marketplace-experience",
+   "tarefa": "8.5",
+   "descricao": "Em produção: conferir cada item dos requisitos no navegador (incluindo o aviso de compras indisponíveis enquanto os termos do frete não estiverem publicados) e que o log não tem 404 nem erros de hidratação novos",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "improve-marketplace-experience#9.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "improve-marketplace-experience",
+   "tarefa": "9.1",
+   "descricao": "Publicar os termos de produtor e dropshipper com a cláusula do frete (acompanhado em `pendencias-manuais-de-producao`); só isso libera o cálculo de frete e a compra em produção",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-store-domain-dns-guide#4.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "add-store-domain-dns-guide",
+   "tarefa": "4.1",
+   "descricao": "Conferir as orientações de cada provedor com alguém que tenha conta nele (campo de nome relativo ou completo, aspas no TXT, TTL, raiz, proxy do Cloudflare) e registrar a data da conferência; onde não houver como conferir, deixar o texto genérico",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-store-domain-dns-guide#4.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "add-store-domain-dns-guide",
+   "tarefa": "4.2",
+   "descricao": "Definir `STOREFRONT_TARGET_IPS` com o IP público do servidor no `.env` de produção (acompanhado em `pendencias-manuais-de-producao`); sem isso a raiz segue sem suporte",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-store-domain-dns-guide#4.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "add-store-domain-dns-guide",
+   "tarefa": "4.4",
+   "descricao": "Deploy: backend primeiro, depois o painel (sem os campos novos o painel cai no comportamento atual)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-store-domain-dns-guide#4.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "add-store-domain-dns-guide",
+   "tarefa": "4.5",
+   "descricao": "Em produção: cadastrar um domínio de teste seu, seguir só as instruções do painel num provedor real, e conferir que o domínio passa na verificação",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "replace-public-product-id-with-opaque-identifier#4.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "replace-public-product-id-with-opaque-identifier",
+   "tarefa": "4.1",
+   "descricao": "Aplicar a migration pelo `docker-compose.migrations.yml` (serviço `migrations`) e conferir que nenhum produto ficou sem `public_id`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "replace-public-product-id-with-opaque-identifier#4.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "replace-public-product-id-with-opaque-identifier",
+   "tarefa": "4.2",
+   "descricao": "Publicar o backend com `PUBLIC_NUMERIC_PRODUCT_IDS=true` e conferir que o app antigo continua funcionando",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "replace-public-product-id-with-opaque-identifier#4.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "replace-public-product-id-with-opaque-identifier",
+   "tarefa": "4.3",
+   "descricao": "Publicar o app e revalidar as tags das lojas e o `sitemap.xml`; conferir uma loja publicada: URL com `public_id`, canônica, JSON-LD e sitemap sem número",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "replace-public-product-id-with-opaque-identifier#4.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "replace-public-product-id-with-opaque-identifier",
+   "tarefa": "4.4",
+   "descricao": "Desligar `PUBLIC_NUMERIC_PRODUCT_IDS` e conferir: `/produto/<número>` dá 404 igual ao de inexistente, e a API pública não devolve `id` numérico (`curl` no catálogo e no detalhe)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "replace-public-product-id-with-opaque-identifier#4.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "replace-public-product-id-with-opaque-identifier",
+   "tarefa": "4.5",
+   "descricao": "Registrar a data da virada do identificador nos relatórios de analytics e avisar quem lê os dados de produto",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-terms-admin-actor-id-type#3.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-terms-admin-actor-id-type",
+   "tarefa": "3.1",
+   "descricao": "Aplicar a migration pelo `docker-compose.migrations.yml` (serviço `migrations`, `--no-deps`) e reconstruir `manejo-api` com `up -d --build --no-deps`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-terms-admin-actor-id-type#3.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-terms-admin-actor-id-type",
+   "tarefa": "3.2",
+   "descricao": "No admin dash, salvar e publicar os termos de PRODUTOR e DROPSHIPPER com a cláusula de frete e conferir `compras_disponiveis` da loja `acurui`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "fix-storefront-schema-unterminated-comment#4.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "fix-storefront-schema-unterminated-comment",
+   "tarefa": "4.3",
+   "descricao": "Abrir a vitrine e salvar um rótulo pelo painel, confirmando que a seção `textos` persiste e aparece no idioma configurado.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-admin-store-availability-diagnostics#3.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "add-admin-store-availability-diagnostics",
+   "tarefa": "3.1",
+   "descricao": "Em produção, usar o diagnóstico na loja `acurui` para confirmar a causa e registrar o resultado",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-admin-store-availability-diagnostics#3.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "add-admin-store-availability-diagnostics",
+   "tarefa": "3.2",
+   "descricao": "Reconstruir `manejo-api` e `manejo-app` com `up -d --build --no-deps` e publicar o `arpt-admin-dash`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-store-customer-accounts-and-panel#1.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "add-store-customer-accounts-and-panel",
+   "tarefa": "1.1",
+   "descricao": "Criar o client público `arpt-loja` no Keycloak do realm `arpt`, com PKCE S256 e um único redirect URI, e ligar cadastro, verificação de e-mail e recuperação de senha, como em `docs/KEYCLOAK_CLIENT_LOJA.md`",
+   "roteiro": {
+    "secao": "login-social",
+    "ancora": "doc-keycloak-client-loja",
+    "titulo": "Client do Keycloak para o login das lojas"
+   },
+   "bloqueia": false
+  },
+  {
+   "id": "add-store-customer-accounts-and-panel#0.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "add-store-customer-accounts-and-panel",
+   "tarefa": "0.2",
+   "descricao": "Conferir no Keycloak de teste que cadastro, verificação de e-mail, recuperação de senha e envio de e-mail funcionam (realm `arpt`, abas Login e Email)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-store-customer-accounts-and-panel#4.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "add-store-customer-accounts-and-panel",
+   "tarefa": "4.3",
+   "descricao": "Revisão jurídica do texto de `/privacidade-da-conta` (conta única entre lojas, o que a loja e o vendedor veem, retenção, direitos), em pt e en, antes de publicar",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-store-customer-accounts-and-panel#4.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "add-store-customer-accounts-and-panel",
+   "tarefa": "4.4",
+   "descricao": "Segunda leitura de segurança do fluxo de login entre domínios (`docs/REVISAO_SEGURANCA_LOGIN_LOJA.md`) por quem não escreveu o código, e execução do fluxo contra o Keycloak real",
+   "roteiro": {
+    "secao": "login-social",
+    "ancora": "doc-revisao-seguranca-login-loja",
+    "titulo": "Revisão de segurança do login do cliente da loja"
+   },
+   "bloqueia": false
+  },
+  {
+   "id": "replace-public-order-ids-with-opaque-identifier#3.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "replace-public-order-ids-with-opaque-identifier",
+   "tarefa": "3.1",
+   "descricao": "Aplicar a migration `20261113130000_add_public_id_to_pedidos` pelo `docker-compose.migrations.yml` (serviço `migrations`, `--no-deps`) e conferir que nenhum pedido nem subpedido ficou sem `public_id`; antes, contar as linhas das duas tabelas (o preenchimento é em lotes de 5000)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "replace-public-order-ids-with-opaque-identifier#3.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "replace-public-order-ids-with-opaque-identifier",
+   "tarefa": "3.1",
+   "descricao": "Publicar o backend com `PUBLIC_NUMERIC_ORDER_IDS=true` e conferir que o app antigo continua funcionando (conta e link do e-mail)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "replace-public-order-ids-with-opaque-identifier#3.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "replace-public-order-ids-with-opaque-identifier",
+   "tarefa": "3.1",
+   "descricao": "Publicar o app (`up -d --build --no-deps manejo-app`) e conferir numa loja: conta do cliente e acompanhamento mostram o código `#XXXXXXXX`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "replace-public-order-ids-with-opaque-identifier#3.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "replace-public-order-ids-with-opaque-identifier",
+   "tarefa": "3.1",
+   "descricao": "Desligar `PUBLIC_NUMERIC_ORDER_IDS` e conferir: `/me/orders/<número>` dá o mesmo 404 de pedido inexistente, e as respostas de acompanhamento e da conta não trazem `pedido_id` nem `itens[].id` (`curl`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "remove-mercadopago-gateway#3.2",
+   "area": "pagamentos-e-repasses",
+   "tipo": "codigo",
+   "origem": "remove-mercadopago-gateway",
+   "tarefa": "3.2",
+   "descricao": "Remover `MercadoPagoGateway`, `mp-webhook` (passa a responder 410), `mp-return`, `connect/mercadopago`, o ramo `mercadopago` de `ownerNotification.services.ts` e do tipo de gateway",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "remove-mercadopago-gateway#3.3",
+   "area": "pagamentos-e-repasses",
+   "tipo": "codigo",
+   "origem": "remove-mercadopago-gateway",
+   "tarefa": "3.3",
+   "descricao": "Remover a dependência `mercadopago`, as variáveis `MP_*` de `src/env/index.ts` e o import em `shipping.ts`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "remove-mercadopago-gateway#3.4",
+   "area": "pagamentos-e-repasses",
+   "tipo": "codigo",
+   "origem": "remove-mercadopago-gateway",
+   "tarefa": "3.4",
+   "descricao": "Remover `tests/integration/gateways/mercadopago.test.ts` e o que for do Mercado Pago em `tests/fixtures/payment_mocks.ts`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "remove-mercadopago-gateway#3.5",
+   "area": "pagamentos-e-repasses",
+   "tipo": "codigo",
+   "origem": "remove-mercadopago-gateway",
+   "tarefa": "3.5",
+   "descricao": "Testes: notificação tardia em `mp-webhook` => 410 sem alterar compra; compra antiga consultável sem requisição ao Mercado Pago; suíte completa verde",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "remove-mercadopago-gateway#4.3",
+   "area": "pagamentos-e-repasses",
+   "tipo": "codigo",
+   "origem": "remove-mercadopago-gateway",
+   "tarefa": "4.3",
+   "descricao": "Atualizar `TUTORIAL_PAYMENTS_TEST.md`, `docs/` e arquivar as specs do Mercado Pago (`openspec archive`)",
+   "roteiro": {
+    "secao": "pagamentos-e-repasses",
+    "ancora": "doc-tutorial-payments-test",
+    "titulo": "Tutorial: Testando Stripe e Mercado Pago Localmente"
+   },
+   "bloqueia": false
+  },
+  {
+   "id": "rename-dropshipper-panel-and-collapse-account-tabs#1.1",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
+   "tarefa": "1.1",
+   "descricao": "`locales/pt` e `locales/en`: `sponsorships.tabs.dropshipperPanel` para \"Painel do Vendedor(a)\" e \"Seller panel\"",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rename-dropshipper-panel-and-collapse-account-tabs#1.2",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
+   "tarefa": "1.2",
+   "descricao": "`components/dropshipperTextos.ts` (pt e en): `painelTitulo`, `abrirPainel` e `ativoDetalhe` com o nome novo",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rename-dropshipper-panel-and-collapse-account-tabs#1.3",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
+   "tarefa": "1.3",
+   "descricao": "`components/ConvitePagina.tsx` (pt e en): texto `abrir`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rename-dropshipper-panel-and-collapse-account-tabs#1.4",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
+   "tarefa": "1.4",
+   "descricao": "Varredura por \"Painel do dropshipper\" e \"Dropshipper panel\" em `frontend/manejo-app/src` e no `mobile`/`arpt-admin-dash` para achar textos visíveis esquecidos; decidir caso a caso (role, rota e termos não mudam)",
+   "roteiro": null,
+   "bloqueia": true
+  },
+  {
+   "id": "rename-dropshipper-panel-and-collapse-account-tabs#1.5",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
+   "tarefa": "1.5",
+   "descricao": "Atualizar os testes que citam o texto antigo (`page.vitest.tsx`, `PapelDropshipper.vitest.tsx` e demais da varredura)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rename-dropshipper-panel-and-collapse-account-tabs#2.1",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
+   "tarefa": "2.1",
+   "descricao": "Em `pages/patrocinios/ui/page.tsx`, trocar `<Tabs>` por barra com hambúrguer + nome da seção atual abaixo de `md` (via `useMediaQuery`), mantendo `<Tabs>` a partir de `md`; verificar renderização no servidor e evitar aviso de hidratação",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rename-dropshipper-panel-and-collapse-account-tabs#2.2",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
+   "tarefa": "2.2",
+   "descricao": "`Menu` do MUI ancorado no botão, um `MenuItem` por aba (ícone, rótulo, `selected`), chamando o `handleTabChange` existente e fechando ao selecionar",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rename-dropshipper-panel-and-collapse-account-tabs#2.3",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
+   "tarefa": "2.3",
+   "descricao": "Acessibilidade: `aria-label` próprio (distinto do menu do site), `aria-haspopup`, `aria-expanded`, `aria-controls`, alvos de 44 px, foco devolvido ao botão",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rename-dropshipper-panel-and-collapse-account-tabs#2.4",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
+   "tarefa": "2.4",
+   "descricao": "Textos novos em português e inglês (rótulo do botão)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rename-dropshipper-panel-and-collapse-account-tabs#3.1",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
+   "tarefa": "3.1",
+   "descricao": "Teste do menu: abaixo de `md` mostra hambúrguer e não as abas; acima, o contrário (simulando `matchMedia`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rename-dropshipper-panel-and-collapse-account-tabs#3.2",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
+   "tarefa": "3.2",
+   "descricao": "Teste: abrir, escolher aba (troca, fecha, URL), aba sem papel não listada, Esc devolve o foco, troca de formato ao cruzar o breakpoint mantém a aba",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rename-dropshipper-panel-and-collapse-account-tabs#3.3",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
+   "tarefa": "3.3",
+   "descricao": "Teste dos rótulos novos em português e inglês",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rename-dropshipper-panel-and-collapse-account-tabs#4.1",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
+   "tarefa": "4.1",
+   "descricao": "Conferir em telas de 360, 768 e 1024 px, com e sem as abas de produtor e vendedor(a)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "rename-dropshipper-panel-and-collapse-account-tabs#4.2",
+   "area": "dropshipping",
+   "tipo": "codigo",
+   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
+   "tarefa": "4.2",
+   "descricao": "Reconstruir o `manejo-app` com `up -d --build --no-deps`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "replace-mobile-sync-password-encryption#3.3",
+   "area": "app-e-site",
+   "tipo": "codigo",
+   "origem": "replace-mobile-sync-password-encryption",
+   "tarefa": "3.3",
+   "descricao": "Remover `CipherUtils.ts` e a chave do backend",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "replace-mobile-sync-password-encryption#3.4",
+   "area": "app-e-site",
+   "tipo": "codigo",
+   "origem": "replace-mobile-sync-password-encryption",
+   "tarefa": "3.4",
+   "descricao": "Na versão seguinte do app, remover `CriptoUtils.java` e a chave",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "replace-public-content-ids-with-opaque-identifier#1.1",
+   "area": "pedidos-e-frete",
+   "tipo": "codigo",
+   "origem": "replace-public-content-ids-with-opaque-identifier",
+   "tarefa": "1.1",
+   "descricao": "Para `/manejos/[id]`, `/carbon-report/[id]`, `/campanhas/[id]`, `/patrocinio/[id]`, `/recompensa/[id]` e ids de loja nas respostas públicas: acessível sem login? id é a única credencial? Registrar no design",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "replace-public-content-ids-with-opaque-identifier#2.1",
+   "area": "pedidos-e-frete",
+   "tipo": "codigo",
+   "origem": "replace-public-content-ids-with-opaque-identifier",
+   "tarefa": "2.1",
+   "descricao": "Migration `public_id` por tabela, tradução na borda, rotas, app e testes (mesma técnica de `replace-public-product-id-with-opaque-identifier`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "replace-public-content-ids-with-opaque-identifier#3.1",
+   "area": "pedidos-e-frete",
+   "tipo": "codigo",
+   "origem": "replace-public-content-ids-with-opaque-identifier",
+   "tarefa": "3.1",
+   "descricao": "Migration, backend com flag ligada, app, desligar a flag e conferir; mover para `pendencias-manuais-de-producao`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "replace-store-login-redirect-with-store-modals#3.6",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "replace-store-login-redirect-with-store-modals",
+   "tarefa": "3.6",
+   "descricao": "Conferir o visual em todos os templates e em tela pequena",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "replace-store-login-redirect-with-store-modals#5.1",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "replace-store-login-redirect-with-store-modals",
+   "tarefa": "5.1",
+   "descricao": "Reconstruir `manejo-api` e `manejo-app` em produção com as novas variáveis",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "replace-store-login-redirect-with-store-modals#5.2",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "replace-store-login-redirect-with-store-modals",
+   "tarefa": "5.2",
+   "descricao": "Testar em uma loja de subdomínio e em uma de domínio próprio",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "replace-store-login-redirect-with-store-modals#5.3",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "replace-store-login-redirect-with-store-modals",
+   "tarefa": "5.3",
+   "descricao": "Em outra change, remover o fluxo por redirecionamento se nada mais o usar",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "show-producer-product-form-in-modal#1.1",
+   "area": "painel-do-produtor",
+   "tipo": "codigo",
+   "origem": "show-producer-product-form-in-modal",
+   "tarefa": "1.1",
+   "descricao": "Trocar o `Card` condicional de `PainelDoProdutor.tsx` por `Dialog` (`scroll=\"paper\"`, `fullWidth`, `maxWidth=\"md\"`, `fullScreen` abaixo de `sm`), com `<form>` como `Paper`, `DialogTitle` (ligado por `aria-labelledby`), `DialogContent dividers` e `DialogActions`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "show-producer-product-form-in-modal#1.2",
+   "area": "painel-do-produtor",
+   "tipo": "codigo",
+   "origem": "show-producer-product-form-in-modal",
+   "tarefa": "1.2",
+   "descricao": "Mover `erroEnvio` para o topo do `DialogContent` e, na falha de validação, rolar e focar o primeiro campo com erro",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "show-producer-product-form-in-modal#1.3",
+   "area": "painel-do-produtor",
+   "tipo": "codigo",
+   "origem": "show-producer-product-form-in-modal",
+   "tarefa": "1.3",
+   "descricao": "No sucesso, fechar o modal, limpar o formulário e mostrar `sucesso` na página depois de `carregar()`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "show-producer-product-form-in-modal#1.4",
+   "area": "painel-do-produtor",
+   "tipo": "codigo",
+   "origem": "show-producer-product-form-in-modal",
+   "tarefa": "1.4",
+   "descricao": "Fechar o modal se o `estado` virar `acesso` ou `sessao`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "show-producer-product-form-in-modal#2.1",
+   "area": "painel-do-produtor",
+   "tipo": "codigo",
+   "origem": "show-producer-product-form-in-modal",
+   "tarefa": "2.1",
+   "descricao": "Detectar \"vazio\" (igual a `FORM_VAZIO` e sem fotos) e, se não vazio, abrir a confirmação \"Descartar o cadastro?\" em Esc, clique fora, X e Cancelar",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "show-producer-product-form-in-modal#2.2",
+   "area": "painel-do-produtor",
+   "tipo": "codigo",
+   "origem": "show-producer-product-form-in-modal",
+   "tarefa": "2.2",
+   "descricao": "Ignorar o fechamento enquanto `enviando`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "show-producer-product-form-in-modal#2.3",
+   "area": "painel-do-produtor",
+   "tipo": "codigo",
+   "origem": "show-producer-product-form-in-modal",
+   "tarefa": "2.3",
+   "descricao": "Descartar usa a limpeza existente (`FORM_VAZIO`, `limparFotos`, `setErros({})`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "show-producer-product-form-in-modal#2.4",
+   "area": "painel-do-produtor",
+   "tipo": "codigo",
+   "origem": "show-producer-product-form-in-modal",
+   "tarefa": "2.4",
+   "descricao": "Textos novos em português e inglês",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "show-producer-product-form-in-modal#3.1",
+   "area": "painel-do-produtor",
+   "tipo": "codigo",
+   "origem": "show-producer-product-form-in-modal",
+   "tarefa": "3.1",
+   "descricao": "Atualizar `PainelDoProdutor.vitest.tsx` para achar o formulário no `dialog`, sem afrouxar as asserções existentes",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "show-producer-product-form-in-modal#3.2",
+   "area": "painel-do-produtor",
+   "tipo": "codigo",
+   "origem": "show-producer-product-form-in-modal",
+   "tarefa": "3.2",
+   "descricao": "Novos testes: abrir, fechar vazio, fechar com dados (confirmar e recusar), Esc durante envio, erro de validação mantém o modal aberto, erro de envio preserva dados, sucesso fecha e lista atualiza, retorno do foco, sem acesso não abre",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "show-producer-product-form-in-modal#3.3",
+   "area": "painel-do-produtor",
+   "tipo": "codigo",
+   "origem": "show-producer-product-form-in-modal",
+   "tarefa": "3.3",
+   "descricao": "Conferir `AssistenteTexto`, o editor de texto rico e o seletor de fotos funcionando dentro do diálogo",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "show-producer-product-form-in-modal#4.1",
+   "area": "painel-do-produtor",
+   "tipo": "codigo",
+   "origem": "show-producer-product-form-in-modal",
+   "tarefa": "4.1",
+   "descricao": "Verificar manualmente em tela de celular (rolagem, teclado virtual, botões do rodapé)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "show-producer-product-form-in-modal#4.2",
+   "area": "painel-do-produtor",
+   "tipo": "codigo",
+   "origem": "show-producer-product-form-in-modal",
+   "tarefa": "4.2",
+   "descricao": "Reconstruir o `manejo-app` com `up -d --build --no-deps`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "show-seller-context-on-checkout-page#1.1",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "show-seller-context-on-checkout-page",
+   "tarefa": "1.1",
+   "descricao": "`contextoDoPagamento({ tipo, nomes, idioma })`: higienização (controle, espaços, 60 caracteres, escape de `[ ] ( ) < > * _`), singular e plural, \"e mais N\" a partir de três nomes, omitir se vazio, textos pt/en",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "show-seller-context-on-checkout-page#1.2",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "show-seller-context-on-checkout-page",
+   "tarefa": "1.2",
+   "descricao": "Testes do utilitário, incluindo nome com link, nome longo, nome vazio e várias lojas",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "show-seller-context-on-checkout-page#2.1",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "show-seller-context-on-checkout-page",
+   "tarefa": "2.1",
+   "descricao": "Em `StripeCheckoutSessionCreator`, enviar `custom_text.submit.message` e o prefixo \"Vendido por\" na descrição dos itens, respeitando o limite de 200 caracteres da descrição",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "show-seller-context-on-checkout-page#2.2",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "show-seller-context-on-checkout-page",
+   "tarefa": "2.2",
+   "descricao": "Passar o nome da loja ao criador a partir da loja já resolvida no fluxo; definir `locale` pelo idioma da compra",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "show-seller-context-on-checkout-page#2.3",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "show-seller-context-on-checkout-page",
+   "tarefa": "2.3",
+   "descricao": "Verificar no marketplace se uma sessão pode juntar mais de uma loja e passar todos os nomes",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "show-seller-context-on-checkout-page#2.4",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "show-seller-context-on-checkout-page",
+   "tarefa": "2.4",
+   "descricao": "Testes com o Stripe simulado: parâmetros enviados nas lojas e no marketplace, metadados do webhook inalterados",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "show-seller-context-on-checkout-page#3.1",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "show-seller-context-on-checkout-page",
+   "tarefa": "3.1",
+   "descricao": "Localizar a coluna do nome do negócio (cadeia `arpt_manejo_produto` → `arpt_manejo`) e buscá-la em `createCheckoutSession`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "show-seller-context-on-checkout-page#3.2",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "show-seller-context-on-checkout-page",
+   "tarefa": "3.2",
+   "descricao": "Enviar `custom_text.submit.message` e \"Negócio: {nome}\" na descrição do item, preservando a descrição existente dentro do limite",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "show-seller-context-on-checkout-page#3.3",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "show-seller-context-on-checkout-page",
+   "tarefa": "3.3",
+   "descricao": "Testes: sessão com o nome do negócio, negócio sem nome (mensagem omitida), metadados e divisão do pagamento inalterados",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "show-seller-context-on-checkout-page#4.1",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "show-seller-context-on-checkout-page",
+   "tarefa": "4.1",
+   "descricao": "Conferir que as três origens abrem a página de pagamento com o contexto, no ambiente de teste do Stripe, em pt e en",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "show-seller-context-on-checkout-page#4.2",
+   "area": "lojas",
+   "tipo": "codigo",
+   "origem": "show-seller-context-on-checkout-page",
+   "tarefa": "4.2",
+   "descricao": "Reconstruir `manejo-api` com `up -d --build --no-deps`",
+   "roteiro": null,
+   "bloqueia": false
+  }
+ ]
+}

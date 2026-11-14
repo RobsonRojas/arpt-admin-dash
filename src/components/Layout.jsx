@@ -22,11 +22,14 @@ import {
   AutoGraph,
   Policy,
   MonitorHeart,
+  MenuBook,
   PersonSearch
 } from '@mui/icons-material';
 import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
 import { setQuotaCallback } from '../services/gemini';
+import { AlertaPendencias } from './AlertaPendencias';
+import { LinkManual } from './LinkManual';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const DRAWER_WIDTH = 240;
@@ -85,6 +88,7 @@ export const Layout = ({ children }) => {
     { id: 'error-logs', label: 'Log de Erros', icon: <BugReport />, path: '/error-logs' },
     { id: 'monitoring', label: 'Monitoramento', icon: <MonitorHeart />, path: '/monitoring' },
     { id: 'social-login', label: 'Login social', icon: <Security />, path: '/social-login' },
+    { id: 'manual', label: 'Manual', icon: <MenuBook />, path: '/manual' },
     { id: 'store-customers', label: 'Clientes de loja', icon: <PersonSearch />, path: '/store-customers' },
     { id: 'store-panel', label: 'Minha loja', icon: <Storefront />, path: '/loja' },
     { id: 'dropshipping-admin', label: 'Admin Dropshipping', icon: <Storefront />, path: '/dropshipping-admin' },
@@ -94,7 +98,7 @@ export const Layout = ({ children }) => {
   ];
 
   const getPageTitle = () => {
-    const currentItem = menuItems.find(item => item.path === location.pathname || (item.path === '/loja' && location.pathname.startsWith('/loja')));
+    const currentItem = menuItems.find(item => item.path === location.pathname || (item.path === '/manual' && location.pathname.startsWith('/manual')) || (item.path === '/loja' && location.pathname.startsWith('/loja')));
     if (currentItem) return currentItem.label;
 
     // Fallbacks or special cases
@@ -154,6 +158,8 @@ export const Layout = ({ children }) => {
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             {getPageTitle()}
           </Typography>
+          <LinkManual />
+          <AlertaPendencias />
           <Tooltip title="Sair">
             <IconButton onClick={handleLogout} color="inherit" sx={{ mr: 1 }}>
               <Logout />

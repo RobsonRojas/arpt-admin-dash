@@ -1,0 +1,67 @@
+{
+ "total": 463,
+ "manuais": 176,
+ "codigo": 287,
+ "porArea": {
+  "sala-de-situacao": {
+   "total": 3,
+   "manuais": 1
+  },
+  "termos-e-privacidade": {
+   "total": 26,
+   "manuais": 0
+  },
+  "lojas": {
+   "total": 85,
+   "manuais": 5
+  },
+  "dropshipping": {
+   "total": 74,
+   "manuais": 0
+  },
+  "login-social": {
+   "total": 10,
+   "manuais": 0
+  },
+  "pedidos-e-frete": {
+   "total": 10,
+   "manuais": 3
+  },
+  "pixels-e-rastreio": {
+   "total": 14,
+   "manuais": 0
+  },
+  "app-e-site": {
+   "total": 19,
+   "manuais": 15
+  },
+  "infraestrutura-e-deploy": {
+   "total": 163,
+   "manuais": 127
+  },
+  "usuarios-e-acesso": {
+   "total": 16,
+   "manuais": 0
+  },
+  "monitoramento": {
+   "total": 4,
+   "manuais": 4
+  },
+  "crescimento": {
+   "total": 6,
+   "manuais": 6
+  },
+  "produtos-e-catalogo": {
+   "total": 3,
+   "manuais": 3
+  },
+  "painel-do-produtor": {
+   "total": 18,
+   "manuais": 5
+  },
+  "pagamentos-e-repasses": {
+   "total": 12,
+   "manuais": 7
+  }
+ }
+}
