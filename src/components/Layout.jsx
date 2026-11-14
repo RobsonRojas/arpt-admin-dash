@@ -84,6 +84,7 @@ export const Layout = ({ children }) => {
     { id: 'developer-settings', label: 'Configurações Dev', icon: <Code />, path: '/developer-settings' },
     { id: 'error-logs', label: 'Log de Erros', icon: <BugReport />, path: '/error-logs' },
     { id: 'monitoring', label: 'Monitoramento', icon: <MonitorHeart />, path: '/monitoring' },
+    { id: 'social-login', label: 'Login social', icon: <Security />, path: '/social-login' },
     { id: 'store-customers', label: 'Clientes de loja', icon: <PersonSearch />, path: '/store-customers' },
     { id: 'store-panel', label: 'Minha loja', icon: <Storefront />, path: '/loja' },
     { id: 'dropshipping-admin', label: 'Admin Dropshipping', icon: <Storefront />, path: '/dropshipping-admin' },
