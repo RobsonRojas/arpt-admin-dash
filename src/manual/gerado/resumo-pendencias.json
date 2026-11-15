@@ -1,22 +1,26 @@
 {
- "total": 460,
+ "total": 529,
  "manuais": 175,
- "codigo": 285,
+ "codigo": 354,
  "porArea": {
   "termos-e-privacidade": {
    "total": 26,
    "manuais": 0
   },
+  "infraestrutura-e-deploy": {
+   "total": 246,
+   "manuais": 127
+  },
   "lojas": {
    "total": 85,
    "manuais": 5
   },
-  "dropshipping": {
-   "total": 74,
-   "manuais": 0
-  },
   "login-social": {
    "total": 10,
+   "manuais": 0
+  },
+  "dropshipping": {
+   "total": 60,
    "manuais": 0
   },
   "pedidos-e-frete": {
@@ -30,10 +34,6 @@
   "app-e-site": {
    "total": 19,
    "manuais": 15
-  },
-  "infraestrutura-e-deploy": {
-   "total": 163,
-   "manuais": 127
   },
   "usuarios-e-acesso": {
    "total": 16,

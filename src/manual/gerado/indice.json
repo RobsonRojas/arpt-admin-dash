@@ -444,6 +444,7 @@
    ],
    "specs": [
     "dropshipper-default-store-template",
+    "dropshipper-store-availability",
     "dropshipper-store-marketing",
     "dropshipper-store-orders",
     "dropshipper-store-panel",
