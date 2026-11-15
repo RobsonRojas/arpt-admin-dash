@@ -261,86 +261,6 @@
    "bloqueia": false
   },
   {
-   "id": "add-automatic-store-domain-activation#1.1",
-   "area": "lojas",
-   "tipo": "codigo",
-   "origem": "add-automatic-store-domain-activation",
-   "tarefa": "1.1",
-   "descricao": "Extrair de `verifyDomain` a transição `PENDENTE` → `VERIFICADO` (com a emissão do TLS enfileirada uma vez) para uma função usada pelo botão e pelo job",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-automatic-store-domain-activation#1.2",
-   "area": "lojas",
-   "tipo": "codigo",
-   "origem": "add-automatic-store-domain-activation",
-   "tarefa": "1.2",
-   "descricao": "Job `domain-verify-pending` em `dropshippingMaintenance` (a cada poucos minutos), com lote, tempo máximo por consulta e recuo por idade do cadastro (decidir no design: calcular por `created_at`/`ultima_checagem_em` ou coluna de próxima checagem)",
-   "roteiro": null,
-   "bloqueia": true
-  },
-  {
-   "id": "add-automatic-store-domain-activation#1.3",
-   "area": "lojas",
-   "tipo": "codigo",
-   "origem": "add-automatic-store-domain-activation",
-   "tarefa": "1.3",
-   "descricao": "Consulta inconclusiva não altera o estado; atualizar pendências só com consulta conclusiva",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-automatic-store-domain-activation#1.4",
-   "area": "lojas",
-   "tipo": "codigo",
-   "origem": "add-automatic-store-domain-activation",
-   "tarefa": "1.4",
-   "descricao": "E-mails: domínio ativo, falha definitiva de TLS e aviso antes de expirar, cada um uma vez por evento",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-automatic-store-domain-activation#1.5",
-   "area": "lojas",
-   "tipo": "codigo",
-   "origem": "add-automatic-store-domain-activation",
-   "tarefa": "1.5",
-   "descricao": "Testes de integração com DNS e emissor falsos: ativação sem clique, pendente que segue pendente, inconclusivo, corrida manual × automática, lote maior que o limite, expiração, e-mails sem repetição",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-automatic-store-domain-activation#2.1",
-   "area": "lojas",
-   "tipo": "codigo",
-   "origem": "add-automatic-store-domain-activation",
-   "tarefa": "2.1",
-   "descricao": "Tela do domínio atualiza o estado sozinha enquanto aberta (consulta periódica com pausa quando a aba está oculta); textos do guia deixam de pedir o clique",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-automatic-store-domain-activation#2.2",
-   "area": "lojas",
-   "tipo": "codigo",
-   "origem": "add-automatic-store-domain-activation",
-   "tarefa": "2.2",
-   "descricao": "Testes do painel",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-automatic-store-domain-activation#3.1",
-   "area": "lojas",
-   "tipo": "codigo",
-   "origem": "add-automatic-store-domain-activation",
-   "tarefa": "3.1",
-   "descricao": "Atualizar `STOREFRONT_DOMINIOS_TLS.md` (a verificação deixa de depender do clique) e o guia do dropshipper",
-   "roteiro": null,
-   "bloqueia": true
-  },
-  {
    "id": "add-automatic-store-domain-activation#4.1",
    "area": "lojas",
    "tipo": "codigo",
@@ -357,106 +277,6 @@
    "origem": "add-automatic-store-domain-activation",
    "tarefa": "4.2",
    "descricao": "Em produção: cadastrar um domínio de teste, criar só os registros de DNS e conferir que ele ativa sem abrir o painel e que o e-mail chega",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-cep-autofill-to-store-delivery-address#1.1",
-   "area": "lojas",
-   "tipo": "codigo",
-   "origem": "add-cep-autofill-to-store-delivery-address",
-   "tarefa": "1.1",
-   "descricao": "Conferir termos de uso e limites do ViaCEP e da BrasilAPI e registrar a escolha (principal e reserva); trocar se algum for inadequado para produção",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-cep-autofill-to-store-delivery-address#1.2",
-   "area": "lojas",
-   "tipo": "codigo",
-   "origem": "add-cep-autofill-to-store-delivery-address",
-   "tarefa": "1.2",
-   "descricao": "Serviço de consulta de CEP com interface de provedor, timeout curto, fallback, cache (achado e não achado com TTLs diferentes) e disjuntor simples",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-cep-autofill-to-store-delivery-address#1.3",
-   "area": "lojas",
-   "tipo": "codigo",
-   "origem": "add-cep-autofill-to-store-delivery-address",
-   "tarefa": "1.3",
-   "descricao": "Rota pública `GET /public/stores/:slug/cep/:cep` em `routes/public/stores.ts`: validar 8 dígitos (400), 404, 503 e 429, devolvendo só logradouro, bairro, cidade e UF; limite de taxa com a mesma chave de cliente do frete",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-cep-autofill-to-store-delivery-address#1.4",
-   "area": "lojas",
-   "tipo": "codigo",
-   "origem": "add-cep-autofill-to-store-delivery-address",
-   "tarefa": "1.4",
-   "descricao": "Log sem juntar CEP e IP",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-cep-autofill-to-store-delivery-address#1.5",
-   "area": "lojas",
-   "tipo": "codigo",
-   "origem": "add-cep-autofill-to-store-delivery-address",
-   "tarefa": "1.5",
-   "descricao": "Testes de integração: achado, cache, 404, 400, provedor principal fora com reserva, ambos fora (503), 429",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-cep-autofill-to-store-delivery-address#2.1",
-   "area": "lojas",
-   "tipo": "codigo",
-   "origem": "add-cep-autofill-to-store-delivery-address",
-   "tarefa": "2.1",
-   "descricao": "Proxy same-origin para a consulta, no estilo do proxy do frete",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-cep-autofill-to-store-delivery-address#2.2",
-   "area": "lojas",
-   "tipo": "codigo",
-   "origem": "add-cep-autofill-to-store-delivery-address",
-   "tarefa": "2.2",
-   "descricao": "`CartView.tsx`: consultar ao ter o CEP do frete e a cada mudança, ignorar respostas fora de ordem, preencher só campos vazios e não editados, refazer ao mudar o CEP preservando o digitado",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-cep-autofill-to-store-delivery-address#2.3",
-   "area": "lojas",
-   "tipo": "codigo",
-   "origem": "add-cep-autofill-to-store-delivery-address",
-   "tarefa": "2.3",
-   "descricao": "Foco no campo Número, região `aria-live` com o aviso de conferir, nota discreta para CEP não encontrado, textos em português e inglês em `strings.ts`",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-cep-autofill-to-store-delivery-address#2.4",
-   "area": "lojas",
-   "tipo": "codigo",
-   "origem": "add-cep-autofill-to-store-delivery-address",
-   "tarefa": "2.4",
-   "descricao": "Testes de componente: completo, genérico, cliente já digitou, CEP muda, 404, 503, foco e aviso, inglês",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-cep-autofill-to-store-delivery-address#3.1",
-   "area": "lojas",
-   "tipo": "codigo",
-   "origem": "add-cep-autofill-to-store-delivery-address",
-   "tarefa": "3.1",
-   "descricao": "Confirmar que o formulário compartilhado cobre todos os templates de loja",
    "roteiro": null,
    "bloqueia": false
   },
@@ -1611,7 +1431,7 @@
    "bloqueia": false
   },
   {
-   "id": "add-marketplace-channel-integrations#161",
+   "id": "add-marketplace-channel-integrations#143",
    "area": "dropshipping",
    "tipo": "codigo",
    "origem": "add-marketplace-channel-integrations",
@@ -1997,86 +1817,6 @@
    "origem": "add-per-store-checkout-branding",
    "tarefa": "5.3",
    "descricao": "Definir revisão ou denúncia de nome e logo de loja que imite outra marca, no processo de suspensão existente",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-producer-terms-reacceptance-to-web-panel#1.1",
-   "area": "termos-e-privacidade",
-   "tipo": "codigo",
-   "origem": "add-producer-terms-reacceptance-to-web-panel",
-   "tarefa": "1.1",
-   "descricao": "Serviço no `manejo-app` para `GET /api/v1/producer/terms` e `POST /api/v1/producer/terms/:id/accept` (usando o cliente `api` e a recuperação de papel já usada no painel)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-producer-terms-reacceptance-to-web-panel#1.2",
-   "area": "termos-e-privacidade",
-   "tipo": "codigo",
-   "origem": "add-producer-terms-reacceptance-to-web-panel",
-   "tarefa": "1.2",
-   "descricao": "Componente `AvisoTermosProdutor`: versão, link para `/termo-de-uso/produtor` (nova aba), checkbox, botão, texto do efeito (só aceitar novos pedidos), erro anunciável, textos em português e inglês",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-producer-terms-reacceptance-to-web-panel#1.3",
-   "area": "termos-e-privacidade",
-   "tipo": "codigo",
-   "origem": "add-producer-terms-reacceptance-to-web-panel",
-   "tarefa": "1.3",
-   "descricao": "Integrar em `PainelDoProdutor.tsx` no topo da aba, só quando o painel tem acesso e sessão; carregar ao montar e recarregar depois do aceite",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-producer-terms-reacceptance-to-web-panel#1.4",
-   "area": "termos-e-privacidade",
-   "tipo": "codigo",
-   "origem": "add-producer-terms-reacceptance-to-web-panel",
-   "tarefa": "1.4",
-   "descricao": "Corrida de versão: se o aceite for recusado (404/termo diferente), recarregar o termo vigente e mostrar o aviso atualizado com mensagem curta",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-producer-terms-reacceptance-to-web-panel#1.5",
-   "area": "termos-e-privacidade",
-   "tipo": "codigo",
-   "origem": "add-producer-terms-reacceptance-to-web-panel",
-   "tarefa": "1.5",
-   "descricao": "Falha na consulta não derruba o painel: sem aviso e registro no log do cliente",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-producer-terms-reacceptance-to-web-panel#2.1",
-   "area": "termos-e-privacidade",
-   "tipo": "codigo",
-   "origem": "add-producer-terms-reacceptance-to-web-panel",
-   "tarefa": "2.1",
-   "descricao": "Componente: pendente (aviso, botão desabilitado até marcar), aceitar (chama a rota com o `id` certo e remove o aviso), em dia, sem termo, falha na consulta, erro no aceite, versão trocada, inglês",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-producer-terms-reacceptance-to-web-panel#2.2",
-   "area": "termos-e-privacidade",
-   "tipo": "codigo",
-   "origem": "add-producer-terms-reacceptance-to-web-panel",
-   "tarefa": "2.2",
-   "descricao": "`PainelDoProdutor`: o aviso aparece no topo e não aparece sem acesso ou sessão",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-producer-terms-reacceptance-to-web-panel#3.1",
-   "area": "termos-e-privacidade",
-   "tipo": "codigo",
-   "origem": "add-producer-terms-reacceptance-to-web-panel",
-   "tarefa": "3.1",
-   "descricao": "Reconstruir o `manejo-app` com `up -d --build --no-deps`",
    "roteiro": null,
    "bloqueia": false
   },

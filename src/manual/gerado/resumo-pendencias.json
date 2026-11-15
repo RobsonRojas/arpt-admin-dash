@@ -1,10 +1,10 @@
 {
- "total": 501,
+ "total": 475,
  "manuais": 175,
- "codigo": 326,
+ "codigo": 300,
  "porArea": {
   "termos-e-privacidade": {
-   "total": 11,
+   "total": 3,
    "manuais": 0
   },
   "infraestrutura-e-deploy": {
@@ -12,7 +12,7 @@
    "manuais": 127
   },
   "lojas": {
-   "total": 85,
+   "total": 67,
    "manuais": 5
   },
   "login-social": {

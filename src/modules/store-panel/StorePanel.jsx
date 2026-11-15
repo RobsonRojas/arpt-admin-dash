@@ -76,6 +76,11 @@ function StoreShell() {
     if (bad) setToast({ severity: 'error', text: err(bad.reason) });
   }, [store?.id, papel]);
   useEffect(() => { reload(); }, [reload]);
+  // Só a lista de domínios, em silêncio (sem aviso de erro): é o que a tela do domínio consulta sozinha enquanto há algo em andamento.
+  const reloadDomains = useCallback(async () => {
+    if (!store || !accessFor(papel, 'domain')) return;
+    try { const r = await api.get(`${BASE(store.id)}/storefront/domains`); setData((d) => ({ ...d, domains: r.data })); } catch { /* a próxima consulta tenta de novo */ }
+  }, [store?.id, papel]);
 
   if (loadError) return <Alert severity="error">{loadError}</Alert>;
   if (!stores) return <CircularProgress />;
@@ -86,7 +91,7 @@ function StoreShell() {
   if (!section) return <Navigate to={`/loja/${store.id}/${defaultSection(papel)}`} replace />;
   const access = accessFor(papel, section);
   const notify = (severity, text) => setToast({ severity, text });
-  const ctx = { store, papel, access, config: data.config, products: data.products, domains: data.domains, reload, refreshStores, notify, setStoreName: (nome) => setStores((l) => l.map((s) => (s.id === store.id ? { ...s, nome } : s))) };
+  const ctx = { store, papel, access, config: data.config, products: data.products, domains: data.domains, reload, reloadDomains, refreshStores, notify, setStoreName: (nome) => setStores((l) => l.map((s) => (s.id === store.id ? { ...s, nome } : s))) };
   const View = SECTION_VIEW[section];
 
   return (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Alert, Box, Button, Chip, Paper, TextField, Typography } from '@mui/material';
 import { api } from '../../../services/api';
 import { useLang } from '../LangContext';
@@ -6,16 +6,41 @@ import { BASE, usePanel } from '../PanelContext';
 import DnsGuide, { DiagnosticoDaVerificacao } from '../DnsGuide';
 
 const TLS_COLOR = { ATIVO: 'success', EMITINDO: 'info', FALHA: 'error' };
+/** Intervalo com que a tela confere o estado dos domínios sozinha (a verificação em si é do servidor, a cada poucos minutos). */
+export const ACOMPANHAR_MS = 15000;
 
 /** Domínio próprio: cadastrar, mostrar o que configurar no DNS, verificar e remover. A verificação e o TLS são do servidor. */
 export default function Domain() {
   const { t, err } = useLang();
-  const { store, domains, reload, notify, access } = usePanel();
+  const { store, domains, reload, reloadDomains, notify, access } = usePanel();
   const [host, setHost] = useState(''); const [busy, setBusy] = useState(false); const [lastCheck, setLastCheck] = useState({});
   const d = (rota = '') => `${BASE(store.id)}/storefront/domains${rota}`;
   const editable = access === 'edit';
 
-  const run = async (fn) => { setBusy(true); try { await fn(); await reload(); } catch (e) { notify('error', err(e)); } finally { setBusy(false); } };
+  // O servidor ativa o domínio sozinho quando o DNS propaga (add-automatic-store-domain-activation): enquanto a tela estiver aberta e houver
+  // domínio pendente ou com certificado em emissão, ela confere o estado a cada ACOMPANHAR_MS, sem clique. Pausa com a aba oculta e, ao voltar, confere na hora.
+  const acompanhar = domains.some((x) => x.status === 'PENDENTE' || x.tls_status === 'EMITINDO');
+  const ocupado = useRef(false);
+  useEffect(() => {
+    if (!acompanhar || !reloadDomains) return undefined;
+    let timer = null; let vivo = true;
+    const conferir = async () => { if (!ocupado.current && !document.hidden) await reloadDomains(); };
+    const agendar = () => { timer = setTimeout(async () => { await conferir(); if (vivo) agendar(); }, ACOMPANHAR_MS); };
+    const aoMudarVisibilidade = () => { if (!document.hidden) { clearTimeout(timer); conferir().then(() => { if (vivo) agendar(); }); } };
+    document.addEventListener('visibilitychange', aoMudarVisibilidade);
+    agendar();
+    return () => { vivo = false; clearTimeout(timer); document.removeEventListener('visibilitychange', aoMudarVisibilidade); };
+  }, [acompanhar, reloadDomains]);
+
+  // Avisa quando um domínio que estava pendente foi ativado pelo servidor enquanto a tela estava aberta.
+  const antes = useRef(null);
+  useEffect(() => {
+    const atual = Object.fromEntries(domains.map((x) => [x.id, x.status]));
+    if (antes.current) for (const x of domains) if (antes.current[x.id] === 'PENDENTE' && x.status === 'VERIFICADO') notify('success', t('domain_auto_verified', { dominio: x.dominio }));
+    antes.current = atual;
+  }, [domains]);
+
+  const run = async (fn) => { setBusy(true); ocupado.current = true; try { await fn(); await reload(); } catch (e) { notify('error', err(e)); } finally { ocupado.current = false; setBusy(false); } };
   const add = () => run(async () => { await api.post(d(), { dominio: host.trim().toLowerCase() }); setHost(''); notify('success', t('domain_added')); });
   const verify = (x) => run(async () => { const r = await api.post(d(`/${x.id}/verify`)); setLastCheck({ ...lastCheck, [x.id]: r.data }); });
   const remove = (x) => { if (window.confirm(t('confirm_remove_domain'))) run(async () => { await api.delete(d(`/${x.id}`)); notify('success', t('domain_removed')); }); };
