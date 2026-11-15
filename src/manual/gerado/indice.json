@@ -33,6 +33,7 @@
    ],
    "specs": [
     "admin-core",
+    "admin-ecosystem-manual",
     "admin-governance",
     "standardized-revenue-and-purchases",
     "sync-failures"

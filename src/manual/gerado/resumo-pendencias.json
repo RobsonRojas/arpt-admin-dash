@@ -1,12 +1,8 @@
 {
- "total": 463,
- "manuais": 176,
- "codigo": 287,
+ "total": 460,
+ "manuais": 175,
+ "codigo": 285,
  "porArea": {
-  "sala-de-situacao": {
-   "total": 3,
-   "manuais": 1
-  },
   "termos-e-privacidade": {
    "total": 26,
    "manuais": 0

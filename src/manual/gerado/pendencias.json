@@ -1,36 +1,6 @@
 {
  "itens": [
   {
-   "id": "add-admin-ecosystem-manual#1.8",
-   "area": "sala-de-situacao",
-   "tipo": "manual",
-   "origem": "add-admin-ecosystem-manual",
-   "tarefa": "1.8",
-   "descricao": "Revisar a classificação manual × código e marcar ` ` nos itens de ação humana das demais changes ativas",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-admin-ecosystem-manual#5.1",
-   "area": "sala-de-situacao",
-   "tipo": "codigo",
-   "origem": "add-admin-ecosystem-manual",
-   "tarefa": "5.1",
-   "descricao": "Rodar o gerador e revisar o manual: distribuição das specs, textos de `resumo`, documentos incluídos, nenhuma credencial; commitar os arquivos gerados no `arpt-admin-dash`",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-admin-ecosystem-manual#5.4",
-   "area": "sala-de-situacao",
-   "tipo": "codigo",
-   "origem": "add-admin-ecosystem-manual",
-   "tarefa": "5.4",
-   "descricao": "Reconstruir `arpt-admin-dash` com `up -d --build --no-deps` e conferir `/manual`, o alerta no cabeçalho, uma seção por área, contagens e o link \"Manual\" em cada área",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
    "id": "add-ai-terms-legal-assistant-and-translation#1.1",
    "area": "termos-e-privacidade",
    "tipo": "codigo",
@@ -1105,7 +1075,7 @@
    "bloqueia": false
   },
   {
-   "id": "add-marketplace-channel-integrations#110",
+   "id": "add-marketplace-channel-integrations#107",
    "area": "dropshipping",
    "tipo": "codigo",
    "origem": "add-marketplace-channel-integrations",
