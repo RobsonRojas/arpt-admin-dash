@@ -1,146 +1,6 @@
 {
  "itens": [
   {
-   "id": "add-ai-terms-legal-assistant-and-translation#1.1",
-   "area": "termos-e-privacidade",
-   "tipo": "codigo",
-   "origem": "add-ai-terms-legal-assistant-and-translation",
-   "tarefa": "1.1",
-   "descricao": "Rota `/ai/terms-review`: persona de advogado, regras (sem inventar norma, marcar \"verificar\", não prometer comportamento inexistente) e saída JSON estruturada",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-ai-terms-legal-assistant-and-translation#1.2",
-   "area": "termos-e-privacidade",
-   "tipo": "codigo",
-   "origem": "add-ai-terms-legal-assistant-and-translation",
-   "tarefa": "1.2",
-   "descricao": "Rota `/ai/terms-translate`: inglês jurídico, preserva Markdown, numeração, títulos e glossário",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-ai-terms-legal-assistant-and-translation#1.3",
-   "area": "termos-e-privacidade",
-   "tipo": "codigo",
-   "origem": "add-ai-terms-legal-assistant-and-translation",
-   "tarefa": "1.3",
-   "descricao": "Respeitar o liga/desliga (503) e o fallback de modelos já existentes",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-ai-terms-legal-assistant-and-translation#1.4",
-   "area": "termos-e-privacidade",
-   "tipo": "codigo",
-   "origem": "add-ai-terms-legal-assistant-and-translation",
-   "tarefa": "1.4",
-   "descricao": "Testes: formato da saída, JSON inválido, IA desligada",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-ai-terms-legal-assistant-and-translation#2.1",
-   "area": "termos-e-privacidade",
-   "tipo": "codigo",
-   "origem": "add-ai-terms-legal-assistant-and-translation",
-   "tarefa": "2.1",
-   "descricao": "Fonte única de fatos fixos do sistema (frete ao produtor etc.) e glossário de termos, injetados nos prompts",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-ai-terms-legal-assistant-and-translation#2.2",
-   "area": "termos-e-privacidade",
-   "tipo": "codigo",
-   "origem": "add-ai-terms-legal-assistant-and-translation",
-   "tarefa": "2.2",
-   "descricao": "`POST /admin/ai/terms/review` e `POST /admin/ai/terms/translate` em `routes/admin/ai.ts`: papel `administrador`, Zod, tamanho máximo (413), limite de taxa (429), validação da saída com uma nova tentativa",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-ai-terms-legal-assistant-and-translation#2.3",
-   "area": "termos-e-privacidade",
-   "tipo": "codigo",
-   "origem": "add-ai-terms-legal-assistant-and-translation",
-   "tarefa": "2.3",
-   "descricao": "Log com ator, público, tamanho e resultado, sem o conteúdo",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-ai-terms-legal-assistant-and-translation#2.4",
-   "area": "termos-e-privacidade",
-   "tipo": "codigo",
-   "origem": "add-ai-terms-legal-assistant-and-translation",
-   "tarefa": "2.4",
-   "descricao": "Testes de integração: 403, 413, 429, saída válida, saída inválida, serviço de IA fora",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-ai-terms-legal-assistant-and-translation#3.1",
-   "area": "termos-e-privacidade",
-   "tipo": "codigo",
-   "origem": "add-ai-terms-legal-assistant-and-translation",
-   "tarefa": "3.1",
-   "descricao": "Botão \"Revisar com assistente jurídico\" e painel de observações (tipo, gravidade, sugestão, aplicar, texto sugerido com comparação e desfazer)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-ai-terms-legal-assistant-and-translation#3.2",
-   "area": "termos-e-privacidade",
-   "tipo": "codigo",
-   "origem": "add-ai-terms-legal-assistant-and-translation",
-   "tarefa": "3.2",
-   "descricao": "Botão \"Traduzir do português\" na aba ENGLISH; resultado editável, sem salvar sozinho",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-ai-terms-legal-assistant-and-translation#3.3",
-   "area": "termos-e-privacidade",
-   "tipo": "codigo",
-   "origem": "add-ai-terms-legal-assistant-and-translation",
-   "tarefa": "3.3",
-   "descricao": "Aviso de tradução desatualizada (hash do português usado na última tradução)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-ai-terms-legal-assistant-and-translation#3.4",
-   "area": "termos-e-privacidade",
-   "tipo": "codigo",
-   "origem": "add-ai-terms-legal-assistant-and-translation",
-   "tarefa": "3.4",
-   "descricao": "Aviso fixo de que a IA não substitui revisão de profissional; estados de carregando, erro, IA desligada, limite",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-ai-terms-legal-assistant-and-translation#3.5",
-   "area": "termos-e-privacidade",
-   "tipo": "codigo",
-   "origem": "add-ai-terms-legal-assistant-and-translation",
-   "tarefa": "3.5",
-   "descricao": "Sem uso do fallback com chave no navegador para este fluxo",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-ai-terms-legal-assistant-and-translation#3.6",
-   "area": "termos-e-privacidade",
-   "tipo": "codigo",
-   "origem": "add-ai-terms-legal-assistant-and-translation",
-   "tarefa": "3.6",
-   "descricao": "Testes de componente: aplicar, recusar, desfazer, tradução, tradução desatualizada, IA desligada",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
    "id": "add-ai-terms-legal-assistant-and-translation#4.1",
    "area": "termos-e-privacidade",
    "tipo": "codigo",
@@ -158,20 +18,6 @@
    "tarefa": "4.2",
    "descricao": "Validar com um termo real (PRODUTOR e DROPSHIPPER) que a saída é útil e registrar ajustes de prompt",
    "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-ai-terms-legal-assistant-and-translation#4.3",
-   "area": "termos-e-privacidade",
-   "tipo": "codigo",
-   "origem": "add-ai-terms-legal-assistant-and-translation",
-   "tarefa": "4.3",
-   "descricao": "Documentar no `ARPT_AI_TUTORIAL.md` e no runbook de termos que a IA é apoio e não revisão",
-   "roteiro": {
-    "secao": "analytics-e-ia",
-    "ancora": "doc-arpt-ai-tutorial",
-    "titulo": "Tutorial Completo: Configuração do Microsserviço `arpt-ai` com `GEMINI_API_KEY`"
-   },
    "bloqueia": false
   },
   {
@@ -1765,7 +1611,7 @@
    "bloqueia": false
   },
   {
-   "id": "add-marketplace-channel-integrations#176",
+   "id": "add-marketplace-channel-integrations#161",
    "area": "dropshipping",
    "tipo": "codigo",
    "origem": "add-marketplace-channel-integrations",
@@ -4849,142 +4695,12 @@
    "bloqueia": false
   },
   {
-   "id": "rename-dropshipper-panel-and-collapse-account-tabs#1.1",
-   "area": "dropshipping",
-   "tipo": "codigo",
-   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
-   "tarefa": "1.1",
-   "descricao": "`locales/pt` e `locales/en`: `sponsorships.tabs.dropshipperPanel` para \"Painel do Vendedor(a)\" e \"Seller panel\"",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "rename-dropshipper-panel-and-collapse-account-tabs#1.2",
-   "area": "dropshipping",
-   "tipo": "codigo",
-   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
-   "tarefa": "1.2",
-   "descricao": "`components/dropshipperTextos.ts` (pt e en): `painelTitulo`, `abrirPainel` e `ativoDetalhe` com o nome novo",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "rename-dropshipper-panel-and-collapse-account-tabs#1.3",
-   "area": "dropshipping",
-   "tipo": "codigo",
-   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
-   "tarefa": "1.3",
-   "descricao": "`components/ConvitePagina.tsx` (pt e en): texto `abrir`",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "rename-dropshipper-panel-and-collapse-account-tabs#1.4",
-   "area": "dropshipping",
-   "tipo": "codigo",
-   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
-   "tarefa": "1.4",
-   "descricao": "Varredura por \"Painel do dropshipper\" e \"Dropshipper panel\" em `frontend/manejo-app/src` e no `mobile`/`arpt-admin-dash` para achar textos visíveis esquecidos; decidir caso a caso (role, rota e termos não mudam)",
-   "roteiro": null,
-   "bloqueia": true
-  },
-  {
-   "id": "rename-dropshipper-panel-and-collapse-account-tabs#1.5",
-   "area": "dropshipping",
-   "tipo": "codigo",
-   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
-   "tarefa": "1.5",
-   "descricao": "Atualizar os testes que citam o texto antigo (`page.vitest.tsx`, `PapelDropshipper.vitest.tsx` e demais da varredura)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "rename-dropshipper-panel-and-collapse-account-tabs#2.1",
-   "area": "dropshipping",
-   "tipo": "codigo",
-   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
-   "tarefa": "2.1",
-   "descricao": "Em `pages/patrocinios/ui/page.tsx`, trocar `<Tabs>` por barra com hambúrguer + nome da seção atual abaixo de `md` (via `useMediaQuery`), mantendo `<Tabs>` a partir de `md`; verificar renderização no servidor e evitar aviso de hidratação",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "rename-dropshipper-panel-and-collapse-account-tabs#2.2",
-   "area": "dropshipping",
-   "tipo": "codigo",
-   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
-   "tarefa": "2.2",
-   "descricao": "`Menu` do MUI ancorado no botão, um `MenuItem` por aba (ícone, rótulo, `selected`), chamando o `handleTabChange` existente e fechando ao selecionar",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "rename-dropshipper-panel-and-collapse-account-tabs#2.3",
-   "area": "dropshipping",
-   "tipo": "codigo",
-   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
-   "tarefa": "2.3",
-   "descricao": "Acessibilidade: `aria-label` próprio (distinto do menu do site), `aria-haspopup`, `aria-expanded`, `aria-controls`, alvos de 44 px, foco devolvido ao botão",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "rename-dropshipper-panel-and-collapse-account-tabs#2.4",
-   "area": "dropshipping",
-   "tipo": "codigo",
-   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
-   "tarefa": "2.4",
-   "descricao": "Textos novos em português e inglês (rótulo do botão)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "rename-dropshipper-panel-and-collapse-account-tabs#3.1",
-   "area": "dropshipping",
-   "tipo": "codigo",
-   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
-   "tarefa": "3.1",
-   "descricao": "Teste do menu: abaixo de `md` mostra hambúrguer e não as abas; acima, o contrário (simulando `matchMedia`)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "rename-dropshipper-panel-and-collapse-account-tabs#3.2",
-   "area": "dropshipping",
-   "tipo": "codigo",
-   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
-   "tarefa": "3.2",
-   "descricao": "Teste: abrir, escolher aba (troca, fecha, URL), aba sem papel não listada, Esc devolve o foco, troca de formato ao cruzar o breakpoint mantém a aba",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "rename-dropshipper-panel-and-collapse-account-tabs#3.3",
-   "area": "dropshipping",
-   "tipo": "codigo",
-   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
-   "tarefa": "3.3",
-   "descricao": "Teste dos rótulos novos em português e inglês",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
    "id": "rename-dropshipper-panel-and-collapse-account-tabs#4.1",
    "area": "dropshipping",
    "tipo": "codigo",
    "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
    "tarefa": "4.1",
    "descricao": "Conferir em telas de 360, 768 e 1024 px, com e sem as abas de produtor e vendedor(a)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "rename-dropshipper-panel-and-collapse-account-tabs#4.2",
-   "area": "dropshipping",
-   "tipo": "codigo",
-   "origem": "rename-dropshipper-panel-and-collapse-account-tabs",
-   "tarefa": "4.2",
-   "descricao": "Reconstruir o `manejo-app` com `up -d --build --no-deps`",
    "roteiro": null,
    "bloqueia": false
   },
