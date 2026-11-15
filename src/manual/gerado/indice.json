@@ -521,6 +521,7 @@
    "resumo": "Identificadores públicos, rastreio, transições, confirmação de entrega e cotação de frete.",
    "rotas": [],
    "specs": [
+    "checkout-delivery-address-binding",
     "delivery-confirmation",
     "freight-quote-resilience",
     "order-public-identifiers",

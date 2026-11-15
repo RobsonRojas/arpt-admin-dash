@@ -1,7 +1,7 @@
 {
- "total": 475,
+ "total": 439,
  "manuais": 175,
- "codigo": 300,
+ "codigo": 264,
  "porArea": {
   "termos-e-privacidade": {
    "total": 3,
@@ -12,7 +12,7 @@
    "manuais": 127
   },
   "lojas": {
-   "total": 67,
+   "total": 57,
    "manuais": 5
   },
   "login-social": {
@@ -23,12 +23,8 @@
    "total": 47,
    "manuais": 0
   },
-  "pedidos-e-frete": {
-   "total": 10,
-   "manuais": 3
-  },
   "pixels-e-rastreio": {
-   "total": 14,
+   "total": 4,
    "manuais": 0
   },
   "app-e-site": {
@@ -47,12 +43,16 @@
    "total": 6,
    "manuais": 6
   },
+  "pedidos-e-frete": {
+   "total": 6,
+   "manuais": 3
+  },
   "produtos-e-catalogo": {
    "total": 3,
    "manuais": 3
   },
   "painel-do-produtor": {
-   "total": 18,
+   "total": 6,
    "manuais": 5
   },
   "pagamentos-e-repasses": {
