@@ -1,11 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Box, Typography, Button, Paper, Table, TableBody, TableCell, 
   TableContainer, TableHead, TableRow, Chip, Modal, TextField, 
-  Alert, Snackbar, MenuItem, Select, FormControl, InputLabel, Tabs, Tab, FormControlLabel, Checkbox
+  Alert, Snackbar, MenuItem, Select, FormControl, InputLabel, Tabs, Tab, FormControlLabel, Checkbox, CircularProgress
 } from '@mui/material';
 import MDEditor from '@uiw/react-md-editor';
 import { api } from '../services/api';
+import { getAiStatus } from '../services/gemini';
+import { revisarTermo, traduzirTermo } from '../services/termsAi';
+import { TermsAiPanel } from '../components/TermsAiPanel';
+import { AVISO_IA, MENSAGEM_IA_DESLIGADA, aplicarObservacao, descreverErroIa, hashTexto, traducaoDesatualizada } from '../utils/termsAi';
 import { AUDIENCES, PENDING_AUDIENCES, audienceLabel, currentTerm, draftPayload, pendingName, publishBlockers, publishWarning, termsOf } from '../utils/terms';
 
 const style = {
@@ -39,6 +43,23 @@ export const TermsOfUse = () => {
   const [pending, setPending] = useState(null); // { term, pendentes } do público da aba (produtor/dropshipper)
   const audience = AUDIENCES[audienceTab];
   const visibleTerms = termsOf(terms, audience);
+
+  // Assistente de IA do editor (add-ai-terms-legal-assistant-and-translation): só sugere; o rascunho só é salvo por "Salvar Rascunho".
+  const [iaLigada, setIaLigada] = useState(true);
+  const [iaCarregando, setIaCarregando] = useState(null); // 'review' | 'translate' | null
+  const [iaErro, setIaErro] = useState(null);
+  const [revisao, setRevisao] = useState(null); // { resumo, observacoes, texto_sugerido, lang }
+  const [aplicadas, setAplicadas] = useState([]); // índices das observações já aplicadas
+  const [desfazer, setDesfazer] = useState([]); // pilha de { lang, texto, indice, hash }
+  const [traducaoHash, setTraducaoHash] = useState(null); // hash do português usado na última tradução da IA
+  const iaSeq = useRef(0); // descarta respostas de uma sessão de edição que já foi fechada
+  const audienciaDoModal = editingTerm ? (editingTerm.audience ?? 'GERAL') : audience;
+  const textoDe = (lang) => (lang === 'pt' ? content : contentEn);
+  const setTextoDe = (lang, texto) => (lang === 'pt' ? setContent(texto) : setContentEn(texto));
+  const resetIa = () => {
+    iaSeq.current += 1;
+    setIaCarregando(null); setIaErro(null); setRevisao(null); setAplicadas([]); setDesfazer([]); setTraducaoHash(null);
+  };
   
   // Read-only modal state
   const [viewModalOpen, setViewModalOpen] = useState(false);
@@ -64,6 +85,14 @@ export const TermsOfUse = () => {
     fetchTerms();
   }, []);
 
+  // Com a IA desligada pelo administrador, os botões do assistente ficam desabilitados e a escrita segue normal.
+  useEffect(() => {
+    if (!modalOpen) return;
+    let cancelled = false;
+    getAiStatus().then((s) => { if (!cancelled) setIaLigada(s?.enabled !== false); }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [modalOpen]);
+
   // Quem ainda não aceitou a versão vigente (só produtor e dropshipper têm essa lista).
   useEffect(() => {
     setPending(null);
@@ -83,6 +112,7 @@ export const TermsOfUse = () => {
     setContentEn(latestPublished?.content_md_en ?? '');
     setClauseFreight(!!latestPublished?.contem_clausula_frete);
     setEditorLang('pt');
+    resetIa();
     setModalOpen(true);
   };
 
@@ -92,6 +122,7 @@ export const TermsOfUse = () => {
     setContentEn(term.content_md_en ?? '');
     setClauseFreight(!!term.contem_clausula_frete);
     setEditorLang('pt');
+    resetIa();
     setModalOpen(true);
   };
 
@@ -101,6 +132,7 @@ export const TermsOfUse = () => {
   };
 
   const handleClose = () => {
+    resetIa();
     setModalOpen(false);
     setViewModalOpen(false);
     setEditingTerm(null);
@@ -121,6 +153,74 @@ export const TermsOfUse = () => {
     } catch (err) {
       console.error(err);
       setSnack({ open: true, message: 'Erro ao salvar rascunho', severity: 'error' });
+    }
+  };
+
+  const empilharDesfazer = (entrada) => setDesfazer((pilha) => [...pilha, entrada]);
+
+  const handleRevisar = async () => {
+    const lang = editorLang;
+    const seq = iaSeq.current;
+    setIaErro(null);
+    setIaCarregando('review');
+    try {
+      const r = await revisarTermo({ text: textoDe(lang), audience: audienciaDoModal, clauseFreight });
+      if (seq !== iaSeq.current) return;
+      setRevisao({ ...r, lang });
+      setAplicadas([]);
+    } catch (err) {
+      if (seq !== iaSeq.current) return;
+      const d = descreverErroIa(err);
+      if (d.desligada) setIaLigada(false);
+      setIaErro(d.mensagem);
+    } finally {
+      if (seq === iaSeq.current) setIaCarregando(null);
+    }
+  };
+
+  const handleAplicarObservacao = (indice) => {
+    if (!revisao) return;
+    const r = aplicarObservacao(textoDe(revisao.lang), revisao.observacoes[indice]);
+    if (!r.ok) return;
+    empilharDesfazer({ lang: revisao.lang, texto: textoDe(revisao.lang), indice });
+    setTextoDe(revisao.lang, r.texto);
+    setAplicadas((a) => [...a, indice]);
+  };
+
+  const handleUsarSugerido = () => {
+    if (!revisao) return;
+    empilharDesfazer({ lang: revisao.lang, texto: textoDe(revisao.lang), indice: null });
+    setTextoDe(revisao.lang, revisao.texto_sugerido);
+  };
+
+  const handleDesfazerIa = () => {
+    const ultima = desfazer[desfazer.length - 1];
+    if (!ultima) return;
+    setTextoDe(ultima.lang, ultima.texto);
+    if (ultima.indice != null) setAplicadas((a) => a.filter((i) => i !== ultima.indice));
+    if (ultima.hash !== undefined) setTraducaoHash(ultima.hash);
+    setDesfazer((pilha) => pilha.slice(0, -1));
+  };
+
+  const handleTraduzir = async () => {
+    if (contentEn.trim() && !window.confirm('A aba ENGLISH já tem texto. A tradução vai substituí-lo (dá para desfazer). Continuar?')) return;
+    const seq = iaSeq.current;
+    const portugues = content;
+    setIaErro(null);
+    setIaCarregando('translate');
+    try {
+      const r = await traduzirTermo({ text: portugues, audience: audienciaDoModal });
+      if (seq !== iaSeq.current) return;
+      empilharDesfazer({ lang: 'en', texto: contentEn, indice: null, hash: traducaoHash });
+      setContentEn(r.text);
+      setTraducaoHash(hashTexto(portugues));
+    } catch (err) {
+      if (seq !== iaSeq.current) return;
+      const d = descreverErroIa(err);
+      if (d.desligada) setIaLigada(false);
+      setIaErro(d.mensagem);
+    } finally {
+      if (seq === iaSeq.current) setIaCarregando(null);
     }
   };
 
@@ -261,6 +361,45 @@ export const TermsOfUse = () => {
           </Box>
           {clauseFreight && !contentEn.trim() && (
             <Alert severity="warning" sx={{ mb: 1 }}>A marca do frete está ligada: a versão em inglês é obrigatória para publicar.</Alert>
+          )}
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap', mb: 1 }}>
+            <Button size="small" variant="outlined" onClick={handleRevisar} disabled={!iaLigada || !!iaCarregando || !textoDe(editorLang).trim()}>
+              Revisar com assistente jurídico
+            </Button>
+            {editorLang === 'en' && (
+              <Button size="small" variant="outlined" onClick={handleTraduzir} disabled={!iaLigada || !!iaCarregando || !content.trim()}>
+                Traduzir do português
+              </Button>
+            )}
+            <Button size="small" onClick={handleDesfazerIa} disabled={desfazer.length === 0}>Desfazer última sugestão da IA</Button>
+            {iaCarregando && <CircularProgress size={18} aria-label="Aguardando o assistente" />}
+            <Typography variant="caption" color="textSecondary">{AVISO_IA}</Typography>
+          </Box>
+          {editorLang === 'en' && !content.trim() && (
+            <Typography variant="caption" color="textSecondary" sx={{ mb: 1 }}>Escreva o texto em português para poder traduzir.</Typography>
+          )}
+          {!iaLigada && <Alert severity="info" sx={{ mb: 1 }}>{MENSAGEM_IA_DESLIGADA}</Alert>}
+          {iaErro && <Alert severity="error" sx={{ mb: 1 }} onClose={() => setIaErro(null)}>{iaErro}</Alert>}
+          {editorLang === 'en' && traducaoDesatualizada(traducaoHash, content) && (
+            <Alert
+              severity="warning"
+              sx={{ mb: 1 }}
+              action={<Button color="inherit" size="small" onClick={handleTraduzir} disabled={!iaLigada || !!iaCarregando}>Traduzir de novo</Button>}
+            >
+              A tradução pode estar desatualizada: o texto em português mudou depois da última tradução.
+            </Alert>
+          )}
+          {revisao && revisao.lang === editorLang && (
+            <TermsAiPanel
+              revisao={revisao}
+              textoAtual={textoDe(revisao.lang)}
+              aplicadas={aplicadas}
+              podeDesfazer={desfazer.length > 0}
+              onAplicar={handleAplicarObservacao}
+              onUsarSugerido={handleUsarSugerido}
+              onDesfazer={handleDesfazerIa}
+              onFechar={() => setRevisao(null)}
+            />
           )}
           <Box sx={{ flexGrow: 1, overflow: 'auto', mb: 2 }}>
             {editorLang === 'pt'
