@@ -14,7 +14,7 @@ vi.mock('../services/api', () => ({ api: { get: vi.fn(), post: vi.fn(), delete: 
  */
 const BASE = '/api/v1/admin/monitoring';
 const SERVICOS = {
-    monitoramento_ligado: true, alertas_ligados: false,
+    monitoramento_ligado: true, alertas_ligados: false, reinicio_habilitado: true,
     servicos: [
         { nome: 'manejo-api', estado: 'up', estado_desde: '2026-10-30T10:00:00Z', ultimo_erro: null, verificado_em: '2026-10-30T12:00:00Z', reiniciavel: false },
         { nome: 'email-worker', estado: 'down', estado_desde: '2026-10-30T11:50:00Z', ultimo_erro: 'container exited', verificado_em: '2026-10-30T12:00:00Z', reiniciavel: true },
@@ -93,6 +93,38 @@ describe('serviços', () => {
         render(<ServicosTab />);
         expect(await screen.findByText(/Monitoramento desligado/)).toBeInTheDocument();
         expect(within(screen.getByTestId('servico-email-worker')).getByRole('button', { name: 'Reiniciar' })).toBeDisabled();
+    });
+
+    // harden-docker-proxy-read-only-mode, 3.2
+    it('reinício desligado por configuração: nenhum botão Reiniciar e a nota aparece (no topo e em cada linha)', async () => {
+        api.get.mockResolvedValue({ data: { ...SERVICOS, reinicio_habilitado: false } });
+        render(<ServicosTab />);
+        await screen.findByTestId('servico-email-worker');
+        expect(screen.queryByRole('button', { name: 'Reiniciar' })).not.toBeInTheDocument();
+        expect(screen.getByTestId('reinicio-desligado')).toHaveTextContent('Reinício desligado por configuração');
+        expect(within(screen.getByTestId('servico-email-worker')).getByText('Reinício desligado por configuração')).toBeInTheDocument();
+        expect(within(screen.getByTestId('servico-manejo-api')).getByText('Reinício desligado por configuração')).toBeInTheDocument();
+        expect(screen.getByText(/Em observação/)).toBeInTheDocument(); // o aviso de observação continua
+    });
+
+    it('resposta de uma API antiga, sem reinicio_habilitado, conta como desligado (sem botão)', async () => {
+        const { reinicio_habilitado: _omitido, ...semCampo } = SERVICOS;
+        api.get.mockResolvedValue({ data: semCampo });
+        render(<ServicosTab />);
+        await screen.findByTestId('servico-email-worker');
+        expect(screen.queryByRole('button', { name: 'Reiniciar' })).not.toBeInTheDocument();
+    });
+
+    it('reinício ligado: botão só nos reiniciáveis, sem a nota de desligado', async () => {
+        const dados = { ...SERVICOS, servicos: [...SERVICOS.servicos, { nome: 'keycloak', estado: 'up', estado_desde: null, ultimo_erro: null, verificado_em: null, reiniciavel: false }] };
+        api.get.mockResolvedValue({ data: dados });
+        render(<ServicosTab />);
+        await screen.findByTestId('servico-keycloak');
+        expect(screen.getAllByRole('button', { name: 'Reiniciar' })).toHaveLength(1);
+        expect(within(screen.getByTestId('servico-email-worker')).getByRole('button', { name: 'Reiniciar' })).toBeInTheDocument();
+        expect(within(screen.getByTestId('servico-keycloak')).queryByRole('button', { name: 'Reiniciar' })).not.toBeInTheDocument();
+        expect(within(screen.getByTestId('servico-keycloak')).getByText('Não reiniciável pelo painel')).toBeInTheDocument();
+        expect(screen.queryByTestId('reinicio-desligado')).not.toBeInTheDocument();
     });
 });
 

@@ -66,6 +66,11 @@ export const ServicosTab = () => {
                     Monitoramento desligado: o servidor não está ligado ao proxy do Docker. Os estados abaixo não são atualizados e o reinício fica indisponível.
                 </Alert>
             )}
+            {dados.monitoramento_ligado && !dados.reinicio_habilitado && (
+                <Alert severity="info" sx={{ mb: 2 }} data-testid="reinicio-desligado">
+                    Reinício desligado por configuração: o painel mostra só o estado dos serviços. Para reiniciar um serviço, use o servidor (SSH).
+                </Alert>
+            )}
             {dados.monitoramento_ligado && !dados.alertas_ligados && (
                 <Alert severity="info" sx={{ mb: 2 }}>Em observação: os estados são verificados, mas nenhum alerta de queda é enviado ainda.</Alert>
             )}
@@ -92,9 +97,11 @@ export const ServicosTab = () => {
                                     <TableCell sx={{ maxWidth: 280, wordBreak: 'break-word' }}>{s.ultimo_erro || '—'}</TableCell>
                                     <TableCell>{dataHora(s.verificado_em)}</TableCell>
                                     <TableCell align="right">
-                                        {s.reiniciavel
-                                            ? <Button size="small" color="warning" disabled={!dados.monitoramento_ligado} onClick={() => abrir(s.nome)}>Reiniciar</Button>
-                                            : <Typography variant="caption" color="text.secondary">Não reiniciável pelo painel</Typography>}
+                                        {!dados.reinicio_habilitado
+                                            ? <Typography variant="caption" color="text.secondary">Reinício desligado por configuração</Typography>
+                                            : s.reiniciavel
+                                                ? <Button size="small" color="warning" disabled={!dados.monitoramento_ligado} onClick={() => abrir(s.nome)}>Reiniciar</Button>
+                                                : <Typography variant="caption" color="text.secondary">Não reiniciável pelo painel</Typography>}
                                     </TableCell>
                                 </TableRow>
                             );

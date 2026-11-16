@@ -1,18 +1,18 @@
 {
- "total": 439,
- "manuais": 175,
- "codigo": 264,
+ "total": 468,
+ "manuais": 176,
+ "codigo": 292,
  "porArea": {
   "termos-e-privacidade": {
    "total": 3,
    "manuais": 0
   },
   "infraestrutura-e-deploy": {
-   "total": 246,
-   "manuais": 127
+   "total": 281,
+   "manuais": 128
   },
   "lojas": {
-   "total": 57,
+   "total": 55,
    "manuais": 5
   },
   "login-social": {
@@ -28,7 +28,7 @@
    "manuais": 0
   },
   "app-e-site": {
-   "total": 19,
+   "total": 18,
    "manuais": 15
   },
   "usuarios-e-acesso": {
@@ -56,7 +56,7 @@
    "manuais": 5
   },
   "pagamentos-e-repasses": {
-   "total": 12,
+   "total": 9,
    "manuais": 7
   }
  }

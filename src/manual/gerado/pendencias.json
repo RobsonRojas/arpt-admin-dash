@@ -1831,6 +1831,16 @@
    "bloqueia": false
   },
   {
+   "id": "add-subdomain-support-for-store-domains#3.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-subdomain-support-for-store-domains",
+   "tarefa": "3.3",
+   "descricao": "Executar bateria de testes de integração via Docker localmente — **parcial:** os 6 testes novos passam e o `manejo-app` (1009) e o painel (232) estão verdes; a integração completa do backend não está verde por falhas que já existiam (dependentes da ordem e de fixtures; ver `remove-mercadopago-gateway`, 3.5)",
+   "roteiro": null,
+   "bloqueia": true
+  },
+  {
    "id": "fix-console-noise-and-duplicate-pixel#1.1",
    "area": "pixels-e-rastreio",
    "tipo": "codigo",
@@ -1881,42 +1891,12 @@
    "bloqueia": false
   },
   {
-   "id": "fix-mobile-auth-token-handling#5.3",
-   "area": "app-e-site",
-   "tipo": "codigo",
-   "origem": "fix-mobile-auth-token-handling",
-   "tarefa": "5.3",
-   "descricao": "Teste de interface: a faixa aparece com a sessão expirada e some depois do login",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
    "id": "fix-store-account-data-edit-and-delete-modal#3.2",
    "area": "lojas",
    "tipo": "codigo",
    "origem": "fix-store-account-data-edit-and-delete-modal",
    "tarefa": "3.2",
    "descricao": "Validar no navegador: editar dados, excluir pelo modal, tentar entrar de novo (recusado) e entrar em outra loja",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "fix-store-login-start-url-double-api#2.2",
-   "area": "lojas",
-   "tipo": "codigo",
-   "origem": "fix-store-login-start-url-double-api",
-   "tarefa": "2.2",
-   "descricao": "Reconstruir o `manejo-app` no servidor (`git pull` e `docker compose up -d --build --no-deps manejo-app`)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "fix-store-login-start-url-double-api#2.3",
-   "area": "lojas",
-   "tipo": "codigo",
-   "origem": "fix-store-login-start-url-double-api",
-   "tarefa": "2.3",
-   "descricao": "Em `acurui.arpt.site`, \"Criar conta\" abre o cadastro do Keycloak (sem 404)",
    "roteiro": null,
    "bloqueia": false
   },
@@ -1947,46 +1927,6 @@
    "origem": "fix-store-modal-shape-and-add-customer-verification-admin",
    "tarefa": "5.2",
    "descricao": "Validar: modal sem corte; reenviar verificação do cadastro de teste e recebê-lo; verificar manualmente e entrar na loja",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "harden-docker-proxy-read-only-mode#1.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "harden-docker-proxy-read-only-mode",
-   "tarefa": "1.1",
-   "descricao": "Criar `docker-proxy/nginx.readonly.conf` (só `GET /version` e `GET /containers/json`; todo o resto 403) e renomear a atual para `docker-proxy/nginx.restart.conf`, com a lista de reinício reduzida aos serviços sem estado",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "harden-docker-proxy-read-only-mode#1.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "harden-docker-proxy-read-only-mode",
-   "tarefa": "1.2",
-   "descricao": "`docker-compose.yml`: o serviço `docker-proxy` monta `./docker-proxy/nginx.${DOCKER_PROXY_MODE:-readonly}.conf`; documentar os valores aceitos (`readonly` e `restart`) e recusar valor desconhecido",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "harden-docker-proxy-read-only-mode#1.3",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "harden-docker-proxy-read-only-mode",
-   "tarefa": "1.3",
-   "descricao": "`docker-proxy/validar-proxy.sh`: aceitar `MODO` (`leitura` por padrão, `reinicio`); em `leitura`, todo `POST .../restart` esperado é 403; em `reinicio`, o `204|404` atual para a allowlist e 403 para `arpt-db`, `redis_manejo`, `keycloak` e `nginx`",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "harden-docker-proxy-read-only-mode#1.4",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "harden-docker-proxy-read-only-mode",
-   "tarefa": "1.4",
-   "descricao": "`deploy.sh`: rodar `validar-proxy.sh` no modo configurado quando o contêiner `arpt-docker-proxy` estiver no ar, abortando o deploy se divergir; sem o proxy, seguir",
    "roteiro": null,
    "bloqueia": false
   },
@@ -2067,26 +2007,6 @@
    "origem": "harden-docker-proxy-read-only-mode",
    "tarefa": "3.2",
    "descricao": "Teste de componente: reinício desligado (sem botão, com nota) e ligado (botão só nos reiniciáveis)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "harden-docker-proxy-read-only-mode#4.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "harden-docker-proxy-read-only-mode",
-   "tarefa": "4.1",
-   "descricao": "Subir o proxy em modo `readonly` localmente e rodar `validar-proxy.sh`: todo reinício dá 403 e a listagem dá 200",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "harden-docker-proxy-read-only-mode#4.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "harden-docker-proxy-read-only-mode",
-   "tarefa": "4.2",
-   "descricao": "Subir em modo `restart` localmente, rodar `MODO=reinicio ./docker-proxy/validar-proxy.sh` e conferir que `arpt-db`, `redis_manejo`, `keycloak` e `nginx` dão 403",
    "roteiro": null,
    "bloqueia": false
   },
@@ -2476,9 +2396,9 @@
    "tipo": "manual",
    "origem": "add-admin-service-monitoring",
    "tarefa": "8.4",
-   "descricao": "Verificação no navegador: estados, reinício, filas e push (manual, registrada)",
+   "descricao": "Verificação no navegador: estados, filas e push, com o painel em modo só leitura (sem botão Reiniciar); o reinício só se o 1.5 for decidido (manual, registrada)",
    "roteiro": null,
-   "bloqueia": false
+   "bloqueia": true
   },
   {
    "id": "add-admin-service-monitoring#9.3",
@@ -2509,6 +2429,16 @@
    "descricao": "Follow-up: monitor externo simples (check HTTP de fora da stack) para cobrir a queda do próprio backend",
    "roteiro": null,
    "bloqueia": false
+  },
+  {
+   "id": "harden-docker-proxy-read-only-mode#4.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "harden-docker-proxy-read-only-mode",
+   "tarefa": "4.3",
+   "descricao": "Decisão separada e opcional: permitir o reinício pelo painel. Exige `DOCKER_PROXY_MODE=restart` no proxy e `MONITORING_RESTART_ENABLED=true` na API; validar com `MODO=reinicio ./docker-proxy/validar-proxy.sh`. Padrão: desligado (ver `docs/PENDENCIAS_MANUAIS.md`, itens 2.8 e 2.8b)",
+   "roteiro": null,
+   "bloqueia": true
   },
   {
    "id": "add-campaign-adhesion-outreach#7.2",
@@ -4241,32 +4171,392 @@
    "bloqueia": false
   },
   {
-   "id": "remove-mercadopago-gateway#3.2",
-   "area": "pagamentos-e-repasses",
+   "id": "persist-account-tab-and-producer-terms-access#1.1",
+   "area": "infraestrutura-e-deploy",
    "tipo": "codigo",
-   "origem": "remove-mercadopago-gateway",
+   "origem": "persist-account-tab-and-producer-terms-access",
+   "tarefa": "1.1",
+   "descricao": "Criar helper `abaPainelPersistida.ts` (ler/gravar `?aba=` preservando outros parâmetros; ler/gravar `sessionStorage` com try/catch; validar contra as chaves de `AbaPainel`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "persist-account-tab-and-producer-terms-access#1.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "persist-account-tab-and-producer-terms-access",
+   "tarefa": "1.2",
+   "descricao": "Em `patrocinios/ui/page.tsx`, inicializar a aba pedida por `?aba=` válido, depois sessão, depois padrão (substitui o `useEffect` só de `dropshipper`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "persist-account-tab-and-producer-terms-access#1.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "persist-account-tab-and-producer-terms-access",
+   "tarefa": "1.3",
+   "descricao": "Gravar a aba ao trocar (tabs e menu hambúrguer) com `history.replaceState`, só depois de as abas visíveis estarem definidas; corrigir a URL quando a aba pedida não for permitida",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "persist-account-tab-and-producer-terms-access#1.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "persist-account-tab-and-producer-terms-access",
+   "tarefa": "1.4",
+   "descricao": "Garantir que papel confirmado depois (token antigo/consulta ao servidor) selecione a aba pedida quando ela aparecer",
+   "roteiro": null,
+   "bloqueia": true
+  },
+  {
+   "id": "persist-account-tab-and-producer-terms-access#2.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "persist-account-tab-and-producer-terms-access",
+   "tarefa": "2.1",
+   "descricao": "Em `PainelDoDropshipper`, refletir a loja em Detalhes em `?loja=<id>` e restaurá-la após carregar a lista; id inválido mostra a lista",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "persist-account-tab-and-producer-terms-access#2.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "persist-account-tab-and-producer-terms-access",
+   "tarefa": "2.2",
+   "descricao": "Voltar à lista remove `?loja=`; trocar de aba remove `?loja=`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "persist-account-tab-and-producer-terms-access#3.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "persist-account-tab-and-producer-terms-access",
+   "tarefa": "3.1",
+   "descricao": "Adicionar em `PainelDoProdutor` o link \"Termos de uso do produtor\" (nova aba) com versão vigente e aceita, visível a todo produtor",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "persist-account-tab-and-producer-terms-access#3.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "persist-account-tab-and-producer-terms-access",
    "tarefa": "3.2",
-   "descricao": "Remover `MercadoPagoGateway`, `mp-webhook` (passa a responder 410), `mp-return`, `connect/mercadopago`, o ramo `mercadopago` de `ownerNotification.services.ts` e do tipo de gateway",
+   "descricao": "Garantir convivência com `AvisoTermosProdutor` (sem duplicar o aceite) e alvo de toque de 44 px em 360 px",
    "roteiro": null,
    "bloqueia": false
   },
   {
-   "id": "remove-mercadopago-gateway#3.3",
-   "area": "pagamentos-e-repasses",
+   "id": "persist-account-tab-and-producer-terms-access#3.3",
+   "area": "infraestrutura-e-deploy",
    "tipo": "codigo",
-   "origem": "remove-mercadopago-gateway",
+   "origem": "persist-account-tab-and-producer-terms-access",
    "tarefa": "3.3",
-   "descricao": "Remover a dependência `mercadopago`, as variáveis `MP_*` de `src/env/index.ts` e o import em `shipping.ts`",
+   "descricao": "Textos pt/en em `producerPanel.*` nos arquivos de tradução",
    "roteiro": null,
    "bloqueia": false
   },
   {
-   "id": "remove-mercadopago-gateway#3.4",
-   "area": "pagamentos-e-repasses",
+   "id": "persist-account-tab-and-producer-terms-access#4.1",
+   "area": "infraestrutura-e-deploy",
    "tipo": "codigo",
-   "origem": "remove-mercadopago-gateway",
-   "tarefa": "3.4",
-   "descricao": "Remover `tests/integration/gateways/mercadopago.test.ts` e o que for do Mercado Pago em `tests/fixtures/payment_mocks.ts`",
+   "origem": "persist-account-tab-and-producer-terms-access",
+   "tarefa": "4.1",
+   "descricao": "Vitest: restauração por `?aba=`, por sessão, aba sem permissão, papel confirmado depois, `replaceState` sem empilhar",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "persist-account-tab-and-producer-terms-access#4.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "persist-account-tab-and-producer-terms-access",
+   "tarefa": "4.2",
+   "descricao": "Vitest: `?loja=` válido/ inválido e remoção ao voltar",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "persist-account-tab-and-producer-terms-access#4.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "persist-account-tab-and-producer-terms-access",
+   "tarefa": "4.3",
+   "descricao": "Vitest: link do termo visível com termo aceito, desatualizado e sem termo publicado",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "persist-account-tab-and-producer-terms-access#4.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "persist-account-tab-and-producer-terms-access",
+   "tarefa": "4.4",
+   "descricao": "Reconstruir `manejo-app` (`up -d --build --no-deps`) e conferir no navegador recarregar/voltar em 360 px",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "producer-defined-product-pricing#1.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "producer-defined-product-pricing",
+   "tarefa": "1.1",
+   "descricao": "Adicionar coluna `margem_percentual NUMERIC(5,2)` em `loja_produtos` e coluna `status VARCHAR` com default `ATIVO`; popular `margem_percentual` a partir do preço antigo via script idempotente",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "producer-defined-product-pricing#1.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "producer-defined-product-pricing",
+   "tarefa": "1.2",
+   "descricao": "Criar tabela `comissao_plataforma` com colunas `id`, `produtor_id NULLABLE`, `percentual NUMERIC(5,2)`, `vigente_a_partir_de TIMESTAMPTZ`; inserir linha global com valor padrão configurável via variável de ambiente",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "producer-defined-product-pricing#1.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "producer-defined-product-pricing",
+   "tarefa": "1.3",
+   "descricao": "Adicionar variável de ambiente `PRICING_V2_ENABLED` (padrão `false`) e guard em todos os pontos de cálculo e rota novos",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "producer-defined-product-pricing#2.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "producer-defined-product-pricing",
+   "tarefa": "2.1",
+   "descricao": "Remover campo `preco` do schema Zod de alocação e edição de produto em loja (`loja_produtos`); garantir que `PUT /stores/:storeId/products/:productId` ignore qualquer campo de preço do cliente",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "producer-defined-product-pricing#2.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "producer-defined-product-pricing",
+   "tarefa": "2.2",
+   "descricao": "Implementar função de cálculo `calcularPrecoFinal(preco_produtor, margem_percentual): number` usada em todas as respostas de vitrine e no checkout",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "producer-defined-product-pricing#2.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "producer-defined-product-pricing",
+   "tarefa": "2.3",
+   "descricao": "Implementar `GET /producers/me/commission` retornando `{ percentual, fonte: \"padrao\" | \"especifico\" }` com query `COALESCE(por_produtor, padrão_global)` na tabela `comissao_plataforma`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "producer-defined-product-pricing#2.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "producer-defined-product-pricing",
+   "tarefa": "2.4",
+   "descricao": "Atualizar criação de pedido no checkout: ler `preco_produtor` e `margem_dropshipper` do banco, calcular `preco_final` no servidor, recusar pedido com 409 `PRODUCT_PRICE_PENDING_REVIEW` se produto em `PENDENTE_REVISAO`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "producer-defined-product-pricing#2.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "producer-defined-product-pricing",
+   "tarefa": "2.5",
+   "descricao": "Salvar snapshot `preco_produtor_snapshot` e `margem_dropshipper_snapshot` no pedido no momento do checkout (migration aditiva se colunas não existirem)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "producer-defined-product-pricing#3.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "producer-defined-product-pricing",
+   "tarefa": "3.1",
+   "descricao": "Ao salvar novo preço pelo produtor, enfileirar job BullMQ que busca alocações ativas do produto, muda `status` para `PENDENTE_REVISAO` e enfileira e-mail de notificação a cada dono de loja afetada",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "producer-defined-product-pricing#3.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "producer-defined-product-pricing",
+   "tarefa": "3.2",
+   "descricao": "Implementar `POST /stores/:storeId/products/:productId/confirm-price` (dono da loja confirma revisão → volta a `ATIVO`) e `DELETE /stores/:storeId/products/:productId` já existente (remoção da alocação)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "producer-defined-product-pricing#3.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "producer-defined-product-pricing",
+   "tarefa": "3.3",
+   "descricao": "Registrar no log da loja (`loja_audit_log`) o evento de alteração de preço pelo produtor como evento de sistema sem `autor_membro_id` e sem flag de reversão",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "producer-defined-product-pricing#4.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "producer-defined-product-pricing",
+   "tarefa": "4.1",
+   "descricao": "Implementar `GET /admin/commission` (retorna padrão e lista de comissões por produtor) e `PUT /admin/commission` (atualiza padrão ou insere por produtor), protegido por role de administrador",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "producer-defined-product-pricing#4.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "producer-defined-product-pricing",
+   "tarefa": "4.2",
+   "descricao": "Validar percentual: recusar valores negativos ou acima de 100; retornar 400 com mensagem clara",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "producer-defined-product-pricing#5.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "producer-defined-product-pricing",
+   "tarefa": "5.1",
+   "descricao": "Atualizar lógica de repasse em `src/services/payout`: calcular `valor_produtor = preco_produtor_snapshot × (1 − comissao_plataforma)` e `valor_dropshipper = preco_produtor_snapshot × margem_dropshipper_snapshot`; registrar percentual e valor retido pela plataforma no histórico do pedido",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "producer-defined-product-pricing#6.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "producer-defined-product-pricing",
+   "tarefa": "6.1",
+   "descricao": "Atualizar `GET /public/stores/:slug/products` para devolver `{ preco_produtor, margem_dropshipper, preco_final }` calculados no servidor; atualizar componente de card de produto na vitrine para exibir `preco_final`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "producer-defined-product-pricing#6.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "producer-defined-product-pricing",
+   "tarefa": "6.2",
+   "descricao": "Atualizar checkout da vitrine: exibir `preco_final` e, ao receber 409 `PRODUCT_PRICE_PENDING_REVIEW`, mostrar mensagem de que o produto está temporariamente indisponível",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "producer-defined-product-pricing#7.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "producer-defined-product-pricing",
+   "tarefa": "7.1",
+   "descricao": "Substituir campo de preço absoluto pelo campo `margem_percentual` (percentual, ex.: 15%) no formulário de alocação e edição de produto na loja",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "producer-defined-product-pricing#7.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "producer-defined-product-pricing",
+   "tarefa": "7.2",
+   "descricao": "Exibir prévia do preço final calculado em tempo real no formulário (`preco_produtor × (1 + margem / 100)`) e validar os limites de margem antes de enviar",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "producer-defined-product-pricing#7.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "producer-defined-product-pricing",
+   "tarefa": "7.3",
+   "descricao": "Adicionar badge e ação de revisão no card do produto quando `status === \"PENDENTE_REVISAO\"`: exibir novo preço do produtor e botões \"Confirmar\" e \"Remover produto\"",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "producer-defined-product-pricing#8.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "producer-defined-product-pricing",
+   "tarefa": "8.1",
+   "descricao": "Exibir comissão da plataforma (percentual e valor líquido estimado por unidade) no formulário de edição de preço do produto, consumindo `GET /producers/me/commission`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "producer-defined-product-pricing#8.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "producer-defined-product-pricing",
+   "tarefa": "8.2",
+   "descricao": "Exibir aviso com número de lojas afetadas antes de salvar uma alteração de preço em produto alocado (consultar contagem via endpoint ou incluir no payload de resposta do `PUT`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "producer-defined-product-pricing#9.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "producer-defined-product-pricing",
+   "tarefa": "9.1",
+   "descricao": "Adicionar tela de configuração de comissão: exibir comissão padrão e lista de comissões por produtor; permitir editar padrão e adicionar/remover comissão por produtor, chamando `GET /admin/commission` e `PUT /admin/commission`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "producer-defined-product-pricing#10.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "producer-defined-product-pricing",
+   "tarefa": "10.1",
+   "descricao": "Testes de integração backend: produtor define preço; dropshipper não pode alterar preço; cálculo de `preco_final`; checkout recusa produto em `PENDENTE_REVISAO`; repasse com comissão",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "producer-defined-product-pricing#10.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "producer-defined-product-pricing",
+   "tarefa": "10.2",
+   "descricao": "Testes de integração backend: notificação e mudança de status ao alterar preço com produto alocado; confirmação e remoção pelo dono da loja",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "producer-defined-product-pricing#10.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "producer-defined-product-pricing",
+   "tarefa": "10.3",
+   "descricao": "Validar `PRICING_V2_ENABLED=false` preserva comportamento atual (nenhuma regressão em testes existentes)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "producer-defined-product-pricing#10.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "producer-defined-product-pricing",
+   "tarefa": "10.4",
+   "descricao": "Reconstruir `manejo-api` e `manejo-app` com `up -d --build --no-deps` e testar em loja real: fluxo completo de alocação com margem, compra, repasse e revisão de preço",
    "roteiro": null,
    "bloqueia": false
   },
@@ -4276,9 +4566,9 @@
    "tipo": "codigo",
    "origem": "remove-mercadopago-gateway",
    "tarefa": "3.5",
-   "descricao": "Testes: notificação tardia em `mp-webhook` => 410 sem alterar compra; compra antiga consultável sem requisição ao Mercado Pago; suíte completa verde",
+   "descricao": "Testes: notificação tardia em `mp-webhook` => 410 sem alterar compra; compra antiga consultável sem requisição ao Mercado Pago; suíte completa verde — **parcial:** teste novo em `resumo-confirmacao.itest.ts` (webhook 410 sem gravar resumo nem consultar o MP; `/pagamentos/:id` 410). `gateway-padrao-stripe`, `stripe` e `resumo-confirmacao` passam (24 testes); `tsc` limpo; unitários: 1025 passam, 9 suítes nem iniciam sem `.env` (FIREBASE_*). **Suíte de integração completa NÃO está verde:** 37 suítes / 235 testes falham na rodada completa. Apurado: (1) é dependente da ordem de execução (`storefront/checkout` e `orders/order-effects-recovery` passam sozinhos e falham na rodada completa, com `relation \"arpt_carrinhos\" does not exist`, `column \"audience\" does not exist` e `TRUNCATE` de tabelas que sumiram, o que indica um teste anterior deixando o schema desfeito; o culpado não foi identificado); (2) falhas próprias de teste mesmo isoladas, ex. `sponsorship` (`invalid input syntax for type uuid: \"dono-…\"`) e `storefront/domains`; (3) `getaddrinfo EAI_AGAIN keycloak` (sem rede de teste). Nada disso toca no que esta mudança alterou, mas a linha de base limpa não foi comparada",
    "roteiro": null,
-   "bloqueia": false
+   "bloqueia": true
   },
   {
    "id": "remove-mercadopago-gateway#4.3",
