@@ -31,13 +31,14 @@ function CampoCopiavel({ valor, rotulo, testId }) {
 const fmtData = (iso) => { try { return new Date(iso).toLocaleDateString(); } catch { return iso; } };
 
 /** Orientações do provedor escolhido: o que vale para ele e o que fazer onde a tela varia. */
-function NotasDoProvedor({ provedor, raiz }) {
+function NotasDoProvedor({ provedor, raiz, zona }) {
   const { t } = useLang();
   const nota = `dnsg_prov_${provedor.id}_nota`;
   const tem = (k) => t(k) !== k;
   return (
     <Box sx={{ display: 'grid', gap: 0.75 }} data-testid="dns-provider-notes">
       <Typography variant="body2">{tem(nota) ? t(nota) : t('dnsg_prov_generico_nota')}</Typography>
+      {!raiz && zona && <Typography variant="body2" data-testid="dns-subdomain-provider">{t('dnsg_sub_prov', { provedor: tem(`dnsg_prov_${provedor.id}`) ? t(`dnsg_prov_${provedor.id}`) : provedor.id, zona })}</Typography>}
       {provedor.proxy && <Alert severity="warning" data-testid="dns-cloudflare-proxy">{t('dnsg_cf_proxy')}</Alert>}
       <Typography variant="body2" color="text.secondary">{t(provedor.txtAspas ? 'dnsg_quotes_yes' : 'dnsg_quotes_no')}</Typography>
       {raiz && <Typography variant="body2" color="text.secondary">{t(provedor.nomeRaiz === '@' ? 'dnsg_root_name_at' : provedor.nomeRaiz === 'vazio' ? 'dnsg_root_name_blank' : 'dnsg_root_name_varies')}</Typography>}
@@ -76,6 +77,7 @@ export default function DnsGuide({ x }) {
     <Paper variant="outlined" sx={{ p: 2, display: 'grid', gap: 1.5 }} data-testid="dns-instructions">
       <Typography variant="subtitle2">{t('dnsg_title')}</Typography>
       <Typography variant="body2">{t('dnsg_intro')}</Typography>
+      {!raiz && zona && <Alert severity="info" data-testid="dns-subdomain-notice">{t('dnsg_sub_aviso', { zona, dominio: x.dominio })}</Alert>}
 
       <Typography variant="subtitle2">{t('dnsg_step_txt')}</Typography>
       <Table size="small" data-testid="dns-table-txt">
@@ -140,7 +142,7 @@ export default function DnsGuide({ x }) {
         <MenuItem value=""><em>{t('dnsg_provider_none')}</em></MenuItem>
         {DNS_PROVIDERS.map((p) => <MenuItem key={p.id} value={p.id} data-testid={`dns-provider-${p.id}`}>{t(`dnsg_prov_${p.id}`)}</MenuItem>)}
       </TextField>
-      {provedor && <NotasDoProvedor provedor={provedor} raiz={raiz} />}
+      {provedor && <NotasDoProvedor provedor={provedor} raiz={raiz} zona={zona} />}
 
       <Typography variant="caption" color="text.secondary">{t('dnsg_propagation')}</Typography>
       {x.expira_em && <Typography variant="caption" color="text.secondary" data-testid="dns-expires">{t('dnsg_expires', { data: fmtData(x.expira_em) })}</Typography>}

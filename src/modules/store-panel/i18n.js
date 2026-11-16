@@ -123,6 +123,8 @@ const pt = {
   // ── guia de DNS do domínio próprio (store-domain-dns-guide) ──
   dnsg_title: 'Como configurar o DNS',
   dnsg_intro: 'No site onde você gerencia o DNS do domínio (normalmente onde ele foi registrado), crie os dois registros abaixo. Depois é só aguardar: o sistema confere o DNS sozinho e ativa o domínio assim que ele propagar, sem você precisar voltar aqui.',
+  dnsg_sub_aviso: 'Este é um subdomínio de {zona}, que você já pode estar usando. Crie só os dois registros de {dominio}. Não altere nem apague os registros da raiz ({zona}, nome @ ou em branco) nem os de e-mail (MX, SPF, DKIM): eles continuam como estão e o site e o e-mail do domínio principal não são afetados.',
+  dnsg_sub_prov: 'Em {provedor}, abra a zona DNS de {zona} e adicione os registros novos. Não edite os que já existem.',
   dnsg_step_txt: '1. Prove que o domínio é seu (registro TXT)',
   dnsg_step_point: '2. Aponte o domínio para a loja',
   dnsg_col_type: 'Tipo',
@@ -291,6 +293,8 @@ const en = {
   // ── DNS guide for the custom domain (store-domain-dns-guide) ──
   dnsg_title: 'How to set up your DNS',
   dnsg_intro: 'Where you manage the DNS of the domain (usually where it was registered), create the two records below. Then just wait: the system checks the DNS on its own and activates the domain as soon as it propagates, with no need to come back here.',
+  dnsg_sub_aviso: 'This is a subdomain of {zona}, which you may already be using. Create only the two records for {dominio}. Do not change or delete the records of the root ({zona}, name @ or blank) or the email ones (MX, SPF, DKIM): they stay as they are, and the main domain\'s site and email are not affected.',
+  dnsg_sub_prov: 'In {provedor}, open the DNS zone of {zona} and add the new records. Do not edit the ones that already exist.',
   dnsg_step_txt: '1. Prove the domain is yours (TXT record)',
   dnsg_step_point: '2. Point the domain to the store',
   dnsg_col_type: 'Type',

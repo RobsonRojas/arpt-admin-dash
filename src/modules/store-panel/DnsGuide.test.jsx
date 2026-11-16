@@ -253,3 +253,54 @@ describe('dados dos provedores', () => {
     expect(nomeRelativoDoDominio('loja.exemplo.com.br', '')).toBe('');
   });
 });
+
+/** add-subdomain-support-for-store-domains, 2.2 e 2.3: subdomínio de domínio existente. */
+describe('DnsGuide: subdomínio de domínio existente', () => {
+  afterEach(() => cleanup());
+  const aninhado = () => subdominio({
+    dominio: 'promo.loja.design.com.br',
+    instrucoes: {
+      zona: 'design.com.br', raiz: false,
+      txt: { nome: '_arpt-verify.promo.loja.design.com.br', nome_relativo: '_arpt-verify.promo.loja', tipo: 'TXT', valor: 'c'.repeat(64) },
+      apontamento: { cname: 'lojas.arpt.site', ips: [], raiz_suportada: false, recomendado: 'CNAME', observacao: 'x' },
+    },
+  });
+
+  it('pt: avisa para não mexer na raiz nem no e-mail, citando a zona e o domínio', () => {
+    render(<DnsGuide x={aninhado()} />);
+    const aviso = screen.getByTestId('dns-subdomain-notice');
+    expect(aviso.textContent).toContain('subdomínio de design.com.br');
+    expect(aviso.textContent).toContain('promo.loja.design.com.br');
+    expect(aviso.textContent).toMatch(/MX/);
+  });
+
+  it('en: o mesmo aviso em inglês', () => {
+    idioma.lang = 'en';
+    render(<DnsGuide x={aninhado()} />);
+    expect(screen.getByTestId('dns-subdomain-notice').textContent).toMatch(/subdomain of design\.com\.br/);
+  });
+
+  it('mostra os dois nomes do TXT do aninhado, relativo e completo', () => {
+    render(<DnsGuide x={aninhado()} />);
+    expect(screen.getAllByText('_arpt-verify.promo.loja').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('_arpt-verify.promo.loja.design.com.br').length).toBeGreaterThan(0);
+  });
+
+  it('raiz: sem o aviso de subdomínio', () => {
+    render(<DnsGuide x={raiz(['203.0.113.10'])} />);
+    expect(screen.queryByTestId('dns-subdomain-notice')).toBeNull();
+  });
+
+  it('com o provedor escolhido, a orientação de subdomínio aparece para cada provedor coberto e não na raiz', async () => {
+    const user = userEvent.setup();
+    for (const id of ['registro_br', 'cloudflare', 'hostinger', 'godaddy']) {
+      const { unmount } = render(<DnsGuide x={aninhado()} />);
+      await escolher(user, id);
+      expect(screen.getByTestId('dns-subdomain-provider').textContent).toContain('design.com.br');
+      unmount();
+    }
+    render(<DnsGuide x={raiz(['203.0.113.10'])} />);
+    await escolher(user, 'cloudflare');
+    expect(screen.queryByTestId('dns-subdomain-provider')).toBeNull();
+  });
+});
