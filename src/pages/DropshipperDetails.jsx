@@ -64,7 +64,6 @@ export function DropshipperDetails() {
         store_id: loja?.id ?? null,
         loja_status: loja?.status ?? null,
         slug: loja?.slug ?? null,
-        commission_override: loja?.commission_override ?? null,
         limite_lojas: data.limite_lojas,
       });
       setUserStores(data.lojas.map((l) => ({ ...l, name: l.nome })));
@@ -95,17 +94,10 @@ export function DropshipperDetails() {
   const handleAddProduct = async () => {
     const produto = availableProducts.find((p) => String(p.id) === String(selectedProductId));
     if (!produto || !store?.store_id) return;
-    // Sugestão já no formato brasileiro, para o administrador poder digitar sem converter.
-    const entrada = window.prompt(`Preço de venda para "${produto.nome}" (R$):`, (Number(produto.preco) * 1.3).toFixed(2).replace('.', ','));
-    if (entrada === null) return;
-    const parsed = parseBrNumber(entrada, { min: 0.01, mensagemCampo: 'o preço de venda' });
-    if (parsed.error) return alert(parsed.error);
-    const precoVenda = parsed.value;
     try {
       setLoadingProducts(true);
       await api.post(`/api/v1/admin/dropshipping/stores/${store.store_id}/products`, {
         produto_id: produto.id,
-        preco_venda: precoVenda,
       });
       setSelectedProductId('');
       await fetchProducts(store.store_id);
@@ -129,25 +121,6 @@ export function DropshipperDetails() {
     }
   };
 
-  const [overrideInput, setOverrideInput] = useState('');
-  const [savingOverride, setSavingOverride] = useState(false);
-
-  const handleSaveOverride = async () => {
-    if (!store?.store_id) return;
-    const valor = overrideInput.trim() === '' ? null : Number(overrideInput.replace(',', '.'));
-    if (valor !== null && !(valor >= 0 && valor <= 100)) return alert('A comissão deve estar entre 0 e 100.');
-    setSavingOverride(true);
-    try {
-      await api.put(`/api/v1/admin/dropshipping/stores/${store.store_id}`, { commission_override: valor });
-      setOverrideInput('');
-      await fetchDetails();
-      alert(valor === null ? 'Comissão da loja voltou ao padrão do dropshipping.' : 'Comissão da loja atualizada.');
-    } catch (err) {
-      alert('Erro ao salvar comissão: ' + (err.response?.data?.error || err.message));
-    } finally {
-      setSavingOverride(false);
-    }
-  };
 
   useEffect(() => {
     fetchDetails();
@@ -303,17 +276,6 @@ export function DropshipperDetails() {
                     </Button>
                   )}
                   {erroLoja && <Typography variant="caption" color="error">{erroLoja}</Typography>}
-                  <TextField
-                    size="small"
-                    label="Comissão desta loja (%)"
-                    placeholder={store.commission_override != null ? String(store.commission_override) : 'padrão do dropshipping'}
-                    value={overrideInput}
-                    onChange={(e) => setOverrideInput(e.target.value)}
-                    helperText="Vazio usa a comissão padrão. Taxa por manejo não se aplica."
-                  />
-                  <Button variant="outlined" size="small" onClick={handleSaveOverride} disabled={savingOverride || !store.store_id}>
-                    Salvar comissão
-                  </Button>
                 </Box>
                 
                 <Divider sx={{ my: 1 }} />
@@ -431,7 +393,7 @@ export function DropshipperDetails() {
                       <ListItem>
                         <ListItemText 
                           primary={product.nome} 
-                          secondary={`Preço de venda: R$ ${Number(product.preco_venda).toFixed(2).replace('.', ',')} | ${product.ativo ? 'Ativo' : `Pausado (${product.pausado_motivo ?? 'motivo não informado'})`} | ${modoLabel(product.modo_oferta)}: ${leadTimeLabel(product)}`}
+                          secondary={`Preço do produtor: R$ ${Number(product.preco_final ?? product.preco_produtor).toFixed(2).replace('.', ',')} | Comissão do dropshipper: ${product.comissao_dropshipper_percent ?? '—'}% | ${product.ativo ? 'Ativo' : `Pausado (${product.pausado_motivo ?? 'motivo não informado'})`} | ${modoLabel(product.modo_oferta)}: ${leadTimeLabel(product)}`}
                         />
                         <ListItemSecondaryAction>
                           <IconButton edge="end" color="error" onClick={() => handleRemoveProduct(product.produto_id)}>

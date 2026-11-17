@@ -27,7 +27,8 @@ function servidor({ campanhas = [campanha()], incentivos = true, metricas = METR
   api.get.mockImplementation(async (url) => {
     if (url.endsWith('/tipos')) return { data: TIPOS };
     if (url.endsWith('/metrics')) return { data: metricas };
-    if (url.includes('/settings')) return { data: { growthIncentivesEnabled: incentivos, dropshipperCommissionPercent: 7 } };
+    if (url.includes('/settings')) return { data: { growthIncentivesEnabled: incentivos } };
+    if (url.includes('/commission')) return { data: { vigentes: { DROPSHIPPER: { percentual: 7 }, PLATAFORMA: { percentual: 15 } } } };
     return { data: campanhas };
   });
 }

@@ -189,7 +189,7 @@ export default function Dropshipping() {
   const fetchCatalog = async (storeId) => {
     try {
       const res = await api.get(`/api/v1/dropshipping/stores/${storeId}/products`);
-      setCatalog(res.data.map((p) => ({ ...p, id: p.produto_id, name: p.nome, price: p.preco_venda })));
+      setCatalog(res.data.map((p) => ({ ...p, id: p.produto_id, name: p.nome, price: p.preco_final })));
     } catch (err) {
       console.error("Error fetching catalog", err);
     }
@@ -298,13 +298,9 @@ export default function Dropshipping() {
 
   const handleAddProduct = async (produto) => {
     if (!store) return alert("Crie a loja primeiro");
-    const sugerido = (Number(produto.preco) * 1.3).toFixed(2);
-    const entrada = window.prompt(`Preço de venda para "${produto.nome}" (R$):`, sugerido);
-    if (entrada === null) return;
-    const precoVenda = Number(entrada.replace(',', '.'));
-    if (!(precoVenda > 0)) return alert("Informe um preço de venda válido.");
+    // O preço é o do produtor: o dropshipper só escolhe o produto e recebe a comissão vigente.
     try {
-      await api.post(`/api/v1/dropshipping/stores/${store.id}/products`, { produto_id: produto.id, preco_venda: precoVenda });
+      await api.post(`/api/v1/dropshipping/stores/${store.id}/products`, { produto_id: produto.id });
       fetchCatalog(store.id);
     } catch (error) {
       alert("Erro ao adicionar produto: " + (error.response?.data?.error || error.message));

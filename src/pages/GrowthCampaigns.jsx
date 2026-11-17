@@ -281,8 +281,8 @@ export const GrowthCampaigns = () => {
       const params = {};
       if (filtroEstado) params.estado = filtroEstado;
       if (filtroTipo) params.tipo = filtroTipo;
-      const [c, t, s] = await Promise.all([api.get(BASE, { params }), api.get(`${BASE}/tipos`), api.get('/api/v1/admin/dropshipping/settings')]);
-      setCampanhas(c.data); setTipos(t.data); setConfig(s.data);
+      const [c, t, s, com] = await Promise.all([api.get(BASE, { params }), api.get(`${BASE}/tipos`), api.get('/api/v1/admin/dropshipping/settings'), api.get('/api/v1/admin/dropshipping/commission')]);
+      setCampanhas(c.data); setTipos(t.data); setConfig({ ...s.data, dropshipperCommissionPercent: com.data.vigentes.DROPSHIPPER.percentual });
     } catch { setErro('Não foi possível carregar as campanhas.'); setCampanhas(null); }
   }, [filtroEstado, filtroTipo]);
   useEffect(() => { carregar(); }, [carregar]);

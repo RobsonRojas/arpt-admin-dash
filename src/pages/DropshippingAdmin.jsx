@@ -92,7 +92,6 @@ function TransferOwnerModal({ store, onClose, onSuccess }) {
 // ─── Catalog Allocation Modal ───────────────────────────────────────────────
 function CatalogModal({ store, allProducts, onClose, onSuccess }) {
   const [selectedIds, setSelectedIds] = useState([]);
-  const [precoVenda, setPrecoVenda] = useState('');
   const [loading, setLoading] = useState(false);
   const [searchQ, setSearchQ] = useState('');
 
@@ -108,12 +107,10 @@ function CatalogModal({ store, allProducts, onClose, onSuccess }) {
 
   const handleSave = async () => {
     if (selectedIds.length === 0) return alert('Selecione pelo menos um produto.');
-    const preco = parseBrNumber(precoVenda, { min: 0.01, mensagemCampo: 'o preço de venda' });
-    if (preco.error) return alert(preco.error);
     setLoading(true);
     try {
       const results = await Promise.allSettled(selectedIds.map((produtoId) =>
-        api.post(`/api/v1/admin/dropshipping/stores/${store.id}/products`, { produto_id: produtoId, preco_venda: preco.value })
+        api.post(`/api/v1/admin/dropshipping/stores/${store.id}/products`, { produto_id: produtoId })
       ));
       const ok = results.filter((r) => r.status === 'fulfilled').length;
       const falhas = results
@@ -173,15 +170,9 @@ function CatalogModal({ store, allProducts, onClose, onSuccess }) {
           {selectedIds.length} produto(s) selecionado(s)
         </Typography>
       </DialogContent>
-      <TextField
-        fullWidth
-        size="small"
-        type="number"
-        label="Preço de venda para os produtos selecionados (R$)"
-        value={precoVenda}
-        onChange={(e) => setPrecoVenda(e.target.value)}
-        sx={{ mt: 2 }}
-      />
+      <Typography variant="caption" color="textSecondary" sx={{ px: 3, mt: 2, display: 'block' }}>
+        O preço é o do produtor e o dropshipper recebe a comissão vigente. A alocação não tem preço próprio.
+      </Typography>
       <DialogActions sx={{ px: 3, pb: 3, gap: 1 }}>
         <Button onClick={onClose} color="inherit">Cancelar</Button>
         <Button variant="contained" color="success" onClick={handleSave} disabled={loading}>
@@ -189,6 +180,95 @@ function CatalogModal({ store, allProducts, onClose, onSuccess }) {
         </Button>
       </DialogActions>
     </Dialog>
+  );
+}
+
+// ─── Comissões globais (plataforma e dropshipper) com histórico ─────
+const TIPOS_COMISSAO = [['PLATAFORMA', 'Comissão da plataforma (%)'], ['DROPSHIPPER', 'Comissão do dropshipper (%)']];
+
+export function CommissionCard() {
+  const [data, setData] = useState(null);
+  const [form, setForm] = useState({ PLATAFORMA: '', DROPSHIPPER: '' });
+  const [confirmar, setConfirmar] = useState(null); // { tipo, percentual }
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState(null);
+
+  const carregar = () => api.get('/api/v1/admin/dropshipping/commission')
+    .then((res) => {
+      setData(res.data);
+      setForm({ PLATAFORMA: String(res.data.vigentes.PLATAFORMA.percentual), DROPSHIPPER: String(res.data.vigentes.DROPSHIPPER.percentual) });
+    })
+    .catch(() => setMessage({ severity: 'error', text: 'Não foi possível carregar as comissões.' }));
+  useEffect(() => { carregar(); }, []);
+
+  const pedir = (tipo) => {
+    const parsed = parseBrNumber(form[tipo], { min: 0, mensagemCampo: 'a comissão' });
+    if (parsed.error) return setMessage({ severity: 'error', text: parsed.error });
+    setMessage(null);
+    setConfirmar({ tipo, percentual: parsed.value });
+  };
+
+  const salvar = async () => {
+    setSaving(true);
+    try {
+      const res = await api.put('/api/v1/admin/dropshipping/commission', confirmar);
+      setMessage({ severity: 'success', text: `Nova comissão salva. ${res.data.pausadas} alocação(ões) em ${res.data.lojas} loja(s) foram pausadas para revisão dos donos.` });
+      setConfirmar(null);
+      await carregar();
+    } catch (err) {
+      setMessage({ severity: 'error', text: err.response?.data?.error || err.message });
+      setConfirmar(null);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (!data) return message ? <Alert severity={message.severity} sx={{ mb: 3 }}>{message.text}</Alert> : null;
+  const rotulo = (tipo) => (tipo === 'PLATAFORMA' ? 'Plataforma' : 'Dropshipper');
+
+  return (
+    <Paper variant="outlined" sx={{ p: 3, borderRadius: 3, mb: 3 }}>
+      <Typography variant="subtitle1" fontWeight="bold">Comissões do dropshipping</Typography>
+      <Typography variant="caption" color="textSecondary" display="block" sx={{ mb: 2 }}>
+        Percentuais globais sobre o preço do produtor, os mesmos para todos os produtos e lojas. Cada alteração cria uma nova versão no histórico e pausa
+        todos os produtos em todas as lojas até os donos confirmarem a revisão (3 dias, ou o produto é removido). O bônus de campanha soma à comissão do dropshipper.
+      </Typography>
+      <Grid container spacing={2} alignItems="center">
+        {TIPOS_COMISSAO.map(([tipo, label]) => (
+          <Grid item xs={12} sm={6} key={tipo}>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <TextField fullWidth size="small" label={label} value={form[tipo]} onChange={(e) => setForm({ ...form, [tipo]: e.target.value })} />
+              <Button variant="contained" onClick={() => pedir(tipo)} disabled={String(data.vigentes[tipo].percentual) === form[tipo].trim()}>Salvar</Button>
+            </Box>
+          </Grid>
+        ))}
+      </Grid>
+      {message && <Alert severity={message.severity} sx={{ mt: 2, borderRadius: 2 }}>{message.text}</Alert>}
+      <Typography variant="subtitle2" sx={{ mt: 3, mb: 1 }}>Histórico</Typography>
+      <Box component="table" sx={{ width: '100%', fontSize: 14, borderCollapse: 'collapse' }}>
+        <thead><tr><th align="left">Tipo</th><th align="left">Percentual</th><th align="left">Vigente desde</th><th align="left">Autor</th></tr></thead>
+        <tbody>
+          {data.historico.map((v) => (
+            <tr key={v.id}>
+              <td>{rotulo(v.tipo)}</td><td>{v.percentual}%</td><td>{new Date(v.vigente_a_partir_de).toLocaleString('pt-BR')}</td><td>{v.criado_por ?? '—'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </Box>
+      <Dialog open={!!confirmar} onClose={() => setConfirmar(null)}>
+        <DialogTitle>Confirmar nova comissão</DialogTitle>
+        <DialogContent>
+          <Typography>
+            A comissão {confirmar ? rotulo(confirmar.tipo).toLowerCase() : ''} passará para {confirmar?.percentual}%. Isto pausa <strong>{data.impacto.alocacoes}</strong> alocação(ões)
+            em <strong>{data.impacto.lojas}</strong> loja(s) de dropshippers até cada dono confirmar a revisão. Sem resposta em 3 dias, o produto é removido da loja.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmar(null)} color="inherit">Cancelar</Button>
+          <Button onClick={salvar} variant="contained" color="warning" disabled={saving}>{saving ? 'Salvando...' : 'Confirmar e pausar'}</Button>
+        </DialogActions>
+      </Dialog>
+    </Paper>
   );
 }
 
@@ -201,7 +281,6 @@ function FeeSettingsCard() {
   useEffect(() => {
     api.get('/api/v1/admin/dropshipping/settings')
       .then((res) => setForm({
-        commissionPercent: String(res.data.commissionPercent),
         gatewayPercent: String(res.data.gatewayPercent),
         defaultMaxStores: String(res.data.defaultMaxStores),
         termsVersion: res.data.termsVersion,
@@ -214,16 +293,13 @@ function FeeSettingsCard() {
     setMessage(null);
     try {
       const res = await api.put('/api/v1/admin/dropshipping/settings', {
-        commissionPercent: Number(form.commissionPercent),
         gatewayPercent: Number(form.gatewayPercent),
         defaultMaxStores: Number(form.defaultMaxStores),
         termsVersion: form.termsVersion,
       });
       setMessage({
         severity: 'success',
-        text: res.data.pausa_agendada
-          ? 'Configurações salvas. As alocações abaixo do novo preço mínimo serão pausadas em instantes.'
-          : 'Configurações salvas.',
+        text: 'Configurações salvas.',
       });
     } catch (err) {
       setMessage({ severity: 'error', text: err.response?.data?.error || err.message });
@@ -235,8 +311,7 @@ function FeeSettingsCard() {
   if (!form) return null;
 
   const fields = [
-    ['commissionPercent', 'Comissão padrão (%)'],
-    ['gatewayPercent', 'Taxa do gateway (%)'],
+    ['gatewayPercent', 'Estimativa da taxa do Stripe (%) — a taxa real vem do Stripe'],
     ['defaultMaxStores', 'Lojas por dropshipper (padrão)'],
     ['termsVersion', 'Versão dos termos (nova versão exige novo aceite)'],
   ];
@@ -245,7 +320,7 @@ function FeeSettingsCard() {
     <Paper variant="outlined" sx={{ p: 3, borderRadius: 3, mb: 3 }}>
       <Typography variant="subtitle1" fontWeight="bold">Taxas e limites do dropshipping</Typography>
       <Typography variant="caption" color="textSecondary" display="block" sx={{ mb: 2 }}>
-        Independente da taxa por manejo, que pertence ao financiamento coletivo. Override por loja fica na tela do dropshipper.
+        Independente da taxa por manejo, que pertence ao financiamento coletivo. As comissões da plataforma e do dropshipper ficam no cartão abaixo, com histórico.
       </Typography>
       <Grid container spacing={2}>
         {fields.map(([key, label]) => (
@@ -328,6 +403,7 @@ export function DropshippingAdmin() {
         <Box display="flex" justifyContent="center" py={8}><CircularProgress /></Box>
       ) : (
         <>
+          <CommissionCard />
           <FeeSettingsCard />
 
           <MarketplaceVisibilidadeCard />
