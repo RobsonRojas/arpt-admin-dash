@@ -14,6 +14,7 @@ import LgpdAdminCard from '../components/dropshipping/LgpdAdminCard';
 import TermosEmNomeCard from '../components/dropshipping/TermosEmNomeCard';
 import DiagnosticoVendasCard from '../components/dropshipping/DiagnosticoVendasCard';
 import MotivoDialog from '../components/dropshipping/MotivoDialog';
+import TransferDialog from '../components/dropshipping/TransferDialog';
 
 export function DropshipperDetails() {
   const { id } = useParams();
@@ -29,6 +30,7 @@ export function DropshipperDetails() {
   const [acaoLoja, setAcaoLoja] = useState(null); // 'suspend' | null
   const [enviandoLoja, setEnviandoLoja] = useState(false);
   const [erroLoja, setErroLoja] = useState('');
+  const [transferencia, setTransferencia] = useState(null); // { ids: number[] | null } (null = todas as lojas)
   const [diagChave, setDiagChave] = useState(0); // muda depois do aceite em nome: recarrega o diagnóstico
   const [aposAceite, setAposAceite] = useState(false);
 
@@ -44,6 +46,12 @@ export function DropshipperDetails() {
     } finally {
       setEnviandoLoja(false);
     }
+  };
+
+  // Destinos da transferência: dropshippers aprovados, menos o próprio.
+  const carregarDestinosLojas = async () => {
+    const { data } = await api.get('/api/v1/admin/dropshipping/profiles', { params: { status: 'APROVADA' } });
+    return data.filter((p) => p.user_id !== id).map((p) => ({ id: p.user_id, label: `${p.nome_comercial} (${p.email ?? p.user_id})` }));
   };
 
   const reativarLoja = () => {
@@ -299,6 +307,11 @@ export function DropshipperDetails() {
               <Typography variant="h6" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                 <Store color="primary" /> Todas Lojas do Dropshipper
               </Typography>
+              {userStores.length > 0 && (
+                <Button size="small" variant="outlined" color="warning" sx={{ mb: 2 }} onClick={() => setTransferencia({ ids: null })}>
+                  Transferir todas as lojas
+                </Button>
+              )}
               <Divider sx={{ mb: 2 }} />
               {userStores.length === 0 ? (
                 <Typography color="text.secondary">Nenhuma loja encontrada.</Typography>
@@ -311,6 +324,9 @@ export function DropshipperDetails() {
                           primary={s.name} 
                           secondary={`Slug: ${s.slug} | Domínio: ${s.custom_domain || 'Nenhum'} | Produtos: ${s.product_count}`}
                         />
+                        <ListItemSecondaryAction>
+                          <Button size="small" color="warning" onClick={() => setTransferencia({ ids: [s.id] })}>Transferir loja</Button>
+                        </ListItemSecondaryAction>
                       </ListItem>
                       {index < userStores.length - 1 && <Divider />}
                     </React.Fragment>
@@ -419,6 +435,15 @@ export function DropshipperDetails() {
         enviando={enviandoLoja}
         onClose={() => setAcaoLoja(null)}
         onConfirm={(motivo) => executarAcaoLoja('suspend', { motivo })}
+      />
+      <TransferDialog
+        open={Boolean(transferencia)} modo="lojas" titulo="Transferir lojas para outro dropshipper"
+        endpoint={`/api/v1/admin/dropshipping/dropshippers/${id}/transfer-stores`}
+        itemIds={transferencia?.ids ?? []}
+        resumoItens={transferencia?.ids ? `Loja: ${userStores.find((l) => l.id === transferencia.ids[0])?.name ?? ''}.` : `Todas as ${userStores.length} lojas deste dropshipper.`}
+        carregarDestinos={carregarDestinosLojas}
+        onClose={() => setTransferencia(null)}
+        onDone={() => { setTransferencia(null); fetchDetails(); }}
       />
     </Box>
   );

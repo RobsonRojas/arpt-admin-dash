@@ -15,6 +15,7 @@ import { usePersistence } from '../hooks/usePersistence';
 import { AssignPropertyModal } from '../components/modules/AssignPropertyModal';
 import { StripeConnectModal } from '../components/modules/StripeConnectModal';
 import { ProducerRoleControl } from '../components/modules/ProducerRoleControl';
+import { ProducerProductsTransfer } from '../components/modules/ProducerProductsTransfer';
 
 const ROLES = ['Administrador', 'Gestor', 'Operador', 'Visualizador'];
 const STATUS = ['Ativo', 'Inativo'];
@@ -49,6 +50,7 @@ export const Users = () => {
     const [openCertForm, setOpenCertForm] = useState(false);
     const [openCertList, setOpenCertList] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
+    const [selectedUserEhProdutor, setSelectedUserEhProdutor] = useState(false);
     const [userCertificates, setUserCertificates] = useState([]);
     const [loadingCerts, setLoadingCerts] = useState(false);
     const [certData, setCertData] = useState({
@@ -1151,7 +1153,8 @@ export const Users = () => {
                             </Grid>
                         </Grid>
 
-                    <ProducerRoleControl userId={selectedUser.id} getToken={() => authUser.getIdToken()} />
+                    <ProducerRoleControl userId={selectedUser.id} getToken={() => authUser.getIdToken()} onProdutorChange={setSelectedUserEhProdutor} />
+                    {selectedUserEhProdutor && <ProducerProductsTransfer userId={selectedUser.id} getToken={() => authUser.getIdToken()} />}
 
                     <Box mt={3} mb={4} p={2} sx={{ border: '1px solid #e0e0e0', borderRadius: 1 }}>
                         <Typography variant="h6" gutterBottom display="flex" alignItems="center" gap={1} sx={{ fontWeight: 'bold' }}>

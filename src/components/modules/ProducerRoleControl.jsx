@@ -7,12 +7,14 @@ import { api } from '../../services/api';
  * Não confundir com a "Função" da lista (Administrador, Gestor, Operador, Visualizador), que é outro conceito, gravado em arpt_users.
  * Concede direto; retirar pede confirmação. Se a alteração falhar, o estado exibido continua o anterior.
  */
-export const ProducerRoleControl = ({ userId, getToken }) => {
+export const ProducerRoleControl = ({ userId, getToken, onProdutorChange }) => {
     const [estado, setEstado] = useState('carregando'); // carregando | ok | erro
     const [produtor, setProdutor] = useState(false);
     const [proprietario, setProprietario] = useState(false);
     const [salvando, setSalvando] = useState(false);
     const [erro, setErro] = useState(null);
+
+    useEffect(() => { onProdutorChange?.(estado === 'ok' && produtor); }, [estado, produtor]);
 
     const headers = async () => ({ Authorization: `Bearer ${await getToken()}` });
 
