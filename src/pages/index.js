@@ -36,3 +36,4 @@ export * from './Monitoring';
 export * from './SocialLogin';
 export * from './Manual';
 export * from './StoreCustomers';
+export * from './WoodOrigin';

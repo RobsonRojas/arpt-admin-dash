@@ -89,6 +89,7 @@ export const Layout = ({ children }) => {
     { id: 'monitoring', label: 'Monitoramento', icon: <MonitorHeart />, path: '/monitoring' },
     { id: 'social-login', label: 'Login social', icon: <Security />, path: '/social-login' },
     { id: 'manual', label: 'Manual', icon: <MenuBook />, path: '/manual' },
+    { id: 'wood-origin', label: 'Origem da madeira', icon: <Forest />, path: '/wood-origin' },
     { id: 'store-customers', label: 'Clientes de loja', icon: <PersonSearch />, path: '/store-customers' },
     { id: 'store-panel', label: 'Minha loja', icon: <Storefront />, path: '/loja' },
     { id: 'dropshipping-admin', label: 'Admin Dropshipping', icon: <Storefront />, path: '/dropshipping-admin' },

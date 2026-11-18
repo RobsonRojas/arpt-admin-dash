@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { ThemeProvider, CssBaseline, CircularProgress, Box } from '@mui/material';
 import { theme } from './theme';
 import { Layout, ErrorBoundary } from './components';
-import { Dashboard, Projects, Properties, Necromassa, Sponsors, Login, Users, Rewards, Certificates, Products, AuditLogs, GeminiSettings, PaymentConfig, MediaManager, ErrorLogs, Refunds, ForestIntelligence, Adoptions, PhysicalPieces, Notifications, DeveloperSettings, ProductSimulation, Dropshipping, ManejoLogs, DropshippingAdmin, DropshipperDetails, AdminOrders, PrivacySettings, AnalyticsDashboard, TermsOfUse, AnalyticsPixels, ExitSurvey, Monitoring, StoreCustomers, SocialLogin, Manual } from './pages';
+import { Dashboard, Projects, Properties, Necromassa, Sponsors, Login, Users, Rewards, Certificates, Products, AuditLogs, GeminiSettings, PaymentConfig, MediaManager, ErrorLogs, Refunds, ForestIntelligence, Adoptions, PhysicalPieces, Notifications, DeveloperSettings, ProductSimulation, Dropshipping, ManejoLogs, DropshippingAdmin, DropshipperDetails, AdminOrders, PrivacySettings, AnalyticsDashboard, TermsOfUse, AnalyticsPixels, ExitSurvey, Monitoring, StoreCustomers, SocialLogin, Manual, WoodOrigin } from './pages';
 import { CertificateView } from './pages/CertificateView';
 import { GrowthIndicators } from './pages/GrowthIndicators';
 import { GrowthCampaigns } from './pages/GrowthCampaigns';
@@ -89,6 +89,7 @@ export default function App() {
                   <Route path="social-login" element={<SocialLogin />} />
                   <Route path="manual" element={<Manual />} />
                   <Route path="manual/:secao" element={<Manual />} />
+                  <Route path="wood-origin" element={<WoodOrigin />} />
                   <Route path="store-customers" element={<StoreCustomers />} />
                   <Route path="product-simulation" element={<ProductSimulation />} />
                   <Route path="dropshipping" element={<Dropshipping />} />

@@ -1,0 +1,144 @@
+import { useCallback, useEffect, useState } from 'react';
+import { Alert, Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, InputLabel, MenuItem, Select, Stack, Switch, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@mui/material';
+import { api } from '../../services/api';
+import { BASE, SITUACAO_ESPECIE, mensagemErro } from '../../utils/wood';
+import { ReasonDialog } from './ReasonDialog';
+
+const VAZIA = { nome_cientifico: '', nome_principal_pt: '', nome_principal_en: '', nomes_populares: [''], descricao_pt: '', descricao_en: '', foto_url: '', situacao: 'PERMITIDA', nota_exportacao: '', motivo_bloqueio: '', ativo: true };
+export const AVISO_BLOQUEIO = 'Bloquear esta espécie tira de venda, agora, os produtos aprovados que a usam, e o produtor é avisado. Confirme só se for isso mesmo.';
+
+export function SpeciesForm({ inicial, onSaved, onClose }) {
+    const [f, setF] = useState(() => ({ ...VAZIA, ...inicial, nomes_populares: inicial?.nomes_populares?.length ? inicial.nomes_populares : [''] }));
+    const [erro, setErro] = useState(null);
+    const [confirmaBloqueio, setConfirmaBloqueio] = useState(false);
+    const set = (k) => (e) => setF((x) => ({ ...x, [k]: e.target.value }));
+    const bloqueando = f.situacao === 'BLOQUEADA' && inicial?.situacao !== 'BLOQUEADA';
+    const populares = f.nomes_populares.map((n) => n.trim()).filter(Boolean);
+
+    const salvar = async () => {
+        setErro(null);
+        if (!f.nome_cientifico.trim() || !f.nome_principal_pt.trim()) return setErro('Informe o nome científico e o nome principal.');
+        if (populares.length === 0) return setErro('Informe pelo menos um nome popular.');
+        if (f.situacao === 'BLOQUEADA' && !f.motivo_bloqueio.trim()) return setErro('Informe o motivo do bloqueio.');
+        if (bloqueando && !confirmaBloqueio) { setConfirmaBloqueio(true); return; }
+        const corpo = {
+            nome_cientifico: f.nome_cientifico.trim(), nome_principal_pt: f.nome_principal_pt.trim(), nome_principal_en: f.nome_principal_en?.trim() || null, nomes_populares: populares,
+            descricao_pt: f.descricao_pt?.trim() || null, descricao_en: f.descricao_en?.trim() || null, foto_url: f.foto_url?.trim() || null, situacao: f.situacao,
+            nota_exportacao: f.nota_exportacao?.trim() || null, motivo_bloqueio: f.situacao === 'BLOQUEADA' ? f.motivo_bloqueio.trim() : null,
+        };
+        try {
+            if (inicial?.id) await api.patch(`${BASE}/species/${inicial.id}`, { ...corpo, ativo: f.ativo });
+            else await api.post(`${BASE}/species`, corpo);
+            onSaved();
+        } catch (e) { setErro(mensagemErro(e)); setConfirmaBloqueio(false); }
+    };
+
+    return (
+        <Dialog open onClose={onClose} fullWidth maxWidth="md">
+            <DialogTitle>{inicial?.id ? 'Editar espécie' : 'Nova espécie'}</DialogTitle>
+            <DialogContent>
+                <Stack spacing={2} sx={{ mt: 1 }}>
+                    {erro && <Alert severity="error">{erro}</Alert>}
+                    {confirmaBloqueio && <Alert severity="warning">{AVISO_BLOQUEIO} Clique em "Confirmar bloqueio" para seguir.</Alert>}
+                    <TextField label="Nome científico" value={f.nome_cientifico} onChange={set('nome_cientifico')} />
+                    <TextField label="Nome principal (pt)" value={f.nome_principal_pt} onChange={set('nome_principal_pt')} />
+                    <TextField label="Nome principal (en)" value={f.nome_principal_en ?? ''} onChange={set('nome_principal_en')} />
+                    <Box>
+                        <Typography variant="subtitle2">Nomes populares (pelo menos um)</Typography>
+                        {f.nomes_populares.map((n, i) => (
+                            <Stack key={i} direction="row" spacing={1} sx={{ mt: 1 }}>
+                                <TextField size="small" fullWidth label={`Nome popular ${i + 1}`} value={n} onChange={(e) => setF((x) => ({ ...x, nomes_populares: x.nomes_populares.map((v, j) => (j === i ? e.target.value : v)) }))} />
+                                <Button disabled={f.nomes_populares.length === 1} onClick={() => setF((x) => ({ ...x, nomes_populares: x.nomes_populares.filter((_, j) => j !== i) }))}>Remover</Button>
+                            </Stack>
+                        ))}
+                        <Button onClick={() => setF((x) => ({ ...x, nomes_populares: [...x.nomes_populares, ''] }))}>Adicionar nome</Button>
+                    </Box>
+                    <TextField label="Descrição (pt)" multiline value={f.descricao_pt ?? ''} onChange={set('descricao_pt')} inputProps={{ maxLength: 400 }} />
+                    <TextField label="Descrição (en)" multiline value={f.descricao_en ?? ''} onChange={set('descricao_en')} inputProps={{ maxLength: 400 }} />
+                    <TextField label="Foto (URL)" value={f.foto_url ?? ''} onChange={set('foto_url')} />
+                    <FormControl>
+                        <InputLabel id="sit">Situação</InputLabel>
+                        <Select labelId="sit" label="Situação" value={f.situacao} onChange={set('situacao')}>
+                            {Object.entries(SITUACAO_ESPECIE).map(([k, v]) => <MenuItem key={k} value={k}>{v}</MenuItem>)}
+                        </Select>
+                    </FormControl>
+                    {f.situacao === 'EXIGE_CITES' && <TextField label="Nota de exportação" value={f.nota_exportacao ?? ''} onChange={set('nota_exportacao')} />}
+                    {f.situacao === 'BLOQUEADA' && <TextField label="Motivo do bloqueio" value={f.motivo_bloqueio ?? ''} onChange={set('motivo_bloqueio')} />}
+                    {inicial?.id && <FormControlLabel control={<Switch checked={f.ativo} onChange={(e) => setF((x) => ({ ...x, ativo: e.target.checked }))} />} label="Ativa" />}
+                </Stack>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={onClose}>Cancelar</Button>
+                <Button variant="contained" onClick={salvar}>{confirmaBloqueio ? 'Confirmar bloqueio' : 'Salvar'}</Button>
+            </DialogActions>
+        </Dialog>
+    );
+}
+
+function Pedidos({ especies }) {
+    const [lista, setLista] = useState(null);
+    const [erro, setErro] = useState(null);
+    const [vinculo, setVinculo] = useState({});
+    const [recusando, setRecusando] = useState(null);
+    const carregar = useCallback(() => api.get(`${BASE}/species/requests`, { params: { situacao: 'PENDENTE' } }).then((r) => setLista(r.data.pedidos)).catch((e) => setErro(mensagemErro(e))), []);
+    useEffect(() => { carregar(); }, [carregar]);
+    const decidir = async (id, corpo) => {
+        setErro(null);
+        try { await api.post(`${BASE}/species/requests/${id}/decision`, corpo); setRecusando(null); carregar(); } catch (e) { setErro(mensagemErro(e)); }
+    };
+    return (
+        <Box sx={{ mt: 4 }}>
+            <Typography variant="h6">Pedidos de inclusão de espécie</Typography>
+            {erro && <Alert severity="error" sx={{ my: 1 }}>{erro}</Alert>}
+            {lista && lista.length === 0 && <Typography color="text.secondary">Nenhum pedido pendente.</Typography>}
+            {(lista ?? []).map((p) => (
+                <Stack key={p.id} direction="row" spacing={1} alignItems="center" sx={{ py: 1 }}>
+                    <Typography variant="body2" sx={{ minWidth: 220 }}>{p.nome_popular}{p.nome_cientifico ? ` (${p.nome_cientifico})` : ''}</Typography>
+                    <FormControl size="small" sx={{ minWidth: 220 }}>
+                        <InputLabel id={`v-${p.id}`}>Vincular a</InputLabel>
+                        <Select labelId={`v-${p.id}`} label="Vincular a" value={vinculo[p.id] ?? ''} onChange={(e) => setVinculo((v) => ({ ...v, [p.id]: e.target.value }))}>
+                            {especies.map((e) => <MenuItem key={e.id} value={e.id}>{e.nome_principal_pt}</MenuItem>)}
+                        </Select>
+                    </FormControl>
+                    <Button size="small" disabled={!vinculo[p.id]} onClick={() => decidir(p.id, { decisao: 'ATENDIDO', especie_id: vinculo[p.id] })}>Atender</Button>
+                    <Button size="small" color="error" onClick={() => setRecusando(p.id)}>Recusar</Button>
+                </Stack>
+            ))}
+            {recusando && <ReasonDialog titulo="Recusar pedido" descricao="O produtor recebe o motivo." confirmar="Recusar" onClose={() => setRecusando(null)} onConfirm={(m) => decidir(recusando, { decisao: 'RECUSADO', motivo: m })} />}
+        </Box>
+    );
+}
+
+/** Lista de espécies de madeira e pedidos de inclusão. */
+export function WoodSpecies() {
+    const [lista, setLista] = useState(null);
+    const [erro, setErro] = useState(null);
+    const [editando, setEditando] = useState(null);
+    const carregar = useCallback(() => api.get(`${BASE}/species`).then((r) => setLista(r.data.especies)).catch((e) => setErro(mensagemErro(e, 'Não foi possível carregar as espécies.'))), []);
+    useEffect(() => { carregar(); }, [carregar]);
+    return (
+        <Box>
+            <Button variant="contained" onClick={() => setEditando({})} sx={{ mb: 2 }}>Nova espécie</Button>
+            {erro && <Alert severity="error" sx={{ mb: 2 }}>{erro}</Alert>}
+            {!lista && !erro && <CircularProgress size={22} />}
+            {lista && (
+                <Table size="small">
+                    <TableHead><TableRow><TableCell>Nome</TableCell><TableCell>Científico</TableCell><TableCell>Nomes populares</TableCell><TableCell>Situação</TableCell><TableCell /></TableRow></TableHead>
+                    <TableBody>
+                        {lista.map((e) => (
+                            <TableRow key={e.id}>
+                                <TableCell>{e.nome_principal_pt}{!e.ativo && <Chip size="small" label="inativa" sx={{ ml: 1 }} />}</TableCell>
+                                <TableCell><i>{e.nome_cientifico}</i></TableCell>
+                                <TableCell>{(e.nomes_populares ?? []).join(', ')}</TableCell>
+                                <TableCell><Chip size="small" color={e.situacao === 'BLOQUEADA' ? 'error' : e.situacao === 'EXIGE_CITES' ? 'warning' : 'default'} label={SITUACAO_ESPECIE[e.situacao]} /></TableCell>
+                                <TableCell><Button size="small" onClick={() => setEditando(e)}>Editar</Button></TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            )}
+            {editando && <SpeciesForm inicial={editando.id ? editando : undefined} onClose={() => setEditando(null)} onSaved={() => { setEditando(null); carregar(); }} />}
+            <Pedidos especies={(lista ?? []).filter((e) => e.ativo)} />
+        </Box>
+    );
+}
