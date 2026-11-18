@@ -113,3 +113,67 @@ describe('WhatsApp de apoio', () => {
         await waitFor(() => expect(api.put).toHaveBeenCalledWith('/api/v1/admin/wood/help/support-contact', { whatsapp: '(92) 99999-0000' }));
     });
 });
+
+describe('Espécies: foto e crédito', () => {
+    const base = { id: 4, nome_cientifico: 'Dipteryx odorata', nome_principal_pt: 'Cumaru', nomes_populares: ['Cumaru'], situacao: 'PERMITIDA', ativo: true };
+
+    it('sem foto não pede crédito; com foto mostra a prévia e os campos de crédito', async () => {
+        render(<SpeciesForm inicial={base} onSaved={() => {}} onClose={() => {}} />);
+        expect(screen.queryByTestId('foto-credito')).toBeNull();
+        cleanup(); // o formulário guarda o estado inicial: uma nova tela, não uma nova renderização
+        render(<SpeciesForm inicial={{ ...base, foto_url: 'https://arpt.test/c.jpg', foto_autor: 'Maria', foto_licenca: 'CC BY 4.0' }} onSaved={() => {}} onClose={() => {}} />);
+        expect(await screen.findByTestId('foto-credito')).toBeTruthy();
+        expect(screen.getByLabelText('Autor da foto').value).toBe('Maria');
+        expect(screen.getByLabelText('Licença da foto').value).toBe('CC BY 4.0');
+        expect(screen.getByAltText('Prévia da foto')).toBeTruthy();
+    });
+
+    it('envia o crédito e o "conferida" junto da foto', async () => {
+        api.patch.mockResolvedValue({ data: {} });
+        render(<SpeciesForm inicial={{ ...base, foto_url: 'https://arpt.test/c.jpg' }} onSaved={() => {}} onClose={() => {}} />);
+        await userEvent.type(await screen.findByLabelText('Autor da foto'), ' Maria Souza ');
+        await userEvent.type(screen.getByLabelText('Licença da foto'), 'CC BY 4.0');
+        await userEvent.type(screen.getByLabelText('Página da imagem na origem'), 'https://commons.wikimedia.org/wiki/File:C.jpg');
+        await userEvent.click(screen.getByRole('checkbox', { name: /Foto conferida pelo especialista/ }));
+        await userEvent.click(screen.getByRole('button', { name: 'Salvar' }));
+        await waitFor(() => expect(api.patch).toHaveBeenCalledWith('/api/v1/admin/wood/species/4', expect.objectContaining({
+            foto_url: 'https://arpt.test/c.jpg', foto_autor: 'Maria Souza', foto_licenca: 'CC BY 4.0', foto_fonte_url: 'https://commons.wikimedia.org/wiki/File:C.jpg', foto_conferida: true,
+        })));
+    });
+
+    it('sem foto, o crédito vai vazio (null) e conferida falso', async () => {
+        api.patch.mockResolvedValue({ data: {} });
+        render(<SpeciesForm inicial={base} onSaved={() => {}} onClose={() => {}} />);
+        await userEvent.click(screen.getByRole('button', { name: 'Salvar' }));
+        await waitFor(() => expect(api.patch).toHaveBeenCalledWith('/api/v1/admin/wood/species/4', expect.objectContaining({ foto_url: null, foto_autor: null, foto_licenca: null, foto_fonte_url: null, foto_conferida: false })));
+    });
+
+    it('trocar a URL da foto limpa o crédito e a conferência; voltar à URL original os restaura', async () => {
+        const inicial = { ...base, foto_url: 'https://arpt.test/c.jpg', foto_autor: 'Maria', foto_licenca: 'CC BY 4.0', foto_fonte_url: 'https://commons.wikimedia.org/wiki/File:C.jpg', foto_conferida: true };
+        render(<SpeciesForm inicial={inicial} onSaved={() => {}} onClose={() => {}} />);
+        const campo = await screen.findByLabelText('Foto (URL)');
+        await userEvent.type(campo, 'x');
+        expect(screen.getByLabelText('Autor da foto').value).toBe('');
+        expect(screen.getByLabelText('Licença da foto').value).toBe('');
+        expect(screen.getByLabelText('Página da imagem na origem').value).toBe('');
+        expect(screen.getByRole('checkbox', { name: /Foto conferida pelo especialista/ }).checked).toBe(false);
+        await userEvent.type(campo, '{backspace}');
+        expect(screen.getByLabelText('Autor da foto').value).toBe('Maria');
+        expect(screen.getByLabelText('Licença da foto').value).toBe('CC BY 4.0');
+        expect(screen.getByRole('checkbox', { name: /Foto conferida pelo especialista/ }).checked).toBe(true);
+    });
+
+    it('foto nova: o crédito digitado depois da troca é enviado e a conferência vai como falsa', async () => {
+        api.patch.mockResolvedValue({ data: {} });
+        render(<SpeciesForm inicial={{ ...base, foto_url: 'https://arpt.test/c.jpg', foto_autor: 'Maria', foto_licenca: 'CC BY 4.0', foto_conferida: true }} onSaved={() => {}} onClose={() => {}} />);
+        const campo = await screen.findByLabelText('Foto (URL)');
+        await userEvent.clear(campo);
+        await userEvent.type(campo, 'https://arpt.test/nova.jpg');
+        await userEvent.type(screen.getByLabelText('Autor da foto'), 'João');
+        await userEvent.type(screen.getByLabelText('Licença da foto'), 'CC0');
+        await userEvent.click(screen.getByRole('button', { name: 'Salvar' }));
+        await waitFor(() => expect(api.patch).toHaveBeenCalledWith('/api/v1/admin/wood/species/4', expect.objectContaining({
+            foto_url: 'https://arpt.test/nova.jpg', foto_autor: 'João', foto_licenca: 'CC0', foto_fonte_url: null, foto_conferida: false,
+        })));
+    });
+});

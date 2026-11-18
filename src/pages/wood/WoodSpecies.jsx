@@ -4,7 +4,7 @@ import { api } from '../../services/api';
 import { BASE, SITUACAO_ESPECIE, mensagemErro } from '../../utils/wood';
 import { ReasonDialog } from './ReasonDialog';
 
-const VAZIA = { nome_cientifico: '', nome_principal_pt: '', nome_principal_en: '', nomes_populares: [''], descricao_pt: '', descricao_en: '', foto_url: '', situacao: 'PERMITIDA', nota_exportacao: '', motivo_bloqueio: '', ativo: true };
+const VAZIA = { nome_cientifico: '', nome_principal_pt: '', nome_principal_en: '', nomes_populares: [''], descricao_pt: '', descricao_en: '', foto_url: '', foto_autor: '', foto_licenca: '', foto_fonte_url: '', foto_conferida: false, situacao: 'PERMITIDA', nota_exportacao: '', motivo_bloqueio: '', ativo: true };
 export const AVISO_BLOQUEIO = 'Bloquear esta espécie tira de venda, agora, os produtos aprovados que a usam, e o produtor é avisado. Confirme só se for isso mesmo.';
 
 export function SpeciesForm({ inicial, onSaved, onClose }) {
@@ -12,6 +12,13 @@ export function SpeciesForm({ inicial, onSaved, onClose }) {
     const [erro, setErro] = useState(null);
     const [confirmaBloqueio, setConfirmaBloqueio] = useState(false);
     const set = (k) => (e) => setF((x) => ({ ...x, [k]: e.target.value }));
+    // Trocar a URL da foto limpa o crédito e a conferência (eram da foto anterior); voltar à URL original os restaura.
+    const trocarFoto = (e) => {
+        const v = e.target.value;
+        setF((x) => (v.trim() !== (inicial?.foto_url ?? '')
+            ? { ...x, foto_url: v, foto_autor: '', foto_licenca: '', foto_fonte_url: '', foto_conferida: false }
+            : { ...x, foto_url: v, foto_autor: inicial?.foto_autor ?? '', foto_licenca: inicial?.foto_licenca ?? '', foto_fonte_url: inicial?.foto_fonte_url ?? '', foto_conferida: !!inicial?.foto_conferida }));
+    };
     const bloqueando = f.situacao === 'BLOQUEADA' && inicial?.situacao !== 'BLOQUEADA';
     const populares = f.nomes_populares.map((n) => n.trim()).filter(Boolean);
 
@@ -23,7 +30,8 @@ export function SpeciesForm({ inicial, onSaved, onClose }) {
         if (bloqueando && !confirmaBloqueio) { setConfirmaBloqueio(true); return; }
         const corpo = {
             nome_cientifico: f.nome_cientifico.trim(), nome_principal_pt: f.nome_principal_pt.trim(), nome_principal_en: f.nome_principal_en?.trim() || null, nomes_populares: populares,
-            descricao_pt: f.descricao_pt?.trim() || null, descricao_en: f.descricao_en?.trim() || null, foto_url: f.foto_url?.trim() || null, situacao: f.situacao,
+            descricao_pt: f.descricao_pt?.trim() || null, descricao_en: f.descricao_en?.trim() || null, foto_url: f.foto_url?.trim() || null, foto_autor: f.foto_autor?.trim() || null, foto_licenca: f.foto_licenca?.trim() || null,
+            foto_fonte_url: f.foto_fonte_url?.trim() || null, foto_conferida: !!f.foto_conferida, situacao: f.situacao,
             nota_exportacao: f.nota_exportacao?.trim() || null, motivo_bloqueio: f.situacao === 'BLOQUEADA' ? f.motivo_bloqueio.trim() : null,
         };
         try {
@@ -55,7 +63,19 @@ export function SpeciesForm({ inicial, onSaved, onClose }) {
                     </Box>
                     <TextField label="Descrição (pt)" multiline value={f.descricao_pt ?? ''} onChange={set('descricao_pt')} inputProps={{ maxLength: 400 }} />
                     <TextField label="Descrição (en)" multiline value={f.descricao_en ?? ''} onChange={set('descricao_en')} inputProps={{ maxLength: 400 }} />
-                    <TextField label="Foto (URL)" value={f.foto_url ?? ''} onChange={set('foto_url')} />
+                    <TextField label="Foto (URL)" value={f.foto_url ?? ''} onChange={trocarFoto} helperText="Ao trocar a foto, o crédito da anterior é apagado: informe o crédito da nova." />
+                    {f.foto_url && (
+                        <Stack spacing={2} data-testid="foto-credito" sx={{ border: 1, borderColor: 'divider', borderRadius: 1, p: 2 }}>
+                            <Box component="img" src={f.foto_url} alt="Prévia da foto" sx={{ maxWidth: 240, maxHeight: 160, objectFit: 'cover', borderRadius: 1 }} />
+                            <Typography variant="caption" color="text.secondary">
+                                Foto de base pública exige mostrar autor e licença junto da imagem. O crédito é da foto atual: ao trocar a URL ele é limpo.
+                            </Typography>
+                            <TextField label="Autor da foto" value={f.foto_autor ?? ''} onChange={set('foto_autor')} inputProps={{ maxLength: 300 }} />
+                            <TextField label="Licença da foto" value={f.foto_licenca ?? ''} onChange={set('foto_licenca')} helperText="Por exemplo: CC BY 4.0, CC0, Domínio público" inputProps={{ maxLength: 60 }} />
+                            <TextField label="Página da imagem na origem" value={f.foto_fonte_url ?? ''} onChange={set('foto_fonte_url')} inputProps={{ maxLength: 500 }} />
+                            <FormControlLabel control={<Switch checked={!!f.foto_conferida} onChange={(e) => setF((x) => ({ ...x, foto_conferida: e.target.checked }))} />} label="Foto conferida pelo especialista (mostra a espécie certa)" />
+                        </Stack>
+                    )}
                     <FormControl>
                         <InputLabel id="sit">Situação</InputLabel>
                         <Select labelId="sit" label="Situação" value={f.situacao} onChange={set('situacao')}>
@@ -123,7 +143,7 @@ export function WoodSpecies() {
             {!lista && !erro && <CircularProgress size={22} />}
             {lista && (
                 <Table size="small">
-                    <TableHead><TableRow><TableCell>Nome</TableCell><TableCell>Científico</TableCell><TableCell>Nomes populares</TableCell><TableCell>Situação</TableCell><TableCell /></TableRow></TableHead>
+                    <TableHead><TableRow><TableCell>Nome</TableCell><TableCell>Científico</TableCell><TableCell>Nomes populares</TableCell><TableCell>Situação</TableCell><TableCell>Foto</TableCell><TableCell /></TableRow></TableHead>
                     <TableBody>
                         {lista.map((e) => (
                             <TableRow key={e.id}>
@@ -131,6 +151,9 @@ export function WoodSpecies() {
                                 <TableCell><i>{e.nome_cientifico}</i></TableCell>
                                 <TableCell>{(e.nomes_populares ?? []).join(', ')}</TableCell>
                                 <TableCell><Chip size="small" color={e.situacao === 'BLOQUEADA' ? 'error' : e.situacao === 'EXIGE_CITES' ? 'warning' : 'default'} label={SITUACAO_ESPECIE[e.situacao]} /></TableCell>
+                                <TableCell data-testid={`foto-${e.id}`}>
+                                    {!e.foto_url ? <Chip size="small" label="sem foto" /> : e.foto_conferida ? <Chip size="small" color="success" label="conferida" /> : <Chip size="small" color="warning" label="a conferir" />}
+                                </TableCell>
                                 <TableCell><Button size="small" onClick={() => setEditando(e)}>Editar</Button></TableCell>
                             </TableRow>
                         ))}
