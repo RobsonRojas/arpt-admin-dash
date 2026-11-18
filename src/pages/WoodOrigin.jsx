@@ -9,6 +9,7 @@ import { WoodHelp } from './wood/WoodHelp';
 import { WoodNcm } from './wood/WoodNcm';
 import { WoodAdequacao } from './wood/WoodAdequacao';
 import { WoodFunil } from './wood/WoodFunil';
+import { WoodRequisitos } from './wood/WoodRequisitos';
 import { DocumentDecision } from './wood/DocumentDecision';
 
 function AuditoriaProduto() {
@@ -43,7 +44,7 @@ export const WoodOrigin = () => {
         <Box p={3}>
             <Typography variant="h5" gutterBottom>Origem da madeira</Typography>
             <Tabs value={aba} onChange={(_, v) => { setAba(v); setAberto(null); }} sx={{ mb: 2 }} variant="scrollable">
-                <Tab label="Fila de análise" /><Tab label="Espécies" /><Tab label="Ajuda" /><Tab label="NCM por peça" /><Tab label="Adequação" /><Tab label="Auditoria por produto" /><Tab label="Funil" />
+                <Tab label="Fila de análise" /><Tab label="Espécies" /><Tab label="Ajuda" /><Tab label="NCM por peça" /><Tab label="Adequação" /><Tab label="Auditoria por produto" /><Tab label="Funil" /><Tab label="Requisitos" />
             </Tabs>
             {aba === 0 && (aberto?.tipo === 'DECLARACAO'
                 ? <WoodDeclaration id={aberto.id} onBack={() => { setAberto(null); setAtualiza((n) => n + 1); }} />
@@ -62,6 +63,7 @@ export const WoodOrigin = () => {
             {aba === 4 && <WoodAdequacao />}
             {aba === 5 && <AuditoriaProduto />}
             {aba === 6 && <WoodFunil />}
+            {aba === 7 && <WoodRequisitos />}
         </Box>
     );
 };
