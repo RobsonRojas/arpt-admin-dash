@@ -9,6 +9,7 @@ import * as err from '../src/modules/store-panel/errors.js';
 import * as blocks from '../src/modules/store-panel/blocks.js';
 import * as tpl from '../src/modules/store-panel/templates.js';
 import * as ai from '../src/modules/store-panel/ai.js';
+import { DNS_PROVIDERS } from '../src/modules/store-panel/dnsProviders.js';
 
 const dir = path.join(path.dirname(fileURLToPath(import.meta.url)), '../src/modules/store-panel');
 const { pt, en } = i18n.DICTIONARIES;
@@ -37,6 +38,7 @@ for (const f of files) {
 }
 for (const k of used) assert.ok(k in pt, `chave usada e sem texto: ${k}`);
 const VALUES = {
+  dnsg_prov_: DNS_PROVIDERS.map((p) => p.id), // nome de cada provedor no guia de DNS (a nota `_nota` é opcional: o código cai na genérica)
   role_: perm.ROLES, menu_: perm.SECTIONS.map((s) => s.id), status_: Object.values(rules.STORE_STATUS), block_: ['hero', 'produtos_destaque', 'texto', 'imagem', 'faq', 'depoimentos', 'newsletter', 'contato'],
   color_: ['primaria', 'secundaria', 'fundo', 'texto', 'destaque'], font_: ['sistema', 'serifada', 'moderna', 'arredondada', 'monoespacada'],
   button_: ['arredondado', 'quadrado', 'pilula'], card_: ['sombra', 'borda', 'plano'], domain_: ['PENDENTE', 'VERIFICADO'], tls_: ['ATIVO', 'EMITINDO', 'FALHA'],
