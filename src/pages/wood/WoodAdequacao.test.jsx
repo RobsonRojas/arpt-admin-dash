@@ -32,6 +32,12 @@ describe('aba Adequação', () => {
         expect(screen.getAllByText('Ana Silva', { selector: 'td' })).toHaveLength(2); // na tabela por produtor e na de produtos
     });
 
+    it('mostra o aviso quando o bloqueio está ligado sem a data de início', async () => {
+        api.get.mockResolvedValue({ data: dados({ configuracao: { modo: 'block', dias_de_adequacao: 30, bloqueio_desde: null, avisos: ['O bloqueio está ligado sem WOOD_ORIGIN_BLOCK_SINCE: não há prazo.'] } }) });
+        render(<WoodAdequacao />);
+        expect((await screen.findByTestId('aviso-config')).textContent).toMatch(/sem WOOD_ORIGIN_BLOCK_SINCE/);
+    });
+
     it('avisa que ignora o prazo de adequação e mostra o prazo configurado', async () => {
         api.get.mockResolvedValue({ data: dados({ configuracao: { modo: 'block', dias_de_adequacao: 45, bloqueio_desde: '2026-12-01' } }) });
         render(<WoodAdequacao />);

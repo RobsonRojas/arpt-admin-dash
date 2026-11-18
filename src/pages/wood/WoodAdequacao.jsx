@@ -49,6 +49,7 @@ export function WoodAdequacao() {
                     Prazo de adequação: {c.dias_de_adequacao} dias{c.bloqueio_desde ? ` (bloqueio desde ${c.bloqueio_desde})` : ' (conta a partir da data em que o bloqueio for ligado)'}.
                 </Typography>
             </Stack>
+            {(c.avisos ?? []).map((m) => <Alert key={m} severity="error" sx={{ mb: 2 }} data-testid="aviso-config">{m}</Alert>)}
             <Alert severity="info" sx={{ mb: 2 }}>
                 Mostra o que sairia de venda se o bloqueio estivesse ligado <b>agora</b>, sem considerar o prazo de adequação. Use para ajustar as regras e a lista de
                 espécies e para avisar os produtores antes de ligar. Gerado em {formatarData(dados.gerado_em)}.
