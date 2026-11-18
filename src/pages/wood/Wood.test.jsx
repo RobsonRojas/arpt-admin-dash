@@ -220,3 +220,17 @@ describe('Origem dos dados na análise', () => {
     });
 });
 
+describe('documento lido por IA na análise', () => {
+    it('mostra quais campos do documento foram lidos por IA e confirmados; sem IA, não mostra nada', async () => {
+        const det = detalhe();
+        det.documentos = [
+            { id: 11, tipo: 'DOF', numero: '1', orgao_emissor: 'X', validade: '2099-01-01', situacao: 'EM_ANALISE', versoes: [], proveniencia: { numero: { fonte: 'ia_leitura', confirmado: true }, validade: { fonte: 'ia_leitura', confirmado: true }, orgao_emissor: { fonte: 'digitado', confirmado: true } } },
+            { id: 12, tipo: 'NOTA_FISCAL', numero: '2', situacao: 'EM_ANALISE', versoes: [], proveniencia: { numero: { fonte: 'digitado', confirmado: true } } },
+        ];
+        api.get.mockResolvedValue({ data: det });
+        render(<WoodDeclaration id={7} onBack={() => {}} />);
+        expect((await screen.findByTestId('doc-ia-11')).textContent).toBe('Lido por IA e confirmado pelo produtor: número, validade');
+        expect(screen.queryByTestId('doc-ia-12')).toBeNull();
+    });
+});
+

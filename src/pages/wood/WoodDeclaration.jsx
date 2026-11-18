@@ -137,6 +137,10 @@ export function WoodDeclaration({ id, onBack }) {
                 {d.documentos.map((doc) => (
                     <Box key={doc.id} sx={{ mb: 1.5 }}>
                         <Typography variant="body2"><b>{doc.tipo}</b>{doc.numero ? ` nº ${doc.numero}` : ''} · {doc.orgao_emissor ?? ''} · validade {doc.validade ? String(doc.validade).slice(0, 10) : '—'} · <Chip size="small" label={doc.situacao} /></Typography>
+                        {Object.entries(doc.proveniencia ?? {}).some(([, m]) => m?.fonte === 'ia_leitura') && (
+                            <Chip size="small" color="warning" data-testid={`doc-ia-${doc.id}`} sx={{ mr: 1 }}
+                                label={`Lido por IA e confirmado pelo produtor: ${Object.entries(doc.proveniencia).filter(([, m]) => m?.fonte === 'ia_leitura').map(([k]) => ({ numero: 'número', orgao_emissor: 'órgão', emitido_em: 'emissão', validade: 'validade' }[k] ?? k)).join(', ')}`} />
+                        )}
                         {doc.versoes.map((v) => (
                             <Stack key={v.versao} direction="row" spacing={1} alignItems="center" flexWrap="wrap">
                                 <Typography variant="caption">v{v.versao} · {v.situacao} · {ehFoto(v) ? 'foto' : v.mime}{v.motivo ? ` · ${v.motivo}` : ''}</Typography>
