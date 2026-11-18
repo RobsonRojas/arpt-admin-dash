@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, Box, Button, Checkbox, Chip, CircularProgress, Divider, FormControlLabel, Link, Paper, Stack, TextField, Typography } from '@mui/material';
 import { api } from '../../services/api';
-import { BASE, TIPO_ORIGEM, formatarData, linkMapa, mensagemErro } from '../../utils/wood';
+import { BASE, TIPO_ORIGEM, formatarData, linhasDeProveniencia, linkMapa, mensagemErro, naoDigitados } from '../../utils/wood';
 import { DocumentDecision } from './DocumentDecision';
 import { FileViewer } from './FileViewer';
 import { ReasonDialog } from './ReasonDialog';
@@ -16,6 +16,31 @@ const Historico = ({ itens }) => (
 );
 
 /** Detalhe da declaração: dados, ponto exato, espécies, documentos/fotos, pendências, histórico e decisões. */
+/** Como cada dado foi preenchido (digitado, copiado, padrão do perfil, lido ou sugerido por IA, lote) e se o produtor confirmou. */
+export function OrigemDosDados({ proveniencia }) {
+    const linhas = linhasDeProveniencia(proveniencia);
+    if (linhas.length === 0) return null;
+    const extras = naoDigitados(proveniencia);
+    const semConfirmar = extras.filter((l) => !l.confirmado);
+    return (
+        <Paper sx={{ p: 2, mb: 2 }} data-testid="origem-dos-dados">
+            <Typography variant="subtitle1">Origem dos dados</Typography>
+            {extras.length > 0 && (
+                <Alert severity={semConfirmar.length ? 'warning' : 'info'} sx={{ my: 1 }}>
+                    {extras.length} campo(s) não foram digitados pelo produtor (copiados, de perfil, lidos ou sugeridos por IA, ou em lote).
+                    {semConfirmar.length ? ` ${semConfirmar.length} ainda NÃO foram confirmados por ele.` : ' Todos foram confirmados por ele.'} Confira estes com atenção.
+                </Alert>
+            )}
+            <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+                {linhas.map((l) => (
+                    <Chip key={l.campo} size="small" variant={l.fonte === 'digitado' ? 'outlined' : 'filled'} color={l.cor} data-testid={`fonte-${l.campo}`}
+                        label={`${l.rotulo}: ${l.texto}${l.fonte !== 'digitado' ? (l.confirmado ? ' · confirmado' : ' · a confirmar') : ''}`} />
+                ))}
+            </Stack>
+        </Paper>
+    );
+}
+
 export function WoodDeclaration({ id, onBack }) {
     const [d, setD] = useState(null);
     const [erro, setErro] = useState(null);
@@ -87,6 +112,8 @@ export function WoodDeclaration({ id, onBack }) {
                 {decl.historia_pt && <Typography variant="body2" sx={{ mt: 1 }}>História: {decl.historia_pt}</Typography>}
                 {decl.motivo && <Typography variant="body2" color="text.secondary">Último motivo: {decl.motivo}</Typography>}
             </Paper>
+
+            <OrigemDosDados proveniencia={decl.proveniencia} />
 
             <Paper sx={{ p: 2, mb: 2 }}>
                 <Typography variant="subtitle1">Espécies</Typography>

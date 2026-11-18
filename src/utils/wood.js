@@ -50,3 +50,25 @@ export const formatarNcm = (d) => {
     const s = String(d ?? '');
     return s.length === 8 ? `${s.slice(0, 4)}.${s.slice(4, 6)}.${s.slice(6)}` : s.length === 6 ? `${s.slice(0, 4)}.${s.slice(4)}` : s;
 };
+
+/** Origem de cada dado da declaração (simplificar-processo-produtor): como foi preenchido. */
+export const FONTE_DADO = {
+    digitado: { texto: 'Digitado pelo produtor', cor: 'default' },
+    copiado: { texto: 'Copiado de outra peça', cor: 'info' },
+    padrao_perfil: { texto: 'Padrão do perfil', cor: 'info' },
+    ia_leitura: { texto: 'Lido por IA', cor: 'warning' },
+    ia_sugestao: { texto: 'Sugerido por IA', cor: 'warning' },
+    lote: { texto: 'Aplicado em lote', cor: 'info' },
+};
+
+export const ROTULO_CAMPO = {
+    tipo_origem: 'Tipo de origem', especies: 'Espécies', ponto: 'Ponto de colheita', municipio: 'Município', comunidade: 'Comunidade', descricao_local: 'Descrição do local',
+    uso_previsto: 'Uso', acabamento: 'Acabamento', acabamento_seguro_alimento: 'Acabamento seguro p/ alimento', embalagem: 'Embalagem', embalagem_nimf15: 'Selo NIMF 15',
+    autor_nome: 'Nome de quem fez', autor_foto_url: 'Foto de quem fez', historia_pt: 'História (pt)', historia_en: 'História (en)', tecnica: 'Técnica', cuidados: 'Cuidados',
+};
+
+/** Linhas para a tela da análise, na ordem dos campos. Só os campos que têm marca. */
+export const linhasDeProveniencia = (prov) => Object.keys(ROTULO_CAMPO).filter((c) => prov?.[c]).map((c) => ({ campo: c, rotulo: ROTULO_CAMPO[c], ...prov[c], texto: (FONTE_DADO[prov[c].fonte] ?? { texto: prov[c].fonte }).texto, cor: (FONTE_DADO[prov[c].fonte] ?? {}).cor ?? 'default' }));
+
+/** Quantos campos não foram digitados pelo produtor (para destacar na análise). */
+export const naoDigitados = (prov) => linhasDeProveniencia(prov).filter((l) => l.fonte !== 'digitado');

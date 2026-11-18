@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { api } from '../../services/api';
-import { WoodDeclaration } from './WoodDeclaration';
+import { OrigemDosDados, WoodDeclaration } from './WoodDeclaration';
 import { SpeciesForm, AVISO_BLOQUEIO } from './WoodSpecies';
 import { SupportContact } from './WoodHelp';
 import { DocumentDecision } from './DocumentDecision';
@@ -177,3 +177,46 @@ describe('Espécies: foto e crédito', () => {
         })));
     });
 });
+
+describe('Origem dos dados na análise', () => {
+    const prov = {
+        tipo_origem: { fonte: 'digitado', confirmado: true },
+        embalagem: { fonte: 'copiado', confirmado: false },
+        acabamento: { fonte: 'ia_leitura', confirmado: true },
+        autor_nome: { fonte: 'padrao_perfil', confirmado: false },
+    };
+
+    it('mostra como cada campo foi preenchido e se foi confirmado', () => {
+        render(<OrigemDosDados proveniencia={prov} />);
+        expect(screen.getByTestId('fonte-tipo_origem').textContent).toBe('Tipo de origem: Digitado pelo produtor');
+        expect(screen.getByTestId('fonte-embalagem').textContent).toBe('Embalagem: Copiado de outra peça · a confirmar');
+        expect(screen.getByTestId('fonte-acabamento').textContent).toBe('Acabamento: Lido por IA · confirmado');
+        expect(screen.getByTestId('fonte-autor_nome').textContent).toBe('Nome de quem fez: Padrão do perfil · a confirmar');
+    });
+
+    it('avisa quantos não foram digitados e quantos ainda não foram confirmados', () => {
+        render(<OrigemDosDados proveniencia={prov} />);
+        expect(screen.getByText(/3 campo\(s\) não foram digitados pelo produtor/)).toBeTruthy();
+        expect(screen.getByText(/2 ainda NÃO foram confirmados por ele/)).toBeTruthy();
+    });
+
+    it('tudo confirmado: avisa que o produtor confirmou; só digitado: sem alerta; sem marcas: nada na tela', () => {
+        render(<OrigemDosDados proveniencia={{ acabamento: { fonte: 'ia_leitura', confirmado: true } }} />);
+        expect(screen.getByText(/Todos foram confirmados por ele/)).toBeTruthy();
+        cleanup();
+        render(<OrigemDosDados proveniencia={{ tipo_origem: { fonte: 'digitado', confirmado: true } }} />);
+        expect(screen.queryByText(/não foram digitados/)).toBeNull();
+        cleanup();
+        const { container } = render(<OrigemDosDados proveniencia={{}} />);
+        expect(container.innerHTML).toBe('');
+        cleanup();
+        expect(render(<OrigemDosDados />).container.innerHTML).toBe('');
+    });
+
+    it('ignora campo e fonte desconhecidos sem quebrar a tela', () => {
+        render(<OrigemDosDados proveniencia={{ campo_novo: { fonte: 'digitado' }, embalagem: { fonte: 'fonte_nova', confirmado: false } }} />);
+        expect(screen.getByTestId('fonte-embalagem').textContent).toMatch(/fonte_nova/);
+        expect(screen.queryByTestId('fonte-campo_novo')).toBeNull();
+    });
+});
+
