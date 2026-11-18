@@ -2,6 +2,7 @@
 export const BASE = '/api/v1/admin/wood';
 
 export const TIPO_ORIGEM = { MANEJO: 'Manejo florestal', ARVORE_CAIDA: 'Árvore caída', REAPROVEITAMENTO: 'Reaproveitamento' };
+export const USO_PECA = { DECORACAO: 'Decoração', MOVEL: 'Móvel', UTENSILIO_COZINHA: 'Utensílio de cozinha', BRINQUEDO: 'Brinquedo', OUTRO: 'Outro' };
 export const SITUACAO_ESPECIE = { PERMITIDA: 'Permitida', EXIGE_CITES: 'Exige CITES', BLOQUEADA: 'Bloqueada' };
 
 /** Mensagens em linguagem clara para os códigos de erro do backend. */
@@ -37,3 +38,15 @@ export const normalizarWhatsapp = (v) => {
 
 export const formatarData = (v) => (v ? new Date(v).toLocaleString('pt-BR') : '—');
 export const linkMapa = (lat, lng) => `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=17/${lat}/${lng}`;
+
+/** Mesma regra do servidor: 4, 6 ou 8 dígitos, pontos só nos lugares certos. Devolve só os dígitos ou null. */
+export const normalizarNcm = (v) => {
+    const t = String(v ?? '').trim();
+    return /^\d{4}(\.?\d{2}(\.?\d{2})?)?$/.test(t) ? t.replace(/\./g, '') : null;
+};
+
+/** 44209000 -> 4420.90.00; 442090 -> 4420.90; 4420 fica como está. */
+export const formatarNcm = (d) => {
+    const s = String(d ?? '');
+    return s.length === 8 ? `${s.slice(0, 4)}.${s.slice(4, 6)}.${s.slice(6)}` : s.length === 6 ? `${s.slice(0, 4)}.${s.slice(4)}` : s;
+};
