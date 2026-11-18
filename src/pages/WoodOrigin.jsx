@@ -8,6 +8,7 @@ import { WoodSpecies } from './wood/WoodSpecies';
 import { WoodHelp } from './wood/WoodHelp';
 import { WoodNcm } from './wood/WoodNcm';
 import { WoodAdequacao } from './wood/WoodAdequacao';
+import { WoodFunil } from './wood/WoodFunil';
 import { DocumentDecision } from './wood/DocumentDecision';
 
 function AuditoriaProduto() {
@@ -33,7 +34,7 @@ function AuditoriaProduto() {
     );
 }
 
-/** Origem da madeira (add-wood-product-origin-compliance): fila de análise, espécies, ajuda, NCM por peça, adequação e auditoria. */
+/** Origem da madeira (add-wood-product-origin-compliance): fila de análise, espécies, ajuda, NCM por peça, adequação, auditoria e funil do formulário. */
 export const WoodOrigin = () => {
     const [aba, setAba] = useState(0);
     const [aberto, setAberto] = useState(null);
@@ -42,7 +43,7 @@ export const WoodOrigin = () => {
         <Box p={3}>
             <Typography variant="h5" gutterBottom>Origem da madeira</Typography>
             <Tabs value={aba} onChange={(_, v) => { setAba(v); setAberto(null); }} sx={{ mb: 2 }} variant="scrollable">
-                <Tab label="Fila de análise" /><Tab label="Espécies" /><Tab label="Ajuda" /><Tab label="NCM por peça" /><Tab label="Adequação" /><Tab label="Auditoria por produto" />
+                <Tab label="Fila de análise" /><Tab label="Espécies" /><Tab label="Ajuda" /><Tab label="NCM por peça" /><Tab label="Adequação" /><Tab label="Auditoria por produto" /><Tab label="Funil" />
             </Tabs>
             {aba === 0 && (aberto?.tipo === 'DECLARACAO'
                 ? <WoodDeclaration id={aberto.id} onBack={() => { setAberto(null); setAtualiza((n) => n + 1); }} />
@@ -60,6 +61,7 @@ export const WoodOrigin = () => {
             {aba === 3 && <WoodNcm />}
             {aba === 4 && <WoodAdequacao />}
             {aba === 5 && <AuditoriaProduto />}
+            {aba === 6 && <WoodFunil />}
         </Box>
     );
 };
