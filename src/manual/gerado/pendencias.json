@@ -1671,66 +1671,6 @@
    "bloqueia": false
   },
   {
-   "id": "corrigir-busca-madeira-por-nome#1.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "corrigir-busca-madeira-por-nome",
-   "tarefa": "1.1",
-   "descricao": "Com sessão de produtor no manejo-app, abrir o passo \"Qual é a madeira?\", digitar \"Cumaru\" e anotar o status e o corpo da resposta de `GET /api/v1/producer/wood/species?q=Cumaru` (aba Rede)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "corrigir-busca-madeira-por-nome#4.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "corrigir-busca-madeira-por-nome",
-   "tarefa": "4.2",
-   "descricao": "Conferir no navegador que \"Cumaru\" e \"champagne\" listam a espécie",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "corrigir-busca-madeira-vazia-em-producao#1.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "corrigir-busca-madeira-vazia-em-producao",
-   "tarefa": "1.1",
-   "descricao": "Consultar (leitura) a contagem de espécies ativas e de nomes em produção",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "corrigir-busca-madeira-vazia-em-producao#1.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "corrigir-busca-madeira-vazia-em-producao",
-   "tarefa": "1.2",
-   "descricao": "Capturar o corpo da resposta de `species?q=Cum` em produção e comparar com a tela no celular",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "corrigir-busca-madeira-vazia-em-producao#3.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "corrigir-busca-madeira-vazia-em-producao",
-   "tarefa": "3.1",
-   "descricao": "Se houver dados e a tela não mostrar: corrigir a exibição da lista no celular, com teste",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "corrigir-busca-madeira-vazia-em-producao#5.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "corrigir-busca-madeira-vazia-em-producao",
-   "tarefa": "5.2",
-   "descricao": "Em produção, com confirmação do responsável: simulação, depois `--aplicar --producao`; conferir \"Cum\" e \"macucu\" no celular",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
    "id": "corrigir-testes-integracao-contato-e-slug#1.1",
    "area": "infraestrutura-e-deploy",
    "tipo": "codigo",
