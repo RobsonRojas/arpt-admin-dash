@@ -256,7 +256,8 @@
    "resumo": "Cadastro e regras de produtos, prazos, modo de oferta, descrições, identificadores públicos e simulação.",
    "rotas": [
     "/products",
-    "/product-simulation"
+    "/product-simulation",
+    "/wood-origin"
    ],
    "specs": [
     "admin-product-dimensions",
@@ -286,11 +287,11 @@
     "dropshipping-payout-resilience",
     "dropshipping-payouts",
     "gateway-receiving-config-ui",
-    "mp-webhook-resilience",
     "pagamentos",
     "payment-idempotency-safety",
     "payments",
     "payout-transfer-safety",
+    "platform-commission-config",
     "shipping-fee-settlement",
     "stripe-connect-onboarding",
     "stripe-connect-status-ui",
@@ -306,7 +307,7 @@
      "ancora": "doc-stripe-production-tutorial"
     },
     {
-     "titulo": "Tutorial: Testando Stripe e Mercado Pago Localmente",
+     "titulo": "Tutorial: Testando o Stripe Localmente",
      "ancora": "doc-tutorial-payments-test"
     },
     {
@@ -326,6 +327,9 @@
     "/notifications"
    ],
    "specs": [
+    "account-panel-tab-persistence",
+    "account-tabs-navigation",
+    "admin-push-notifications",
     "admin-user-id-sync",
     "admin-user-linking",
     "admin-user-relations-view",
@@ -361,7 +365,9 @@
     "dropshipper-terms-reacceptance",
     "producer-role-terms-acceptance",
     "producer-terms-page",
+    "producer-terms-reacceptance",
     "shipping-fee-terms-content",
+    "terms-ai-assistant",
     "terms-legal-review",
     "terms-of-use-acceptance",
     "terms-of-use-management"
@@ -389,7 +395,9 @@
    "rotas": [
     "/social-login"
    ],
-   "specs": [],
+   "specs": [
+    "social-login"
+   ],
    "docs": [
     {
      "titulo": "Login com Google: passo a passo (Google Cloud + Keycloak)",
@@ -423,8 +431,12 @@
     "/error-logs"
    ],
    "specs": [
+    "admin-service-monitoring",
     "client-ip-rate-limiting",
-    "maintenance-job-isolation"
+    "container-restart-control",
+    "maintenance-job-isolation",
+    "queue-job-management",
+    "service-health-monitoring"
    ],
    "docs": [
     {
@@ -443,6 +455,8 @@
     "/store-customers"
    ],
    "specs": [
+    "admin-store-customers",
+    "checkout-context-display",
     "dropshipper-default-store-template",
     "dropshipper-store-availability",
     "dropshipper-store-marketing",
@@ -454,13 +468,16 @@
     "dropshipper-store-theme",
     "dropshipper-stores",
     "store-address-availability",
+    "store-cep-address-autofill",
     "store-checkout-guards",
     "store-content-languages",
     "store-custom-domains",
     "store-customer-addresses",
     "store-customer-auth",
+    "store-customer-auth-modals",
     "store-customer-panel",
     "store-domain-dns-guide",
+    "store-product-review-timeout",
     "store-template-library",
     "store-theme-customization",
     "storefront-content-editing",
@@ -485,6 +502,7 @@
     "/dropshipping"
    ],
    "specs": [
+    "admin-dropshipper-store-transfer",
     "admin-dropshipping",
     "admin-marketplace",
     "admin-store-availability",
@@ -560,9 +578,18 @@
    "id": "painel-do-produtor",
    "titulo": "Painel do produtor",
    "grupo": "Ecossistema",
-   "resumo": "Papel, ativação, produtos, fotos, prazos, desempenho e uso offline do produtor.",
+   "resumo": "Papel, ativação, produtos, fotos, prazos, desempenho e uso offline do produtor, e a origem da madeira (espécies, declaração, documentos, análise e requisitos).",
    "rotas": [],
    "specs": [
+    "admin-producer-product-transfer",
+    "origin-assisted-input",
+    "origin-declaration-reuse",
+    "origin-draft-recovery",
+    "origin-flow-shortening",
+    "origin-funnel-metrics",
+    "origin-requirements-config-api",
+    "origin-requirements-rollout",
+    "origin-requirements-versioning",
     "producer-app-validation-parity",
     "producer-assignment",
     "producer-catalog-availability",
@@ -575,13 +602,21 @@
     "producer-product-images",
     "producer-product-management",
     "producer-product-performance",
+    "producer-product-pricing",
     "producer-product-registration",
     "producer-role-activation",
     "producer-role-activation-card",
     "producer-role-consistency",
     "producer-role-management",
     "producer-sla",
-    "producer-web-panel"
+    "producer-web-panel",
+    "wood-origin-declaration",
+    "wood-origin-documents",
+    "wood-origin-guided-form",
+    "wood-origin-help",
+    "wood-origin-review",
+    "wood-origin-storefront",
+    "wood-species-registry"
    ],
    "docs": []
   },
@@ -593,12 +628,14 @@
    "rotas": [],
    "specs": [
     "mobile-auth",
+    "mobile-auth-token-handling",
     "mobile-i18n-headers",
     "mobile-inventory",
     "mobile-manejo",
     "mobile-order-fulfillment",
     "mobile-session-lifecycle",
     "mobile-sync",
+    "mobile-sync-credential-protection",
     "pwa-support"
    ],
    "docs": []
