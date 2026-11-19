@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, Box, Button, Checkbox, Chip, CircularProgress, Divider, FormControlLabel, Link, Paper, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Chip, CircularProgress, Divider, Link, Paper, Stack, TextField, Typography } from '@mui/material';
 import { api } from '../../services/api';
 import { BASE, TIPO_ORIGEM, formatarData, linhasDeProveniencia, linkMapa, mensagemErro, naoDigitados } from '../../utils/wood';
 import { DocumentDecision } from './DocumentDecision';
 import { FileViewer } from './FileViewer';
 import { ReasonDialog } from './ReasonDialog';
+import { EspeciePicker } from './EspeciePicker';
 
 const Historico = ({ itens }) => (
     <Box>
@@ -45,7 +46,6 @@ export function WoodDeclaration({ id, onBack }) {
     const [d, setD] = useState(null);
     const [erro, setErro] = useState(null);
     const [aviso, setAviso] = useState(null);
-    const [especies, setEspecies] = useState([]);
     const [escolhidas, setEscolhidas] = useState([]);
     const [justificativa, setJustificativa] = useState('');
     const [motivoDe, setMotivoDe] = useState(null);
@@ -60,11 +60,6 @@ export function WoodDeclaration({ id, onBack }) {
 
     const decl = d?.declaracao;
     const aConfirmar = !!decl && (decl.especie_a_confirmar || d.especies.some((e) => !e.especie_id));
-    useEffect(() => {
-        if (!aConfirmar) return;
-        api.get(`${BASE}/species`).then((r) => setEspecies((r.data.especies ?? []).filter((e) => e.ativo && e.situacao !== 'BLOQUEADA'))).catch(() => setErro('Não foi possível carregar a lista de espécies.'));
-    }, [aConfirmar]);
-
     if (erro && !d) return <Alert severity="error">{erro}</Alert>;
     if (!d) return <CircularProgress size={22} />;
 
@@ -77,7 +72,7 @@ export function WoodDeclaration({ id, onBack }) {
         setAviso(null);
         if (aConfirmar && escolhidas.length === 0) { setErro('Escolha a espécie antes de aprovar: o produtor marcou "não tenho certeza".'); return; }
         if (decl.sem_comprovante_fiscal && justificativa.trim().length < 10) { setErro('Reaproveitamento sem comprovante fiscal exige a justificativa da aprovação (mínimo 10 caracteres).'); return; }
-        enviar({ decisao: 'APROVAR', ...(aConfirmar ? { especie_ids: escolhidas } : {}), ...(decl.sem_comprovante_fiscal ? { justificativa: justificativa.trim() } : {}) }, 'Declaração aprovada. O produtor foi avisado.');
+        enviar({ decisao: 'APROVAR', ...(aConfirmar ? { especie_ids: escolhidas.map((e) => e.id) } : {}), ...(decl.sem_comprovante_fiscal ? { justificativa: justificativa.trim() } : {}) }, 'Declaração aprovada. O produtor foi avisado.');
     };
     const verHistorico = async () => {
         try { setHistoricoProduto((await api.get(`${BASE}/products/${decl.produto_id}/audit`)).data.historico); } catch (e) { setErro(mensagemErro(e)); }
@@ -123,10 +118,7 @@ export function WoodDeclaration({ id, onBack }) {
                 {aConfirmar && emAnalise && (
                     <Box sx={{ mt: 1 }}>
                         <Typography variant="body2" color="error">Defina a espécie antes de aprovar:</Typography>
-                        {especies.map((e) => (
-                            <FormControlLabel key={e.id} sx={{ display: 'block' }} label={`${e.nome_principal_pt} (${e.nome_cientifico})`}
-                                control={<Checkbox size="small" checked={escolhidas.includes(e.id)} onChange={(ev) => setEscolhidas((s) => ev.target.checked ? [...s, e.id] : s.filter((x) => x !== e.id))} />} />
-                        ))}
+                        <EspeciePicker multiple semBloqueadas label="Espécie" value={escolhidas} onChange={setEscolhidas} sx={{ mt: 1, maxWidth: 520 }} />
                     </Box>
                 )}
             </Paper>

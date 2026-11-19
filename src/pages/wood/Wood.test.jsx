@@ -3,7 +3,7 @@ import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { api } from '../../services/api';
 import { OrigemDosDados, WoodDeclaration } from './WoodDeclaration';
-import { SpeciesForm, AVISO_BLOQUEIO } from './WoodSpecies';
+import { SpeciesForm, WoodSpecies, AVISO_BLOQUEIO } from './WoodSpecies';
 import { SupportContact } from './WoodHelp';
 import { DocumentDecision } from './DocumentDecision';
 
@@ -42,7 +42,8 @@ describe('Decisão da declaração', () => {
         await screen.findByText(/Escolha a espécie antes de aprovar/);
         expect(api.post).not.toHaveBeenCalled();
         api.post.mockResolvedValue({ data: {} });
-        await userEvent.click(await screen.findByLabelText(/Cumaru/));
+        await userEvent.click(await screen.findByRole('combobox', { name: 'Espécie' }));
+        await userEvent.click(await screen.findByRole('option', { name: /Cumaru/ }));
         await userEvent.click(screen.getByRole('button', { name: 'Aprovar' }));
         await waitFor(() => expect(api.post).toHaveBeenCalledWith('/api/v1/admin/wood/declarations/7/decision', { decisao: 'APROVAR', especie_ids: [5] }));
     });
@@ -234,3 +235,30 @@ describe('documento lido por IA na análise', () => {
     });
 });
 
+describe('Lista de espécies (paginada)', () => {
+    const resp = (extra = {}) => ({ data: { especies: [{ id: 1, ativo: true, situacao: 'PERMITIDA', nome_principal_pt: 'Macucu', nome_cientifico: 'Aldina heterophylla', nomes_populares: ['Macucu'] }], total: 120, pagina: 1, por_pagina: 50, ativas: 120, ...extra } });
+
+    it('pede a primeira página, mostra o total e busca no servidor ao digitar', async () => {
+        api.get.mockImplementation((url) => Promise.resolve(url.endsWith('/requests') ? { data: { pedidos: [] } } : resp()));
+        render(<WoodSpecies />);
+        await screen.findByText('Aldina heterophylla');
+        expect(api.get).toHaveBeenCalledWith('/api/v1/admin/wood/species', { params: { q: undefined, pagina: 1, por_pagina: 50 } });
+        expect(screen.getByText(/120 espécie\(s\) · 120 ativa\(s\) no total/)).toBeTruthy();
+        await userEvent.type(screen.getByLabelText('Buscar espécie'), 'macucu');
+        await waitFor(() => expect(api.get).toHaveBeenCalledWith('/api/v1/admin/wood/species', { params: { q: 'macucu', pagina: 1, por_pagina: 50 } }));
+    });
+
+    it('avisa quando não há nenhuma espécie ativa', async () => {
+        api.get.mockImplementation((url) => Promise.resolve(url.endsWith('/requests') ? { data: { pedidos: [] } } : resp({ especies: [], total: 0, ativas: 0 })));
+        render(<WoodSpecies />);
+        expect(await screen.findByText(/Não há nenhuma espécie ativa/)).toBeTruthy();
+        expect(screen.getByText('Nenhuma espécie cadastrada.')).toBeTruthy();
+    });
+
+    it('com espécies ativas não mostra o aviso', async () => {
+        api.get.mockImplementation((url) => Promise.resolve(url.endsWith('/requests') ? { data: { pedidos: [] } } : resp()));
+        render(<WoodSpecies />);
+        await screen.findByText('Aldina heterophylla');
+        expect(screen.queryByText(/Não há nenhuma espécie ativa/)).toBeNull();
+    });
+});

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Accordion, AccordionDetails, AccordionSummary, Alert, Box, Button, Checkbox, Chip, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, MenuItem, Paper, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import { api } from '../../services/api';
+import { EspeciePicker } from './EspeciePicker';
 import { BASE, formatarData, mensagemErro, TIPO_ORIGEM, USO_PECA } from '../../utils/wood';
 
 const hoje = new Date().toISOString().slice(0, 10);
@@ -41,7 +42,10 @@ export function WoodRequisitos() {
     const carregar = useCallback(async () => {
         setErro(null);
         try {
-            const [v, e] = await Promise.all([api.get(`${BASE}/requirements`), api.get(`${BASE}/species`)]);
+            const v = await api.get(`${BASE}/requirements`);
+            // Só os nomes das espécies que as versões citam (a lista completa tem milhares): busca por ids.
+            const ids = [...new Set((v.data.versoes ?? []).flatMap((x) => x.escopo?.especies ?? []))];
+            const e = ids.length ? await api.get(`${BASE}/species`, { params: { ids: ids.join(','), por_pagina: 200 } }) : { data: { especies: [] } };
             setDados(v.data); setEspecies(e.data.especies ?? []);
         } catch (e) { setErro(mensagemErro(e, 'Não foi possível carregar as versões.')); }
     }, []);
@@ -199,7 +203,8 @@ export function WoodRequisitos() {
                             <TextField label="Por quê" value={form.por_que} onChange={set('por_que')} multiline minRows={2} inputProps={{ 'data-testid': 'f-porque' }} />
                             <Typography variant="subtitle2">A quem se aplica (vazio = não restringe)</Typography>
                             <TextField select label="Origem" value={form.origens} onChange={set('origens')} SelectProps={{ multiple: true }}>{Object.entries(TIPO_ORIGEM).map(([k, v]) => <MenuItem key={k} value={k}>{v}</MenuItem>)}</TextField>
-                            <TextField select label="Espécie" value={form.especies} onChange={set('especies')} SelectProps={{ multiple: true }}>{especies.filter((e) => e.ativo).map((e) => <MenuItem key={e.id} value={e.id}>{e.nome_principal_pt}</MenuItem>)}</TextField>
+                            <EspeciePicker multiple size="medium" label="Espécie" value={form.especies.map((id) => especies.find((e) => e.id === id) ?? { id, nome_principal_pt: `#${id}`, nome_cientifico: '' })}
+                                onChange={(v) => { setEspecies((atuais) => [...atuais.filter((e) => !v.some((x) => x.id === e.id)), ...v]); setForm((f) => ({ ...f, especies: v.map((e) => e.id) })); }} />
                             <TextField select label="Uso" value={form.usos} onChange={set('usos')} SelectProps={{ multiple: true }}>{Object.entries(USO_PECA).map(([k, v]) => <MenuItem key={k} value={k}>{v}</MenuItem>)}</TextField>
                             <TextField label="Países de destino (códigos de 2 letras, separados por vírgula)" value={form.destinos} onChange={set('destinos')} helperText="Fica registrado, mas não restringe quem aparece como desatualizado: a declaração não tem destino." />
                             {form.regras && (

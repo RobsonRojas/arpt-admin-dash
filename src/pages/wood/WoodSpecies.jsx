@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, InputLabel, MenuItem, Select, Stack, Switch, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, InputLabel, MenuItem, Select, Stack, Switch, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
 import { api } from '../../services/api';
 import { BASE, SITUACAO_ESPECIE, mensagemErro } from '../../utils/wood';
 import { ReasonDialog } from './ReasonDialog';
+import { EspeciePicker } from './EspeciePicker';
 
 const VAZIA = { nome_cientifico: '', nome_principal_pt: '', nome_principal_en: '', nomes_populares: [''], descricao_pt: '', descricao_en: '', foto_url: '', foto_autor: '', foto_licenca: '', foto_fonte_url: '', foto_conferida: false, situacao: 'PERMITIDA', nota_exportacao: '', motivo_bloqueio: '', ativo: true };
 export const AVISO_BLOQUEIO = 'Bloquear esta espécie tira de venda, agora, os produtos aprovados que a usam, e o produtor é avisado. Confirme só se for isso mesmo.';
@@ -95,7 +96,7 @@ export function SpeciesForm({ inicial, onSaved, onClose }) {
     );
 }
 
-function Pedidos({ especies }) {
+function Pedidos() {
     const [lista, setLista] = useState(null);
     const [erro, setErro] = useState(null);
     const [vinculo, setVinculo] = useState({});
@@ -114,13 +115,8 @@ function Pedidos({ especies }) {
             {(lista ?? []).map((p) => (
                 <Stack key={p.id} direction="row" spacing={1} alignItems="center" sx={{ py: 1 }}>
                     <Typography variant="body2" sx={{ minWidth: 220 }}>{p.nome_popular}{p.nome_cientifico ? ` (${p.nome_cientifico})` : ''}</Typography>
-                    <FormControl size="small" sx={{ minWidth: 220 }}>
-                        <InputLabel id={`v-${p.id}`}>Vincular a</InputLabel>
-                        <Select labelId={`v-${p.id}`} label="Vincular a" value={vinculo[p.id] ?? ''} onChange={(e) => setVinculo((v) => ({ ...v, [p.id]: e.target.value }))}>
-                            {especies.map((e) => <MenuItem key={e.id} value={e.id}>{e.nome_principal_pt}</MenuItem>)}
-                        </Select>
-                    </FormControl>
-                    <Button size="small" disabled={!vinculo[p.id]} onClick={() => decidir(p.id, { decisao: 'ATENDIDO', especie_id: vinculo[p.id] })}>Atender</Button>
+                    <EspeciePicker sx={{ minWidth: 320 }} label="Vincular a" value={vinculo[p.id] ?? null} onChange={(v) => setVinculo((x) => ({ ...x, [p.id]: v }))} />
+                    <Button size="small" disabled={!vinculo[p.id]} onClick={() => decidir(p.id, { decisao: 'ATENDIDO', especie_id: vinculo[p.id].id })}>Atender</Button>
                     <Button size="small" color="error" onClick={() => setRecusando(p.id)}>Recusar</Button>
                 </Stack>
             ))}
@@ -134,18 +130,35 @@ export function WoodSpecies() {
     const [lista, setLista] = useState(null);
     const [erro, setErro] = useState(null);
     const [editando, setEditando] = useState(null);
-    const carregar = useCallback(() => api.get(`${BASE}/species`).then((r) => setLista(r.data.especies)).catch((e) => setErro(mensagemErro(e, 'Não foi possível carregar as espécies.'))), []);
+    const [pagina, setPagina] = useState(0);
+    const [porPagina, setPorPagina] = useState(50);
+    const [busca, setBusca] = useState('');
+    const [termo, setTermo] = useState('');
+    useEffect(() => { const t = setTimeout(() => { setTermo(busca.trim()); setPagina(0); }, 350); return () => clearTimeout(t); }, [busca]);
+    const carregar = useCallback(() => api.get(`${BASE}/species`, { params: { q: termo || undefined, pagina: pagina + 1, por_pagina: porPagina } })
+        .then((r) => { setLista(r.data); setErro(null); }).catch((e) => setErro(mensagemErro(e, 'Não foi possível carregar as espécies.'))), [termo, pagina, porPagina]);
     useEffect(() => { carregar(); }, [carregar]);
+    const especies = lista?.especies ?? [];
     return (
         <Box>
-            <Button variant="contained" onClick={() => setEditando({})} sx={{ mb: 2 }}>Nova espécie</Button>
+            {lista && lista.ativas === 0 && (
+                <Alert severity="warning" sx={{ mb: 2 }} role="alert">
+                    Não há nenhuma espécie ativa. O produtor não consegue escolher a madeira no formulário de origem. Carregue a lista de espécies (script de carga) ou ative espécies cadastradas.
+                </Alert>
+            )}
+            <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
+                <Button variant="contained" onClick={() => setEditando({})}>Nova espécie</Button>
+                <TextField size="small" label="Buscar espécie" placeholder="nome popular ou científico" value={busca} onChange={(e) => setBusca(e.target.value)} sx={{ minWidth: 280 }} />
+                {lista && <Typography variant="body2" color="text.secondary">{lista.total ?? especies.length} espécie(s){lista.ativas !== undefined ? ` · ${lista.ativas} ativa(s) no total` : ''}</Typography>}
+            </Stack>
             {erro && <Alert severity="error" sx={{ mb: 2 }}>{erro}</Alert>}
             {!lista && !erro && <CircularProgress size={22} />}
             {lista && (
+                <>
                 <Table size="small">
                     <TableHead><TableRow><TableCell>Nome</TableCell><TableCell>Científico</TableCell><TableCell>Nomes populares</TableCell><TableCell>Situação</TableCell><TableCell>Foto</TableCell><TableCell /></TableRow></TableHead>
                     <TableBody>
-                        {lista.map((e) => (
+                        {especies.map((e) => (
                             <TableRow key={e.id}>
                                 <TableCell>{e.nome_principal_pt}{!e.ativo && <Chip size="small" label="inativa" sx={{ ml: 1 }} />}</TableCell>
                                 <TableCell><i>{e.nome_cientifico}</i></TableCell>
@@ -157,11 +170,15 @@ export function WoodSpecies() {
                                 <TableCell><Button size="small" onClick={() => setEditando(e)}>Editar</Button></TableCell>
                             </TableRow>
                         ))}
+                        {especies.length === 0 && <TableRow><TableCell colSpan={6}><Typography color="text.secondary">{termo ? 'Nenhuma espécie encontrada para essa busca.' : 'Nenhuma espécie cadastrada.'}</Typography></TableCell></TableRow>}
                     </TableBody>
                 </Table>
+                <TablePagination component="div" count={lista.total ?? especies.length} page={pagina} rowsPerPage={porPagina} rowsPerPageOptions={[25, 50, 100]}
+                    onPageChange={(_, p) => setPagina(p)} onRowsPerPageChange={(e) => { setPorPagina(Number(e.target.value)); setPagina(0); }} labelRowsPerPage="Por página" />
+                </>
             )}
             {editando && <SpeciesForm inicial={editando.id ? editando : undefined} onClose={() => setEditando(null)} onSaved={() => { setEditando(null); carregar(); }} />}
-            <Pedidos especies={(lista ?? []).filter((e) => e.ativo)} />
+            <Pedidos />
         </Box>
     );
 }
