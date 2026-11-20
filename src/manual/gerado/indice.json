@@ -515,6 +515,7 @@
     "dropshipper-pricing-rules",
     "dropshipper-profile",
     "dropshipper-self-activation",
+    "dropshipper-stripe-account",
     "dropshipping-journey-test",
     "dropshipping-order-integrity",
     "dropshipping-orders",

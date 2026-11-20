@@ -1671,62 +1671,12 @@
    "bloqueia": false
   },
   {
-   "id": "corrigir-testes-integracao-contato-e-slug#1.1",
+   "id": "corrigir-retorno-onboarding-stripe#3.3",
    "area": "infraestrutura-e-deploy",
    "tipo": "codigo",
-   "origem": "corrigir-testes-integracao-contato-e-slug",
-   "tarefa": "1.1",
-   "descricao": "Rodar `consent/sem-importacao` e copiar do `expect` as strings exatas das rotas acusadas",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "corrigir-testes-integracao-contato-e-slug#1.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "corrigir-testes-integracao-contato-e-slug",
-   "tarefa": "1.2",
-   "descricao": "Acrescentar essas rotas a `AUTORIZADAS` em `sem-importacao.itest.ts`, com a justificativa no comentário",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "corrigir-testes-integracao-contato-e-slug#1.3",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "corrigir-testes-integracao-contato-e-slug",
-   "tarefa": "1.3",
-   "descricao": "Conferir que o teste passa e que as outras seis checagens do arquivo seguem passando",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "corrigir-testes-integracao-contato-e-slug#2.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "corrigir-testes-integracao-contato-e-slug",
-   "tarefa": "2.1",
-   "descricao": "Trocar `artesanato-amazonas` por `artesanato-manaus` nas duas ocorrências de `admin.itest.ts`",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "corrigir-testes-integracao-contato-e-slug#2.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "corrigir-testes-integracao-contato-e-slug",
-   "tarefa": "2.2",
-   "descricao": "Rodar `dropshipping/admin` completo e conferir que passa",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "corrigir-testes-integracao-contato-e-slug#3.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "corrigir-testes-integracao-contato-e-slug",
-   "tarefa": "3.1",
-   "descricao": "Rodar a suíte completa de integração (Postgres descartável em porta livre) e confirmar 0 falhas",
+   "origem": "corrigir-retorno-onboarding-stripe",
+   "tarefa": "3.3",
+   "descricao": "Em produção, completar um onboarding em modo teste e conferir que volta a `/patrocinios` com a confirmação",
    "roteiro": null,
    "bloqueia": false
   },

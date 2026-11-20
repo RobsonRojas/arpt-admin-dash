@@ -1,10 +1,10 @@
 {
- "total": 440,
+ "total": 435,
  "manuais": 189,
- "codigo": 251,
+ "codigo": 246,
  "porArea": {
   "infraestrutura-e-deploy": {
-   "total": 276,
+   "total": 271,
    "manuais": 128
   },
   "lojas": {
