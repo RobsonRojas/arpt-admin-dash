@@ -1,11 +1,11 @@
 {
- "total": 435,
- "manuais": 189,
- "codigo": 246,
+ "total": 448,
+ "manuais": 195,
+ "codigo": 253,
  "porArea": {
   "infraestrutura-e-deploy": {
-   "total": 271,
-   "manuais": 128
+   "total": 283,
+   "manuais": 130
   },
   "lojas": {
    "total": 48,
@@ -28,8 +28,8 @@
    "manuais": 6
   },
   "pedidos-e-frete": {
-   "total": 6,
-   "manuais": 3
+   "total": 7,
+   "manuais": 7
   },
   "produtos-e-catalogo": {
    "total": 3,

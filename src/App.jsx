@@ -6,6 +6,7 @@ import { Dashboard, Projects, Properties, Necromassa, Sponsors, Login, Users, Re
 import { CertificateView } from './pages/CertificateView';
 import { GrowthIndicators } from './pages/GrowthIndicators';
 import { GrowthCampaigns } from './pages/GrowthCampaigns';
+import { Coupons } from './pages/Coupons';
 import StorePanel from './modules/store-panel/StorePanel';
 import { useAdmin } from './contexts/AdminContext';
 import { useAuth } from './contexts/AuthContext.jsx';
@@ -65,6 +66,7 @@ export default function App() {
                   <Route path="exit-survey" element={<ExitSurvey />} />
                   <Route path="growth" element={<GrowthIndicators />} />
                   <Route path="growth-campaigns" element={<GrowthCampaigns />} />
+                  <Route path="coupons" element={<Coupons />} />
                   <Route path="projects" element={<Projects />} />
                   <Route path="properties" element={<Properties />} />
                   <Route path="necromassa" element={<Necromassa />} />

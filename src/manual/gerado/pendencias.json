@@ -1,246 +1,6 @@
 {
  "itens": [
   {
-   "id": "add-arpttoken-site-services#1.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-arpttoken-site-services",
-   "tarefa": "1.1",
-   "descricao": "Mover `deploy-blockchain/backend/arpt-token-api` para `token-api/` e `deploy-blockchain/frontend` para `token-app/`, preservando `.git` internos e `bvmrepo/bvmblockchain`; não levar `.env`, `html/`, nem os compose antigos",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-arpttoken-site-services#1.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-arpttoken-site-services",
-   "tarefa": "1.2",
-   "descricao": "Trocar a chave privada do `.env.example` movido por placeholder e conferir que nenhum `.env` com segredo entrou no que será versionado",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-arpttoken-site-services#1.3",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-arpttoken-site-services",
-   "tarefa": "1.3",
-   "descricao": "Acrescentar `token-api/` e `token-app/` ao `.gitignore` do deploy (repositórios independentes) e documentar isso no `commit-push-repos` se a lista de repositórios for atualizada",
-   "roteiro": null,
-   "bloqueia": true
-  },
-  {
-   "id": "add-arpttoken-site-services#2.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-arpttoken-site-services",
-   "tarefa": "2.1",
-   "descricao": "Adicionar `token-api` ao `docker-compose.yml` (build em `./token-api`, `PORT=3005`, `BLOCKCHAIN_PVT_KEY`/`BLOCKCHAIN_ADD_TO_SEND`/`BLOCKCHAIN_NETWORK` por variável, rede `arptNet`, sem `ports`, limites de recursos)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-arpttoken-site-services#2.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-arpttoken-site-services",
-   "tarefa": "2.2",
-   "descricao": "Adicionar `token-app` (build em `./token-app/bvmrepo/bvmblockchain`, rede `arptNet`, sem `ports`, `restart: unless-stopped`)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-arpttoken-site-services#2.3",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-arpttoken-site-services",
-   "tarefa": "2.3",
-   "descricao": "Passar `TOKEN_API_URL` e `TOKEN_API_KEY` ao `manejo-api`, ao `blockchain-worker` e a todo serviço que importa `TokenApi` (levantar por `grep`), e `TOKEN_API_KEY` ao `nginx`",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-arpttoken-site-services#2.4",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-arpttoken-site-services",
-   "tarefa": "2.4",
-   "descricao": "Documentar as variáveis novas em `env.example` (sem valores reais) e incluir `token-api`/`token-app` em `MONITORED_CONTAINERS`",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-arpttoken-site-services#2.5",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-arpttoken-site-services",
-   "tarefa": "2.5",
-   "descricao": "Validar com `docker compose config`",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-arpttoken-site-services#3.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-arpttoken-site-services",
-   "tarefa": "3.1",
-   "descricao": "Acrescentar `$TOKEN_API_KEY` ao `envsubst` do `start-nginx.sh`, com valor aleatório descartável quando vazio",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-arpttoken-site-services#3.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-arpttoken-site-services",
-   "tarefa": "3.2",
-   "descricao": "Adicionar ao `nginx.conf` o bloco da porta 80 de `arpttoken.site`/`www` (ACME + redirecionamento) e publicar",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-arpttoken-site-services#3.3",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-arpttoken-site-services",
-   "tarefa": "3.3",
-   "descricao": "Emitir o certificado de `arpttoken.site`/`www` com o certbot do deploy (webroot) e conferir `certbot/conf/live/arpttoken.site/`",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-arpttoken-site-services#3.4",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-arpttoken-site-services",
-   "tarefa": "3.4",
-   "descricao": "Adicionar o bloco 443: `/` para `token-app`, `/api/` para `token-api` com remoção do prefixo, `map` do segredo e 401 nas escritas, cabeçalhos `Host`/`X-Real-IP`/`X-Forwarded-*`, `client_max_body_size` suficiente para arquivos de token",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-arpttoken-site-services#3.5",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-arpttoken-site-services",
-   "tarefa": "3.5",
-   "descricao": "Testar a configuração (`nginx -t` em contêiner descartável) e conferir que `arpt.site` e `auth.arpt.site` seguem respondendo igual",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-arpttoken-site-services#3.6",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-arpttoken-site-services",
-   "tarefa": "3.6",
-   "descricao": "Acrescentar `DOMAIN_3: arpttoken.site` ao nginx do compose, por consistência com `DOMAIN_1`/`DOMAIN_2`",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-arpttoken-site-services#4.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-arpttoken-site-services",
-   "tarefa": "4.1",
-   "descricao": "Em `tokenApi.service.ts`, trocar as URLs fixas por uma base única lida de `TOKEN_API_URL` (padrão `https://arpttoken.site/api`, sem barra final)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-arpttoken-site-services#4.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-arpttoken-site-services",
-   "tarefa": "4.2",
-   "descricao": "Enviar `X-Token-Api-Key` nas gravações e falhar antes da rede se `TOKEN_API_KEY` faltar, sem logar o valor",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-arpttoken-site-services#4.3",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-arpttoken-site-services",
-   "tarefa": "4.3",
-   "descricao": "Testes unitários: padrão, base customizada, barra final, cabeçalho nas gravações, ausência nas leituras, erro sem chave",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-arpttoken-site-services#4.4",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-arpttoken-site-services",
-   "tarefa": "4.4",
-   "descricao": "Revisar `blockchainService.ts` (URL de exemplo morta `api.blockchain.exemplo`) e remover se não for usado",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-arpttoken-site-services#5.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-arpttoken-site-services",
-   "tarefa": "5.1",
-   "descricao": "Subir `token-api` e `token-app` com `up -d --build --no-deps` (um de cada vez, o `token-app` com swap) e reconstruir `manejo-api` e workers",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-arpttoken-site-services#5.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-arpttoken-site-services",
-   "tarefa": "5.2",
-   "descricao": "Conferir por `curl`: `https://arpttoken.site/` abre, `GET /api/` responde `OK`, leitura pública funciona, `POST /api/v1/tokenjson/plain` sem segredo dá 401 e com segredo chega à API",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-arpttoken-site-services#5.3",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-arpttoken-site-services",
-   "tarefa": "5.3",
-   "descricao": "Verificar de dentro do `manejo-api` que `https://arpttoken.site/api` é alcançável (hairpin); se não for, adicionar `extra_hosts` ao serviço",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-arpttoken-site-services#5.4",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-arpttoken-site-services",
-   "tarefa": "5.4",
-   "descricao": "Exercitar uma gravação real de token pelo worker (testnet) ponta a ponta",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-arpttoken-site-services#5.5",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-arpttoken-site-services",
-   "tarefa": "5.5",
-   "descricao": "Parar (sem apagar) a stack antiga de `deploy-blockchain` antes do corte final e registrar o plano de rollback",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-arpttoken-site-services#5.6",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-arpttoken-site-services",
-   "tarefa": "5.6",
-   "descricao": "Documentar em `docs/` o domínio, a emissão/renovação do certificado, as variáveis e a rotação do segredo",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
    "id": "add-digital-origin-passports-tracking#1.1",
    "area": "infraestrutura-e-deploy",
    "tipo": "codigo",
@@ -1281,7 +1041,7 @@
    "bloqueia": false
   },
   {
-   "id": "add-marketplace-channel-integrations#128",
+   "id": "add-marketplace-channel-integrations#104",
    "area": "dropshipping",
    "tipo": "codigo",
    "origem": "add-marketplace-channel-integrations",
@@ -1671,12 +1431,352 @@
    "bloqueia": false
   },
   {
-   "id": "corrigir-retorno-onboarding-stripe#3.3",
+   "id": "add-store-discount-coupons#4.1",
    "area": "infraestrutura-e-deploy",
    "tipo": "codigo",
-   "origem": "corrigir-retorno-onboarding-stripe",
-   "tarefa": "3.3",
-   "descricao": "Em produção, completar um onboarding em modo teste e conferir que volta a `/patrocinios` com a confirmação",
+   "origem": "add-store-discount-coupons",
+   "tarefa": "4.1",
+   "descricao": "Rota `POST /storefront/:slug/cupom/validar` com rate limit por cliente e respeito a `COUPONS_ENABLED`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-store-discount-coupons#4.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-store-discount-coupons",
+   "tarefa": "4.2",
+   "descricao": "`createStoreCheckout`: revalidar e reservar o cupom, cobrar o total com desconto, gravar `cupom_id`, `desconto_cents` e `total_esperado_cents` nos metadados, responder `COUPON_CHANGED` quando o cupom deixar de valer, liberar a reserva em caso de erro",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-store-discount-coupons#4.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-store-discount-coupons",
+   "tarefa": "4.3",
+   "descricao": "Gateways: `descontoCents` na interface do criador de sessão; Stripe com cupom efêmero de uso único, Mercado Pago e simulado com linha de desconto",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-store-discount-coupons#4.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-store-discount-coupons",
+   "tarefa": "4.4",
+   "descricao": "Webhook (`storeCheckout.ts`): ler o cupom dos metadados e repassar ao pedido; liberar o uso quando o pagamento for reembolsado sem pedido",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-store-discount-coupons#4.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-store-discount-coupons",
+   "tarefa": "4.5",
+   "descricao": "Testes de integração: pagamento com cupom, cupom esgotado entre carrinho e checkout, webhook repetido, valor pago menor que o esperado",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-store-discount-coupons#5.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-store-discount-coupons",
+   "tarefa": "5.1",
+   "descricao": "`createOrderFromPayment`: recalcular o desconto no servidor, conferir com os metadados, ratear por produtor, calcular a divisão sobre o preço com desconto e consumir o uso na mesma transação",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-store-discount-coupons#5.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-store-discount-coupons",
+   "tarefa": "5.2",
+   "descricao": "Gravar snapshot (`desconto_cents` no pedido e nos subpedidos, cupom e código) e usar esses valores em extratos e repasses",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-store-discount-coupons#5.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-store-discount-coupons",
+   "tarefa": "5.3",
+   "descricao": "Estorno e devolução (`orders/payouts.ts`): reembolso limitado ao valor pago e comissão estornada a partir do snapshot",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-store-discount-coupons#5.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-store-discount-coupons",
+   "tarefa": "5.4",
+   "descricao": "Testes: comissões com cupom (R$ 100 com R$ 20 de desconto), dois produtores, líquido negativo recusado, cupom editado depois do pedido",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-store-discount-coupons#6.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-store-discount-coupons",
+   "tarefa": "6.1",
+   "descricao": "Página `Coupons.jsx` com lista, criação e edição, seletor de lojas, validade, quantidade, valor mínimo, pausa e aviso de impacto nas comissões",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-store-discount-coupons#6.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-store-discount-coupons",
+   "tarefa": "6.2",
+   "descricao": "Detalhe do cupom com usos consumidos, reservados, saldo e pedidos; entrada no menu e testes do componente",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-store-discount-coupons#7.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-store-discount-coupons",
+   "tarefa": "7.1",
+   "descricao": "Campo de cupom no carrinho (só com o recurso ligado), com desconto e total atualizados, remoção e aviso quando o cupom deixar de valer",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-store-discount-coupons#7.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-store-discount-coupons",
+   "tarefa": "7.2",
+   "descricao": "Resumo do checkout com a linha de desconto e tratamento de `COUPON_CHANGED`; textos nos idiomas da vitrine",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-store-discount-coupons#8.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-store-discount-coupons",
+   "tarefa": "8.1",
+   "descricao": "Aplicar a migration pelo `docker-compose.migrations.yml` e reconstruir `manejo-api`, `manejo-app` e o painel com `up -d --build --no-deps`, com a flag desligada",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-store-discount-coupons#8.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-store-discount-coupons",
+   "tarefa": "8.2",
+   "descricao": "Ligar a flag, validar em loja de execução de teste (pagamento simulado) e depois com uma compra real de baixo valor, conferindo recibo, pedido, comissões e log",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-store-discount-coupons#8.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-store-discount-coupons",
+   "tarefa": "8.3",
+   "descricao": "Sincronizar as specs do change e atualizar o manual do painel",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "admin-dash-users-search-sort#1.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "admin-dash-users-search-sort",
+   "tarefa": "1.1",
+   "descricao": "Em `backend/manejo-api/src/services/user.services.ts`, estender `listUsersPaginated` com `search`, `sortBy` e `sortDir` (padrão `created_at`/`desc`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "admin-dash-users-search-sort#1.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "admin-dash-users-search-sort",
+   "tarefa": "1.2",
+   "descricao": "Criar o mapa fixo de coluna → expressão SQL (`id`, `name`, `email`, `status`, `created_at`) e aplicar `ORDER BY` com desempate por `id`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "admin-dash-users-search-sort#1.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "admin-dash-users-search-sort",
+   "tarefa": "1.3",
+   "descricao": "Aplicar a busca em nome completo e e-mail com `ILIKE`, binding e escape de `\\`, `%` e `_`; usar a mesma cláusula na consulta de dados e no `count`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "admin-dash-users-search-sort#2.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "admin-dash-users-search-sort",
+   "tarefa": "2.1",
+   "descricao": "Em `backend/manejo-api/src/routes/admin/manejo.ts` (`GET /users`), validar `search` (trim, máx. 100), `sortBy` e `sortDir` com zod e repassar ao serviço",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "admin-dash-users-search-sort#2.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "admin-dash-users-search-sort",
+   "tarefa": "2.2",
+   "descricao": "Conferir que entrada inválida responde 400 (não 500); se o handler global não tratar `ZodError`, capturar na rota",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "admin-dash-users-search-sort#2.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "admin-dash-users-search-sort",
+   "tarefa": "2.3",
+   "descricao": "Garantir que sem os novos parâmetros a resposta é a mesma de hoje (`created_at desc`, `{ users, total }`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "admin-dash-users-search-sort#3.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "admin-dash-users-search-sort",
+   "tarefa": "3.1",
+   "descricao": "Testes do serviço: busca por nome, por e-mail, sem diferenciar maiúsculas, com `%`/`_` literais, total filtrado e usuário que estaria em outra página",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "admin-dash-users-search-sort#3.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "admin-dash-users-search-sort",
+   "tarefa": "3.2",
+   "descricao": "Testes de ordenação: cada coluna nos dois sentidos, desempate estável entre páginas, `sortBy` inválido rejeitado",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "admin-dash-users-search-sort#4.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "admin-dash-users-search-sort",
+   "tarefa": "4.1",
+   "descricao": "Ler `searchTerm`, `sortBy` e `sortDir` do `localStorage` de forma síncrona, com validação (valor inválido → padrão `created_at desc`) e nova chave `admin_users_filters_sortBy`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "admin-dash-users-search-sort#4.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "admin-dash-users-search-sort",
+   "tarefa": "4.2",
+   "descricao": "Adicionar `debouncedSearch` (300 ms) e passar `search`, `sortBy`, `sortDir` como `params` em `fetchUsers`; mudar busca ou ordenação faz `setPage(1)`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "admin-dash-users-search-sort#4.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "admin-dash-users-search-sort",
+   "tarefa": "4.3",
+   "descricao": "Descartar respostas obsoletas de `fetchUsers` (contador de requisição ou `AbortController`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "admin-dash-users-search-sort#4.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "admin-dash-users-search-sort",
+   "tarefa": "4.4",
+   "descricao": "Renderizar o campo de pesquisa (ícone, botão de limpar) acima da tabela e dos cartões móveis, mais o aviso de filtro aplicado",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "admin-dash-users-search-sort#4.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "admin-dash-users-search-sort",
+   "tarefa": "4.5",
+   "descricao": "Trocar os cabeçalhos ID, Usuário, Email, Status e Cadastrado em por `TableSortLabel` (com `aria-sort`); alternar sentido na coluna ativa e iniciar em `asc` ao trocar de coluna; deixar Função, Split, Stripe e Ações sem ordenação",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "admin-dash-users-search-sort#4.6",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "admin-dash-users-search-sort",
+   "tarefa": "4.6",
+   "descricao": "Adicionar na lista móvel um seletor de ordenação equivalente",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "admin-dash-users-search-sort#4.7",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "admin-dash-users-search-sort",
+   "tarefa": "4.7",
+   "descricao": "Remover `filteredUsers` e usar `users` direto nas duas listas; manter \"Nenhum usuário encontrado.\" para busca sem resultado",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "admin-dash-users-search-sort#4.8",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "admin-dash-users-search-sort",
+   "tarefa": "4.8",
+   "descricao": "Persistir e limpar `localStorage` conforme a spec; \"limpar\" remove a busca e restaura a ordenação padrão",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "admin-dash-users-search-sort#5.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "admin-dash-users-search-sort",
+   "tarefa": "5.1",
+   "descricao": "Rodar lint e testes de `manejo-api` e o lint/build de `arpt-admin-dash`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "admin-dash-users-search-sort#5.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "admin-dash-users-search-sort",
+   "tarefa": "5.2",
+   "descricao": "Reconstruir `manejo-api` e o admin dash (`up -d --build --no-deps`) e conferir no navegador: busca em página distante, ordenação de cada coluna, recarregar com filtros salvos, limpar filtros",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "admin-dash-users-search-sort#5.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "admin-dash-users-search-sort",
+   "tarefa": "5.3",
+   "descricao": "Rodar `openspec validate admin-dash-users-search-sort` e corrigir pendências",
    "roteiro": null,
    "bloqueia": false
   },
@@ -4191,6 +4291,66 @@
    "bloqueia": false
   },
   {
+   "id": "replace-public-content-ids-with-opaque-identifier#3.1",
+   "area": "pedidos-e-frete",
+   "tipo": "manual",
+   "origem": "replace-public-content-ids-with-opaque-identifier",
+   "tarefa": "3.1",
+   "descricao": "Aplicar as migrations `20261120100000_add_public_id_to_manejo`, `20261120100100_add_public_id_to_arpt_manejo_produto` e `20261120100200_add_public_id_to_dropshipper_lojas` pelo `docker-compose.migrations.yml` (serviço `migrations`, `--no-deps`) e conferir que nenhuma linha ficou sem `public_id`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "replace-public-content-ids-with-opaque-identifier#3.1",
+   "area": "pedidos-e-frete",
+   "tipo": "manual",
+   "origem": "replace-public-content-ids-with-opaque-identifier",
+   "tarefa": "3.1",
+   "descricao": "Publicar o backend com `PUBLIC_NUMERIC_CONTENT_IDS=true` (padrão) e conferir que o app antigo continua funcionando (`up -d --build --no-deps manejo-api`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "replace-public-content-ids-with-opaque-identifier#3.1",
+   "area": "pedidos-e-frete",
+   "tipo": "manual",
+   "origem": "replace-public-content-ids-with-opaque-identifier",
+   "tarefa": "3.1",
+   "descricao": "Publicar o app (`up -d --build --no-deps manejo-app`) e conferir `sitemap.xml` (nome ou `public_id`, sem número), a recompensa (`/recompensa/<nome>/<public_id>`) e o pagamento de uma recompensa",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "replace-public-content-ids-with-opaque-identifier#3.1",
+   "area": "pedidos-e-frete",
+   "tipo": "manual",
+   "origem": "replace-public-content-ids-with-opaque-identifier",
+   "tarefa": "3.1",
+   "descricao": "Desligar `PUBLIC_NUMERIC_CONTENT_IDS=false` e conferir com `curl` anônimo: `/manejos/<número>` e `/manejos/<id>/carbon-report` dão 404 igual ao de inexistente; `GET /manejos`, `/manejos/<nome>/produtos` e `/public/stores/by-host` não trazem `id`, `id_propriedade` nem `id_produto`; logado, o painel do dono segue funcionando",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "notify-admin-on-deploy-failure#4.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "notify-admin-on-deploy-failure",
+   "tarefa": "4.1",
+   "descricao": "Conferir `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USER` e `EMAIL_PAS` no `.env` do servidor e enviar um e-mail de teste: `bash scripts/deploy-notify.sh teste 1 /tmp/deploy.log`; conferir que chega em `admin@arpt.com.br`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "notify-admin-on-deploy-failure#4.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "manual",
+   "origem": "notify-admin-on-deploy-failure",
+   "tarefa": "4.2",
+   "descricao": "Forçar uma falha controlada (por exemplo `DOCKER_PROXY_MODE=invalido` com o proxy no ar) e conferir o e-mail; depois conferir que um deploy normal não envia nada. Atenção: a migration que falha agora interrompe o deploy e religa a versão anterior",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
    "id": "redis-incident-followup#1.3",
    "area": "infraestrutura-e-deploy",
    "tipo": "codigo",
@@ -4337,36 +4497,6 @@
    "origem": "redis-incident-followup",
    "tarefa": "6.1",
    "descricao": "Revisar `harden-redis-auth-and-exposure`: marcar o que o commit `0859e50` já cumpre, ajustar a premissa de senha opcional e manter só o que falta (documento de operação, healthcheck, `docker-compose.integration.yml`)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "replace-public-content-ids-with-opaque-identifier#1.1",
-   "area": "pedidos-e-frete",
-   "tipo": "codigo",
-   "origem": "replace-public-content-ids-with-opaque-identifier",
-   "tarefa": "1.1",
-   "descricao": "Para `/manejos/[id]`, `/carbon-report/[id]`, `/campanhas/[id]`, `/patrocinio/[id]`, `/recompensa/[id]` e ids de loja nas respostas públicas: acessível sem login? id é a única credencial? Registrar no design",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "replace-public-content-ids-with-opaque-identifier#2.1",
-   "area": "pedidos-e-frete",
-   "tipo": "codigo",
-   "origem": "replace-public-content-ids-with-opaque-identifier",
-   "tarefa": "2.1",
-   "descricao": "Migration `public_id` por tabela, tradução na borda, rotas, app e testes (mesma técnica de `replace-public-product-id-with-opaque-identifier`)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "replace-public-content-ids-with-opaque-identifier#3.1",
-   "area": "pedidos-e-frete",
-   "tipo": "codigo",
-   "origem": "replace-public-content-ids-with-opaque-identifier",
-   "tarefa": "3.1",
-   "descricao": "Migration, backend com flag ligada, app, desligar a flag e conferir; mover para `pendencias-manuais-de-producao`",
    "roteiro": null,
    "bloqueia": false
   }

@@ -6,7 +6,7 @@ import {
 } from '@mui/material';
 import {
   Dashboard, FolderOpen, People, Menu as MenuIcon,
-  Landscape, Forest, HomeWork, Logout, ManageAccounts, CardGiftcard, CardMembership, History,
+  Landscape, Forest, HomeWork, Logout, ManageAccounts, CardGiftcard, CardMembership, LocalOffer, History,
   SettingsSuggest,
   Payment,
   PermMedia,
@@ -65,6 +65,7 @@ export const Layout = ({ children }) => {
     { id: 'exit-survey', label: 'Pesquisa de saída', icon: <AutoGraph />, path: '/exit-survey' },
     { id: 'growth', label: 'Indicadores de crescimento', icon: <AutoGraph />, path: '/growth' },
     { id: 'growth-campaigns', label: 'Campanhas de crescimento', icon: <AutoGraph />, path: '/growth-campaigns' },
+    { id: 'coupons', label: 'Cupons de desconto', icon: <LocalOffer />, path: '/coupons' },
     { id: 'necromassa', label: 'Necromassa', icon: <Forest />, path: '/necromassa' },
     { id: 'projects', label: 'Gestão Projetos', icon: <FolderOpen />, path: '/projects' },
     { id: 'adoptions', label: 'Gestão de Adoções', icon: <Forest />, path: '/adoptions' },

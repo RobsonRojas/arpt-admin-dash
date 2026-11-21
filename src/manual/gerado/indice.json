@@ -452,7 +452,8 @@
    "resumo": "Lojas, domínios próprios e DNS, temas e modelos, conteúdo e idiomas, contas e painel do cliente, checkout, endereço e frete da vitrine.",
    "rotas": [
     "/loja",
-    "/store-customers"
+    "/store-customers",
+    "/coupons"
    ],
    "specs": [
     "admin-store-customers",
@@ -476,6 +477,7 @@
     "store-customer-auth",
     "store-customer-auth-modals",
     "store-customer-panel",
+    "store-discount-coupons",
     "store-domain-dns-guide",
     "store-product-review-timeout",
     "store-template-library",
@@ -628,6 +630,7 @@
    "resumo": "Páginas e abas públicas do arpt.site, PWA e o app móvel (sessão, sincronização, inventário, manejo, pedidos).",
    "rotas": [],
    "specs": [
+    "content-public-identifiers",
     "mobile-auth",
     "mobile-auth-token-handling",
     "mobile-i18n-headers",
@@ -650,6 +653,7 @@
     "/developer-settings"
    ],
    "specs": [
+    "arpttoken-site-hosting",
     "bitbucket-webhook-deploy",
     "build",
     "deploy-script",
@@ -661,7 +665,8 @@
     "smoke-test-host-header",
     "ssl-certbot-preflight",
     "ssl-environment-scripts",
-    "ssl-prod-setup"
+    "ssl-prod-setup",
+    "token-api-client"
    ],
    "docs": [
     {
@@ -733,6 +738,7 @@
   "/error-logs": "monitoramento",
   "/loja": "lojas",
   "/store-customers": "lojas",
+  "/coupons": "lojas",
   "/dropshipping-admin": "dropshipping",
   "/orders-admin": "dropshipping",
   "/dropshipping": "dropshipping",
