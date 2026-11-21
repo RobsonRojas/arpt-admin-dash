@@ -1,12 +1,13 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
     Box, Typography, Button, Table, TableContainer, TableHead,
     TableRow, TableCell, TableBody, Paper, IconButton, Chip,
     Dialog, DialogTitle, DialogContent, DialogActions, Grid,
     TextField, MenuItem, Avatar, TablePagination, CircularProgress,
-    Snackbar, Alert, List, ListItem, ListItemText
+    Snackbar, Alert, List, ListItem, ListItemText,
+    TableSortLabel, InputAdornment
 } from '@mui/material';
-import { Add, Edit, Delete, ManageAccounts, CardMembership, Visibility, History, QrCode, Public, PublicOff, Inventory, Sync, HomeWork, Warning } from '@mui/icons-material';
+import { Add, Edit, Delete, ManageAccounts, CardMembership, Visibility, History, QrCode, Public, PublicOff, Inventory, Sync, HomeWork, Warning, Search, Clear } from '@mui/icons-material';
 import { QRCodeSVG } from 'qrcode.react';
 import { useAuth } from '../contexts/AuthContext';
 import { useAdmin } from '../contexts/AdminContext';
@@ -20,6 +21,34 @@ import { ProducerProductsTransfer } from '../components/modules/ProducerProducts
 const ROLES = ['Administrador', 'Gestor', 'Operador', 'Visualizador'];
 const STATUS = ['Ativo', 'Inativo'];
 const CERTIFICATE_TYPES = ['Bronze', 'Prata', 'Ouro', 'Diamante', 'Platina'];
+
+const SORT_COLUMNS = {
+    id: 'ID',
+    name: 'Usuário',
+    email: 'Email',
+    status: 'Status',
+    created_at: 'Cadastrado em',
+};
+const DEFAULT_SORT_BY = 'created_at';
+const DEFAULT_SORT_DIR = 'desc';
+const LS_SEARCH = 'admin_users_filters_search';
+const LS_SORT_BY = 'admin_users_filters_sortBy';
+const LS_SORT_DIR = 'admin_users_filters_sortDir';
+
+const lerFiltrosSalvos = () => {
+    try {
+        const search = (localStorage.getItem(LS_SEARCH) || '').slice(0, 100);
+        const by = localStorage.getItem(LS_SORT_BY);
+        const dir = localStorage.getItem(LS_SORT_DIR);
+        // sortDir antigo sem sortBy salvo significava "por nome"; agora ficaria ambíguo, então volta ao padrão.
+        if (!by || !(by in SORT_COLUMNS) || (dir !== 'asc' && dir !== 'desc')) {
+            return { search, sortBy: DEFAULT_SORT_BY, sortDir: DEFAULT_SORT_DIR };
+        }
+        return { search, sortBy: by, sortDir: dir };
+    } catch (e) {
+        return { search: '', sortBy: DEFAULT_SORT_BY, sortDir: DEFAULT_SORT_DIR };
+    }
+};
 
 export const Users = () => {
     const { user: authUser } = useAuth();
@@ -103,70 +132,107 @@ export const Users = () => {
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
     const [assignPropUser, setAssignPropUser] = useState(null);
     const [stripeModalUser, setStripeModalUser] = useState(null);
-    const [searchTerm, setSearchTerm] = useState(() => {
-        try { return localStorage.getItem("admin_users_filters_search") || ""; } catch (e) { return ""; }
-    });
-    const [sortBy, setSortBy] = useState("name");
-    const [sortDir, setSortDir] = useState(() => {
-        try { const v = localStorage.getItem("admin_users_filters_sortDir"); return v === "desc" ? "desc" : "asc"; } catch (e) { return "asc"; }
-    });
-    const [filterApplied, setFilterApplied] = useState(false);
+    const [filtrosIniciais] = useState(lerFiltrosSalvos);
+    const [searchTerm, setSearchTerm] = useState(filtrosIniciais.search);
+    const [debouncedSearch, setDebouncedSearch] = useState(filtrosIniciais.search.trim());
+    const [sortBy, setSortBy] = useState(filtrosIniciais.sortBy);
+    const [sortDir, setSortDir] = useState(filtrosIniciais.sortDir);
+    const requisicaoAtual = useRef(0);
+    const buscaAplicada = useRef(filtrosIniciais.search.trim());
+
+    const filterApplied = debouncedSearch !== '' || sortBy !== DEFAULT_SORT_BY || sortDir !== DEFAULT_SORT_DIR;
+
+    useEffect(() => {
+        const t = setTimeout(() => {
+            const novo = searchTerm.trim();
+            if (novo !== buscaAplicada.current) {
+                buscaAplicada.current = novo;
+                setDebouncedSearch(novo);
+                setPage(1);
+            }
+        }, 300);
+        return () => clearTimeout(t);
+    }, [searchTerm]);
 
     const fetchUsers = useCallback(async () => {
         if (!authUser) return;
+        const idReq = ++requisicaoAtual.current;
         setLoading(true);
         try {
             const token = await authUser.getIdToken();
+            const params = { page, pageSize, sortBy, sortDir };
+            if (debouncedSearch) params.search = debouncedSearch;
             const response = await api.get('/admin/users', {
-                params: { page, pageSize },
+                params,
                 headers: { Authorization: `Bearer ${token}` }
             });
+            if (idReq !== requisicaoAtual.current) return; // resposta obsoleta
             setUsers(response.data.users);
             setTotalUsers(response.data.total);
         } catch (error) {
+            if (idReq !== requisicaoAtual.current) return;
             console.error('Erro ao buscar usuários:', error);
             setSnackbar({ open: true, message: 'Erro ao carregar usuários', severity: 'error' });
         } finally {
-            setLoading(false);
+            if (idReq === requisicaoAtual.current) setLoading(false);
         }
-    }, [authUser, page, pageSize]);
+    }, [authUser, page, pageSize, debouncedSearch, sortBy, sortDir]);
 
     useEffect(() => {
         fetchUsers();
     }, [fetchUsers]);
-    useEffect(() => {
-        try {
-            const search = localStorage.getItem("admin_users_filters_search") || "";
-            const sortDir = localStorage.getItem("admin_users_filters_sortDir") || "asc";
-            if (search || sortDir !== "asc") {
-                setFilterApplied(true);
-            }
-        } catch (e) {}
-    }, []);
 
     useEffect(() => {
         try {
-            localStorage.setItem("admin_users_filters_search", searchTerm);
-            localStorage.setItem("admin_users_filters_sortDir", sortDir);
-            if (searchTerm || sortDir !== "asc") {
-                setFilterApplied(true);
+            if (searchTerm || sortBy !== DEFAULT_SORT_BY || sortDir !== DEFAULT_SORT_DIR) {
+                localStorage.setItem(LS_SEARCH, searchTerm);
+                localStorage.setItem(LS_SORT_BY, sortBy);
+                localStorage.setItem(LS_SORT_DIR, sortDir);
             } else {
-                setFilterApplied(false);
+                localStorage.removeItem(LS_SEARCH);
+                localStorage.removeItem(LS_SORT_BY);
+                localStorage.removeItem(LS_SORT_DIR);
             }
-        } catch (e) {}
-    }, [searchTerm, sortDir]);
+        } catch (e) { /* armazenamento indisponível: segue sem persistir */ }
+    }, [searchTerm, sortBy, sortDir]);
 
+    const handleSort = (coluna) => {
+        if (coluna === sortBy) {
+            setSortDir(d => (d === 'asc' ? 'desc' : 'asc'));
+        } else {
+            setSortBy(coluna);
+            setSortDir('asc');
+        }
+        setPage(1);
+    };
 
-    const filteredUsers = users.filter(u => {
-        const term = searchTerm.toLowerCase();
-        const name = (u.first_name ? `${u.first_name} ${u.last_name}` : u.name || "").toLowerCase();
-        const email = (u.email || "").toLowerCase();
-        return !term || name.includes(term) || email.includes(term);
-    }).sort((a, b) => {
-        const nameA = (a.first_name ? `${a.first_name} ${a.last_name}` : a.name || "").toLowerCase();
-        const nameB = (b.first_name ? `${b.first_name} ${b.last_name}` : b.name || "").toLowerCase();
-        return sortDir === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
-    });
+    const handleClearFilters = () => {
+        setSearchTerm('');
+        buscaAplicada.current = '';
+        setDebouncedSearch('');
+        setSortBy(DEFAULT_SORT_BY);
+        setSortDir(DEFAULT_SORT_DIR);
+        setPage(1);
+    };
+
+    const searchField = (
+        <TextField
+            size="small"
+            fullWidth
+            placeholder="Pesquisar por nome ou e-mail"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value.slice(0, 100))}
+            inputProps={{ 'aria-label': 'Pesquisar usuários', maxLength: 100, 'data-testid': 'users-search' }}
+            InputProps={{
+                startAdornment: <InputAdornment position="start"><Search fontSize="small" /></InputAdornment>,
+                endAdornment: searchTerm ? (
+                    <InputAdornment position="end">
+                        <IconButton size="small" aria-label="Limpar pesquisa" onClick={() => setSearchTerm('')}><Clear fontSize="small" /></IconButton>
+                    </InputAdornment>
+                ) : null,
+            }}
+        />
+    );
 
     const fetchUserCertificates = async (userId) => {
         setLoadingCerts(true);
@@ -612,8 +678,31 @@ export const Users = () => {
                 </Button>
             </Box>
 
+            <Box display="flex" flexWrap="wrap" alignItems="center" gap={2} mb={2}>
+                <Box sx={{ flex: '1 1 280px', maxWidth: 480 }}>{searchField}</Box>
+                <TextField
+                    select
+                    size="small"
+                    label="Ordenar por"
+                    value={`${sortBy}:${sortDir}`}
+                    onChange={(e) => { const [b, d] = e.target.value.split(':'); setSortBy(b); setSortDir(d); setPage(1); }}
+                    sx={{ display: { xs: 'block', md: 'none' }, minWidth: 200 }}
+                >
+                    {Object.entries(SORT_COLUMNS).flatMap(([k, rotulo]) => [
+                        <MenuItem key={`${k}:asc`} value={`${k}:asc`}>{rotulo} (crescente)</MenuItem>,
+                        <MenuItem key={`${k}:desc`} value={`${k}:desc`}>{rotulo} (decrescente)</MenuItem>,
+                    ])}
+                </TextField>
+                {filterApplied && (
+                    <>
+                        <Chip size="small" color="info" label="Filtro aplicado" data-testid="users-filter-applied" />
+                        <Button size="small" onClick={handleClearFilters}>Limpar filtros</Button>
+                    </>
+                )}
+            </Box>
+
             <Box sx={{ display: { xs: 'block', md: 'none' } }}>
-                {filteredUsers.map((user) => (
+                {users.map((user) => (
                     <Paper key={user.id} sx={{ p: 2, mb: 2 }}>
                         <Box display="flex" alignItems="center" gap={2} mb={2}>
                             <Avatar sx={{ bgcolor: 'primary.main' }}>
@@ -649,19 +738,29 @@ export const Users = () => {
                 <Table data-testid="users-table">
                     <TableHead sx={{ bgcolor: '#f9fafb' }}>
                         <TableRow>
-                            <TableCell>ID</TableCell>
-                            <TableCell onClick={() => setSortDir(d => d === "asc" ? "desc" : "asc")} sx={{ cursor: "pointer" }}>Usuário {sortDir === "asc" ? "▲" : "▼"}</TableCell>
-                            <TableCell>Email</TableCell>
+                            <TableCell sortDirection={sortBy === 'id' ? sortDir : false}>
+                                <TableSortLabel active={sortBy === 'id'} direction={sortBy === 'id' ? sortDir : 'asc'} onClick={() => handleSort('id')}>ID</TableSortLabel>
+                            </TableCell>
+                            <TableCell sortDirection={sortBy === 'name' ? sortDir : false}>
+                                <TableSortLabel active={sortBy === 'name'} direction={sortBy === 'name' ? sortDir : 'asc'} onClick={() => handleSort('name')}>Usuário</TableSortLabel>
+                            </TableCell>
+                            <TableCell sortDirection={sortBy === 'email' ? sortDir : false}>
+                                <TableSortLabel active={sortBy === 'email'} direction={sortBy === 'email' ? sortDir : 'asc'} onClick={() => handleSort('email')}>Email</TableSortLabel>
+                            </TableCell>
                             <TableCell>Função</TableCell>
-                            <TableCell>Status</TableCell>
+                            <TableCell sortDirection={sortBy === 'status' ? sortDir : false}>
+                                <TableSortLabel active={sortBy === 'status'} direction={sortBy === 'status' ? sortDir : 'asc'} onClick={() => handleSort('status')}>Status</TableSortLabel>
+                            </TableCell>
                             <TableCell>Split Financeiro</TableCell>
                             <TableCell>Stripe</TableCell>
-                            <TableCell>Cadastrado em</TableCell>
+                            <TableCell sortDirection={sortBy === 'created_at' ? sortDir : false}>
+                                <TableSortLabel active={sortBy === 'created_at'} direction={sortBy === 'created_at' ? sortDir : 'asc'} onClick={() => handleSort('created_at')}>Cadastrado em</TableSortLabel>
+                            </TableCell>
                             <TableCell align="right">Ações</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {filteredUsers.map((user) => (
+                        {users.map((user) => (
                             <TableRow key={user.id} hover data-testid="user-row">
                                 <TableCell>
                                     <Typography variant="body2" fontWeight="medium">
