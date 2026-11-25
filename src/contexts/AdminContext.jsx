@@ -452,9 +452,9 @@ export const AdminProvider = ({ children }) => {
 
     const getTreeHistory = async (treeId) => {
         try {
-            const response = await api.get(`/arvores/${treeId}/transactions`);
+            const response = await api.get(`/arvores/${treeId}/blockchain-history`);
             if (response.status === 200) {
-                return response.data;
+                return Array.isArray(response.data) ? response.data : (response.data?.data || []);
             }
             console.warn(`Resposta inesperada ao buscar histórico da árvore: status ${response.status}`);
             return [];

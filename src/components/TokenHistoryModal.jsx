@@ -7,6 +7,9 @@ import {
 import { Refresh, Restore, Sync } from '@mui/icons-material';
 import { api } from '../services/api';
 
+// baseURL do `api` já termina em /api
+const ROTAS = { tree: 'arvores', manejo: 'manejos', propriedade: 'propriedades' };
+
 export const TokenHistoryModal = ({ open, onClose, tokenType, tokenId }) => {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -16,14 +19,11 @@ export const TokenHistoryModal = ({ open, onClose, tokenType, tokenId }) => {
     if (!tokenId || !tokenType) return;
     setLoading(true);
     try {
-      // api routes:
-      // tree: /api/v1/tree/:id/blockchain-history
-      // manejo: /api/v1/manejo/:id/blockchain-history
-      // propriedade: /api/v1/propriedades/:id/blockchain-history
-      const routeType = tokenType === 'propriedade' ? 'propriedades' : tokenType;
-      const endpoint = `/api/v1/${routeType}/${tokenId}/blockchain-history`;
+      const endpoint = `/${ROTAS[tokenType]}/${tokenId}/blockchain-history`;
       const response = await api.get(endpoint);
-      setHistory(response.data || []);
+      // árvore e propriedade respondem { result, data: [...] }; manejo responde o array direto
+      const corpo = response.data;
+      setHistory(Array.isArray(corpo) ? corpo : (corpo?.data || []));
     } catch (error) {
       console.error('Error fetching token history:', error);
       setHistory([]);
@@ -45,8 +45,7 @@ export const TokenHistoryModal = ({ open, onClose, tokenType, tokenId }) => {
     
     setResendingId(historyId);
     try {
-      const routeType = tokenType === 'propriedade' ? 'propriedades' : tokenType;
-      const endpoint = `/api/v1/${routeType}/${tokenId}/blockchain-history/${historyId}/resend`;
+      const endpoint = `/${ROTAS[tokenType]}/${tokenId}/blockchain-history/${historyId}/resend`;
       await api.post(endpoint);
       alert('Transação enfileirada com sucesso para correção na blockchain!');
     } catch (error) {
