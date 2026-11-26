@@ -587,6 +587,7 @@
     "/dropshipping-admin/produtores"
    ],
    "specs": [
+    "admin-producer-management",
     "admin-producer-product-transfer",
     "origin-assisted-input",
     "origin-declaration-reuse",
@@ -721,6 +722,7 @@
     "nginx-config-live-mount",
     "production-secret-rollout",
     "secret-hygiene",
+    "selective-deploy",
     "server-key-management",
     "smoke-test-host-header",
     "spa-nginx-routing",

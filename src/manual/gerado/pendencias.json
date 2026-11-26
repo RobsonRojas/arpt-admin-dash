@@ -1131,36 +1131,6 @@
    "bloqueia": false
   },
   {
-   "id": "add-dropshipping-producer-management-panel#6.3",
-   "area": "painel-do-produtor",
-   "tipo": "codigo",
-   "origem": "add-dropshipping-producer-management-panel",
-   "tarefa": "6.3",
-   "descricao": "Verificação ponta a ponta no painel real (listar, editar, cadastrar produto, importar de um projeto e conferir a lista do produtor): exige Keycloak e login de administrador, que não existem no ambiente local; fazer depois do deploy. Coberto até aqui por testes de integração (API com banco real) e de componente (painel com API simulada)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-dropshipping-producer-management-panel#6.5",
-   "area": "painel-do-produtor",
-   "tipo": "codigo",
-   "origem": "add-dropshipping-producer-management-panel",
-   "tarefa": "6.5",
-   "descricao": "Regenerar o manual (`node scripts/gerar-manual.mjs`): hoje o gerador falha por 43 specs sem seção que já existiam antes desta change (`wallet-*`, `blockchain-*`, `display-tokens`, etc.); mapeá-las primeiro",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-dropshipping-producer-management-panel#6.6",
-   "area": "painel-do-produtor",
-   "tipo": "codigo",
-   "origem": "add-dropshipping-producer-management-panel",
-   "tarefa": "6.6",
-   "descricao": "Sincronizar as specs ao arquivar a change (`/opsx:archive`)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
    "id": "add-international-dropshipping-journey#1.1",
    "area": "infraestrutura-e-deploy",
    "tipo": "codigo",
@@ -2581,7 +2551,7 @@
    "bloqueia": false
   },
   {
-   "id": "add-marketplace-channel-integrations#258",
+   "id": "add-marketplace-channel-integrations#255",
    "area": "dropshipping",
    "tipo": "codigo",
    "origem": "add-marketplace-channel-integrations",
@@ -2967,46 +2937,6 @@
    "origem": "add-per-store-checkout-branding",
    "tarefa": "5.3",
    "descricao": "Definir revisão ou denúncia de nome e logo de loja que imite outra marca, no processo de suspensão existente",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "fix-register-ip-output-not-function#1.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "fix-register-ip-output-not-function",
-   "tarefa": "1.2",
-   "descricao": "Se o bundle estiver atual e ainda falhar, identificar qual `bsv` o webpack resolve (`scryptlib`, `@scrypt-inc/bsv`, `bsv@2`) e se `Transaction.Output` é construtor nele",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "fix-register-ip-output-not-function#2.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "fix-register-ip-output-not-function",
-   "tarefa": "2.2",
-   "descricao": "Se 1.2 indicar resolução divergente, fixar o `bsv` correto (alias/dependência) e confirmar que `RegisterIP` constrói as saídas",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "fix-register-ip-output-not-function#4.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "fix-register-ip-output-not-function",
-   "tarefa": "4.1",
-   "descricao": "Reconstruir e republicar o frontend; garantir que o service worker/PWA entregue o novo bundle",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "fix-register-ip-output-not-function#4.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "fix-register-ip-output-not-function",
-   "tarefa": "4.2",
-   "descricao": "Smoke test no site publicado: registrar um arquivo de teste e confirmar o redirecionamento para a visualização do token",
    "roteiro": null,
    "bloqueia": false
   },
@@ -3717,6 +3647,16 @@
    "origem": "mover-produto-campanha-para-dropshipping",
    "tarefa": "5.2",
    "descricao": "Teste ponta a ponta: mover, apoiador recebe como prometido, dropshipper aloca só o excedente",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "notify-admin-on-deploy-success#4.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "notify-admin-on-deploy-success",
+   "tarefa": "4.4",
+   "descricao": "Após o push em `main`, ligar `DEPLOY_NOTIFY_SUCCESS=true` no `.env` do servidor e confirmar o recebimento no deploy seguinte",
    "roteiro": null,
    "bloqueia": false
   },
