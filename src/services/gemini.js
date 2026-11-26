@@ -1,11 +1,5 @@
-import axios from 'axios';
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { db } from './firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const AI_SERVICE_URL = import.meta.env.VITE_ARPT_AI_URL || 'https://arpt.site/api/ai';
-const ARPT_AI_SECRET = import.meta.env.VITE_ARPT_AI_SECRET || 'arpt_ai_secret_token_123456';
 
 // Default configuration if Firestore is empty
 const DEFAULT_MODELS = [
@@ -17,17 +11,11 @@ const DEFAULT_MODELS = [
 let dynamicModelsPriority = [];
 let lastFetchTime = 0;
 const CACHE_TTL = 30000;
-const expiredModels = new Set();
 let quotaExhaustedCallback = null;
 
 export const setQuotaCallback = (callback) => {
     quotaExhaustedCallback = callback;
 };
-
-let genAI = null;
-if (API_KEY) {
-    genAI = new GoogleGenerativeAI(API_KEY);
-}
 
 export const fetchModelConfig = async (forceRefresh = false) => {
     const now = Date.now();
@@ -77,70 +65,21 @@ export class QuotaError extends Error {
     }
 }
 
-// Fallback executor if calling client-side SDK directly
-const runWithFallbackClientSide = async (operation) => {
-    if (!genAI) throw new Error("API Key do Gemini não configurada e serviço arpt-ai indisponível");
-
-    const modelsPriority = await fetchModelConfig();
-    let lastError = null;
-
-    for (const modelName of modelsPriority) {
-        if (expiredModels.has(modelName)) continue;
-
-        try {
-            const model = genAI.getGenerativeModel({ model: modelName });
-            return await operation(model, modelName);
-        } catch (error) {
-            lastError = error;
-            const errorMsg = error.message || "";
-
-            if (errorMsg.includes("429") || errorMsg.includes("quota") || errorMsg.includes("exhausted") || errorMsg.includes("503")) {
-                console.warn(`Cota esgotada para modelo: ${modelName}. Tentando próximo...`);
-                expiredModels.add(modelName);
-                if (quotaExhaustedCallback) quotaExhaustedCallback(modelName);
-                continue;
-            }
-
-            if (errorMsg.includes("404")) {
-                expiredModels.add(modelName);
-                continue;
-            }
-
-            throw error;
-        }
-    }
-
-    throw lastError || new Error("Nenhum modelo Gemini disponível ou cotas esgotadas.");
-};
-
-// Helper: Call backend arpt-ai microservice with Auth header
-const callArptAiService = async (endpoint, payload) => {
-    const targetUrl = `${AI_SERVICE_URL.replace(/\/$/, '')}${endpoint}`;
+// Toda chamada de IA vai pela manejo-api (token do administrador). Nenhuma chave nem segredo de IA existe no navegador.
+const chamarIa = async (endpoint, payload) => {
     try {
-        const response = await axios.post(targetUrl, payload, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${ARPT_AI_SECRET}`,
-                'x-arpt-ai-secret': ARPT_AI_SECRET,
-            },
-            timeout: 60000,
-        });
-        if (response.data && response.data.text) {
-            return response.data.text;
-        }
-        throw new Error("Resposta inválida do serviço arpt-ai");
+        const { api } = await import('./api');
+        const response = await api.post(`/admin/ai${endpoint}`, payload, { timeout: 60000 });
+        const text = response.data?.text ?? response.data?.result;
+        if (typeof text === 'string' && text) return text;
+        throw new Error('Resposta inválida do serviço de IA');
     } catch (error) {
-        let errorMsg = error.message;
-        if (error.response && error.response.data && error.response.data.error) {
-            errorMsg = error.response.data.error;
-        }
-        
-        console.warn(`[arpt-ai service] Call to ${targetUrl} failed:`, errorMsg);
-
-        if (errorMsg.includes('high demand') || errorMsg.includes('quota') || error.response?.status === 503) {
+        const status = error.response?.status;
+        const errorMsg = error.response?.data?.error || error.message || '';
+        if (status === 503 || /high demand|quota/i.test(errorMsg)) {
+            if (quotaExhaustedCallback) quotaExhaustedCallback('arpt-ai');
             throw new Error('O modelo de IA está sobrecarregado (alta demanda) ou a cota esgotou. Tente novamente mais tarde.');
         }
-
         throw new Error(errorMsg);
     }
 };
@@ -148,28 +87,8 @@ const callArptAiService = async (endpoint, payload) => {
 /**
  * Gera estratégia completa de campanha de crowdfunding
  */
-export const generateCampaignStrategy = async (project, products = [], rewards = []) => {
-    try {
-        return await callArptAiService('/ai/campaign-strategy', { project, products, rewards });
-    } catch (err) {
-        if (genAI) {
-            return runWithFallbackClientSide(async (model) => {
-                const prodNames = products.map(p => `${p.nome} (R$ ${p.preco})`).join(", ");
-                const rewardNames = rewards.map(r => `${r.name} (R$ ${r.reward_price})`).join(", ");
-                const prompt = `
-                    Atue como Especialista em Crowdfunding na Amazônia.
-                    Projeto: ${project.descricao}
-                    Local: ${project.municipio} - ${project.estado}
-                    Produtos: ${prodNames}
-                    Recompensas: ${rewardNames}
-                `;
-                const result = await model.generateContent(prompt);
-                return (await result.response).text();
-            });
-        }
-        throw err;
-    }
-};
+export const generateCampaignStrategy = async (project, products = [], rewards = []) =>
+    chamarIa('/campaign-strategy', { project, products, rewards });
 
 /**
  * Função genérica para melhoria / tradução de texto com IA
@@ -177,89 +96,33 @@ export const generateCampaignStrategy = async (project, products = [], rewards =
 export const improveText = async (text, context = "", type = "improve", sourceText = "") => {
     const targetText = text || sourceText;
     if (!targetText || targetText.length < 2) return targetText;
-
-    try {
-        const token = await import('../contexts/AuthContext').then(m => {
-            // Need to get token or we can just use the standard api instance which adds the interceptor
-            return null;
-        });
-        const { api } = await import('./api');
-        const response = await api.post('/admin/ai/translate', {
-            text,
-            sourceText,
-            context,
-            type,
-        });
-        return response.data?.text || response.data?.result || response.data;
-    } catch (err) {
-        if (genAI) {
-            return runWithFallbackClientSide(async (model) => {
-                let specificInstruction = "Melhore a escrita do texto abaixo, tornando-o mais técnico e claro.";
-                if (type === 'translate_en') {
-                    specificInstruction = "Traduza o texto abaixo do Português para o Inglês mantendo a formatação Markdown.";
-                }
-                const prompt = `${specificInstruction}\n\nTexto: "${targetText}"\nContexto: ${context}`;
-                const result = await model.generateContent(prompt);
-                return (await result.response).text();
-            });
-        }
-        throw err;
-    }
+    const { api } = await import('./api');
+    const response = await api.post('/admin/ai/translate', { text: targetText, sourceText, context, type });
+    return response.data?.text || response.data?.result || response.data;
 };
 
 /**
  * Gera documentos formais (licenciamento / árvore caída)
  */
-export const generateDocument = async (type, data) => {
-    try {
-        return await callArptAiService('/ai/generate-document', { type, data });
-    } catch (err) {
-        if (genAI) {
-            return runWithFallbackClientSide(async (model) => {
-                const prompt = `Gere documento tipo ${type} para o projeto ${data.descricao || data.specieName}`;
-                const result = await model.generateContent(prompt);
-                return (await result.response).text();
-            });
-        }
-        throw err;
-    }
-};
+export const generateDocument = async (type, data) => chamarIa('/generate-document', { type, data });
 
 /**
  * Gera um Modelo de Negócio (Business Model Canvas)
  */
-export const generateBusinessModel = async (project) => {
-    try {
-        return await callArptAiService('/ai/improve-text', {
-            text: project.descricao,
-            context: `Gere um Business Model Canvas em Markdown para o projeto de manejo ${project.descricao} em ${project.municipio}-${project.estado}`,
-            type: 'expand',
-        });
-    } catch (err) {
-        if (genAI) {
-            return runWithFallbackClientSide(async (model) => {
-                const prompt = `Crie um Business Model Canvas para o projeto ${project.descricao}`;
-                const result = await model.generateContent(prompt);
-                return (await result.response).text();
-            });
-        }
-        throw err;
-    }
-};
+export const generateBusinessModel = async (project) =>
+    improveText(
+        project.descricao,
+        `Gere um Business Model Canvas em Markdown para o projeto de manejo ${project.descricao} em ${project.municipio}-${project.estado}`,
+        'expand',
+    );
 
 /**
  * Consulta status do serviço arpt-ai (se está habilitado)
  */
 export const getAiStatus = async () => {
-    const targetUrl = `${AI_SERVICE_URL.replace(/\/$/, '')}/status`;
     try {
-        const response = await axios.get(targetUrl, {
-            headers: {
-                'Authorization': `Bearer ${ARPT_AI_SECRET}`,
-                'x-arpt-ai-secret': ARPT_AI_SECRET,
-            },
-            timeout: 10000,
-        });
+        const { api } = await import('./api');
+        const response = await api.get('/admin/ai/status', { timeout: 10000 });
         return response.data;
     } catch (error) {
         console.warn("[arpt-ai] Failed to get AI status:", error.message);
@@ -271,23 +134,9 @@ export const getAiStatus = async () => {
  * Habilita ou desabilita o serviço arpt-ai via API e define o defaultModel
  */
 export const setAiStatus = async (enabled, defaultModel = undefined) => {
-    const targetUrl = `${AI_SERVICE_URL.replace(/\/$/, '')}/status`;
-    try {
-        const payload = { enabled };
-        if (defaultModel) payload.defaultModel = defaultModel;
-        
-        const response = await axios.post(targetUrl, payload, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${ARPT_AI_SECRET}`,
-                'x-arpt-ai-secret': ARPT_AI_SECRET,
-            },
-            timeout: 10000,
-        });
-        return response.data;
-    } catch (error) {
-        console.error("[arpt-ai] Failed to set AI status:", error.message);
-        throw error;
-    }
+    const payload = { enabled };
+    if (defaultModel) payload.defaultModel = defaultModel;
+    const { api } = await import('./api');
+    const response = await api.post('/admin/ai/status', payload, { timeout: 10000 });
+    return response.data;
 };
-

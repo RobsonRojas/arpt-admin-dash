@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "vite build",
+    "build": "vite build && node scripts/check-bundle-sem-segredos.mjs",
     "lint": "eslint src",
     "preview": "vite preview",
     "check:utils": "node scripts/check-offer-utils.mjs && node scripts/check-orders-utils.mjs && node scripts/check-terms-utils.mjs && node scripts/check-shipping-utils.mjs && node scripts/check-store-panel.mjs && node scripts/check-product-form.mjs && node scripts/check-number-utils.mjs && node scripts/check-dropshipper-utils.mjs && node scripts/check-motivo-utils.mjs && node scripts/check-lgpd-utils.mjs && node scripts/check-pwa-update.mjs && node scripts/check-referral-review.mjs",
@@ -14,7 +14,6 @@
   "dependencies": {
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
-    "@google/generative-ai": "^0.24.1",
     "@mui/icons-material": "^5.15.0",
     "@mui/material": "^5.15.0",
     "@uiw/react-md-editor": "^4.0.11",
