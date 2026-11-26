@@ -28,6 +28,7 @@ import {
 import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
 import { setQuotaCallback } from '../services/gemini';
+import { estadoDoAgente } from '../services/agente';
 import { AlertaPendencias } from './AlertaPendencias';
 import { LinkManual } from './LinkManual';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -41,6 +42,8 @@ export const Layout = ({ children }) => {
   const location = useLocation();
 
   // Quota Notification State
+  const [agenteLigado, setAgenteLigado] = useState(false);
+  useEffect(() => { estadoDoAgente().then((e) => setAgenteLigado(!!e.habilitado)); }, []);
   const [quotaMeta, setQuotaMeta] = useState({ open: false, model: "" });
 
   useEffect(() => {
@@ -84,6 +87,7 @@ export const Layout = ({ children }) => {
     { id: 'payment-config', label: 'Configurações de Pagamento', icon: <Payment />, path: '/payment-config' },
     { id: 'media-manager', label: 'Gerenciador de Arquivos', icon: <PermMedia />, path: '/media-manager' },
     { id: 'forest-intelligence', label: 'Inteligência Florestal', icon: <Psychology />, path: '/forest-intelligence' },
+    ...(agenteLigado ? [{ id: 'agente-ia', label: 'Agente de IA', icon: <Psychology />, path: '/agente-ia' }] : []),
     { id: 'gemini-settings', label: 'Configuração IA', icon: <SettingsSuggest />, path: '/gemini-settings' },
     { id: 'developer-settings', label: 'Configurações Dev', icon: <Code />, path: '/developer-settings' },
     { id: 'error-logs', label: 'Log de Erros', icon: <BugReport />, path: '/error-logs' },

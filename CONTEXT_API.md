@@ -273,3 +273,9 @@ useEffect(() => {
 - Não modifique estados diretamente, use as funções fornecidas
 - Adicione novas funções no AdminContext, não nos componentes
 - Documente novas funções com comentários JSDoc
+
+## Agente de IA (`/admin/agent`) e IA do painel (`/admin/ai/*`)
+- `GET /admin/agent/estado` → `{habilitado, motivo?}` (define se o menu "Agente de IA" aparece). `POST /admin/agent/estado {habilitado}` é o kill switch.
+- `POST /admin/agent {mensagem, sessaoId?}` → SSE (`sessao`, `texto`, `tool`, `proposta`, `erro`, `fim`). 503 desligado, 429 teto/rate limit.
+- `POST /admin/agent/proposals/:id/confirm|reject` executa/recusa uma proposta com os parâmetros gravados no servidor.
+- `/admin/ai/{status,campaign-strategy,generate-document,translate,terms/*}` encaminham ao `arpt-ai`. O painel não tem chave nem segredo de IA.

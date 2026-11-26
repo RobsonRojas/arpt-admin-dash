@@ -154,3 +154,6 @@ Quando for trabalhar com dados reais:
 - Arquivos de componentes com extensão `.jsx`
 - Exportações nomeadas para componentes (exceto App.jsx)
 - Comentários descritivos nos componentes complexos
+
+## Agente de IA do administrador
+Página `AgenteIA` (SSE via `services/agente.js`) → `manejo-api` `/admin/agent` (loop sobre o SDK da Anthropic, tools em lista fechada, pseudonimização de dados pessoais, escritas só por proposta confirmada) → provedor. Detalhes e operação: `backend/manejo-api/docs/RUNBOOK_SEGREDOS.md` e a change `agente-ia-admin-dash`.

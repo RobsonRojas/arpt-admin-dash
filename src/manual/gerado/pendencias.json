@@ -2951,132 +2951,12 @@
    "bloqueia": false
   },
   {
-   "id": "agente-ia-admin-dash#1.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "1.2",
-   "descricao": "Criar script `scripts/set-admin-claims` com `firebase-admin` (`setCustomUserClaims({ admin: true })`) que recebe a lista de UIDs/e-mails e é idempotente",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#1.3",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "1.3",
-   "descricao": "Criar `ehAdministrador(user)` em `backend/manejo-api/src/services/papeis.ts`: Keycloak `administrador`, ou Firebase do projeto correto com `admin === true` ou UID em `ADMIN_FIREBASE_UIDS`",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#1.4",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "1.4",
-   "descricao": "Fazer `temPapel` e `isAdministrador` (`src/services/dropshipping/admin-check.ts`) delegarem a `ehAdministrador`, eliminando a regra duplicada",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#1.5",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "1.5",
-   "descricao": "Testes de unidade: Firebase com claim, sem claim, na allowlist, de outro projeto, e Keycloak (cenários da spec `auth`)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#1.6",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "1.6",
-   "descricao": "Teste de integração: rota admin existente responde 403 para Firebase sem claim e 200 com claim",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
    "id": "agente-ia-admin-dash#1.7",
    "area": "infraestrutura-e-deploy",
    "tipo": "codigo",
    "origem": "agente-ia-admin-dash",
    "tarefa": "1.7",
    "descricao": "Atribuir as claims aos administradores em produção e validar o login de cada um antes de publicar a nova regra",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#1.8",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "1.8",
-   "descricao": "Documentar `ADMIN_FIREBASE_UIDS` e o procedimento de rollback no runbook de segredos",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#2.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "2.1",
-   "descricao": "Mapear todos os usos de `gemini.js`, `AIAssistant.jsx`, `CampaignAssistant.jsx` e `termsAi.js` no dash e as rotas de servidor equivalentes",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#2.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "2.2",
-   "descricao": "Criar/estender rotas `/admin/ai/*` na `manejo-api` (admin explícito) que encaminham ao `arpt-ai` com o segredo só no servidor",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#2.3",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "2.3",
-   "descricao": "Migrar as chamadas do dash para essas rotas usando o `api.js` autenticado",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#2.4",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "2.4",
-   "descricao": "Remover `@google/generative-ai`, `VITE_GEMINI_API_KEY`, `VITE_ARPT_AI_SECRET` e o fallback `arpt_ai_secret_token_123456` do dash, de `.env.example` e da documentação",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#2.5",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "2.5",
-   "descricao": "Fazer o `arpt-ai` rejeitar o segredo antigo e carregar o novo apenas de variável de ambiente do servidor",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#2.6",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "2.6",
-   "descricao": "Teste de build no dash que falha se o bundle contiver padrão `AIza...` ou o segredo antigo",
    "roteiro": null,
    "bloqueia": false
   },
@@ -3097,306 +2977,6 @@
    "origem": "agente-ia-admin-dash",
    "tarefa": "2.8",
    "descricao": "Rebuild e publicação do painel, e conferência de que o bundle publicado está limpo (grep no JS servido)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#3.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "3.1",
-   "descricao": "Criar o módulo `pseudonimizador` com `tokenizar`, `destokenizar` e mapa por sessão em Redis com TTL",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#3.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "3.2",
-   "descricao": "Tokenização por esquema (campos sensíveis declarados pela tool) e detector por padrões para texto livre (e-mail, CPF/CNPJ, telefone, CEP, IP)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#3.3",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "3.3",
-   "descricao": "Tokens estáveis na sessão e rejeição de token desconhecido na destokenização",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#3.4",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "3.4",
-   "descricao": "Falha segura: erro ou campo sensível não declarado aborta o envio ao provedor",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#3.5",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "3.5",
-   "descricao": "Garantir que o mapa nunca vai a log nem a auditoria",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#3.6",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "3.6",
-   "descricao": "Testes de unidade com fixtures reais anonimizadas (cenários da spec `ai-pii-pseudonymization`)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#3.7",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "3.7",
-   "descricao": "Teste de não vazamento: para cada tool registrada, o payload enviado ao provedor não contém e-mail, CPF, telefone, endereço nem IP em claro; tool sem fixture faz a suíte falhar",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#4.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "4.1",
-   "descricao": "Confirmar prefixos das rotas, colunas de `arpt_admin_audit_log` e `loja_ai_uso`, e o provider Anthropic existente (itens \"não verificados\" do design)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#4.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "4.2",
-   "descricao": "Flag `ADMIN_AGENT_ENABLED` (padrão desligado), kill switch em runtime e configuração do modelo, dos tetos e do máximo de passos",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#4.3",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "4.3",
-   "descricao": "Rota `POST /admin/agent` com `validateHybridAuth` + exigência de administrador explícito, streaming SSE e loop manual sobre `@anthropic-ai/sdk`, passando sempre pelo pseudonimizador",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#4.4",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "4.4",
-   "descricao": "Registro de tools em lista fechada (`nome`, `descricao`, schema zod, `classe`, `camposSensiveis`, `executar`), com recusa de tool desconhecida e de argumentos inválidos",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#4.5",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "4.5",
-   "descricao": "Rate limit por administrador, teto de tokens/custo por sessão e por dia, e máximo de passos por pergunta",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#4.6",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "4.6",
-   "descricao": "Migration aditiva para registrar o uso do agente em `loja_ai_uso` (ou tabela própria), se o esquema atual não comportar",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#4.7",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "4.7",
-   "descricao": "Auditoria de cada pedido, tool e confirmação em `arpt_admin_audit_log`, com argumentos pseudonimizados",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#4.8",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "4.8",
-   "descricao": "System prompt: papel do agente, regras de tratar resultado de tool como dado não confiável, e resumo das specs `admin-*`/`dropshipping-*`",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#4.9",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "4.9",
-   "descricao": "Script que gera o resumo de specs a partir de `openspec/specs` e o inclui na imagem",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#4.10",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "4.10",
-   "descricao": "Tool `buscar_docs` (busca textual em specs e docs empacotados, sem dados de produção)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#5.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "5.1",
-   "descricao": "Tools de pedidos: listagem, SLA, enviados e cancelamentos, com campos mínimos, mascaramento e limite de linhas",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#5.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "5.2",
-   "descricao": "Tools de repasses e pagamentos (somente leitura)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#5.3",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "5.3",
-   "descricao": "Tools de campanhas, comparação e métricas, e de cupons e usos",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#5.4",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "5.4",
-   "descricao": "Tools de dropshipping: configurações, lojas, desempenho, funil e alertas de capacidade",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#5.5",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "5.5",
-   "descricao": "Tools de monitoramento: serviços e filas, sem retry nem clean",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#5.6",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "5.6",
-   "descricao": "Teste por tool com fixture, verificando limite de linhas, campos omitidos e ausência de segredo",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#6.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "6.1",
-   "descricao": "Armazenar a proposta (`id`, `adminId`, tool, argumentos reais, resumo, `expiraEm`) com TTL curto",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#6.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "6.2",
-   "descricao": "Rotas `POST /admin/agent/proposals/:id/confirm` e `/reject`, executando com os argumentos gravados, só para o mesmo administrador e só antes de expirar",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#6.3",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "6.3",
-   "descricao": "Tools de escrita iniciais: pausar e reativar cupom, suspender e reativar loja de dropshipping, reaproveitando os serviços existentes",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#6.4",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "6.4",
-   "descricao": "Informar ao modelo apenas \"executada\" ou \"recusada\", sem permitir que texto do modelo confirme nada",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#6.5",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "6.5",
-   "descricao": "Testes: proposta sem confirmação não altera dados, confirmação executa os parâmetros exibidos, proposta alterada/expirada/de outro administrador é rejeitada",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#6.6",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "6.6",
-   "descricao": "Teste de injeção: descrição de produto com instrução maliciosa não gera escrita nem tool fora da lista",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "agente-ia-admin-dash#6.7",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "agente-ia-admin-dash",
-   "tarefa": "6.7",
-   "descricao": "Teste garantindo que anonimizar, apagar carrinho, reiniciar contêiner, limpar fila, reembolso e deploy não existem na lista de tools",
    "roteiro": null,
    "bloqueia": false
   },
@@ -3507,6 +3087,516 @@
    "origem": "agente-ia-admin-dash",
    "tarefa": "8.5",
    "descricao": "Avisar antes de qualquer push em `main`, que dispara o deploy em produção, e sequenciar as etapas 0b, 0a e 1 em commits separados",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "alterar-status-manejo-com-formulario#1.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "alterar-status-manejo-com-formulario",
+   "tarefa": "1.1",
+   "descricao": "Migração: tabela `arpt_manejo_status_historico` (só inserção) e, se faltar, colunas de apoio em `arpt_manejo` (equipe de campo, data prevista e conclusão do inventário, nota, motivo e data de encerramento), com `down`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "alterar-status-manejo-com-formulario#1.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "alterar-status-manejo-com-formulario",
+   "tarefa": "1.2",
+   "descricao": "Aplicar pelo `docker-compose.migrations.yml` (serviço `migrations`, `--build`, `--no-deps`) e conferir no banco",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "alterar-status-manejo-com-formulario#2.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "alterar-status-manejo-com-formulario",
+   "tarefa": "2.1",
+   "descricao": "Módulo da máquina de estados: transições, retornos e definição dos dados exigidos por transição (zod)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "alterar-status-manejo-com-formulario#2.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "alterar-status-manejo-com-formulario",
+   "tarefa": "2.2",
+   "descricao": "`GET /admin/manejo/:id/status-options` (status atual, destinos, campos exigidos, o que já está preenchido e o que falta)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "alterar-status-manejo-com-formulario#2.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "alterar-status-manejo-com-formulario",
+   "tarefa": "2.3",
+   "descricao": "`POST /admin/manejo/:id/status` em transação com `FOR UPDATE`: validar, gravar dados do projeto, atualizar `id_status`, inserir histórico; 400/403/409/422 conforme a spec; aviso para texto em inglês ausente",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "alterar-status-manejo-com-formulario#2.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "alterar-status-manejo-com-formulario",
+   "tarefa": "2.4",
+   "descricao": "`GET /admin/manejo/:id/status-history`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "alterar-status-manejo-com-formulario#2.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "alterar-status-manejo-com-formulario",
+   "tarefa": "2.5",
+   "descricao": "Remover `POST /admin/manejo/:id` (ou responder 410) depois de procurar outros usos",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "alterar-status-manejo-com-formulario#2.6",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "alterar-status-manejo-com-formulario",
+   "tarefa": "2.6",
+   "descricao": "Edição geral do manejo ignora `id_status` (`routes/manejo.ts`, `interfaces/manejo.ts`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "alterar-status-manejo-com-formulario#2.7",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "alterar-status-manejo-com-formulario",
+   "tarefa": "2.7",
+   "descricao": "Testes de integração: cada transição válida, pulo, status desconhecido, não administrador, dados faltando, inventário vazio, retorno sem motivo, concorrência, edição geral não muda status, histórico",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "alterar-status-manejo-com-formulario#3.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "alterar-status-manejo-com-formulario",
+   "tarefa": "3.1",
+   "descricao": "`ManejoStatusDialog.jsx`: status atual, destinos, campos por transição com pendências, confirmação, erro do servidor sem perder o digitado",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "alterar-status-manejo-com-formulario#3.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "alterar-status-manejo-com-formulario",
+   "tarefa": "3.2",
+   "descricao": "Ação \"Alterar status\" em `ProjectTable`, `ProjectMobileCards`, `ProjectDetailsDrawer` e na edição do manejo, com a lista do histórico",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "alterar-status-manejo-com-formulario#3.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "alterar-status-manejo-com-formulario",
+   "tarefa": "3.3",
+   "descricao": "`AdminContext.updateProject`/`PreCadForm`: parar de enviar `id_status` e remover o mapa de texto para número",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "alterar-status-manejo-com-formulario#3.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "alterar-status-manejo-com-formulario",
+   "tarefa": "3.4",
+   "descricao": "Trocar `STATUS_PROJETO` legado por `GET /manejo/states` no filtro e nos chips",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "alterar-status-manejo-com-formulario#3.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "alterar-status-manejo-com-formulario",
+   "tarefa": "3.5",
+   "descricao": "Testes de interface do diálogo (destinos, campos por transição, erro 422/409)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "alterar-status-manejo-com-formulario#4.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "alterar-status-manejo-com-formulario",
+   "tarefa": "4.1",
+   "descricao": "Confirmar com a ARPT a lista de dados exigidos (design.md, Open Questions)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "alterar-status-manejo-com-formulario#4.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "alterar-status-manejo-com-formulario",
+   "tarefa": "4.2",
+   "descricao": "Reconstruir `manejo-api` e `arpt-admin-dash` com `up -d --build --no-deps` e conferir por fora",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "alterar-status-manejo-com-formulario#4.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "alterar-status-manejo-com-formulario",
+   "tarefa": "4.3",
+   "descricao": "Mapear a função no manual do ecossistema administrativo, se aplicável",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "copiar-produto-manejo-para-catalogo-produtor#1.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "copiar-produto-manejo-para-catalogo-produtor",
+   "tarefa": "1.1",
+   "descricao": "Conferir em `admin_produtor_acoes_log` que `ator_user_id` aceita o `sub` de um produtor (sem FK ou checagem que o impeça); se impedir, ajustar por migration aditiva",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "copiar-produto-manejo-para-catalogo-produtor#1.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "copiar-produto-manejo-para-catalogo-produtor",
+   "tarefa": "1.2",
+   "descricao": "Extrair de `importarProdutosDeProjeto` o núcleo `copiarProdutosDeProjeto(destino, input, ator)` em `services/producer/adminManagement.ts`, mantendo o comportamento e os códigos de erro atuais do administrador",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "copiar-produto-manejo-para-catalogo-produtor#1.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "copiar-produto-manejo-para-catalogo-produtor",
+   "tarefa": "1.3",
+   "descricao": "Dar a `listarProjetosImportaveis` e `produtosDoProjeto` o filtro opcional por dono (`arpt_propriedade.user_id`); sem o filtro, o resultado fica igual ao atual",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "copiar-produto-manejo-para-catalogo-produtor#1.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "copiar-produto-manejo-para-catalogo-produtor",
+   "tarefa": "1.4",
+   "descricao": "Criar `exigirProjetoDoProdutor(sub, idManejo)` que lança `PROJECT_NOT_OWNED` (403) quando a propriedade do projeto não é do usuário",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "copiar-produto-manejo-para-catalogo-produtor#2.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "copiar-produto-manejo-para-catalogo-produtor",
+   "tarefa": "2.1",
+   "descricao": "`GET /api/v1/producer/import-sources/projects` (só `produtor`; projetos da propriedade do token; busca e paginação)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "copiar-produto-manejo-para-catalogo-produtor#2.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "copiar-produto-manejo-para-catalogo-produtor",
+   "tarefa": "2.2",
+   "descricao": "`GET /api/v1/producer/import-sources/projects/:idManejo/products` (checa a posse; marca `ja_importado` para o próprio produtor)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "copiar-produto-manejo-para-catalogo-produtor#2.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "copiar-produto-manejo-para-catalogo-produtor",
+   "tarefa": "2.3",
+   "descricao": "`POST /api/v1/producer/import-products` com schema `.strict()` (`id_manejo`, `produto_ids`, `simular`), destino e ator = `sub`; 200 na prévia, 201 na cópia; 400 se vier campo de destino",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "copiar-produto-manejo-para-catalogo-produtor#2.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "copiar-produto-manejo-para-catalogo-produtor",
+   "tarefa": "2.4",
+   "descricao": "Documentar as três rotas no Swagger e mapear `AdminProducerError` para a resposta de erro da rota do produtor",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "copiar-produto-manejo-para-catalogo-produtor#3.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "copiar-produto-manejo-para-catalogo-produtor",
+   "tarefa": "3.1",
+   "descricao": "Criar o diálogo **Copiar de um projeto** (projeto → produtos → prévia → confirmação) em `manejo-app`, com estado vazio, erro e produto já copiado desabilitado",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "copiar-produto-manejo-para-catalogo-produtor#3.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "copiar-produto-manejo-para-catalogo-produtor",
+   "tarefa": "3.2",
+   "descricao": "Incluir o botão no `PainelDoProdutor.tsx` e recarregar a lista após a cópia, com aviso de estoque zerado, fora do catálogo e origem de madeira pendente",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "copiar-produto-manejo-para-catalogo-produtor#3.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "copiar-produto-manejo-para-catalogo-produtor",
+   "tarefa": "3.3",
+   "descricao": "Textos em `pt` e `en` nas traduções, com acessibilidade (rótulos, foco no diálogo, mensagens de estado)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "copiar-produto-manejo-para-catalogo-produtor#4.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "copiar-produto-manejo-para-catalogo-produtor",
+   "tarefa": "4.1",
+   "descricao": "API: produtor lista só projetos dele; projeto alheio devolve 403 `PROJECT_NOT_OWNED` nas duas rotas que recebem `idManejo`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "copiar-produto-manejo-para-catalogo-produtor#4.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "copiar-produto-manejo-para-catalogo-produtor",
+   "tarefa": "4.2",
+   "descricao": "API: cópia válida (campos, fotos, `origem_produto_id`, estoque zero, fora do catálogo, madeira em rascunho), prévia sem efeitos, `ALREADY_IMPORTED`, `PRODUCT_NOT_IN_PROJECT`, `PRODUCT_NOT_IMPORTABLE`, lote atômico e auditoria",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "copiar-produto-manejo-para-catalogo-produtor#4.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "copiar-produto-manejo-para-catalogo-produtor",
+   "tarefa": "4.3",
+   "descricao": "API: 403 `NOT_A_PRODUCER` sem o papel; corpo com destino/produtor devolve 400; a importação do administrador segue passando nos testes existentes",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "copiar-produto-manejo-para-catalogo-produtor#4.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "copiar-produto-manejo-para-catalogo-produtor",
+   "tarefa": "4.4",
+   "descricao": "Frontend: o diálogo mostra a ação só ao produtor, lista, marca copiado, faz prévia e confirma (vitest)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "copiar-produto-manejo-para-catalogo-produtor#5.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "copiar-produto-manejo-para-catalogo-produtor",
+   "tarefa": "5.1",
+   "descricao": "Reconstruir `manejo-api` e `manejo-app` (`up -d --build --no-deps`) e conferir o fluxo por fora com um produtor dono de projeto",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "copiar-produto-manejo-para-catalogo-produtor#5.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "copiar-produto-manejo-para-catalogo-produtor",
+   "tarefa": "5.2",
+   "descricao": "Rodar `openspec validate copiar-produto-manejo-para-catalogo-produtor --strict`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "editar-arvore-inventario-com-status#1.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "editar-arvore-inventario-com-status",
+   "tarefa": "1.1",
+   "descricao": "Migração: coluna `status` (padrão `INVENTARIADA`, CHECK na união dos valores) em `arpt_arvore_inventario` e tabela `arpt_arvore_status_historico` (com `dados` jsonb, só inserção), com `down`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "editar-arvore-inventario-com-status#1.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "editar-arvore-inventario-com-status",
+   "tarefa": "1.2",
+   "descricao": "Aplicar pelo `docker-compose.migrations.yml` (serviço `migrations`, `--build`, `--no-deps`) e conferir no banco",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "editar-arvore-inventario-com-status#2.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "editar-arvore-inventario-com-status",
+   "tarefa": "2.1",
+   "descricao": "Módulo de status: `tipoDaArvore` (classificação normalizada), transições por tipo e definição zod dos dados exigidos por transição; DAP mínimo configurável (padrão 50)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "editar-arvore-inventario-com-status#2.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "editar-arvore-inventario-com-status",
+   "tarefa": "2.2",
+   "descricao": "`iInventoryTree.ts`: `status` nas leituras; `PUT /tree/:treeId` ignora `status` e bloqueia troca de tipo da classificação após `INVENTARIADA` (409)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "editar-arvore-inventario-com-status#2.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "editar-arvore-inventario-com-status",
+   "tarefa": "2.3",
+   "descricao": "`POST /tree/:treeId/status` em transação com `FOR UPDATE`: 400/403/409/422, histórico, job de blockchain com status e dados",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "editar-arvore-inventario-com-status#2.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "editar-arvore-inventario-com-status",
+   "tarefa": "2.4",
+   "descricao": "`GET /tree/:treeId` e a listagem do inventário devolvem `status`, `tipo` e `proximos_status` com `campos`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "editar-arvore-inventario-com-status#2.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "editar-arvore-inventario-com-status",
+   "tarefa": "2.5",
+   "descricao": "`GET /tree/:treeId/status-history` para administrador",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "editar-arvore-inventario-com-status#2.6",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "editar-arvore-inventario-com-status",
+   "tarefa": "2.6",
+   "descricao": "`carbon.services.ts`: excluir `ABATIDA`, `COLETADA`, `EXPEDIDA`, `CANCELADA`, `PERDIDA` do estoque vivo",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "editar-arvore-inventario-com-status#2.7",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "editar-arvore-inventario-com-status",
+   "tarefa": "2.7",
+   "descricao": "Testes de integração: padrão, status de outro tipo, cada fluxo completo (manejo e caída), pulos, finais, AUTEX/licença vencida, DAP baixo, coleta fora da validade, 409 de tela velha, 403, `PUT` com `status` ignorado, reclassificação bloqueada, carbono, edição só de status com peças derivadas",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "editar-arvore-inventario-com-status#3.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "editar-arvore-inventario-com-status",
+   "tarefa": "3.1",
+   "descricao": "Conferir `updateTree`/`createTree` no `AdminContext` e adicionar chamada do novo `POST /tree/:id/status` e do histórico",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "editar-arvore-inventario-com-status#3.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "editar-arvore-inventario-com-status",
+   "tarefa": "3.2",
+   "descricao": "`ArvoreStatusDialog.jsx`: status atual, próximos do tipo, campos por transição a partir de `proximos_status.campos`, pendências, erro do servidor sem perder o digitado",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "editar-arvore-inventario-com-status#3.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "editar-arvore-inventario-com-status",
+   "tarefa": "3.3",
+   "descricao": "`TreeRow.jsx`: chip de status e ação \"Atualizar status\" (desabilitada em status final), mantendo o botão Editar; histórico visível",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "editar-arvore-inventario-com-status#3.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "editar-arvore-inventario-com-status",
+   "tarefa": "3.4",
+   "descricao": "`InventoryManager.jsx`/`TreeForm.jsx`: filtro por status, coluna na exportação, status somente leitura no formulário de dados com atalho para o diálogo",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "editar-arvore-inventario-com-status#3.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "editar-arvore-inventario-com-status",
+   "tarefa": "3.5",
+   "descricao": "Testes de interface: fluxo manejo, fluxo caída, estado final, erro 422/409, filtro",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "editar-arvore-inventario-com-status#4.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "editar-arvore-inventario-com-status",
+   "tarefa": "4.1",
+   "descricao": "Confirmar com a ARPT/responsável técnico os dados exigidos, o DAP mínimo e a identificação de porta-semente/remanescente (Open Questions do design)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "editar-arvore-inventario-com-status#4.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "editar-arvore-inventario-com-status",
+   "tarefa": "4.2",
+   "descricao": "Reconstruir `manejo-api` e `arpt-admin-dash` com `up -d --build --no-deps` e conferir por fora",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "editar-arvore-inventario-com-status#4.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "editar-arvore-inventario-com-status",
+   "tarefa": "4.3",
+   "descricao": "Mapear a função no manual do ecossistema administrativo, se aplicável",
    "roteiro": null,
    "bloqueia": false
   },
@@ -4227,6 +4317,256 @@
    "origem": "notify-admin-on-deploy-success",
    "tarefa": "4.4",
    "descricao": "Após o push em `main`, ligar `DEPLOY_NOTIFY_SUCCESS=true` no `.env` do servidor e confirmar o recebimento no deploy seguinte",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "origem-madeira-arvore-manejo-ou-caida#1.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "origem-madeira-arvore-manejo-ou-caida",
+   "tarefa": "1.1",
+   "descricao": "Migração: colunas `licenciado`, `licenca_numero`, `licenca_validade` em `arpt_manejo` e tabela `arpt_origem_declaracao_arvore` (com `down`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "origem-madeira-arvore-manejo-ou-caida#1.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "origem-madeira-arvore-manejo-ou-caida",
+   "tarefa": "1.2",
+   "descricao": "Aplicar pelo `docker-compose.migrations.yml` (serviço `migrations`, `--build`, `--no-deps`) e conferir as tabelas no banco",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "origem-madeira-arvore-manejo-ou-caida#2.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "origem-madeira-arvore-manejo-ou-caida",
+   "tarefa": "2.1",
+   "descricao": "Rota admin para marcar/limpar o selo com número e validade, só para administrador, com registro de auditoria",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "origem-madeira-arvore-manejo-ou-caida#2.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "origem-madeira-arvore-manejo-ou-caida",
+   "tarefa": "2.2",
+   "descricao": "Expor o selo (ativo/vencido) nos rótulos do projeto (pt/en) onde os rótulos já aparecem",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "origem-madeira-arvore-manejo-ou-caida#2.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "origem-madeira-arvore-manejo-ou-caida",
+   "tarefa": "2.3",
+   "descricao": "Testes: administrador marca, produtor recebe 403, validade vencida deixa o selo inativo, status comercial inalterado",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "origem-madeira-arvore-manejo-ou-caida#3.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "origem-madeira-arvore-manejo-ou-caida",
+   "tarefa": "3.1",
+   "descricao": "Função única de \"árvore do produtor\" (propriedade `user_id` ou responsável do projeto) e de elegibilidade por tipo (viva+licenciada válida / caída), com a regra de \"caída\" normalizada",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "origem-madeira-arvore-manejo-ou-caida#3.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "origem-madeira-arvore-manejo-ou-caida",
+   "tarefa": "3.2",
+   "descricao": "Rota `GET /api/v1/producer/wood/trees` (tipo, busca, paginação, foto, `especie_id` casado), sem coordenada exata para quem não é dono",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "origem-madeira-arvore-manejo-ou-caida#3.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "origem-madeira-arvore-manejo-ou-caida",
+   "tarefa": "3.3",
+   "descricao": "Campo `arvores` no `declaracaoSchema`; gravar em `arpt_origem_declaracao_arvore` com validação de tipo, responsabilidade e elegibilidade (403/422 `TREE_NOT_ELIGIBLE`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "origem-madeira-arvore-manejo-ou-caida#3.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "origem-madeira-arvore-manejo-ou-caida",
+   "tarefa": "3.4",
+   "descricao": "Unicidade de uso: recusar árvore já ligada a declaração `APROVADA` (409 `TREE_ALREADY_LINKED`), em transação com bloqueio da linha",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "origem-madeira-arvore-manejo-ou-caida#3.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "origem-madeira-arvore-manejo-ou-caida",
+   "tarefa": "3.5",
+   "descricao": "Derivar espécies e ponto das árvores respeitando a proveniência (automático × digitado); espécie sem casamento vira \"não tenho certeza\"",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "origem-madeira-arvore-manejo-ou-caida#3.6",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "origem-madeira-arvore-manejo-ou-caida",
+   "tarefa": "3.6",
+   "descricao": "Mudança de árvores em declaração aprovada volta para `EM_ANALISE`, tira o produto de venda e registra auditoria",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "origem-madeira-arvore-manejo-ou-caida#3.7",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "origem-madeira-arvore-manejo-ou-caida",
+   "tarefa": "3.7",
+   "descricao": "Regra versionada `exigir_arvore` (padrão desligada) e pendência \"escolher a árvore\" em `pendenciasDeOrigem.ts`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "origem-madeira-arvore-manejo-ou-caida#3.8",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "origem-madeira-arvore-manejo-ou-caida",
+   "tarefa": "3.8",
+   "descricao": "Testes de integração: tipo incoerente, árvore de outro produtor, árvore já usada, licença vencida, declaração sem árvores continua válida, exigência ligada",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "origem-madeira-arvore-manejo-ou-caida#4.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "origem-madeira-arvore-manejo-ou-caida",
+   "tarefa": "4.1",
+   "descricao": "`woodReview.ts`: devolver árvores com projeto, licença e coordenada exata; sinalizar árvore que deixou de ser elegível",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "origem-madeira-arvore-manejo-ou-caida#4.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "origem-madeira-arvore-manejo-ou-caida",
+   "tarefa": "4.2",
+   "descricao": "`publicOrigin.ts`: devolver contagem e `{ numero, especie }` por árvore, sem coordenada exata nem proprietário; teste de vazamento",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "origem-madeira-arvore-manejo-ou-caida#4.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "origem-madeira-arvore-manejo-ou-caida",
+   "tarefa": "4.3",
+   "descricao": "`arpt-admin-dash`: campo do selo no projeto de manejo e lista de árvores na revisão de origem",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "origem-madeira-arvore-manejo-ou-caida#5.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "origem-madeira-arvore-manejo-ou-caida",
+   "tarefa": "5.1",
+   "descricao": "Cliente da rota de árvores e tipos em `origemMadeira.ts`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "origem-madeira-arvore-manejo-ou-caida#5.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "origem-madeira-arvore-manejo-ou-caida",
+   "tarefa": "5.2",
+   "descricao": "Componente seletor de árvores (busca, paginação, foto, múltipla escolha, estado vazio explicando como obter licença/registrar árvore) em `OrigemMadeira.tsx`, só para `MANEJO` e `ARVORE_CAIDA`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "origem-madeira-arvore-manejo-ou-caida#5.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "origem-madeira-arvore-manejo-ou-caida",
+   "tarefa": "5.3",
+   "descricao": "Preencher espécie e ponto ao selecionar; aviso e confirmação ao trocar o tipo de origem com árvores já escolhidas",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "origem-madeira-arvore-manejo-ou-caida#5.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "origem-madeira-arvore-manejo-ou-caida",
+   "tarefa": "5.4",
+   "descricao": "Textos pt/en em `locales/*/translation.json` (sem prometer ganho de preço), acessível por teclado e leitor de tela",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "origem-madeira-arvore-manejo-ou-caida#5.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "origem-madeira-arvore-manejo-ou-caida",
+   "tarefa": "5.5",
+   "descricao": "Mostrar as árvores na visualização do produto e na prévia da página pública",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "origem-madeira-arvore-manejo-ou-caida#5.6",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "origem-madeira-arvore-manejo-ou-caida",
+   "tarefa": "5.6",
+   "descricao": "Testes de interface (`OrigemMadeira.vitest.tsx`): listar por tipo, selecionar, preenchimento automático, troca de tipo, falha da busca com \"tentar de novo\"",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "origem-madeira-arvore-manejo-ou-caida#6.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "origem-madeira-arvore-manejo-ou-caida",
+   "tarefa": "6.1",
+   "descricao": "Atualizar as specs `wood-origin-declaration`, `manejo` e a nova `wood-origin-tree-link` ao arquivar e mapear no manual do ecossistema administrativo se aplicável",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "origem-madeira-arvore-manejo-ou-caida#6.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "origem-madeira-arvore-manejo-ou-caida",
+   "tarefa": "6.2",
+   "descricao": "Reconstruir `manejo-api`, `manejo-app` e `arpt-admin-dash` com `up -d --build --no-deps` e conferir por fora",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "origem-madeira-arvore-manejo-ou-caida#6.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "origem-madeira-arvore-manejo-ou-caida",
+   "tarefa": "6.3",
+   "descricao": "Antes de ligar `exigir_arvore`, conferir quantos projetos/árvores existentes têm propriedade e responsável válidos",
    "roteiro": null,
    "bloqueia": false
   },

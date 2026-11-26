@@ -48,7 +48,8 @@
    "rotas": [
     "/analytics",
     "/forest-intelligence",
-    "/gemini-settings"
+    "/gemini-settings",
+    "/agente-ia"
    ],
    "specs": [
     "admin-product-ai-translation",
@@ -638,6 +639,7 @@
     "blockchain-data-anchoring",
     "blockchain-data-retrieval",
     "blockchain-env-config",
+    "bvmblockchain-data-handling",
     "create-wallet-ui",
     "display-tokens",
     "fetch-blockchain-assets",
@@ -771,6 +773,7 @@
   "/analytics": "analytics-e-ia",
   "/forest-intelligence": "analytics-e-ia",
   "/gemini-settings": "analytics-e-ia",
+  "/agente-ia": "analytics-e-ia",
   "/analytics-pixels": "pixels-e-rastreio",
   "/exit-survey": "pesquisa-de-saida",
   "/growth": "crescimento",
