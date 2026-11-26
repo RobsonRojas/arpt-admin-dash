@@ -2941,6 +2941,576 @@
    "bloqueia": false
   },
   {
+   "id": "agente-ia-admin-dash#1.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "1.1",
+   "descricao": "Confirmar no console do Firebase se o cadastro por e-mail/senha está aberto e listar os usuários do projeto; registrar quem é administrador e quem não é (incluindo dropshippers convidados)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#1.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "1.2",
+   "descricao": "Criar script `scripts/set-admin-claims` com `firebase-admin` (`setCustomUserClaims({ admin: true })`) que recebe a lista de UIDs/e-mails e é idempotente",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#1.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "1.3",
+   "descricao": "Criar `ehAdministrador(user)` em `backend/manejo-api/src/services/papeis.ts`: Keycloak `administrador`, ou Firebase do projeto correto com `admin === true` ou UID em `ADMIN_FIREBASE_UIDS`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#1.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "1.4",
+   "descricao": "Fazer `temPapel` e `isAdministrador` (`src/services/dropshipping/admin-check.ts`) delegarem a `ehAdministrador`, eliminando a regra duplicada",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#1.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "1.5",
+   "descricao": "Testes de unidade: Firebase com claim, sem claim, na allowlist, de outro projeto, e Keycloak (cenários da spec `auth`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#1.6",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "1.6",
+   "descricao": "Teste de integração: rota admin existente responde 403 para Firebase sem claim e 200 com claim",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#1.7",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "1.7",
+   "descricao": "Atribuir as claims aos administradores em produção e validar o login de cada um antes de publicar a nova regra",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#1.8",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "1.8",
+   "descricao": "Documentar `ADMIN_FIREBASE_UIDS` e o procedimento de rollback no runbook de segredos",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#2.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "2.1",
+   "descricao": "Mapear todos os usos de `gemini.js`, `AIAssistant.jsx`, `CampaignAssistant.jsx` e `termsAi.js` no dash e as rotas de servidor equivalentes",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#2.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "2.2",
+   "descricao": "Criar/estender rotas `/admin/ai/*` na `manejo-api` (admin explícito) que encaminham ao `arpt-ai` com o segredo só no servidor",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#2.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "2.3",
+   "descricao": "Migrar as chamadas do dash para essas rotas usando o `api.js` autenticado",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#2.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "2.4",
+   "descricao": "Remover `@google/generative-ai`, `VITE_GEMINI_API_KEY`, `VITE_ARPT_AI_SECRET` e o fallback `arpt_ai_secret_token_123456` do dash, de `.env.example` e da documentação",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#2.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "2.5",
+   "descricao": "Fazer o `arpt-ai` rejeitar o segredo antigo e carregar o novo apenas de variável de ambiente do servidor",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#2.6",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "2.6",
+   "descricao": "Teste de build no dash que falha se o bundle contiver padrão `AIza...` ou o segredo antigo",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#2.7",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "2.7",
+   "descricao": "Rotacionar a chave Gemini e o segredo do `arpt-ai` (ação do responsável), revogar a chave antiga e checar uso suspeito no console do Google",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#2.8",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "2.8",
+   "descricao": "Rebuild e publicação do painel, e conferência de que o bundle publicado está limpo (grep no JS servido)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#3.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "3.1",
+   "descricao": "Criar o módulo `pseudonimizador` com `tokenizar`, `destokenizar` e mapa por sessão em Redis com TTL",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#3.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "3.2",
+   "descricao": "Tokenização por esquema (campos sensíveis declarados pela tool) e detector por padrões para texto livre (e-mail, CPF/CNPJ, telefone, CEP, IP)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#3.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "3.3",
+   "descricao": "Tokens estáveis na sessão e rejeição de token desconhecido na destokenização",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#3.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "3.4",
+   "descricao": "Falha segura: erro ou campo sensível não declarado aborta o envio ao provedor",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#3.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "3.5",
+   "descricao": "Garantir que o mapa nunca vai a log nem a auditoria",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#3.6",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "3.6",
+   "descricao": "Testes de unidade com fixtures reais anonimizadas (cenários da spec `ai-pii-pseudonymization`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#3.7",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "3.7",
+   "descricao": "Teste de não vazamento: para cada tool registrada, o payload enviado ao provedor não contém e-mail, CPF, telefone, endereço nem IP em claro; tool sem fixture faz a suíte falhar",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#4.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "4.1",
+   "descricao": "Confirmar prefixos das rotas, colunas de `arpt_admin_audit_log` e `loja_ai_uso`, e o provider Anthropic existente (itens \"não verificados\" do design)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#4.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "4.2",
+   "descricao": "Flag `ADMIN_AGENT_ENABLED` (padrão desligado), kill switch em runtime e configuração do modelo, dos tetos e do máximo de passos",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#4.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "4.3",
+   "descricao": "Rota `POST /admin/agent` com `validateHybridAuth` + exigência de administrador explícito, streaming SSE e loop manual sobre `@anthropic-ai/sdk`, passando sempre pelo pseudonimizador",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#4.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "4.4",
+   "descricao": "Registro de tools em lista fechada (`nome`, `descricao`, schema zod, `classe`, `camposSensiveis`, `executar`), com recusa de tool desconhecida e de argumentos inválidos",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#4.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "4.5",
+   "descricao": "Rate limit por administrador, teto de tokens/custo por sessão e por dia, e máximo de passos por pergunta",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#4.6",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "4.6",
+   "descricao": "Migration aditiva para registrar o uso do agente em `loja_ai_uso` (ou tabela própria), se o esquema atual não comportar",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#4.7",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "4.7",
+   "descricao": "Auditoria de cada pedido, tool e confirmação em `arpt_admin_audit_log`, com argumentos pseudonimizados",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#4.8",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "4.8",
+   "descricao": "System prompt: papel do agente, regras de tratar resultado de tool como dado não confiável, e resumo das specs `admin-*`/`dropshipping-*`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#4.9",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "4.9",
+   "descricao": "Script que gera o resumo de specs a partir de `openspec/specs` e o inclui na imagem",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#4.10",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "4.10",
+   "descricao": "Tool `buscar_docs` (busca textual em specs e docs empacotados, sem dados de produção)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#5.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "5.1",
+   "descricao": "Tools de pedidos: listagem, SLA, enviados e cancelamentos, com campos mínimos, mascaramento e limite de linhas",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#5.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "5.2",
+   "descricao": "Tools de repasses e pagamentos (somente leitura)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#5.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "5.3",
+   "descricao": "Tools de campanhas, comparação e métricas, e de cupons e usos",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#5.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "5.4",
+   "descricao": "Tools de dropshipping: configurações, lojas, desempenho, funil e alertas de capacidade",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#5.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "5.5",
+   "descricao": "Tools de monitoramento: serviços e filas, sem retry nem clean",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#5.6",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "5.6",
+   "descricao": "Teste por tool com fixture, verificando limite de linhas, campos omitidos e ausência de segredo",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#6.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "6.1",
+   "descricao": "Armazenar a proposta (`id`, `adminId`, tool, argumentos reais, resumo, `expiraEm`) com TTL curto",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#6.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "6.2",
+   "descricao": "Rotas `POST /admin/agent/proposals/:id/confirm` e `/reject`, executando com os argumentos gravados, só para o mesmo administrador e só antes de expirar",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#6.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "6.3",
+   "descricao": "Tools de escrita iniciais: pausar e reativar cupom, suspender e reativar loja de dropshipping, reaproveitando os serviços existentes",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#6.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "6.4",
+   "descricao": "Informar ao modelo apenas \"executada\" ou \"recusada\", sem permitir que texto do modelo confirme nada",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#6.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "6.5",
+   "descricao": "Testes: proposta sem confirmação não altera dados, confirmação executa os parâmetros exibidos, proposta alterada/expirada/de outro administrador é rejeitada",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#6.6",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "6.6",
+   "descricao": "Teste de injeção: descrição de produto com instrução maliciosa não gera escrita nem tool fora da lista",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#6.7",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "6.7",
+   "descricao": "Teste garantindo que anonimizar, apagar carrinho, reiniciar contêiner, limpar fila, reembolso e deploy não existem na lista de tools",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#7.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "7.1",
+   "descricao": "Cliente SSE em `src/services` usando o `api.js` autenticado",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#7.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "7.2",
+   "descricao": "Página de chat (MUI) com mensagens em streaming, estado de erro, agente desligado (503) e teto atingido (429)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#7.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "7.3",
+   "descricao": "Card de proposta com ação, parâmetros exatos e botões Confirmar e Rejeitar",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#7.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "7.4",
+   "descricao": "Rota e item de menu para a página, visíveis só quando o agente está habilitado",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#7.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "7.5",
+   "descricao": "Testes (vitest e testing-library) do chat e do card de proposta",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#7.6",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "7.6",
+   "descricao": "Entrada no manual do painel (`src/manual`) descrevendo o agente, seus limites e a confirmação de escritas",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#8.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "8.1",
+   "descricao": "Atualizar `ARQUITETURA.md`/`CONTEXT_API.md` e o runbook com variáveis, tetos, kill switch e procedimento de claims",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#8.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "8.2",
+   "descricao": "Rodar as suítes da `manejo-api` e do dash e `openspec validate agente-ia-admin-dash`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#8.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "8.3",
+   "descricao": "Reconstruir `manejo-api` e o painel com `up -d --build --no-deps` e conferir o bundle servido",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#8.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "8.4",
+   "descricao": "Habilitar a flag só para um administrador de teste e validar de ponta a ponta: pergunta de leitura, proposta de escrita, confirmação, auditoria e kill switch",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "agente-ia-admin-dash#8.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "agente-ia-admin-dash",
+   "tarefa": "8.5",
+   "descricao": "Avisar antes de qualquer push em `main`, que dispara o deploy em produção, e sequenciar as etapas 0b, 0a e 1 em commits separados",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
    "id": "fix-safe-browsing-dangerous-site-warning#3.3",
    "area": "infraestrutura-e-deploy",
    "tipo": "codigo",
