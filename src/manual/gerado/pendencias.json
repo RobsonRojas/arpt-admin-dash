@@ -1,6 +1,106 @@
 {
  "itens": [
   {
+   "id": "add-backup-object-storage-rclone#1.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-backup-object-storage-rclone",
+   "tarefa": "1.3",
+   "descricao": "Testar o script em `BACKUP_DIR=/tmp/teste-backup` e ativar `/etc/cron.d/arpt-backup`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-backup-object-storage-rclone#1.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-backup-object-storage-rclone",
+   "tarefa": "1.4",
+   "descricao": "Aviso por e-mail em caso de falha (reaproveitar `deploy-notify.sh`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-backup-object-storage-rclone#2.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-backup-object-storage-rclone",
+   "tarefa": "2.3",
+   "descricao": "Autorizar a chave no servidor com `restrict,command=\"rrsync -ro /root/backups-arpt\"` e confirmar o primeiro pull",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-backup-object-storage-rclone#3.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-backup-object-storage-rclone",
+   "tarefa": "3.1",
+   "descricao": "Escolher o provedor e registrar custo/limite (aprovação do dono)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-backup-object-storage-rclone#3.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-backup-object-storage-rclone",
+   "tarefa": "3.2",
+   "descricao": "Criar bucket com versionamento ou bloqueio de exclusão e credencial de escopo mínimo",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-backup-object-storage-rclone#3.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-backup-object-storage-rclone",
+   "tarefa": "3.3",
+   "descricao": "Instalar `rclone`, configurar `crypt` e guardar a senha fora do servidor",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-backup-object-storage-rclone#3.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-backup-object-storage-rclone",
+   "tarefa": "3.4",
+   "descricao": "Definir `BACKUP_RCLONE` no cron e verificar o primeiro envio",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-backup-object-storage-rclone#3.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-backup-object-storage-rclone",
+   "tarefa": "3.5",
+   "descricao": "Documentar a recuperação a partir do bucket",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-backup-object-storage-rclone#4.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-backup-object-storage-rclone",
+   "tarefa": "4.1",
+   "descricao": "Teste de restauração em máquina de teste, comparando usuários e tabelas",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-backup-object-storage-rclone#4.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-backup-object-storage-rclone",
+   "tarefa": "4.2",
+   "descricao": "Registrar o teste mensal em `docs/BACKUP.md`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
    "id": "add-digital-origin-passports-tracking#1.1",
    "area": "infraestrutura-e-deploy",
    "tipo": "codigo",
@@ -591,6 +691,1446 @@
    "bloqueia": false
   },
   {
+   "id": "add-docker-housekeeping-schedule#1.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-docker-housekeeping-schedule",
+   "tarefa": "1.1",
+   "descricao": "Criar `scripts/docker-housekeeping.sh` (image prune, builder prune semanal, trava de deploy, serviços parados, registro do espaço liberado)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-docker-housekeeping-schedule#1.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-docker-housekeeping-schedule",
+   "tarefa": "1.2",
+   "descricao": "Criar a agenda versionada e o passo de instalação idempotente",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-docker-housekeeping-schedule#1.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-docker-housekeeping-schedule",
+   "tarefa": "1.3",
+   "descricao": "Aviso quando o uso do disco passar de 80%",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-docker-housekeeping-schedule#2.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-docker-housekeeping-schedule",
+   "tarefa": "2.1",
+   "descricao": "Teste com a trava de deploy presente (a limpeza deve adiar)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-docker-housekeeping-schedule#2.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-docker-housekeeping-schedule",
+   "tarefa": "2.2",
+   "descricao": "Teste com um serviço parado (a limpeza deve adiar)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-docker-housekeeping-schedule#2.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-docker-housekeeping-schedule",
+   "tarefa": "2.3",
+   "descricao": "Conferir que os volumes permanecem após a execução",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-docker-housekeeping-schedule#3.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-docker-housekeeping-schedule",
+   "tarefa": "3.1",
+   "descricao": "Instalar a agenda e executar uma vez manualmente",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-docker-housekeeping-schedule#3.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-docker-housekeeping-schedule",
+   "tarefa": "3.2",
+   "descricao": "Documentar em `docs/` e remover as tarefas manuais do servidor antigo ao desligá-lo",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#1.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "1.1",
+   "descricao": "Migration aditiva: `arpt_comunidade`, `arpt_comunidade_consentimento` (snapshot, representante, revogação), `arpt_comunidade_projeto`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#1.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "1.2",
+   "descricao": "Migration aditiva: `arpt_impacto_regra` e `arpt_pedido_impacto`; coluna `comunidade_id` nula em `arpt_origem_declaracao`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#1.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "1.3",
+   "descricao": "Aplicar pelo `docker-compose.migrations.yml` (serviço `migrations`, `--build`, `--no-deps`) e conferir o esquema",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#2.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "2.1",
+   "descricao": "Serviço de comunidade: cadastro, vínculo com declaração, publicação de snapshot só com consentimento vigente",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#2.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "2.2",
+   "descricao": "Revogação com invalidação de cache em até 15 minutos",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#2.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "2.3",
+   "descricao": "Rota pública `GET /public/comunidades/:slug` (404 sem consentimento; área aproximada ≥ 10 km; sem coordenadas exatas)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#2.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "2.4",
+   "descricao": "Testes: sem consentimento, conteúdo alterado, revogação, ausência de dado pessoal na resposta",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#3.0",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "3.0",
+   "descricao": "Lançamento sem repasse: regra de percentual cadastrada e desligada; exibir só dados factuais enquanto não houver repasse real",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#3.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "3.1",
+   "descricao": "Motor de regras versionadas e cálculo do impacto no pagamento do pedido, gravando regra, fonte e valores",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#3.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "3.2",
+   "descricao": "Estado \"a repassar\" → \"repassado\" derivado do repasse liquidado (`dropshipping-payouts`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#3.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "3.3",
+   "descricao": "Estimativa por unidade para a página do produto; omitir quando não houver regra com base",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#3.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "3.4",
+   "descricao": "Garantir que nenhum valor de carbono ou área preservada seja exibido sem certificação",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#3.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "3.5",
+   "descricao": "Testes: regra alterada não muda pedido antigo, indicador sem base omitido, moeda do comprador com valor em BRL e data",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#4.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "4.1",
+   "descricao": "Serviço de composição da jornada a partir da declaração e, quando existirem, dos lotes de rastreabilidade",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#4.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "4.2",
+   "descricao": "`GET /public/origem/:publicId/historia` (cartão, jornada, impacto por unidade), cache de 60 s",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#4.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "4.3",
+   "descricao": "Link \"Verificar origem\" somente com prova ancorada (integração com `add-digital-origin-passports-tracking`; sem ela, omitir)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#4.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "4.4",
+   "descricao": "Testes: etapa sem registro, lote sem prova, resposta sem dados pessoais",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#5.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "5.1",
+   "descricao": "Cartão do produtor e da madeira em `components/origem/`, ao lado de `SeloOrigem`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#5.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "5.2",
+   "descricao": "Componente da linha do tempo, legível em 360 px e com mídia sob demanda",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#5.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "5.3",
+   "descricao": "Bloco novo em `storefront/components/Blocks.tsx` com tempo limite e queda silenciosa em erro",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#5.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "5.4",
+   "descricao": "Configuração da loja para exibir/ocultar o bloco, sem edição de texto",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#5.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "5.5",
+   "descricao": "Página `/comunidades/[slug]` com metadados em `layout.tsx`; conferir título e descrição no HTML inicial com `curl`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#5.6",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "5.6",
+   "descricao": "i18n com fallback em português rotulado e valores na moeda do comprador",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#5.7",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "5.7",
+   "descricao": "Testes de componente (vitest) para cartão, jornada, ocultar bloco e fallback de idioma",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#6.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "6.1",
+   "descricao": "Cadastro e revisão de comunidades, projetos e prestação de contas",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#6.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "6.2",
+   "descricao": "Registro e revogação de consentimento, com anexo do termo assinado, signatário, data e histórico",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#6.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "6.3",
+   "descricao": "Cadastro de regras de impacto e vínculo da comunidade à declaração",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#6.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "6.4",
+   "descricao": "Publicação de atualizações da comunidade/lote",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#7.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "7.1",
+   "descricao": "Bloco de impacto na confirmação do pedido (idioma e moeda do comprador, só números e link)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#7.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "7.2",
+   "descricao": "Atualizações para compradores: fila, limite de 1 a cada 30 dias por pedido e cancelamento",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#7.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "7.3",
+   "descricao": "Certificado de impacto compartilhável reaproveitando `certificate-share-card`, nome do comprador opcional",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#7.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "7.4",
+   "descricao": "Testes: pedido sem impacto, cancelamento, certificado sem dado pessoal",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#8.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "8.1",
+   "descricao": "Reconstruir `manejo-api` e `manejo-app` com `up -d --build --no-deps`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#8.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "8.2",
+   "descricao": "Cadastrar comunidade-piloto e registrar consentimento antes de ligar o bloco",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#8.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "8.3",
+   "descricao": "Revisão do texto padrão contra risco de greenwashing e conferência manual da jornada ponta a ponta",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipper-origin-story#8.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-dropshipper-origin-story",
+   "tarefa": "8.4",
+   "descricao": "Revisão jurídica do termo de consentimento (comunidade e produtor individual)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipping-producer-management-panel#6.3",
+   "area": "painel-do-produtor",
+   "tipo": "codigo",
+   "origem": "add-dropshipping-producer-management-panel",
+   "tarefa": "6.3",
+   "descricao": "Verificação ponta a ponta no painel real (listar, editar, cadastrar produto, importar de um projeto e conferir a lista do produtor): exige Keycloak e login de administrador, que não existem no ambiente local; fazer depois do deploy. Coberto até aqui por testes de integração (API com banco real) e de componente (painel com API simulada)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipping-producer-management-panel#6.5",
+   "area": "painel-do-produtor",
+   "tipo": "codigo",
+   "origem": "add-dropshipping-producer-management-panel",
+   "tarefa": "6.5",
+   "descricao": "Regenerar o manual (`node scripts/gerar-manual.mjs`): hoje o gerador falha por 43 specs sem seção que já existiam antes desta change (`wallet-*`, `blockchain-*`, `display-tokens`, etc.); mapeá-las primeiro",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-dropshipping-producer-management-panel#6.6",
+   "area": "painel-do-produtor",
+   "tipo": "codigo",
+   "origem": "add-dropshipping-producer-management-panel",
+   "tarefa": "6.6",
+   "descricao": "Sincronizar as specs ao arquivar a change (`/opsx:archive`)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#1.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "1.1",
+   "descricao": "Confirmar que `add-international-taxes-and-customs` e `add-live-fx-and-buyer-currency` estão implementadas em desenvolvimento",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#1.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "1.2",
+   "descricao": "Rever os termos de uso (consumidor e dropshipper) para refletir as regras de retenção, recusa, tributo não pago e perda, em PT e EN",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#1.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "1.3",
+   "descricao": "Definir com o negócio os valores padrão de `ARREPENDIMENTO_DIAS_INTERNACIONAL` e `RETENCAO_ALFANDEGA_PRAZO_DIAS`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#2.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "2.1",
+   "descricao": "Migration aditiva: novos estados do pedido internacional e colunas de retenção, motivo e perda a recuperar",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#2.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "2.2",
+   "descricao": "Migration aditiva: `escopo_execucao_id` nas tabelas de restrição de país e categoria",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#2.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "2.3",
+   "descricao": "Aplicar as migrations pelo `docker-compose.migrations.yml` (serviço `migrations`, `--no-deps`, com `--build` se o script for novo)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#3.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "3.1",
+   "descricao": "Implementar o estado `RETIDO_ALFANDEGA` e as transições para enviado, perdido e não entregue por responsabilidade do comprador",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#3.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "3.2",
+   "descricao": "Exigir rastreio e transportadora no despacho de pedido internacional",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#3.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "3.3",
+   "descricao": "Rotas administrativas de retenção, liberação, perda e não entrega, com motivo registrado",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#3.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "3.4",
+   "descricao": "Bloquear repasses em retenção e antes da entrega confirmada",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#3.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "3.5",
+   "descricao": "Contar o arrependimento a partir da entrega no destino e aplicar o prazo internacional próprio",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#3.6",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "3.6",
+   "descricao": "Aplicar as regras financeiras de perda, recusa e tributo não pago, reembolsando na moeda e no valor cobrados",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#3.7",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "3.7",
+   "descricao": "Job de prazo de retenção no padrão de isolamento dos jobs de manutenção",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#3.8",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "3.8",
+   "descricao": "Notificações do pedido internacional no idioma e na moeda do pedido, suprimidas em execução de teste",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#3.9",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "3.9",
+   "descricao": "Mostrar a declaração aduaneira ao produtor e o estado de retenção ao comprador e ao dropshipper",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#4.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "4.1",
+   "descricao": "Implementar o modo de teste da transportadora internacional e do câmbio, com `JOURNEY_INTL_STUB_ENABLED` e `JOURNEY_INTL_STUB_SECRET`, inexistente quando desligado, sem segredo ou em loja real",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#4.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "4.2",
+   "descricao": "Valores determinísticos por país de teste (DE em DAP, US em DDP) e câmbio fixo para EUR e USD",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#4.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "4.3",
+   "descricao": "Escopar restrições criadas pela execução à loja de teste e garantir que a consulta real as ignore fora dela",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#4.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "4.4",
+   "descricao": "Estender `journey-revert.ts` para apagar declarações, cotações, estados de retenção e restrições marcadas, sem tocar nas reais",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#5.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "5.1",
+   "descricao": "Cenário de compra em DAP para a Europa em EUR, até a entrega e o repasse",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#5.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "5.2",
+   "descricao": "Cenário de compra em DDP para os Estados Unidos em USD, com tributos fora da base dos repasses",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#5.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "5.3",
+   "descricao": "Cenário de destino bloqueado",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#5.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "5.4",
+   "descricao": "Cenário de produto sem dados aduaneiros, verificando que a transportadora não foi chamada",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#5.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "5.5",
+   "descricao": "Cenário de cotação de câmbio vencida no checkout",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#5.6",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "5.6",
+   "descricao": "Cenário de retenção na alfândega, com liberação e retomada até a entrega",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#5.7",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "5.7",
+   "descricao": "Verificações de coerência de moeda, taxa, valor cobrado e divisão em BRL em cada cenário",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#5.8",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "5.8",
+   "descricao": "Pular e relatar como pulados os cenários internacionais em produção sem o modo de teste habilitado",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#5.9",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "5.9",
+   "descricao": "Relatório por cenário, com classificação das falhas e sem tokens, documentos, e-mail, endereço ou rastreio real",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#6.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "6.1",
+   "descricao": "Opção para rodar os cenários internacionais em `scripts/test-journey-local.sh` e `scripts/test-dropshipping-local.sh`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#6.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "6.2",
+   "descricao": "Testes unitários e de integração das transições de estado, das regras financeiras e do modo de teste (inclusive os casos de rota inexistente)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#6.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "6.3",
+   "descricao": "Teste de que uma restrição de teste não bloqueia compras em loja real",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#6.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "6.4",
+   "descricao": "Roteiro em `docs/` da jornada internacional, incluindo o teste manual com credenciais de sandbox da DHL",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#6.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "6.5",
+   "descricao": "Varrer telas e relatórios que enumeram estados do pedido e incluir o novo estado",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#7.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "7.1",
+   "descricao": "Reconstruir `manejo-api` e `manejo-app` com `up -d --build --no-deps` depois das mudanças",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#7.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "7.2",
+   "descricao": "Rodar a jornada completa (nacional e internacional) em desenvolvimento e registrar o relatório",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#7.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "7.3",
+   "descricao": "Rodar em produção só com o modo de teste habilitado para a loja de teste, com reversão ao final",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-dropshipping-journey#7.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-dropshipping-journey",
+   "tarefa": "7.4",
+   "descricao": "Abrir uma change de correção por causa raiz para cada defeito confirmado, referenciada no relatório",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-taxes-and-customs#1.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "1.1",
+   "descricao": "Confirmar com a DHL (contrato e versão da API) se há estimativa de tributos e taxas e qual o formato da resposta; registrar a conclusão em `design.md`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-taxes-and-customs#1.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "1.2",
+   "descricao": "Obter revisão fiscal e jurídica da exportação de produtos de madeira e definir a lista inicial de categorias restritas (antes de ligar em produção)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-taxes-and-customs#1.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "1.3",
+   "descricao": "Redigir o texto do aviso de tributos em PT e EN, com versão",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-taxes-and-customs#2.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "2.1",
+   "descricao": "Migration aditiva: `hs_code`, `pais_origem` e `descricao_aduaneira_en` em produtos",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-taxes-and-customs#2.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "2.2",
+   "descricao": "Migration aditiva: colunas de modelo de tributos, tributos estimados, declaração aduaneira e aceite do aviso no pedido",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-taxes-and-customs#2.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "2.3",
+   "descricao": "Migration aditiva: tabelas `restricao_pais_destino` e `restricao_categoria_exportacao`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-taxes-and-customs#2.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "2.4",
+   "descricao": "Aplicar as migrations pelo `docker-compose.migrations.yml` (serviço `migrations`, `--no-deps`, com `--build` se o script for novo)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-taxes-and-customs#3.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "3.1",
+   "descricao": "Adicionar `CUSTOMS_ENABLED` e `DDP_MARGEM_PERCENTUAL` à configuração e ao `env.example`, ambos com padrão seguro",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-taxes-and-customs#3.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "3.2",
+   "descricao": "Validar código HS (6 a 10 dígitos, pontos aceitos) no cadastro de produto",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-taxes-and-customs#3.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "3.3",
+   "descricao": "Implementar a checagem de país bloqueado, categoria restrita e dados aduaneiros ausentes antes de chamar a transportadora, com resposta 422 sem frete fixo",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-taxes-and-customs#3.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "3.4",
+   "descricao": "Enviar valor declarado, HS, origem e descrição na cotação DHL e ler a estimativa de tributos da resposta",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-taxes-and-customs#3.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "3.5",
+   "descricao": "Decidir DAP ou DDP no servidor e devolver `modelo_tributos` e `tributos_estimados` na cotação",
+   "roteiro": null,
+   "bloqueia": true
+  },
+  {
+   "id": "add-international-taxes-and-customs#3.6",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "3.6",
+   "descricao": "Exigir `aceite_aviso_tributos` em DAP no checkout e gravar versão e data do aceite",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-taxes-and-customs#3.7",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "3.7",
+   "descricao": "Somar os tributos estimados ao total em DDP, fora da base de comissões e repasses, e refazer a estimativa quando expirada",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-taxes-and-customs#3.8",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "3.8",
+   "descricao": "Gravar o instantâneo da declaração aduaneira no pedido internacional",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-taxes-and-customs#3.9",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "3.9",
+   "descricao": "Rotas administrativas de restrições e de consulta da declaração",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-taxes-and-customs#4.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "4.1",
+   "descricao": "Checkout: linha de tributos estimados, aviso e caixa de aceite em DAP, mensagens de destino ou produto não atendido, em PT e EN",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-taxes-and-customs#4.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "4.2",
+   "descricao": "Painel admin: campos aduaneiros no formulário de produto e lista de produtos sem dados aduaneiros",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-taxes-and-customs#4.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "4.3",
+   "descricao": "Painel admin: telas de países bloqueados e categorias restritas",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-taxes-and-customs#4.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "4.4",
+   "descricao": "Painel admin: consulta da declaração no detalhe do pedido",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-taxes-and-customs#5.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "5.1",
+   "descricao": "Testes de unidade: validação de HS, decisão DAP/DDP, soma em DDP e base de comissões",
+   "roteiro": null,
+   "bloqueia": true
+  },
+  {
+   "id": "add-international-taxes-and-customs#5.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "5.2",
+   "descricao": "Testes de integração do frete com DHL simulada: com e sem estimativa, país bloqueado, produto sem HS, contingência",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-taxes-and-customs#5.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "5.3",
+   "descricao": "Teste de que, com `CUSTOMS_ENABLED=false`, as respostas de cotação e checkout são idênticas às anteriores",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-taxes-and-customs#5.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "5.4",
+   "descricao": "Teste de que o destino `BR` nunca recebe dados aduaneiros nem restrições",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-taxes-and-customs#6.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "6.1",
+   "descricao": "Reconstruir `manejo-api` e `manejo-app` com `up -d --build --no-deps` depois das mudanças",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-taxes-and-customs#6.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "6.2",
+   "descricao": "Relatório de divergência entre tributos estimados e cobrados pela transportadora",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-international-taxes-and-customs#6.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-international-taxes-and-customs",
+   "tarefa": "6.3",
+   "descricao": "Ligar `CUSTOMS_ENABLED` em produção somente após 1.2 concluída",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#1.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "1.1",
+   "descricao": "Migration aditiva: tabela `fx_taxas` com índice por moeda e data da leitura",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#1.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "1.2",
+   "descricao": "Migration aditiva: colunas de moeda de cobrança, taxa, margem, valor cobrado e data da leitura no pedido e na compra",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#1.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "1.3",
+   "descricao": "Aplicar as migrations pelo `docker-compose.migrations.yml` (serviço `migrations`, `--no-deps`, com `--build` se o script for novo)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#2.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "2.1",
+   "descricao": "Adicionar as variáveis `FX_*` à configuração e ao `env.example` com padrões seguros",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#2.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "2.2",
+   "descricao": "Implementar o cliente da fonte principal (PTAX do Banco Central) e o da fonte de reserva (Frankfurter)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#2.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "2.3",
+   "descricao": "Implementar a validação das leituras (zero, negativa, variação máxima) com registro do motivo",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#2.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "2.4",
+   "descricao": "Criar o job de atualização na fila de manutenção, isolado dos demais jobs",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#2.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "2.5",
+   "descricao": "Implementar a regra de leitura vigente, contingência e idade máxima, com moeda indisponível sem leitura recente",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#2.6",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "2.6",
+   "descricao": "Criar a rota pública `GET /public/fx/taxas` com cache curto no Redis",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#3.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "3.1",
+   "descricao": "Converter o total em BRL para a moeda do comprador no servidor, com margem e arredondamento por moeda",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#3.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "3.2",
+   "descricao": "Criar a cotação travada (`cotacao_id`, `expira_em`) e responder 409 com o novo valor quando vencida",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#3.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "3.3",
+   "descricao": "Ajustar `StripeGateway` para as moedas disponíveis e para PIX somente em BRL",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#3.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "3.4",
+   "descricao": "Gravar moeda, taxa, margem, valor cobrado e data da leitura no pedido",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#3.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "3.5",
+   "descricao": "Garantir que a divisão de produtor, dropshipper e ARPT continue calculada em BRL",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#3.6",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "3.6",
+   "descricao": "Reembolso na moeda e no valor originalmente cobrados",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#3.7",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "3.7",
+   "descricao": "Ignorar taxa ou valor enviados pelo cliente no corpo do checkout",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#4.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "4.1",
+   "descricao": "Substituir a taxa fixa em `src/shared/lib/currency.ts` pela taxa da API, com fallback para BRL",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#4.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "4.2",
+   "descricao": "Implementar a ordem de escolha da moeda (cookie, país do endereço, idioma)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#4.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "4.3",
+   "descricao": "Criar o seletor de moeda na vitrine e nas lojas de dropshipper, com cookie escopado ao host",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#4.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "4.4",
+   "descricao": "Formatar e arredondar os valores por moeda e idioma",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#4.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "4.5",
+   "descricao": "Mostrar no checkout a cotação travada, a validade e o aviso de valor alterado",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#4.6",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "4.6",
+   "descricao": "Adicionar as traduções PT e EN do seletor e dos avisos",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#4.7",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "4.7",
+   "descricao": "Remover `NEXT_PUBLIC_USD_BRL_RATE` do `Dockerfile`, do `docker-compose.yml` e do `env.example`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#5.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "5.1",
+   "descricao": "Testes de unidade: conversão e arredondamento, margem, validação de leitura, idade máxima",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#5.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "5.2",
+   "descricao": "Testes de integração: fonte principal fora do ar usa a reserva; ambas fora usam a última leitura; leitura velha remove a moeda",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#5.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "5.3",
+   "descricao": "Teste de que a divisão de repasses de um pedido em USD é igual à do mesmo pedido em BRL",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#5.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "5.4",
+   "descricao": "Teste de reembolso integral e parcial em moeda estrangeira",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#5.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "5.5",
+   "descricao": "Teste de interface: trocar idioma não troca moeda, e trocar moeda não troca idioma",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#5.6",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "5.6",
+   "descricao": "Teste de que `cotacao_id` vencida devolve 409 e não cria sessão no Stripe",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#6.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "6.1",
+   "descricao": "Reconstruir `manejo-api` e `manejo-app` com `up -d --build --no-deps` depois das mudanças",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#6.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "6.2",
+   "descricao": "Habilitar EUR somente depois de validar USD e BRL em produção",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#6.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "6.3",
+   "descricao": "Registrar em `docs/` a operação do câmbio (alertas de contingência, como forçar uma leitura)",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "add-live-fx-and-buyer-currency#6.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "add-live-fx-and-buyer-currency",
+   "tarefa": "6.4",
+   "descricao": "Abrir a change do app móvel para seguir a moeda escolhida, se for decidido",
+   "roteiro": null,
+   "bloqueia": true
+  },
+  {
    "id": "add-manual-tls-issue-for-verified-domains#1.1",
    "area": "lojas",
    "tipo": "codigo",
@@ -1041,7 +2581,7 @@
    "bloqueia": false
   },
   {
-   "id": "add-marketplace-channel-integrations#104",
+   "id": "add-marketplace-channel-integrations#258",
    "area": "dropshipping",
    "tipo": "codigo",
    "origem": "add-marketplace-channel-integrations",
@@ -1431,352 +2971,42 @@
    "bloqueia": false
   },
   {
-   "id": "add-store-discount-coupons#4.1",
+   "id": "fix-register-ip-output-not-function#1.2",
    "area": "infraestrutura-e-deploy",
    "tipo": "codigo",
-   "origem": "add-store-discount-coupons",
-   "tarefa": "4.1",
-   "descricao": "Rota `POST /storefront/:slug/cupom/validar` com rate limit por cliente e respeito a `COUPONS_ENABLED`",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-store-discount-coupons#4.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-store-discount-coupons",
-   "tarefa": "4.2",
-   "descricao": "`createStoreCheckout`: revalidar e reservar o cupom, cobrar o total com desconto, gravar `cupom_id`, `desconto_cents` e `total_esperado_cents` nos metadados, responder `COUPON_CHANGED` quando o cupom deixar de valer, liberar a reserva em caso de erro",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-store-discount-coupons#4.3",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-store-discount-coupons",
-   "tarefa": "4.3",
-   "descricao": "Gateways: `descontoCents` na interface do criador de sessão; Stripe com cupom efêmero de uso único, Mercado Pago e simulado com linha de desconto",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-store-discount-coupons#4.4",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-store-discount-coupons",
-   "tarefa": "4.4",
-   "descricao": "Webhook (`storeCheckout.ts`): ler o cupom dos metadados e repassar ao pedido; liberar o uso quando o pagamento for reembolsado sem pedido",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-store-discount-coupons#4.5",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-store-discount-coupons",
-   "tarefa": "4.5",
-   "descricao": "Testes de integração: pagamento com cupom, cupom esgotado entre carrinho e checkout, webhook repetido, valor pago menor que o esperado",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-store-discount-coupons#5.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-store-discount-coupons",
-   "tarefa": "5.1",
-   "descricao": "`createOrderFromPayment`: recalcular o desconto no servidor, conferir com os metadados, ratear por produtor, calcular a divisão sobre o preço com desconto e consumir o uso na mesma transação",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-store-discount-coupons#5.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-store-discount-coupons",
-   "tarefa": "5.2",
-   "descricao": "Gravar snapshot (`desconto_cents` no pedido e nos subpedidos, cupom e código) e usar esses valores em extratos e repasses",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-store-discount-coupons#5.3",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-store-discount-coupons",
-   "tarefa": "5.3",
-   "descricao": "Estorno e devolução (`orders/payouts.ts`): reembolso limitado ao valor pago e comissão estornada a partir do snapshot",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-store-discount-coupons#5.4",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-store-discount-coupons",
-   "tarefa": "5.4",
-   "descricao": "Testes: comissões com cupom (R$ 100 com R$ 20 de desconto), dois produtores, líquido negativo recusado, cupom editado depois do pedido",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-store-discount-coupons#6.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-store-discount-coupons",
-   "tarefa": "6.1",
-   "descricao": "Página `Coupons.jsx` com lista, criação e edição, seletor de lojas, validade, quantidade, valor mínimo, pausa e aviso de impacto nas comissões",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-store-discount-coupons#6.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-store-discount-coupons",
-   "tarefa": "6.2",
-   "descricao": "Detalhe do cupom com usos consumidos, reservados, saldo e pedidos; entrada no menu e testes do componente",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-store-discount-coupons#7.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-store-discount-coupons",
-   "tarefa": "7.1",
-   "descricao": "Campo de cupom no carrinho (só com o recurso ligado), com desconto e total atualizados, remoção e aviso quando o cupom deixar de valer",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-store-discount-coupons#7.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-store-discount-coupons",
-   "tarefa": "7.2",
-   "descricao": "Resumo do checkout com a linha de desconto e tratamento de `COUPON_CHANGED`; textos nos idiomas da vitrine",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-store-discount-coupons#8.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-store-discount-coupons",
-   "tarefa": "8.1",
-   "descricao": "Aplicar a migration pelo `docker-compose.migrations.yml` e reconstruir `manejo-api`, `manejo-app` e o painel com `up -d --build --no-deps`, com a flag desligada",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-store-discount-coupons#8.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-store-discount-coupons",
-   "tarefa": "8.2",
-   "descricao": "Ligar a flag, validar em loja de execução de teste (pagamento simulado) e depois com uma compra real de baixo valor, conferindo recibo, pedido, comissões e log",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "add-store-discount-coupons#8.3",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "add-store-discount-coupons",
-   "tarefa": "8.3",
-   "descricao": "Sincronizar as specs do change e atualizar o manual do painel",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "admin-dash-users-search-sort#1.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "admin-dash-users-search-sort",
-   "tarefa": "1.1",
-   "descricao": "Em `backend/manejo-api/src/services/user.services.ts`, estender `listUsersPaginated` com `search`, `sortBy` e `sortDir` (padrão `created_at`/`desc`)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "admin-dash-users-search-sort#1.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "admin-dash-users-search-sort",
+   "origem": "fix-register-ip-output-not-function",
    "tarefa": "1.2",
-   "descricao": "Criar o mapa fixo de coluna → expressão SQL (`id`, `name`, `email`, `status`, `created_at`) e aplicar `ORDER BY` com desempate por `id`",
+   "descricao": "Se o bundle estiver atual e ainda falhar, identificar qual `bsv` o webpack resolve (`scryptlib`, `@scrypt-inc/bsv`, `bsv@2`) e se `Transaction.Output` é construtor nele",
    "roteiro": null,
    "bloqueia": false
   },
   {
-   "id": "admin-dash-users-search-sort#1.3",
+   "id": "fix-register-ip-output-not-function#2.2",
    "area": "infraestrutura-e-deploy",
    "tipo": "codigo",
-   "origem": "admin-dash-users-search-sort",
-   "tarefa": "1.3",
-   "descricao": "Aplicar a busca em nome completo e e-mail com `ILIKE`, binding e escape de `\\`, `%` e `_`; usar a mesma cláusula na consulta de dados e no `count`",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "admin-dash-users-search-sort#2.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "admin-dash-users-search-sort",
-   "tarefa": "2.1",
-   "descricao": "Em `backend/manejo-api/src/routes/admin/manejo.ts` (`GET /users`), validar `search` (trim, máx. 100), `sortBy` e `sortDir` com zod e repassar ao serviço",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "admin-dash-users-search-sort#2.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "admin-dash-users-search-sort",
+   "origem": "fix-register-ip-output-not-function",
    "tarefa": "2.2",
-   "descricao": "Conferir que entrada inválida responde 400 (não 500); se o handler global não tratar `ZodError`, capturar na rota",
+   "descricao": "Se 1.2 indicar resolução divergente, fixar o `bsv` correto (alias/dependência) e confirmar que `RegisterIP` constrói as saídas",
    "roteiro": null,
    "bloqueia": false
   },
   {
-   "id": "admin-dash-users-search-sort#2.3",
+   "id": "fix-register-ip-output-not-function#4.1",
    "area": "infraestrutura-e-deploy",
    "tipo": "codigo",
-   "origem": "admin-dash-users-search-sort",
-   "tarefa": "2.3",
-   "descricao": "Garantir que sem os novos parâmetros a resposta é a mesma de hoje (`created_at desc`, `{ users, total }`)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "admin-dash-users-search-sort#3.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "admin-dash-users-search-sort",
-   "tarefa": "3.1",
-   "descricao": "Testes do serviço: busca por nome, por e-mail, sem diferenciar maiúsculas, com `%`/`_` literais, total filtrado e usuário que estaria em outra página",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "admin-dash-users-search-sort#3.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "admin-dash-users-search-sort",
-   "tarefa": "3.2",
-   "descricao": "Testes de ordenação: cada coluna nos dois sentidos, desempate estável entre páginas, `sortBy` inválido rejeitado",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "admin-dash-users-search-sort#4.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "admin-dash-users-search-sort",
+   "origem": "fix-register-ip-output-not-function",
    "tarefa": "4.1",
-   "descricao": "Ler `searchTerm`, `sortBy` e `sortDir` do `localStorage` de forma síncrona, com validação (valor inválido → padrão `created_at desc`) e nova chave `admin_users_filters_sortBy`",
+   "descricao": "Reconstruir e republicar o frontend; garantir que o service worker/PWA entregue o novo bundle",
    "roteiro": null,
    "bloqueia": false
   },
   {
-   "id": "admin-dash-users-search-sort#4.2",
+   "id": "fix-register-ip-output-not-function#4.2",
    "area": "infraestrutura-e-deploy",
    "tipo": "codigo",
-   "origem": "admin-dash-users-search-sort",
+   "origem": "fix-register-ip-output-not-function",
    "tarefa": "4.2",
-   "descricao": "Adicionar `debouncedSearch` (300 ms) e passar `search`, `sortBy`, `sortDir` como `params` em `fetchUsers`; mudar busca ou ordenação faz `setPage(1)`",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "admin-dash-users-search-sort#4.3",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "admin-dash-users-search-sort",
-   "tarefa": "4.3",
-   "descricao": "Descartar respostas obsoletas de `fetchUsers` (contador de requisição ou `AbortController`)",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "admin-dash-users-search-sort#4.4",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "admin-dash-users-search-sort",
-   "tarefa": "4.4",
-   "descricao": "Renderizar o campo de pesquisa (ícone, botão de limpar) acima da tabela e dos cartões móveis, mais o aviso de filtro aplicado",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "admin-dash-users-search-sort#4.5",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "admin-dash-users-search-sort",
-   "tarefa": "4.5",
-   "descricao": "Trocar os cabeçalhos ID, Usuário, Email, Status e Cadastrado em por `TableSortLabel` (com `aria-sort`); alternar sentido na coluna ativa e iniciar em `asc` ao trocar de coluna; deixar Função, Split, Stripe e Ações sem ordenação",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "admin-dash-users-search-sort#4.6",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "admin-dash-users-search-sort",
-   "tarefa": "4.6",
-   "descricao": "Adicionar na lista móvel um seletor de ordenação equivalente",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "admin-dash-users-search-sort#4.7",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "admin-dash-users-search-sort",
-   "tarefa": "4.7",
-   "descricao": "Remover `filteredUsers` e usar `users` direto nas duas listas; manter \"Nenhum usuário encontrado.\" para busca sem resultado",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "admin-dash-users-search-sort#4.8",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "admin-dash-users-search-sort",
-   "tarefa": "4.8",
-   "descricao": "Persistir e limpar `localStorage` conforme a spec; \"limpar\" remove a busca e restaura a ordenação padrão",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "admin-dash-users-search-sort#5.1",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "admin-dash-users-search-sort",
-   "tarefa": "5.1",
-   "descricao": "Rodar lint e testes de `manejo-api` e o lint/build de `arpt-admin-dash`",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "admin-dash-users-search-sort#5.2",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "admin-dash-users-search-sort",
-   "tarefa": "5.2",
-   "descricao": "Reconstruir `manejo-api` e o admin dash (`up -d --build --no-deps`) e conferir no navegador: busca em página distante, ordenação de cada coluna, recarregar com filtros salvos, limpar filtros",
-   "roteiro": null,
-   "bloqueia": false
-  },
-  {
-   "id": "admin-dash-users-search-sort#5.3",
-   "area": "infraestrutura-e-deploy",
-   "tipo": "codigo",
-   "origem": "admin-dash-users-search-sort",
-   "tarefa": "5.3",
-   "descricao": "Rodar `openspec validate admin-dash-users-search-sort` e corrigir pendências",
+   "descricao": "Smoke test no site publicado: registrar um arquivo de teste e confirmar o redirecionamento para a visualização do token",
    "roteiro": null,
    "bloqueia": false
   },
@@ -2037,6 +3267,116 @@
    "origem": "harden-redis-auth-and-exposure",
    "tarefa": "6.5",
    "descricao": "Restaurar o `.env` do servidor para o valor acordado (vazio ou senha definitiva) e recriar os serviços na ordem documentada.",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-webhook-deploy-new-server#1.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-webhook-deploy-new-server",
+   "tarefa": "1.1",
+   "descricao": "Remover o segredo padrão de `scripts/webhook-listener.js`; recusar iniciar sem segredo ou com menos de 32 caracteres",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-webhook-deploy-new-server#1.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-webhook-deploy-new-server",
+   "tarefa": "1.2",
+   "descricao": "Comparar o segredo com `crypto.timingSafeEqual`; nunca registrar o valor",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-webhook-deploy-new-server#1.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-webhook-deploy-new-server",
+   "tarefa": "1.3",
+   "descricao": "Registrar repositório, branch e commit de cada deploy disparado",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-webhook-deploy-new-server#1.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-webhook-deploy-new-server",
+   "tarefa": "1.4",
+   "descricao": "Testes do listener: sem segredo, segredo curto/errado (401), branch diferente de `main` (200 sem deploy), push durante deploy",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-webhook-deploy-new-server#2.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-webhook-deploy-new-server",
+   "tarefa": "2.1",
+   "descricao": "Reescrever `scripts/webhook-listener.service` sem segredo e sem caminhos fixos",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-webhook-deploy-new-server#2.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-webhook-deploy-new-server",
+   "tarefa": "2.2",
+   "descricao": "Documentar a instalação (Node.js, `/etc/arpt-webhook.env` 0600, unit, `enable --now`) e a rotação do segredo",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-webhook-deploy-new-server#3.1",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-webhook-deploy-new-server",
+   "tarefa": "3.1",
+   "descricao": "Garantir que o firewall bloqueia a porta 9000 de fora",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-webhook-deploy-new-server#3.2",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-webhook-deploy-new-server",
+   "tarefa": "3.2",
+   "descricao": "Instalar o listener com segredo novo e conferir `systemctl is-active`",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-webhook-deploy-new-server#3.3",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-webhook-deploy-new-server",
+   "tarefa": "3.3",
+   "descricao": "Atualizar o segredo nos webhooks de `deploy`, `backend` e `frontend` no Bitbucket",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-webhook-deploy-new-server#3.4",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-webhook-deploy-new-server",
+   "tarefa": "3.4",
+   "descricao": "Teste com um push, com aviso prévio, conferindo o log do deploy",
+   "roteiro": null,
+   "bloqueia": false
+  },
+  {
+   "id": "harden-webhook-deploy-new-server#3.5",
+   "area": "infraestrutura-e-deploy",
+   "tipo": "codigo",
+   "origem": "harden-webhook-deploy-new-server",
+   "tarefa": "3.5",
+   "descricao": "Confirmar que o listener do servidor antigo permanece desligado",
    "roteiro": null,
    "bloqueia": false
   },

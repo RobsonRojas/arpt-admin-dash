@@ -158,7 +158,8 @@
     "sponsor-recognition",
     "sponsor-recognition-prompt",
     "supporter-updates",
-    "whatsapp-contact"
+    "whatsapp-contact",
+    "whatsapp-funding"
    ],
    "docs": [
     {
@@ -581,8 +582,10 @@
    "id": "painel-do-produtor",
    "titulo": "Painel do produtor",
    "grupo": "Ecossistema",
-   "resumo": "Papel, ativação, produtos, fotos, prazos, desempenho e uso offline do produtor, e a origem da madeira (espécies, declaração, documentos, análise e requisitos).",
-   "rotas": [],
+   "resumo": "Painel administrativo de produtores (lista, detalhes, cadastro e importação de produtos de projetos), papel, ativação, produtos, fotos, prazos, desempenho e uso offline do produtor, e a origem da madeira (espécies, declaração, documentos, análise e requisitos).",
+   "rotas": [
+    "/dropshipping-admin/produtores"
+   ],
    "specs": [
     "admin-producer-product-transfer",
     "origin-assisted-input",
@@ -624,13 +627,61 @@
    "docs": []
   },
   {
+   "id": "token-e-blockchain",
+   "titulo": "Tokens, carteira e blockchain",
+   "grupo": "Ecossistema",
+   "resumo": "Portal de tokens (arpttoken.site): carteira, ativos e ordinals, registro de IPs, histórico e ancoragem de dados na blockchain, e a árvore com histórico em blockchain.",
+   "rotas": [],
+   "specs": [
+    "assets-page-navigation",
+    "blockchain-data-anchoring",
+    "blockchain-data-retrieval",
+    "blockchain-env-config",
+    "create-wallet-ui",
+    "display-tokens",
+    "fetch-blockchain-assets",
+    "fix-register-ip-output-error",
+    "frontend-token-portal",
+    "ip-hash-registration",
+    "ip-registration-carousel",
+    "ip-registration-tutorials",
+    "list-created-tokens",
+    "manual-asset-registration",
+    "network-synchronization",
+    "ordinal-image-preview",
+    "token-api-client",
+    "token-data-validation",
+    "token-file-preview",
+    "token-visualization-resilience",
+    "tree-blockchain-history",
+    "view-registered-ips",
+    "wallet-accounts",
+    "wallet-assets-page",
+    "wallet-assets-viewer",
+    "wallet-balance",
+    "wallet-history",
+    "wallet-history-token-labels",
+    "wallet-ordinals",
+    "wallet-transfer"
+   ],
+   "docs": [
+    {
+     "titulo": "arpttoken.site: site e API de tokens na blockchain",
+     "ancora": "doc-arpttoken-site"
+    }
+   ]
+  },
+  {
    "id": "app-e-site",
    "titulo": "arpt.site e app móvel",
    "grupo": "Ecossistema",
    "resumo": "Páginas e abas públicas do arpt.site, PWA e o app móvel (sessão, sincronização, inventário, manejo, pedidos).",
    "rotas": [],
    "specs": [
+    "contact-options",
     "content-public-identifiers",
+    "i18n-support",
+    "language-toggle",
     "mobile-auth",
     "mobile-auth-token-handling",
     "mobile-i18n-headers",
@@ -640,7 +691,9 @@
     "mobile-session-lifecycle",
     "mobile-sync",
     "mobile-sync-credential-protection",
-    "pwa-support"
+    "pwa-installation",
+    "pwa-support",
+    "pwa-update-detection"
    ],
    "docs": []
   },
@@ -654,19 +707,26 @@
    ],
    "specs": [
     "arpttoken-site-hosting",
+    "background-build",
     "bitbucket-webhook-deploy",
     "build",
+    "build-resource-limits",
+    "credential-storage",
     "deploy-script",
+    "git-security-hygiene",
     "jwt-secret-configuration",
     "lets-encrypt-docker-certificate",
+    "linting",
+    "local-integration-testing",
     "nginx-config-live-mount",
     "production-secret-rollout",
     "secret-hygiene",
+    "server-key-management",
     "smoke-test-host-header",
+    "spa-nginx-routing",
     "ssl-certbot-preflight",
     "ssl-environment-scripts",
-    "ssl-prod-setup",
-    "token-api-client"
+    "ssl-prod-setup"
    ],
    "docs": [
     {
@@ -742,6 +802,7 @@
   "/dropshipping-admin": "dropshipping",
   "/orders-admin": "dropshipping",
   "/dropshipping": "dropshipping",
+  "/dropshipping-admin/produtores": "painel-do-produtor",
   "/developer-settings": "infraestrutura-e-deploy"
  }
 }

@@ -1,11 +1,15 @@
 {
- "total": 448,
+ "total": 582,
  "manuais": 195,
- "codigo": 253,
+ "codigo": 387,
  "porArea": {
   "infraestrutura-e-deploy": {
-   "total": 283,
+   "total": 414,
    "manuais": 130
+  },
+  "painel-do-produtor": {
+   "total": 9,
+   "manuais": 6
   },
   "lojas": {
    "total": 48,
@@ -34,10 +38,6 @@
   "produtos-e-catalogo": {
    "total": 3,
    "manuais": 3
-  },
-  "painel-do-produtor": {
-   "total": 6,
-   "manuais": 6
   },
   "app-e-site": {
    "total": 18,

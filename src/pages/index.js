@@ -24,6 +24,8 @@ export { default as Dropshipping } from './Dropshipping';
 export * from './ManejoLogs';
 export { DropshippingAdmin } from './DropshippingAdmin';
 export { DropshipperDetails } from './DropshipperDetails';
+export { Producers } from './Producers';
+export { ProducerDetails } from './ProducerDetails';
 export { AdminOrders } from './AdminOrders';
 export * from './PrivacySettings';
 export * from './AnalyticsDashboard';

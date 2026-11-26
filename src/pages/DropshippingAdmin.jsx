@@ -393,6 +393,7 @@ export function DropshippingAdmin() {
             Gerencie lojas, transfira propriedades, aloque catálogos e monitore receitas da plataforma.
           </Typography>
         </Box>
+        <Button variant="outlined" onClick={() => navigate('/dropshipping-admin/produtores')}>Produtores</Button>
       </Box>
 
       <AnalyticsSection />
