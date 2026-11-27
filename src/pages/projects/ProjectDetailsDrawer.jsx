@@ -10,6 +10,7 @@ import { ProjectTeam } from '../../components/modules/project_tabs/ProjectTeam';
 import { CampaignAssistant } from '../../components/CampaignAssistant';
 import { ProjectSpends } from '../../components/modules/project_tabs/ProjectSpends';
 import TokenHistoryModal from '../../components/TokenHistoryModal';
+import { LicencaDoProjeto } from './LicencaDoProjeto';
 import { api } from '../../services/api';
 
 export const ProjectDetailsDrawer = ({ 
@@ -211,6 +212,9 @@ export const ProjectDetailsDrawer = ({
                     {triggeringToken ? 'Enfileirando...' : 'Disparar Criação de Token'}
                   </Button>
                 )}
+
+                <Divider sx={{ my: 2 }} />
+                <LicencaDoProjeto projectId={selectedProject.id} />
 
                 <Divider sx={{ my: 2 }} />
                 <Typography variant="subtitle2" gutterBottom>Documentação (IA)</Typography>

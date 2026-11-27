@@ -59,6 +59,7 @@ export const FONTE_DADO = {
     ia_leitura: { texto: 'Lido por IA', cor: 'warning' },
     ia_sugestao: { texto: 'Sugerido por IA', cor: 'warning' },
     lote: { texto: 'Aplicado em lote', cor: 'info' },
+    arvore: { texto: 'Preenchido pelas árvores escolhidas', cor: 'info' },
 };
 
 export const ROTULO_CAMPO = {

@@ -19,6 +19,30 @@ const detalhe = (over = {}, especies) => ({
     documentos: [], pendencias: [], historico: [],
 });
 
+describe('Árvores ligadas à declaração', () => {
+    it('mostra projeto, licença e coordenada exata, e sinaliza árvore que deixou de ser elegível', async () => {
+        api.get.mockResolvedValue({ data: { ...detalhe(), arvores: [
+            { id: 1, numero: 42, especie: 'Ipê', nome_cientifico: 'Handroanthus', projeto: 'Projeto Sol', classificacao: 'Em pé', licenca: { licenciado: true, numero: 'LO-9', validade: '2027-01-31' }, ponto: { lat: -3.12, lng: -60.65 }, inelegivel: false, excluida: false },
+            { id: 2, numero: 43, especie: 'Cumaru', projeto: 'Projeto Sol', licenca: { licenciado: true, numero: 'LO-9', validade: '2020-01-01' }, ponto: null, inelegivel: true, excluida: false },
+        ] } });
+        render(<WoodDeclaration id={7} onBack={() => {}} />);
+        const bloco = await screen.findByTestId('arvores-da-declaracao');
+        expect(bloco).toHaveTextContent('Árvores ligadas (2)');
+        expect(bloco).toHaveTextContent('Árvore nº 42');
+        expect(bloco).toHaveTextContent('nº LO-9, validade 2027-01-31');
+        expect(bloco).toHaveTextContent('-3.12, -60.65');
+        expect(screen.queryByTestId('arvore-inelegivel-1')).toBeNull();
+        expect(screen.getByTestId('arvore-inelegivel-2')).toHaveTextContent(/Deixou de ser elegível/);
+    });
+
+    it('sem árvores, o bloco não aparece', async () => {
+        api.get.mockResolvedValue({ data: detalhe() });
+        render(<WoodDeclaration id={7} onBack={() => {}} />);
+        await screen.findByText('Espécies');
+        expect(screen.queryByTestId('arvores-da-declaracao')).toBeNull();
+    });
+});
+
 describe('Decisão da declaração', () => {
     it('recusar exige motivo: sem texto não chama a API', async () => {
         api.get.mockResolvedValue({ data: detalhe() });

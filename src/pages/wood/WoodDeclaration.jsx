@@ -123,6 +123,28 @@ export function WoodDeclaration({ id, onBack }) {
                 )}
             </Paper>
 
+            {(d.arvores ?? []).length > 0 && (
+                <Paper sx={{ p: 2, mb: 2 }} data-testid="arvores-da-declaracao">
+                    <Typography variant="subtitle1">Árvores ligadas ({d.arvores.length})</Typography>
+                    {d.arvores.map((a) => (
+                        <Box key={a.id} sx={{ mb: 1 }}>
+                            <Typography variant="body2">
+                                <b>Árvore nº {a.numero}</b> · {a.especie}{a.nome_cientifico ? <> (<i>{a.nome_cientifico}</i>)</> : null} · projeto {a.projeto ?? '—'}
+                                {a.classificacao ? ` · ${a.classificacao}` : ''}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                Licença: {a.licenca?.licenciado ? `nº ${a.licenca.numero ?? '—'}, validade ${a.licenca.validade ?? 'sem validade'}` : 'projeto sem o selo Licenciado'}
+                                {a.ponto ? <> · ponto exato: {a.ponto.lat}, {a.ponto.lng} · <Link href={linkMapa(a.ponto.lat, a.ponto.lng)} target="_blank" rel="noreferrer">abrir no mapa</Link></> : ''}
+                            </Typography>
+                            {(a.inelegivel || a.excluida) && (
+                                <Chip size="small" color="warning" sx={{ mt: 0.5 }} data-testid={`arvore-inelegivel-${a.id}`}
+                                    label={a.excluida ? 'Árvore excluída do inventário' : 'Deixou de ser elegível (licença vencida ou tipo incompatível)'} />
+                            )}
+                        </Box>
+                    ))}
+                </Paper>
+            )}
+
             <Paper sx={{ p: 2, mb: 2 }}>
                 <Typography variant="subtitle1">Documentos e fotos</Typography>
                 {d.documentos.length === 0 && <Typography variant="body2" color="text.secondary">Nenhum documento vinculado.</Typography>}
