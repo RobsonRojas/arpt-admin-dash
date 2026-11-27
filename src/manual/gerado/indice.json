@@ -52,7 +52,9 @@
     "/agente-ia"
    ],
    "specs": [
+    "admin-ai-agent",
     "admin-product-ai-translation",
+    "ai-pii-pseudonymization",
     "analytics",
     "arpt-ai",
     "configurable-ai-models",
@@ -612,6 +614,7 @@
     "producer-product-performance",
     "producer-product-pricing",
     "producer-product-registration",
+    "producer-project-product-copy",
     "producer-role-activation",
     "producer-role-activation-card",
     "producer-role-consistency",
@@ -624,6 +627,7 @@
     "wood-origin-help",
     "wood-origin-review",
     "wood-origin-storefront",
+    "wood-origin-tree-link",
     "wood-species-registry"
    ],
    "docs": []
