@@ -35,6 +35,17 @@ describe('Árvores ligadas à declaração', () => {
         expect(screen.getByTestId('arvore-inelegivel-2')).toHaveTextContent(/Deixou de ser elegível/);
     });
 
+    it('coordenada fora da faixa de graus é sinalizada e não gera link de mapa', async () => {
+        api.get.mockResolvedValue({ data: { ...detalhe(), arvores: [
+            { id: 3, numero: 42, especie: 'Macucu', projeto: 'P', licenca: { licenciado: false }, ponto: { lat: 9616364, lng: 187981.2 }, coordenada_invalida: true, inelegivel: false, excluida: false },
+        ] } });
+        render(<WoodDeclaration id={7} onBack={() => {}} />);
+        const bloco = await screen.findByTestId('arvores-da-declaracao');
+        expect(bloco).toHaveTextContent('9616364, 187981.2');
+        expect(screen.getByTestId('arvore-coordenada-invalida-3')).toHaveTextContent(/fora da faixa/);
+        expect(bloco.querySelector('a[href*="openstreetmap"], a[href*="maps"]')).toBeNull();
+    });
+
     it('sem árvores, o bloco não aparece', async () => {
         api.get.mockResolvedValue({ data: detalhe() });
         render(<WoodDeclaration id={7} onBack={() => {}} />);

@@ -134,8 +134,12 @@ export function WoodDeclaration({ id, onBack }) {
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
                                 Licença: {a.licenca?.licenciado ? `nº ${a.licenca.numero ?? '—'}, validade ${a.licenca.validade ?? 'sem validade'}` : 'projeto sem o selo Licenciado'}
-                                {a.ponto ? <> · ponto exato: {a.ponto.lat}, {a.ponto.lng} · <Link href={linkMapa(a.ponto.lat, a.ponto.lng)} target="_blank" rel="noreferrer">abrir no mapa</Link></> : ''}
+                                {a.ponto ? <> · ponto exato: {a.ponto.lat}, {a.ponto.lng}{a.coordenada_invalida ? '' : <> · <Link href={linkMapa(a.ponto.lat, a.ponto.lng)} target="_blank" rel="noreferrer">abrir no mapa</Link></>}</> : ''}
                             </Typography>
+                            {a.coordenada_invalida && (
+                                <Chip size="small" color="warning" sx={{ mt: 0.5, mr: 1 }} data-testid={`arvore-coordenada-invalida-${a.id}`}
+                                    label="Coordenada do inventário fora da faixa de graus (provavelmente UTM): corrija no inventário" />
+                            )}
                             {(a.inelegivel || a.excluida) && (
                                 <Chip size="small" color="warning" sx={{ mt: 0.5 }} data-testid={`arvore-inelegivel-${a.id}`}
                                     label={a.excluida ? 'Árvore excluída do inventário' : 'Deixou de ser elegível (licença vencida ou tipo incompatível)'} />
