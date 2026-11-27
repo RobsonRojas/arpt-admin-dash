@@ -40,7 +40,8 @@ export default function ImportFromProjectDialog({ open, produtorId, onClose, onI
     setProjeto(p); setProdutos(null); setSel([]); setPrevia(null); setErro('');
     try {
       const { data } = await api.get(`${BASE}/import-sources/projects/${p.id}/products`, { params: { destino: produtorId } });
-      setProdutos(data.data);
+      // Um produto em duas recompensas do projeto pode vir repetido: a chave e a seleção são por produto.
+      setProdutos(data.data.filter((x, i, a) => a.findIndex((y) => y.id === x.id) === i));
     } catch (err) { setErro(mensagemDeErro(err, 'Não foi possível carregar os produtos do projeto.')); }
   };
 
